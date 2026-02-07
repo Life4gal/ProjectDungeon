@@ -1,11 +1,5 @@
-// =====================================
-// SFML
-#include <SFML/Graphics.hpp>
+#include <pd/playground.hpp>
 
-// =====================================
-// IMGUI
-
-#include <imgui.h>
 #include <pd/external/imgui-SFML.hpp>
 
 #ifdef _WIN32
@@ -43,39 +37,44 @@ auto main() noexcept -> int
 	}
 
 	// 初始化场景
+	playground::Playground playground{};
 
 	while (window.isOpen())
 	{
 		while (const auto event = window.pollEvent())
 		{
-			ImGui::SFML::ProcessEvent(window, *event);
+			auto e = *event;
 
-			if (event->is<sf::Event::Closed>())
+			ImGui::SFML::ProcessEvent(window, e);
+
+			if (e.is<sf::Event::Closed>())
 			{
 				window.close();
 			}
 			else
 			{
-				// 处理事件
-				// todo
+				playground.handle_event(e);
 			}
 		}
 
 		const auto delta = delta_clock.restart();
+		const auto delta_seconds = delta.asSeconds();
 
 		// 更新游戏状态
 		ImGui::SFML::Update(window, delta);
 
 		// 更新场景
-		// todo
+		playground.update(delta_seconds);
 
-		ImGui::ShowDemoWindow();
+		// ImGui::ShowDemoWindow();
 
 		// 绘制
 		window.clear({35, 35, 35});
 
 		// 绘制场景
-		// todo
+		playground.render(window);
+		playground.show_info();
+
 		ImGui::SFML::Render(window);
 
 		window.display();

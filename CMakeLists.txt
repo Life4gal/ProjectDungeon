@@ -48,7 +48,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/defines.cmake)
 # ===================================================================================================
 # DEPENDENCIES
 
-#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/find_cpm.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/find_cpm.cmake)
 
 # SFML
 find_package(SFML 3 CONFIG REQUIRED COMPONENTS Graphics Audio)
@@ -62,7 +62,15 @@ find_package(imgui CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 
 # box2d
-find_package(box2d CONFIG REQUIRED)
+#find_package(box2d CONFIG REQUIRED)
+CPMAddPackage(
+		NAME box2d
+		GIT_TAG v2.4.2
+		GITHUB_REPOSITORY "erincatto/box2d"
+		OPTIONS 
+		"BOX2D_BUILD_UNIT_TESTS OFF"
+		"BOX2D_BUILD_TESTBED OFF"
+)
 
 # nlohmann::json
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -126,7 +134,7 @@ target_link_libraries(
 		${PD_SFML_LIBRARIES}
 		imgui::imgui
 		EnTT::EnTT
-		box2d::box2d
+		box2d
 		spdlog::spdlog
 )
 
@@ -134,12 +142,25 @@ set(
 		PD_PUBLIC_FILES
 
 		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/defines.hpp
+		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/constants.hpp
+		
+		# ============================
+		# UTILITY
+		# ============================
+
+		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/utility/enumeration.hpp
 
 		# ============================
 		# EXTERNAL
 		# ============================
 
 		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/external/imgui-SFML.hpp
+
+		# ============================
+		# MAIN
+		# ============================
+
+		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/playground.hpp
 )
 
 set(
