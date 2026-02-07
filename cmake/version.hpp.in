@@ -1,0 +1,52 @@
+#pragma once
+
+// =========================================================
+// VERSION
+// =========================================================
+
+#define PD_MAJOR_VERSION @PD_MAJOR_VERSION@
+#define PD_MINOR_VERSION @PD_MINOR_VERSION@
+#define PD_PATCH_VERSION @PD_PATCH_VERSION@
+#define PD_VERSION "@PD_VERSION@"
+
+#define PD_VERSION_STRING \
+    "@PROJECT_NAME@ v" PD_VERSION \
+    " (" PD_GIT_COMMIT_INFO_SHORT ")"
+
+// =========================================================
+// PLATFORM
+// =========================================================
+
+#define @PD_PLATFORM_NAME@
+
+// =========================================================
+// ARCHITECTURE
+// =========================================================
+
+#define @PD_ARCH_NAME@
+
+// =========================================================
+// COMPILER
+// =========================================================
+
+#define @PD_COMPILER_NAME@
+
+// =========================================================
+// BUILD TYPE
+// =========================================================
+
+#define PD_BUILD_TYPE "@CMAKE_BUILD_TYPE@"
+
+// =========================================================
+// GIT INFO
+// =========================================================
+
+#define PD_GIT_BRANCH_NAME "@PD_GIT_BRANCH_NAME@"
+#define PD_GIT_COMMIT_HASH "@PD_GIT_COMMIT_HASH@"
+#define PD_GIT_COMMIT_DATE "@PD_GIT_COMMIT_DATE@"
+#define PD_GIT_DIRTY_FLAG "@PD_GIT_DIRTY_FLAG@"
+#define PD_GIT_DIRTY_STATUS "@PD_GIT_DIRTY_STATUS@"
+#define PD_GIT_TAG "@PD_GIT_TAG@"
+#define PD_GIT_COMMIT_INFO "@PD_GIT_COMMIT_INFO@"
+#define PD_GIT_COMMIT_INFO_SHORT "@PD_GIT_COMMIT_INFO_SHORT@"
+#define PD_GIT_COMMIT_INFO_FULL "@PD_GIT_COMMIT_INFO_FULL@"
