@@ -6,6 +6,7 @@
 #pragma once
 
 #include <algorithm>
+#include <ranges>
 #include <print>
 
 #include <box2d/box2d.h>
@@ -14,25 +15,34 @@
 
 #include <imgui.h>
 
+#include <pd/defines.hpp>
 #include <pd/constants.hpp>
 #include <pd/utility/enumeration.hpp>
 
 namespace playground
 {
-	enum class EntityType : std::uint8_t
+	enum class EntityType : std::uint16_t
 	{
+		// [0~3]
+
 		// 墙
-		WALL = 0b0000'0001,
+		WALL = 0b0000'0000'0000'0001,
+		// 地板
+		FLOOR = 0b0000'0000'0000'0010,
 		// 地形/装饰物
-		DECORATION = 0b0000'0010,
+		DECORATION = 0b0000'0000'0000'0100,
+
+		// [4~7]
 
 		// 敌人实体
-		ENEMY = 0b0000'0100,
+		ENEMY = 0b0000'0000'0001'0000,
 		// 玩家实体
-		PLAYER = 0b0000'1000,
+		PLAYER = 0b0000'0000'0010'0000,
+
+		// [8~11]
 
 		// 飞弹
-		PROJECTILE = 0b0001'0000,
+		PROJECTILE = 0b0000'0001'0000'0000,
 
 		PD_MAGIC_ENUM_FLAG
 	};
@@ -67,8 +77,8 @@ namespace playground
 	class PhysicsDesc final // NOLINT(clang-diagnostic-padded)
 	{
 	public:
+		// 类型
 		b2BodyType type;
-
 		// 是否可旋转
 		bool can_rotate;
 		// 开启连续碰撞检测
@@ -83,13 +93,15 @@ namespace playground
 		b2Vec2 size;
 
 		// 形状
-		b2Shape* shape;
+		std::unique_ptr<b2Shape> shape;
 		// 密度
 		float density;
 		// 摩擦力
 		float friction;
 		// 弹性
 		float restitution;
+		// 是否是传感器(传感器可以接触,而不是碰撞)
+		bool is_sensor;
 
 		// 碰撞过滤类型
 		EntityType category;
@@ -127,10 +139,11 @@ namespace playground
 			// 创建FIXTURE
 			{
 				b2FixtureDef fixture_def{};
-				fixture_def.shape = desc.shape;
+				fixture_def.shape = desc.shape.get();
 				fixture_def.density = desc.density;
 				fixture_def.friction = desc.friction;
 				fixture_def.restitution = desc.restitution;
+				fixture_def.isSensor = desc.is_sensor;
 
 				fixture_def.filter.categoryBits = static_cast<uint16>(desc.category);
 				fixture_def.filter.maskBits = static_cast<uint16>(desc.category_mask);
@@ -161,6 +174,9 @@ namespace playground
 
 		virtual ~Entity() noexcept
 		{
+			// 避免ContactListener::EndContact出问题
+			body_->GetUserData().pointer = 0;
+
 			auto* world = body_->GetWorld();
 			world->DestroyBody(body_);
 		}
@@ -198,6 +214,11 @@ namespace playground
 			return shape_.getPosition();
 		}
 
+		[[nodiscard]] auto get_size() const noexcept -> sf::Vector2f
+		{
+			return shape_.getSize();
+		}
+
 		[[nodiscard]] auto get_velocity() const noexcept -> sf::Vector2f
 		{
 			const auto v = body_->GetLinearVelocity();
@@ -219,10 +240,10 @@ namespace playground
 	private:
 		[[nodiscard]] static auto make_desc(const sf::Vector2f start_position, const sf::Vector2f size) noexcept -> PhysicsDesc
 		{
-			static auto shape = [bs = 0.5f * pd::Constant::to_physics(size)]-> b2PolygonShape
+			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
 			{
-				b2PolygonShape s{};
-				s.SetAsBox(bs.x, bs.y);
+				auto s = std::make_unique<b2PolygonShape>();
+				s->SetAsBox(bs.x, bs.y);
 				return s;
 			}();
 
@@ -231,16 +252,21 @@ namespace playground
 					.type = b2_dynamicBody,
 					.can_rotate = false,
 					.is_bullet = false,
-					.linear_damping = 1,
+					.linear_damping = 5,
 					.initial_position = {start_position.x, start_position.y},
 					.initial_velocity = {0, 0},
 					.size = {size.x, size.y},
-					.shape = &shape,
+					.shape = std::move(shape),
 					.density = 1,
 					.friction = 0.3f,
 					.restitution = 0.05f,
+					.is_sensor = false,
 					.category = EntityType::PLAYER,
-					.category_mask = EntityType::WALL | EntityType::DECORATION,
+					// 可以和墙壁/地板/装饰物/敌人/玩家/飞弹碰撞
+					.category_mask =
+					EntityType::WALL | EntityType::FLOOR | EntityType::DECORATION |
+					EntityType::ENEMY | EntityType::PLAYER |
+					EntityType::PROJECTILE,
 			};
 		}
 
@@ -281,10 +307,10 @@ namespace playground
 	private:
 		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const sf::Vector2f size) noexcept -> PhysicsDesc
 		{
-			static auto shape = [bs = 0.5f * pd::Constant::to_physics(size)]-> b2PolygonShape
+			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
 			{
-				b2PolygonShape s{};
-				s.SetAsBox(bs.x, bs.y);
+				auto s = std::make_unique<b2PolygonShape>();
+				s->SetAsBox(bs.x, bs.y);
 				return s;
 			}();
 
@@ -297,12 +323,16 @@ namespace playground
 					.initial_position = {position.x, position.y},
 					.initial_velocity = {0, 0},
 					.size = {size.x, size.y},
-					.shape = &shape,
+					.shape = std::move(shape),
 					.density = 0,
 					.friction = 0.5f,
 					.restitution = 0.7f,
+					.is_sensor = false,
 					.category = EntityType::WALL,
-					.category_mask = EntityType::ENEMY | EntityType::PLAYER | EntityType::PROJECTILE,
+					// 可以和敌人/玩家/飞弹碰撞
+					.category_mask =
+					EntityType::ENEMY | EntityType::PLAYER |
+					EntityType::PROJECTILE,
 			};
 		}
 
@@ -320,6 +350,159 @@ namespace playground
 		}
 	};
 
+	// 地板
+	class FloorEntity : public Entity
+	{
+	public:
+		enum class Type : std::uint8_t
+		{
+			// 普通地板
+			NORMAL,
+			// 冰地板 - 低摩擦力,高弹性
+			ICE,
+			// 泥地板 - 高摩擦力,低弹性
+			MUD,
+			// 粘性地板 - 高线性阻尼
+			STICKY,
+			// 弹跳地板 - 高弹性
+			BOUNCE,
+		};
+
+	private:
+		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const sf::Vector2f size, const Type type) -> PhysicsDesc
+		{
+			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
+			{
+				auto s = std::make_unique<b2PolygonShape>();
+				s->SetAsBox(bs.x, bs.y);
+				return s;
+			}();
+
+			float friction = 1;
+			float restitution = 0;
+			switch (type)
+			{
+				case Type::NORMAL:
+				{
+					friction = 0.5f;
+					restitution = 0.2f;
+					break;
+				}
+				case Type::ICE:
+				{
+					// 低摩擦力
+					friction = 0.05f;
+					// 稍高弹性
+					restitution = 0.3f;
+					break;
+				}
+				case Type::MUD:
+				{
+					// 高摩擦力
+					friction = 0.9f;
+					// 低弹性
+					restitution = 0.1f;
+					break;
+				}
+				case Type::STICKY:
+				{
+					// 最高摩擦力
+					friction = 1.0f;
+					// 几乎无弹性
+					restitution = 0.05f;
+					break;
+				}
+				case Type::BOUNCE:
+				{
+					// 中等摩擦力
+					friction = 0.3f;
+					// 高弹性
+					restitution = 0.8f;
+					break;
+				}
+			}
+
+			return
+			{
+					.type = b2_staticBody,
+					.can_rotate = false,
+					.is_bullet = false,
+					.linear_damping = 0.f,
+					.initial_position = {position.x, position.y},
+					.initial_velocity = {0, 0},
+					.size = {size.x, size.y},
+					.shape = std::move(shape),
+					.density = 0,
+					.friction = friction,
+					.restitution = restitution,
+					.is_sensor = true,
+					.category = EntityType::FLOOR,
+					// 可以和敌人/玩家碰撞
+					.category_mask = EntityType::ENEMY | EntityType::PLAYER,
+			};
+		}
+
+	public:
+		FloorEntity(b2World& world, const sf::Vector2f position, const sf::Vector2f size, const Type type) noexcept
+			: Entity{world, RenderLayer::FLOOR, make_desc(position, size, type)}
+		{
+			// 地板颜色
+			switch (type)
+			{
+				case Type::NORMAL:
+				{
+					// 绿色
+					shape_.setFillColor(sf::Color::Green);
+					// 深绿色边框
+					shape_.setOutlineColor(sf::Color(0, 150, 0));
+					shape_.setOutlineThickness(1.0f);
+					break;
+				}
+				case Type::ICE:
+				{
+					// 淡蓝色
+					shape_.setFillColor(sf::Color(200, 230, 255));
+					// 蓝色边框
+					shape_.setOutlineColor(sf::Color(150, 200, 255));
+					shape_.setOutlineThickness(1.0f);
+					break;
+				}
+				case Type::MUD:
+				{
+					// 泥棕色
+					shape_.setFillColor(sf::Color(101, 67, 33));
+					// 深棕色边框
+					shape_.setOutlineColor(sf::Color(81, 47, 13));
+					shape_.setOutlineThickness(1.0f);
+					break;
+				}
+				case Type::STICKY:
+				{
+					// 粉色
+					shape_.setFillColor(sf::Color(255, 150, 200));
+					// 深粉色边框
+					shape_.setOutlineColor(sf::Color(235, 130, 180));
+					shape_.setOutlineThickness(1.0f);
+					break;
+				}
+				case Type::BOUNCE:
+				{
+					// 淡黄色
+					shape_.setFillColor(sf::Color(255, 255, 150));
+					// 黄色边框
+					shape_.setOutlineColor(sf::Color(235, 235, 130));
+					shape_.setOutlineThickness(1.0f);
+					break;
+				}
+			}
+		}
+
+		auto type() const noexcept -> EntityType override
+		{
+			return EntityType::FLOOR;
+		}
+	};
+
 	// 地形/装饰物
 	class DecorationEntity : public Entity
 	{
@@ -329,10 +512,10 @@ namespace playground
 	private:
 		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const sf::Vector2f size) noexcept -> PhysicsDesc
 		{
-			static auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] -> b2PolygonShape
+			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
 			{
-				b2PolygonShape s{};
-				s.SetAsBox(bs.x, bs.y);
+				auto s = std::make_unique<b2PolygonShape>();
+				s->SetAsBox(bs.x, bs.y);
 				return s;
 			}();
 
@@ -345,11 +528,14 @@ namespace playground
 					.initial_position = {position.x, position.y},
 					.initial_velocity = {0, 0},
 					.size = {size.x, size.y},
-					.shape = &shape,
+					.shape = std::move(shape),
 					.density = 0,
 					.friction = 0.35f,
 					.restitution = 0.4f,
+					.is_sensor = false,
 					.category = EntityType::DECORATION,
+					// 可以和敌人/玩家/飞弹碰撞
+					// todo: 如果是一个可以移动的装饰物呢?如果可以移动,则还可以和墙壁/装饰物碰撞
 					.category_mask = EntityType::ENEMY | EntityType::PLAYER | EntityType::PROJECTILE,
 			};
 		}
@@ -391,10 +577,10 @@ namespace playground
 
 		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const float radius, sf::Vector2f velocity) noexcept -> PhysicsDesc
 		{
-			static auto shape = [r = 0.5f * pd::Constant::to_physics(radius)] -> b2CircleShape
+			auto shape = [r = pd::Constant::to_physics(radius)] noexcept -> std::unique_ptr<b2CircleShape>
 			{
-				b2CircleShape s{};
-				s.m_radius = r;
+				auto s = std::make_unique<b2CircleShape>();
+				s->m_radius = r;
 				return s;
 			}();
 
@@ -406,13 +592,17 @@ namespace playground
 					.linear_damping = 0.05f,
 					.initial_position = {position.x, position.y},
 					.initial_velocity = {velocity.x, velocity.y},
-					.size = {radius, radius},
-					.shape = &shape,
+					.size = {radius * 2, radius * 2},
+					.shape = std::move(shape),
 					.density = 0.5f,
 					.friction = 0,
 					.restitution = 0.8f,
+					.is_sensor = false,
 					.category = EntityType::PROJECTILE,
-					.category_mask = EntityType::ENEMY | EntityType::PLAYER | EntityType::WALL | EntityType::DECORATION,
+					// 可以和墙壁/装饰物敌人/玩家/碰撞
+					.category_mask =
+					EntityType::WALL | EntityType::DECORATION |
+					EntityType::ENEMY | EntityType::PLAYER,
 			};
 		}
 
@@ -459,7 +649,8 @@ namespace playground
 			if (destroy_on_next_collision_)
 			{
 				if (const auto velocity = body_->GetLinearVelocity();
-					velocity.LengthSquared() < 1)
+					// todo: 低速阈值
+					velocity.LengthSquared() < 8 * 8)
 				{
 					active_ = false;
 				}
@@ -473,6 +664,7 @@ namespace playground
 			// 添加拖尾效果
 
 			const auto position = shape_.getPosition();
+			const auto radius = shape_.getSize().x;
 
 			auto velocity = body_->GetLinearVelocity();
 			velocity.Normalize();
@@ -480,9 +672,9 @@ namespace playground
 			const auto direction = sf::Vector2f{velocity.x, velocity.y};
 			const auto left_perpendicular = sf::Vector2f{-direction.y, direction.x};
 
-			tail_.setPoint(0, position + direction * 5.f);
-			tail_.setPoint(1, position - direction * 10.f + left_perpendicular * 5.f);
-			tail_.setPoint(2, position - direction * 10.f - left_perpendicular * 5.f);
+			tail_.setPoint(0, position + direction * radius);
+			tail_.setPoint(1, position - direction * (radius * 2) + left_perpendicular * radius);
+			tail_.setPoint(2, position - direction * (radius * 2) - left_perpendicular * radius);
 
 			window.draw(tail_);
 		}
@@ -496,17 +688,32 @@ namespace playground
 				// 达到最大反弹次数后,标记为下次碰撞时销毁
 				destroy_on_next_collision_ = true;
 
-				// 减少弹性, 让飞弹逐渐停止
-				for (auto* f = body_->GetFixtureList(); f; f = f->GetNext())
-				{
-					f->SetRestitution(0.3f);
-				}
+				// 进一步降低弹性,让飞弹更快停止
+				// for (auto* f = body_->GetFixtureList(); f; f = f->GetNext())
+				// {
+				// 	f->SetRestitution(0.1f);
+				// }
+			}
+
+			// 每次反弹都稍微降低弹性
+			for (auto* f = body_->GetFixtureList(); f; f = f->GetNext())
+			{
+				// todo: 弹性减少系数
+				const auto restitution = f->GetRestitution();
+				f->SetRestitution(restitution * 0.9f);
 			}
 
 			// 每次反弹后稍微减少速度
-			const auto velocity = body_->GetLinearVelocity();
+			auto velocity = body_->GetLinearVelocity();
 			// todo: 减速系数
-			body_->SetLinearVelocity(0.85f * velocity);
+			// 减速系数可以随着反弹次数增加而增大
+			constexpr auto slowdown_factor_default = 0.95f;
+			auto slowdown_factor = slowdown_factor_default - (bounces_current_ * 0.05f);
+			// 不低于0.3倍
+			slowdown_factor = std::ranges::max(slowdown_factor, 0.3f);
+			// 设置速度
+			velocity *= slowdown_factor;
+			body_->SetLinearVelocity(std::ranges::max(slowdown_factor, 0.3f) * velocity);
 		}
 	};
 
@@ -534,11 +741,45 @@ namespace playground
 			auto* entity_a = reinterpret_cast<Entity*>(body_a->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
 			auto* entity_b = reinterpret_cast<Entity*>(body_b->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
 
+			PD_ASSERT(entity_a != nullptr and entity_b != nullptr);
+
 			const auto type_a = entity_a->type();
 			const auto type_b = entity_b->type();
 
+			// 踩中地板
+			if (type_a == EntityType::FLOOR or type_b == EntityType::FLOOR)
+			{
+				const auto handle_projectile_collision = [this]<typename T>(const FloorEntity* floor, T* entity) noexcept -> void //
+							requires std::is_same_v<T, PlayerEntity> // or std::is_same_v<T, EnemyEntity>
+				{
+					// todo: 引用地板的效果
+					std::ignore = floor;
+					std::ignore = entity;
+				};
+
+				if (type_a == EntityType::FLOOR)
+				{
+					std::println("接触地板: A: FLOOR, B: {}", type_b == EntityType::ENEMY ? "ENEMY" : "PLAYER");
+
+					handle_projectile_collision(
+						static_cast<const FloorEntity*>(entity_a),
+						// type_b == EntityType::ENEMY ? static_cast<EnemyEntity*>(entity_b) : static_cast<PlayerEntity*>(entity_b)
+						static_cast<PlayerEntity*>(entity_b)
+					);
+				}
+				else
+				{
+					std::println("接触地板: A: {}, B: FLOOR", type_a == EntityType::ENEMY ? "ENEMY" : "PLAYER");
+
+					handle_projectile_collision(
+						static_cast<const FloorEntity*>(entity_b),
+						// type_a == EntityType::ENEMY ? static_cast<EnemyEntity*>(entity_a) : static_cast<PlayerEntity*>(entity_a)
+						static_cast<PlayerEntity*>(entity_a)
+					);
+				}
+			}
 			// 飞弹碰撞
-			if (type_a == EntityType::PROJECTILE or type_b == EntityType::PROJECTILE)
+			else if (type_a == EntityType::PROJECTILE or type_b == EntityType::PROJECTILE)
 			{
 				const auto handle_projectile_collision = [this](ProjectileEntity* projectile, const Entity* entity) noexcept -> void
 				{
@@ -549,28 +790,72 @@ namespace playground
 					{
 						// 触发反弹
 						projectile->on_bounce();
-
-						std::println("命中WALL/DECORATION");
+						std::println("命中{}", type == EntityType::WALL ? "WALL" : "DECORATION");
 					}
 					else if (type == EntityType::ENEMY)
 					{
 						std::println("命中ENEMY");
+						// 命中后直接销毁飞弹
 						inactive_entities_.push_back(projectile);
 					}
 					else if (type == EntityType::PLAYER)
 					{
-						std::println("命中Player");
+						std::println("命中PLAYER");
+						// 命中后直接销毁飞弹
 						inactive_entities_.push_back(projectile);
 					}
 				};
 
 				if (type_a == EntityType::PROJECTILE)
 				{
-					handle_projectile_collision(static_cast<ProjectileEntity*>(entity_a), entity_b); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+					handle_projectile_collision(
+						static_cast<ProjectileEntity*>(entity_a),
+						// NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+						entity_b
+					);
 				}
 				else
 				{
-					handle_projectile_collision(static_cast<ProjectileEntity*>(entity_b), entity_a); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+					handle_projectile_collision(
+						static_cast<ProjectileEntity*>(entity_b),
+						// NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+						entity_a
+					);
+				}
+			}
+		}
+
+		void EndContact(b2Contact* contact) override
+		{
+			const auto* fixture_a = contact->GetFixtureA();
+			const auto* fixture_b = contact->GetFixtureB();
+
+			const auto* body_a = fixture_a->GetBody();
+			const auto* body_b = fixture_b->GetBody();
+
+			auto* entity_a = reinterpret_cast<Entity*>(body_a->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
+			auto* entity_b = reinterpret_cast<Entity*>(body_b->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
+
+			// todo: Entity::~Entity销毁body时也会调用该函数,此时再调用Entity的接口将会出问题
+			// PD_ASSERT(entity_a != nullptr and entity_b != nullptr);
+			if (entity_a == nullptr or entity_b == nullptr)
+			{
+				return;
+			}
+
+			const auto type_a = entity_a->type();
+			const auto type_b = entity_b->type();
+
+			// 离开地板
+			if (type_a == EntityType::FLOOR or type_b == EntityType::FLOOR)
+			{
+				if (type_a == EntityType::FLOOR)
+				{
+					std::println("离开地板: A: FLOOR, B: {}", type_b == EntityType::ENEMY ? "ENEMY" : "PLAYER");
+				}
+				else
+				{
+					std::println("离开地板: A: {}, B: FLOOR", type_a == EntityType::ENEMY ? "ENEMY" : "PLAYER");
 				}
 			}
 		}
@@ -632,22 +917,116 @@ namespace playground
 			entities_.emplace_back(std::move(right_wall));
 		}
 
+		auto create_floor() noexcept -> void
+		{
+			constexpr auto size = sf::Vector2f{50, 50};
+			constexpr std::array normal_positions
+			{
+					sf::Vector2f{400 + 0 * size.x, 150},
+					sf::Vector2f{400 + 1 * size.x, 150},
+					sf::Vector2f{400 + 2 * size.x, 150},
+					sf::Vector2f{400 + 3 * size.x, 150},
+					sf::Vector2f{400 + 4 * size.x, 150},
+					sf::Vector2f{400 + 5 * size.x, 150},
+					sf::Vector2f{400 + 6 * size.x, 150},
+					sf::Vector2f{400 + 7 * size.x, 150},
+					sf::Vector2f{400 + 8 * size.x, 150},
+					sf::Vector2f{400 + 9 * size.x, 150},
+			};
+			constexpr std::array ice_positions
+			{
+					sf::Vector2f{400 + 0 * size.x, 250},
+					sf::Vector2f{400 + 1 * size.x, 250},
+					sf::Vector2f{400 + 2 * size.x, 250},
+					sf::Vector2f{400 + 3 * size.x, 250},
+					sf::Vector2f{400 + 4 * size.x, 250},
+					sf::Vector2f{400 + 5 * size.x, 250},
+					sf::Vector2f{400 + 6 * size.x, 250},
+					sf::Vector2f{400 + 7 * size.x, 250},
+					sf::Vector2f{400 + 8 * size.x, 250},
+					sf::Vector2f{400 + 9 * size.x, 250},
+			};
+			constexpr std::array mud_positions
+			{
+					sf::Vector2f{400 + 0 * size.x, 350},
+					sf::Vector2f{400 + 1 * size.x, 350},
+					sf::Vector2f{400 + 2 * size.x, 350},
+					sf::Vector2f{400 + 3 * size.x, 350},
+					sf::Vector2f{400 + 4 * size.x, 350},
+					sf::Vector2f{400 + 5 * size.x, 350},
+					sf::Vector2f{400 + 6 * size.x, 350},
+					sf::Vector2f{400 + 7 * size.x, 350},
+					sf::Vector2f{400 + 8 * size.x, 350},
+					sf::Vector2f{400 + 9 * size.x, 350},
+			};
+			constexpr std::array sticky_positions
+			{
+					sf::Vector2f{400 + 0 * size.x, 450},
+					sf::Vector2f{400 + 1 * size.x, 450},
+					sf::Vector2f{400 + 2 * size.x, 450},
+					sf::Vector2f{400 + 3 * size.x, 450},
+					sf::Vector2f{400 + 4 * size.x, 450},
+					sf::Vector2f{400 + 5 * size.x, 450},
+					sf::Vector2f{400 + 6 * size.x, 450},
+					sf::Vector2f{400 + 7 * size.x, 450},
+					sf::Vector2f{400 + 8 * size.x, 450},
+					sf::Vector2f{400 + 9 * size.x, 450},
+			};
+			constexpr std::array bounce_positions
+			{
+					sf::Vector2f{400 + 0 * size.x, 550},
+					sf::Vector2f{400 + 1 * size.x, 550},
+					sf::Vector2f{400 + 2 * size.x, 550},
+					sf::Vector2f{400 + 3 * size.x, 550},
+					sf::Vector2f{400 + 4 * size.x, 550},
+					sf::Vector2f{400 + 5 * size.x, 550},
+					sf::Vector2f{400 + 6 * size.x, 550},
+					sf::Vector2f{400 + 7 * size.x, 550},
+					sf::Vector2f{400 + 8 * size.x, 550},
+					sf::Vector2f{400 + 9 * size.x, 550},
+			};
+
+			auto do_create = [this, size](const auto& positions, const FloorEntity::Type type) noexcept -> void
+			{
+				for (const auto position: positions)
+				{
+					auto entity = std::make_unique<FloorEntity>(*physics_world_, position, size, type);
+					entities_.emplace_back(std::move(entity));
+				}
+			};
+
+			do_create(normal_positions, FloorEntity::Type::NORMAL);
+			do_create(ice_positions, FloorEntity::Type::ICE);
+			do_create(mud_positions, FloorEntity::Type::MUD);
+			do_create(sticky_positions, FloorEntity::Type::STICKY);
+			do_create(bounce_positions, FloorEntity::Type::BOUNCE);
+		}
+
 		auto create_decoration() noexcept -> void
 		{
+			constexpr auto size = sf::Vector2f{50, 50};
 			constexpr std::array positions
 			{
-					sf::Vector2f{400, 300},
-					sf::Vector2f{800, 500},
-					sf::Vector2f{1200, 400},
-					sf::Vector2f{600, 700},
-					sf::Vector2f{1200, 600},
-					sf::Vector2f{1600, 900},
+					// 左
+					sf::Vector2f{1200, 150 + 0 * (2 * size.y)},
+					sf::Vector2f{1200, 150 + 1 * (2 * size.y)},
+					sf::Vector2f{1200, 150 + 2 * (2 * size.y)},
+					sf::Vector2f{1200, 150 + 3 * (2 * size.y)},
+					sf::Vector2f{1200, 150 + 4 * (2 * size.y)},
+					sf::Vector2f{1200, 150 + 5 * (2 * size.y)},
+					// 右
+					sf::Vector2f{1400, 200 + 0 * (2 * size.y)},
+					sf::Vector2f{1400, 200 + 1 * (2 * size.y)},
+					sf::Vector2f{1400, 200 + 2 * (2 * size.y)},
+					sf::Vector2f{1400, 200 + 3 * (2 * size.y)},
+					sf::Vector2f{1400, 200 + 4 * (2 * size.y)},
+					sf::Vector2f{1400, 200 + 5 * (2 * size.y)},
 			};
 
 			for (const auto position: positions)
 			{
 				// todo: 障碍物大小
-				auto decoration = std::make_unique<DecorationEntity>(*physics_world_, position, sf::Vector2f{50, 50});
+				auto decoration = std::make_unique<DecorationEntity>(*physics_world_, position, size);
 				entities_.emplace_back(std::move(decoration));
 			}
 		}
@@ -682,6 +1061,9 @@ namespace playground
 
 			// 创建房间墙壁
 			create_room();
+
+			// 创建地板
+			create_floor();
 
 			// 创建地形/装饰物
 			create_decoration();
@@ -743,11 +1125,14 @@ namespace playground
 				if (mbp->button == sf::Mouse::Button::Left)
 				{
 					const auto player_position = player_->get_position();
+					const auto player_size = player_->get_size();
 					const auto target_position = sf::Vector2f{mbp->position};
 
 					const auto direction = target_position - player_position;
 					const auto direction_normalized = direction.normalized();
-					const auto spawn_position = player_position + direction_normalized * 30.f;
+					// 偏移一定要足够,避免发射时直接碰撞本体
+					const auto offset = sf::Vector2f{direction_normalized.x * player_size.x, direction_normalized.y * player_size.y};
+					const auto spawn_position = player_position + offset;
 
 					auto projectile = std::make_unique<ProjectileEntity>(
 						*physics_world_,
@@ -837,12 +1222,12 @@ namespace playground
 
 		auto show_info() noexcept -> void
 		{
-			ImGui::Begin("物理调试信息");
+			ImGui::Begin("物理调试信息", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
 			// 显示实体数量
 			ImGui::Text("实体数量: %zu", entities_.size());
 
-			// 显示玩家位置/速度
+			// 显示玩家信息
 			{
 				const auto position = player_->get_position();
 				const auto velocity = player_->get_velocity();
@@ -850,10 +1235,49 @@ namespace playground
 				ImGui::Text("玩家位置: (%.1f, %.1f), 玩家速度: (%.1f, %.1f)", position.x, position.y, velocity.x, velocity.y);
 			}
 
+			// 显示敌人信息
+			{
+				const auto count = std::ranges::count(entities_, EntityType::ENEMY, &Entity::type);
+				ImGui::Text("活动敌人: %td", count);
+
+				std::ranges::for_each(
+					entities_ | std::views::filter(
+						[](const auto& entity) noexcept -> bool
+						{
+							return entity->type() == EntityType::ENEMY;
+						}
+					),
+					[](const auto& entity) noexcept -> void
+					{
+						const auto position = entity->get_position();
+						const auto velocity = entity->get_velocity();
+
+						ImGui::Text("敌人位置: (%.1f, %.1f), 敌人速度: (%.1f, %.1f)", position.x, position.y, velocity.x, velocity.y);
+					}
+				);
+			}
+
 			// 显示飞弹信息
 			{
 				const auto count = std::ranges::count(entities_, EntityType::PROJECTILE, &Entity::type);
 				ImGui::Text("活动飞弹: %td", count);
+
+				std::ranges::for_each(
+					entities_ |
+					std::views::filter(
+						[](const auto& entity) noexcept -> bool
+						{
+							return entity->type() == EntityType::PROJECTILE;
+						}
+					),
+					[](const auto& entity) noexcept -> void
+					{
+						const auto position = entity->get_position();
+						const auto velocity = entity->get_velocity();
+
+						ImGui::Text("飞弹位置: (%.1f, %.1f), 飞弹速度: (%.1f, %.1f)", position.x, position.y, velocity.x, velocity.y);
+					}
+				);
 			}
 
 			ImGui::End();
