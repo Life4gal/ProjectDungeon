@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <random>
 #include <print>
 
 #include <box2d/box2d.h>
@@ -74,97 +75,21 @@ namespace playground
 		return static_cast<std::uint32_t>(lhs) < static_cast<std::uint32_t>(rhs);
 	}
 
-	class PhysicsDesc final // NOLINT(clang-diagnostic-padded)
-	{
-	public:
-		// 类型
-		b2BodyType type;
-		// 是否可旋转
-		bool can_rotate;
-		// 开启连续碰撞检测
-		bool is_bullet;
-		// 阻尼(平滑移动)
-		float linear_damping;
-		// 初始(像素)位置
-		b2Vec2 initial_position;
-		// (像素)初速度
-		b2Vec2 initial_velocity;
-		// (像素)大小
-		b2Vec2 size;
-
-		// 形状
-		std::unique_ptr<b2Shape> shape;
-		// 密度
-		float density;
-		// 摩擦力
-		float friction;
-		// 弹性
-		float restitution;
-		// 是否是传感器(传感器可以接触,而不是碰撞)
-		bool is_sensor;
-
-		// 碰撞过滤类型
-		EntityType category;
-		// 碰撞遮罩
-		EntityType category_mask;
-	};
-
 	class Entity
 	{
 	protected:
-		b2Body* body_;
-
 		// box2d --> 米
 		// SFML --> 像素
-		sf::RectangleShape shape_;
+		b2Body* body_;
 
 		bool active_;
 		RenderLayer render_layer_;
 
-	private:
-		auto create_physics(b2World& world, const PhysicsDesc& desc) noexcept -> void
-		{
-			// 创建BODY
-			{
-				b2BodyDef body_def{};
-				body_def.type = desc.type;
-				body_def.position = pd::Constant::to_physics(desc.initial_position);
-				body_def.linearVelocity = pd::Constant::to_physics(desc.initial_velocity);
-				body_def.fixedRotation = not desc.can_rotate;
-				body_def.bullet = desc.is_bullet;
-				body_def.linearDamping = desc.linear_damping;
-
-				body_ = world.CreateBody(&body_def);
-			}
-			// 创建FIXTURE
-			{
-				b2FixtureDef fixture_def{};
-				fixture_def.shape = desc.shape.get();
-				fixture_def.density = desc.density;
-				fixture_def.friction = desc.friction;
-				fixture_def.restitution = desc.restitution;
-				fixture_def.isSensor = desc.is_sensor;
-
-				fixture_def.filter.categoryBits = static_cast<uint16>(desc.category);
-				fixture_def.filter.maskBits = static_cast<uint16>(desc.category_mask);
-
-				body_->CreateFixture(&fixture_def);
-				body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
-			}
-		}
-
 	public:
-		Entity(b2World& world, const RenderLayer render_layer, const PhysicsDesc& desc) noexcept
+		explicit Entity(const RenderLayer render_layer) noexcept
 			: body_{nullptr},
-			  shape_{{desc.size.x, desc.size.y}},
 			  active_{true},
-			  render_layer_{render_layer}
-		{
-			// 中心对齐
-			shape_.setOrigin(shape_.getSize() / 2.f);
-
-			create_physics(world, desc);
-		}
+			  render_layer_{render_layer} {}
 
 		Entity(const Entity&) noexcept = delete;
 		auto operator=(const Entity&) noexcept -> Entity& = delete;
@@ -181,271 +106,375 @@ namespace playground
 			world->DestroyBody(body_);
 		}
 
-		virtual auto type() const noexcept -> EntityType = 0;
+		[[nodiscard]] virtual auto type() const noexcept -> EntityType = 0;
 
-		virtual auto update(const float delta) noexcept -> void
-		{
-			// 同步box2d世界的位置
-			const auto position = body_->GetPosition();
+		virtual auto update(float delta) noexcept -> void = 0;
 
-			shape_.setPosition(pd::Constant::from_physics(position));
-		}
-
-		virtual auto render(sf::RenderWindow& window) noexcept -> void
-		{
-			if (not active_)
-			{
-				return;
-			}
-
-			const auto radians = body_->GetAngle();
-			shape_.setRotation(sf::radians(radians));
-
-			window.draw(shape_);
-		}
+		virtual auto render(sf::RenderWindow& window) noexcept -> void = 0;
 
 		[[nodiscard]] auto is_active() const noexcept -> bool
 		{
 			return active_;
 		}
 
-		[[nodiscard]] auto get_position() const noexcept -> sf::Vector2f
-		{
-			return shape_.getPosition();
-		}
-
-		[[nodiscard]] auto get_size() const noexcept -> sf::Vector2f
-		{
-			return shape_.getSize();
-		}
-
-		[[nodiscard]] auto get_velocity() const noexcept -> sf::Vector2f
-		{
-			const auto v = body_->GetLinearVelocity();
-			return pd::Constant::from_physics(v);
-		}
-
-		[[nodiscard]] auto get_render_layer() const noexcept -> RenderLayer
+		[[nodiscard]] auto render_layer() const noexcept -> RenderLayer
 		{
 			return render_layer_;
 		}
 	};
 
-	// 玩家
-	class PlayerEntity : public Entity
+	class ActorEntity : public Entity
 	{
 	public:
 		//
 
 	private:
-		[[nodiscard]] static auto make_desc(const sf::Vector2f start_position, const sf::Vector2f size) noexcept -> PhysicsDesc
+		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size, const EntityType type) noexcept -> b2Body*
 		{
-			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
+			b2Body* body;
+			// 创建BODY
 			{
-				auto s = std::make_unique<b2PolygonShape>();
-				s->SetAsBox(bs.x, bs.y);
-				return s;
-			}();
+				const auto physics_position = pd::Constant::to_physics(position);
 
-			return
+				b2BodyDef def{};
+				def.type = b2_dynamicBody;
+				def.position = physics_position;
+				// todo: 需不需要可以旋转?
+				def.fixedRotation = true;
+				def.linearDamping = 5;
+
+				body = world.CreateBody(&def);
+			}
+			// 创建FIXTURE
 			{
-					.type = b2_dynamicBody,
-					.can_rotate = false,
-					.is_bullet = false,
-					.linear_damping = 5,
-					.initial_position = {start_position.x, start_position.y},
-					.initial_velocity = {0, 0},
-					.size = {size.x, size.y},
-					.shape = std::move(shape),
-					.density = 1,
-					.friction = 0.3f,
-					.restitution = 0.05f,
-					.is_sensor = false,
-					.category = EntityType::PLAYER,
-					// 可以和墙壁/地板/装饰物/敌人/玩家/飞弹碰撞
-					.category_mask =
+				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(physics_size.x, physics_size.y);
+
+				b2FixtureDef def{};
+				def.shape = &shape;
+				def.density = 1;
+				def.friction = 0.3f;
+				def.restitution = 0.05f;
+				def.filter.categoryBits = static_cast<uint16>(type);
+				// 可以和墙壁/地板/装饰物/敌人/玩家/飞弹碰撞
+				def.filter.maskBits = static_cast<uint16>(
 					EntityType::WALL | EntityType::FLOOR | EntityType::DECORATION |
 					EntityType::ENEMY | EntityType::PLAYER |
-					EntityType::PROJECTILE,
-			};
+					EntityType::PROJECTILE
+				);
+
+				body->CreateFixture(&def);
+			}
+
+			return body;
 		}
 
-		float move_speed_;
+		sf::RectangleShape shape_;
+		// 最大移动速度(定值)
+		float move_speed_max_;
+		// 当前最大移动速度(可变,例如因踩中地板变化)
+		float move_speed_current_max_;
+		// 避免每次计算
+		float move_speed_current_physics_max_;
+		float move_speed_current_physics_max_squared_;
+
+		// todo: 限制/控制加速度?
+		// todo: 踩中不同地板可能造成[当前最大速度/当前最大加速度]变化,[当前最大移动速度]在普通地板时复原为[最大移动速度]
+
+		auto limit_max_speed() const noexcept -> void
+		{
+			auto physics_velocity = body_->GetLinearVelocity();
+
+			if (const auto physics_speed_squared = physics_velocity.LengthSquared();
+				physics_speed_squared > move_speed_current_physics_max_squared_)
+			{
+				const auto physics_speed = std::sqrt(physics_speed_squared);
+
+				physics_velocity *= move_speed_current_physics_max_ / physics_speed;
+				body_->SetLinearVelocity(physics_velocity);
+			}
+		}
+
+		auto sync_position_and_rotation() noexcept -> void
+		{
+			const auto position = body_->GetPosition();
+			const auto radians = body_->GetAngle();
+
+			shape_.setPosition(pd::Constant::from_physics(position));
+			shape_.setRotation(sf::radians(radians));
+		}
 
 	public:
-		PlayerEntity(b2World& world, const sf::Vector2f start_position, const sf::Vector2f size, const float move_speed) noexcept
-			: Entity{world, RenderLayer::PLAYER, make_desc(start_position, size)},
-			  move_speed_{move_speed}
+		ActorEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const sf::Vector2f size,
+			const float move_speed_max,
+			const EntityType type
+		) noexcept
+			: Entity{type == EntityType::ENEMY ? RenderLayer::ENEMY : RenderLayer::PLAYER},
+			  shape_{size},
+			  move_speed_max_{move_speed_max},
+			  move_speed_current_max_{move_speed_max},
+			  move_speed_current_physics_max_{pd::Constant::to_physics(move_speed_max)},
+			  move_speed_current_physics_max_squared_{move_speed_current_physics_max_ * move_speed_current_physics_max_}
 		{
-			// 玩家颜色
-			shape_.setFillColor(sf::Color::Blue);
+			// 创建body
+			body_ = create_physics(world, position, size, type);
+
+			// 设置UserData
+			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+
+			// 敌人/玩家颜色
+			shape_.setFillColor(type == EntityType::ENEMY ? sf::Color::Red : sf::Color::Green);
+			// 中心对齐
+			shape_.setOrigin(shape_.getSize() / 2.f);
 		}
+
+		auto update(const float delta) noexcept -> void override
+		{
+			// 限制最大速度
+			limit_max_speed();
+
+			// 同步位置/旋转
+			sync_position_and_rotation();
+		}
+
+		auto render(sf::RenderWindow& window) noexcept -> void override
+		{
+			if (not active_)
+			{
+				return;
+			}
+
+			window.draw(shape_);
+		}
+
+		[[nodiscard]] auto position() const noexcept -> sf::Vector2f
+		{
+			return shape_.getPosition();
+		}
+
+		[[nodiscard]] auto size() const noexcept -> sf::Vector2f
+		{
+			return shape_.getSize();
+		}
+
+		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f
+		{
+			const auto physics_velocity = body_->GetLinearVelocity();
+			return pd::Constant::from_physics(physics_velocity);
+		}
+
+		auto apply_force(b2Vec2 force) const noexcept -> void
+		{
+			if (force == b2Vec2_zero)
+			{
+				return;
+			}
+
+			force.Normalize();
+
+			force *= body_->GetMass() * move_speed_current_max_;
+			body_->ApplyForceToCenter(force, true);
+		}
+	};
+
+	// 敌人
+	class EnemyEntity final : public ActorEntity
+	{
+	public:
+		EnemyEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const sf::Vector2f size,
+			const float move_speed_max
+		) noexcept
+			: ActorEntity{world, position, size, move_speed_max, EntityType::ENEMY} {}
+
+		auto type() const noexcept -> EntityType override
+		{
+			return EntityType::ENEMY;
+		}
+	};
+
+	// 玩家
+	class PlayerEntity final : public ActorEntity
+	{
+	public:
+		PlayerEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const sf::Vector2f size,
+			const float move_speed_max
+		) noexcept
+			: ActorEntity{world, position, size, move_speed_max, EntityType::PLAYER} {}
 
 		auto type() const noexcept -> EntityType override
 		{
 			return EntityType::PLAYER;
 		}
-
-		auto apply_force(b2Vec2 force) const noexcept -> void
-		{
-			if (force.LengthSquared() > 0)
-			{
-				force.Normalize();
-			}
-
-			force *= body_->GetMass() * move_speed_;
-			body_->ApplyForceToCenter(force, true);
-		}
 	};
 
 	// 墙壁
-	class WallEntity : public Entity
+	class WallEntity final : public Entity
 	{
 	public:
 		//
 
 	private:
-		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const sf::Vector2f size) noexcept -> PhysicsDesc
+		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept -> b2Body*
 		{
-			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
+			b2Body* body;
+			// 创建BODY
 			{
-				auto s = std::make_unique<b2PolygonShape>();
-				s->SetAsBox(bs.x, bs.y);
-				return s;
-			}();
+				const auto physics_position = pd::Constant::to_physics(position);
 
-			return
+				b2BodyDef def{};
+				def.type = b2_staticBody;
+				def.position = physics_position;
+				def.fixedRotation = true;
+
+				body = world.CreateBody(&def);
+			}
+			// 创建FIXTURE
 			{
-					.type = b2_staticBody,
-					.can_rotate = false,
-					.is_bullet = false,
-					.linear_damping = 5.f,
-					.initial_position = {position.x, position.y},
-					.initial_velocity = {0, 0},
-					.size = {size.x, size.y},
-					.shape = std::move(shape),
-					.density = 0,
-					.friction = 0.5f,
-					.restitution = 0.7f,
-					.is_sensor = false,
-					.category = EntityType::WALL,
-					// 可以和敌人/玩家/飞弹碰撞
-					.category_mask =
+				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(physics_size.x, physics_size.y);
+
+				b2FixtureDef def{};
+				def.shape = &shape;
+				def.density = 0;
+				def.friction = 0.5f;
+				def.restitution = 0.7f;
+				def.filter.categoryBits = static_cast<uint16>(EntityType::WALL);
+				// 可以和敌人/玩家/飞弹碰撞
+				def.filter.maskBits = static_cast<uint16>(
 					EntityType::ENEMY | EntityType::PLAYER |
-					EntityType::PROJECTILE,
-			};
+					EntityType::PROJECTILE
+				);
+
+				body->CreateFixture(&def);
+			}
+
+			return body;
 		}
 
+		sf::RectangleShape shape_;
+
 	public:
-		WallEntity(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept
-			: Entity{world, RenderLayer::WALL, make_desc(position, size)}
+		WallEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const sf::Vector2f size
+		) noexcept
+			: Entity{RenderLayer::WALL},
+			  shape_{size}
 		{
+			// 创建body
+			body_ = create_physics(world, position, size);
+
+			// 设置UserData
+			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+
 			// 墙颜色
-			shape_.setFillColor(sf::Color::Yellow);
+			shape_.setFillColor(sf::Color::Black);
+			// 中心对齐
+			shape_.setOrigin(shape_.getSize() / 2.f);
+			// 初始化位置(因为我们不会在update中更新位置,所以必须初始化)
+			shape_.setPosition(position);
 		}
 
 		auto type() const noexcept -> EntityType override
 		{
 			return EntityType::WALL;
 		}
+
+		auto update(float delta) noexcept -> void override
+		{
+			// 墙无需更新
+			// 除非墙是动画
+		}
+
+		auto render(sf::RenderWindow& window) noexcept -> void override
+		{
+			window.draw(shape_);
+		}
 	};
 
 	// 地板
-	class FloorEntity : public Entity
+	class FloorEntity final : public Entity
 	{
 	public:
 		enum class Type : std::uint8_t
 		{
 			// 普通地板
 			NORMAL,
-			// 冰地板 - 低摩擦力,高弹性
+			// 冰地板
 			ICE,
-			// 泥地板 - 高摩擦力,低弹性
+			// 泥地板
 			MUD,
-			// 粘性地板 - 高线性阻尼
-			STICKY,
-			// 弹跳地板 - 高弹性
-			BOUNCE,
 		};
 
 	private:
-		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const sf::Vector2f size, const Type type) -> PhysicsDesc
+		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept -> b2Body*
 		{
-			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
+			b2Body* body;
+			// 创建BODY
 			{
-				auto s = std::make_unique<b2PolygonShape>();
-				s->SetAsBox(bs.x, bs.y);
-				return s;
-			}();
+				const auto physics_position = pd::Constant::to_physics(position);
 
-			float friction = 1;
-			float restitution = 0;
-			switch (type)
+				b2BodyDef def{};
+				def.type = b2_staticBody;
+				def.position = physics_position;
+				def.fixedRotation = true;
+				def.linearDamping = 5;
+
+				body = world.CreateBody(&def);
+			}
+			// 创建FIXTURE
 			{
-				case Type::NORMAL:
-				{
-					friction = 0.5f;
-					restitution = 0.2f;
-					break;
-				}
-				case Type::ICE:
-				{
-					// 低摩擦力
-					friction = 0.05f;
-					// 稍高弹性
-					restitution = 0.3f;
-					break;
-				}
-				case Type::MUD:
-				{
-					// 高摩擦力
-					friction = 0.9f;
-					// 低弹性
-					restitution = 0.1f;
-					break;
-				}
-				case Type::STICKY:
-				{
-					// 最高摩擦力
-					friction = 1.0f;
-					// 几乎无弹性
-					restitution = 0.05f;
-					break;
-				}
-				case Type::BOUNCE:
-				{
-					// 中等摩擦力
-					friction = 0.3f;
-					// 高弹性
-					restitution = 0.8f;
-					break;
-				}
+				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(physics_size.x, physics_size.y);
+
+				b2FixtureDef def{};
+				def.shape = &shape;
+				// 传感器不阻止移动,可以检测接触
+				def.isSensor = true;
+				def.filter.categoryBits = static_cast<uint16>(EntityType::FLOOR);
+				// 可以和敌人/玩家碰撞
+				def.filter.maskBits = static_cast<uint16>(EntityType::ENEMY | EntityType::PLAYER);
+
+				body->CreateFixture(&def);
 			}
 
-			return
-			{
-					.type = b2_staticBody,
-					.can_rotate = false,
-					.is_bullet = false,
-					.linear_damping = 0.f,
-					.initial_position = {position.x, position.y},
-					.initial_velocity = {0, 0},
-					.size = {size.x, size.y},
-					.shape = std::move(shape),
-					.density = 0,
-					.friction = friction,
-					.restitution = restitution,
-					.is_sensor = true,
-					.category = EntityType::FLOOR,
-					// 可以和敌人/玩家碰撞
-					.category_mask = EntityType::ENEMY | EntityType::PLAYER,
-			};
+			return body;
 		}
 
+		sf::RectangleShape shape_;
+
 	public:
-		FloorEntity(b2World& world, const sf::Vector2f position, const sf::Vector2f size, const Type type) noexcept
-			: Entity{world, RenderLayer::FLOOR, make_desc(position, size, type)}
+		FloorEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const sf::Vector2f size,
+			const Type type
+		) noexcept
+			: Entity{RenderLayer::FLOOR},
+			  shape_{size}
 		{
+			// 创建body
+			body_ = create_physics(world, position, size);
+
+			// 设置UserData
+			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+
 			// 地板颜色
 			switch (type)
 			{
@@ -476,159 +505,136 @@ namespace playground
 					shape_.setOutlineThickness(1.0f);
 					break;
 				}
-				case Type::STICKY:
-				{
-					// 粉色
-					shape_.setFillColor(sf::Color(255, 150, 200));
-					// 深粉色边框
-					shape_.setOutlineColor(sf::Color(235, 130, 180));
-					shape_.setOutlineThickness(1.0f);
-					break;
-				}
-				case Type::BOUNCE:
-				{
-					// 淡黄色
-					shape_.setFillColor(sf::Color(255, 255, 150));
-					// 黄色边框
-					shape_.setOutlineColor(sf::Color(235, 235, 130));
-					shape_.setOutlineThickness(1.0f);
-					break;
-				}
 			}
+			// 中心对齐
+			shape_.setOrigin(shape_.getSize() / 2.f);
+			// 初始化位置(因为我们不会在update中更新位置,所以必须初始化)
+			shape_.setPosition(position);
 		}
 
 		auto type() const noexcept -> EntityType override
 		{
 			return EntityType::FLOOR;
 		}
+
+		auto update(float delta) noexcept -> void override
+		{
+			// 地板无需更新
+			// 除非地板是动画
+		}
+
+		auto render(sf::RenderWindow& window) noexcept -> void override
+		{
+			window.draw(shape_);
+		}
 	};
 
 	// 地形/装饰物
-	class DecorationEntity : public Entity
+	class DecorationEntity final : public Entity
 	{
 	public:
 		//
 
 	private:
-		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const sf::Vector2f size) noexcept -> PhysicsDesc
+		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept -> b2Body*
 		{
-			auto shape = [bs = 0.5f * pd::Constant::to_physics(size)] noexcept -> std::unique_ptr<b2PolygonShape>
+			b2Body* body;
+			// 创建BODY
 			{
-				auto s = std::make_unique<b2PolygonShape>();
-				s->SetAsBox(bs.x, bs.y);
-				return s;
-			}();
+				const auto physics_position = pd::Constant::to_physics(position);
 
-			return
+				b2BodyDef def{};
+				def.type = b2_staticBody;
+				def.position = physics_position;
+				def.fixedRotation = true;
+
+				body = world.CreateBody(&def);
+			}
+			// 创建FIXTURE
 			{
-					.type = b2_staticBody,
-					.can_rotate = false,
-					.is_bullet = false,
-					.linear_damping = 5.f,
-					.initial_position = {position.x, position.y},
-					.initial_velocity = {0, 0},
-					.size = {size.x, size.y},
-					.shape = std::move(shape),
-					.density = 0,
-					.friction = 0.35f,
-					.restitution = 0.4f,
-					.is_sensor = false,
-					.category = EntityType::DECORATION,
-					// 可以和敌人/玩家/飞弹碰撞
-					// todo: 如果是一个可以移动的装饰物呢?如果可以移动,则还可以和墙壁/装饰物碰撞
-					.category_mask = EntityType::ENEMY | EntityType::PLAYER | EntityType::PROJECTILE,
-			};
+				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(physics_size.x, physics_size.y);
+
+				b2FixtureDef def{};
+				def.shape = &shape;
+				def.density = 0;
+				def.friction = 0.5f;
+				def.restitution = 0.7f;
+				def.filter.categoryBits = static_cast<uint16>(EntityType::DECORATION);
+				// 可以和敌人/玩家/飞弹碰撞
+				// todo: 如果是一个可以移动的装饰物呢?如果可以移动,则还可以和墙壁/装饰物碰撞
+				def.filter.maskBits = static_cast<uint16>(
+					EntityType::ENEMY | EntityType::PLAYER |
+					EntityType::PROJECTILE
+				);
+
+				body->CreateFixture(&def);
+			}
+
+			return body;
 		}
 
+		sf::RectangleShape shape_;
+
 	public:
-		DecorationEntity(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept
-			: Entity{world, RenderLayer::DECORATION, make_desc(position, size)}
+		DecorationEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const sf::Vector2f size
+		) noexcept
+			: Entity{RenderLayer::DECORATION},
+			  shape_{size}
 		{
+			// 创建body
+			body_ = create_physics(world, position, size);
+
+			// 设置UserData
+			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+
 			// 地形/装饰物颜色
 			shape_.setFillColor(sf::Color::Yellow);
+			// 中心对齐
+			shape_.setOrigin(shape_.getSize() / 2.f);
+			// 初始化位置(因为我们不会在update中更新位置,所以必须初始化)
+			shape_.setPosition(position);
 		}
 
 		auto type() const noexcept -> EntityType override
 		{
 			return EntityType::DECORATION;
 		}
+
+		auto update(float delta) noexcept -> void override
+		{
+			// 地形/装饰物无需更新
+			// 除非地形/装饰物是动画
+		}
+
+		auto render(sf::RenderWindow& window) noexcept -> void override
+		{
+			window.draw(shape_);
+		}
 	};
 
 	// 飞弹
+	// todo: ProjectileEntity的设计一定程度上和ActorEntity重叠
 	class ProjectileEntity : public Entity
 	{
 	public:
-		using size_type = std::uint32_t;
+		//
 
 	private:
 		// 飞行时长(生命周期)
 		float lifetime_;
 		float lifetime_current_;
 
-		// 弹跳次数(撞击墙壁/装饰物)
-		size_type bounces_;
-		size_type bounces_current_;
-
-		// 下次碰撞时销毁
-		bool destroy_on_next_collision_;
-
-		// 拖尾效果
-		sf::ConvexShape tail_;
-
-		[[nodiscard]] static auto make_desc(const sf::Vector2f position, const float radius, sf::Vector2f velocity) noexcept -> PhysicsDesc
-		{
-			auto shape = [r = pd::Constant::to_physics(radius)] noexcept -> std::unique_ptr<b2CircleShape>
-			{
-				auto s = std::make_unique<b2CircleShape>();
-				s->m_radius = r;
-				return s;
-			}();
-
-			return
-			{
-					.type = b2_dynamicBody,
-					.can_rotate = true,
-					.is_bullet = true,
-					.linear_damping = 0.05f,
-					.initial_position = {position.x, position.y},
-					.initial_velocity = {velocity.x, velocity.y},
-					.size = {radius * 2, radius * 2},
-					.shape = std::move(shape),
-					.density = 0.5f,
-					.friction = 0,
-					.restitution = 0.8f,
-					.is_sensor = false,
-					.category = EntityType::PROJECTILE,
-					// 可以和墙壁/装饰物敌人/玩家/碰撞
-					.category_mask =
-					EntityType::WALL | EntityType::DECORATION |
-					EntityType::ENEMY | EntityType::PLAYER,
-			};
-		}
-
 	public:
-		ProjectileEntity(
-			b2World& world,
-			const sf::Vector2f position,
-			const float radius,
-			const sf::Vector2f velocity,
-			const float lifetime,
-			const size_type bounces
-		) noexcept
-			: Entity{world, RenderLayer::PROJECTILE, make_desc(position, radius, velocity)},
+		explicit ProjectileEntity(const float lifetime) noexcept
+			: Entity{RenderLayer::PROJECTILE},
 			  lifetime_{lifetime},
-			  lifetime_current_{0},
-			  bounces_{bounces},
-			  bounces_current_{0},
-			  destroy_on_next_collision_{false},
-			  // 三角形拖尾
-			  tail_{3}
-		{
-			// 飞弹颜色
-			shape_.setFillColor(sf::Color::Red);
-			// 拖尾颜色
-			tail_.setFillColor({255, 100, 100, 150});
-		}
+			  lifetime_current_{0} {}
 
 		auto type() const noexcept -> EntityType override
 		{
@@ -637,70 +643,401 @@ namespace playground
 
 		auto update(const float delta) noexcept -> void override
 		{
-			Entity::update(delta);
-
 			lifetime_current_ += delta;
 			if (lifetime_current_ >= lifetime_)
 			{
 				active_ = false;
 			}
+		}
 
-			// 如果标记为下次碰撞销毁,且速度很慢,销毁
-			if (destroy_on_next_collision_)
+		virtual auto on_collide(Entity& entity) noexcept -> void = 0;
+
+		[[nodiscard]] virtual auto position() const noexcept -> sf::Vector2f = 0;
+
+		[[nodiscard]] virtual auto size() const noexcept -> sf::Vector2f = 0;
+
+		[[nodiscard]] virtual auto velocity() const noexcept -> sf::Vector2f = 0;
+	};
+
+	// 基础飞弹
+	// 命中目标后消失
+	class BaseProjectileEntity final : public ProjectileEntity
+	{
+	public:
+		//
+
+	private:
+		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const float radius, const sf::Vector2f velocity) noexcept -> b2Body*
+		{
+			b2Body* body;
+			// 创建BODY
 			{
-				if (const auto velocity = body_->GetLinearVelocity();
-					// todo: 低速阈值
-					velocity.LengthSquared() < 8 * 8)
-				{
-					active_ = false;
-				}
+				const auto physics_position = pd::Constant::to_physics(position);
+				const auto physics_velocity = pd::Constant::to_physics(velocity);
+
+				b2BodyDef def{};
+				def.type = b2_dynamicBody;
+				def.position = physics_position;
+				def.linearVelocity = physics_velocity;
+				def.linearDamping = 0.05f;
+				def.fixedRotation = false;
+				def.bullet = true;
+
+				body = world.CreateBody(&def);
 			}
+			// 创建FIXTURE
+			{
+				const auto physics_radius = pd::Constant::to_physics(radius);
+
+				b2CircleShape shape{};
+				shape.m_radius = physics_radius;
+
+				b2FixtureDef def{};
+				def.shape = &shape;
+				def.density = 0.5f;
+				def.friction = 0;
+				def.restitution = 0.8f;
+				def.filter.categoryBits = static_cast<uint16>(EntityType::PROJECTILE);
+				// 可以和墙壁/装饰物/敌人/玩家/碰撞
+				def.filter.maskBits = static_cast<uint16>(
+					EntityType::WALL | EntityType::DECORATION |
+					EntityType::ENEMY | EntityType::PLAYER
+				);
+
+				body->CreateFixture(&def);
+			}
+
+			return body;
+		}
+
+		// 主体
+		sf::CircleShape shape_;
+		// 拖尾效果
+		sf::ConvexShape tail_;
+
+		auto sync_position_and_rotation() noexcept -> void
+		{
+			const auto position = body_->GetPosition();
+			const auto radians = body_->GetAngle();
+
+			shape_.setPosition(pd::Constant::from_physics(position));
+			shape_.setRotation(sf::radians(radians));
+		}
+
+	public:
+		BaseProjectileEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const float radius,
+			const sf::Vector2f velocity,
+			const float lifetime
+		) noexcept
+			: ProjectileEntity{lifetime},
+			  shape_{radius},
+			  // 三角形拖尾
+			  tail_{3}
+		{
+			// 创建body
+			body_ = create_physics(world, position, radius, velocity);
+
+			// 设置UserData
+			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+
+			// 飞弹颜色
+			shape_.setFillColor(sf::Color::Red);
+			// 拖尾颜色
+			tail_.setFillColor({255, 100, 100, 150});
+			// 中心对齐
+			shape_.setOrigin({shape_.getRadius(), shape_.getRadius()});
+			// 不需要初始化位置(因为我们会在update中更新位置)
+			// 不过其实初始化也无所谓?
+			shape_.setPosition(position);
+		}
+
+		auto update(const float delta) noexcept -> void override
+		{
+			ProjectileEntity::update(delta);
+
+			// 低速弹跳飞弹直接销毁
+			// todo: 低速阈值
+			constexpr auto min_velocity_2 = 5 * 5;
+			if (const auto velocity = body_->GetLinearVelocity();
+				velocity.LengthSquared() < min_velocity_2)
+			{
+				active_ = false;
+			}
+
+			if (not active_)
+			{
+				return;
+			}
+
+			// 同步位置/旋转
+			sync_position_and_rotation();
 		}
 
 		auto render(sf::RenderWindow& window) noexcept -> void override
 		{
-			Entity::render(window);
-
-			// 添加拖尾效果
+			if (not active_)
+			{
+				return;
+			}
 
 			const auto position = shape_.getPosition();
-			const auto radius = shape_.getSize().x;
+			const auto radius = shape_.getRadius();
 
-			auto velocity = body_->GetLinearVelocity();
-			velocity.Normalize();
+			auto physics_velocity = body_->GetLinearVelocity();
+			physics_velocity.Normalize();
 
-			const auto direction = sf::Vector2f{velocity.x, velocity.y};
+			const auto direction = sf::Vector2f{physics_velocity.x, physics_velocity.y};
 			const auto left_perpendicular = sf::Vector2f{-direction.y, direction.x};
 
+			// 先渲染拖尾
 			tail_.setPoint(0, position + direction * radius);
 			tail_.setPoint(1, position - direction * (radius * 2) + left_perpendicular * radius);
 			tail_.setPoint(2, position - direction * (radius * 2) - left_perpendicular * radius);
-
 			window.draw(tail_);
+
+			// 再渲染主体(可以遮住拖尾与主体重叠部分)
+			window.draw(shape_);
+		}
+
+		// 处理碰撞
+		auto on_collide(Entity& entity) noexcept -> void override
+		{
+			// todo: 碰撞特效/音效?
+
+			// todo: 在这里结算伤害?
+			if (const auto type = entity.type();
+				type == EntityType::WALL)
+			{
+				std::println("命中WALL");
+			}
+			else if (type == EntityType::DECORATION)
+			{
+				std::println("命中DECORATION");
+			}
+			else if (type == EntityType::ENEMY)
+			{
+				std::println("命中ENEMY");
+			}
+			else if (type == EntityType::PLAYER)
+			{
+				std::println("命中PLAYER");
+			}
+
+			// 命中后直接销毁飞弹
+			active_ = false;
+		}
+
+		auto position() const noexcept -> sf::Vector2f override
+		{
+			return shape_.getPosition();
+		}
+
+		[[nodiscard]] auto size() const noexcept -> sf::Vector2f override
+		{
+			return {shape_.getRadius(), shape_.getRadius()};
+		}
+
+		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f override
+		{
+			const auto physics_velocity = body_->GetLinearVelocity();
+			return pd::Constant::from_physics(physics_velocity);
+		}
+	};
+
+	// 弹跳飞弹
+	// 命中目标后继续弹跳
+	class BounceProjectileEntity final : public ProjectileEntity
+	{
+	public:
+		using size_type = std::uint32_t;
+
+	private:
+		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const float radius, const sf::Vector2f velocity) noexcept -> b2Body*
+		{
+			b2Body* body;
+			// 创建BODY
+			{
+				const auto physics_position = pd::Constant::to_physics(position);
+				const auto physics_velocity = pd::Constant::to_physics(velocity);
+
+				b2BodyDef def{};
+				def.type = b2_dynamicBody;
+				def.position = physics_position;
+				def.linearVelocity = physics_velocity;
+				def.linearDamping = 0.05f;
+				def.fixedRotation = false;
+				def.bullet = true;
+
+				body = world.CreateBody(&def);
+			}
+			// 创建FIXTURE
+			{
+				const auto physics_radius = pd::Constant::to_physics(radius);
+
+				b2CircleShape shape{};
+				shape.m_radius = physics_radius;
+
+				b2FixtureDef def{};
+				def.shape = &shape;
+				def.density = 0.5f;
+				def.friction = 0;
+				def.restitution = 0.8f;
+				def.filter.categoryBits = static_cast<uint16>(EntityType::PROJECTILE);
+				// 可以和墙壁/装饰物/敌人/玩家/碰撞
+				def.filter.maskBits = static_cast<uint16>(
+					EntityType::WALL | EntityType::DECORATION |
+					EntityType::ENEMY | EntityType::PLAYER
+				);
+
+				body->CreateFixture(&def);
+			}
+
+			return body;
+		}
+
+		// 弹跳次数(撞击墙壁/装饰物)
+		size_type bounces_;
+		size_type bounces_current_;
+
+		// 主体
+		sf::CircleShape shape_;
+		// 拖尾效果
+		sf::ConvexShape tail_;
+
+		auto sync_position_and_rotation() noexcept -> void
+		{
+			const auto position = body_->GetPosition();
+			const auto radians = body_->GetAngle();
+
+			shape_.setPosition(pd::Constant::from_physics(position));
+			shape_.setRotation(sf::radians(radians));
+		}
+
+	public:
+		BounceProjectileEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const float radius,
+			const sf::Vector2f velocity,
+			const float lifetime,
+			const size_type bounces
+		) noexcept
+			: ProjectileEntity{lifetime},
+			  bounces_{bounces},
+			  bounces_current_{0},
+			  shape_{radius},
+			  // 三角形拖尾
+			  tail_{3}
+		{
+			// 创建body
+			body_ = create_physics(world, position, radius, velocity);
+
+			// 设置UserData
+			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+
+			// 飞弹颜色
+			shape_.setFillColor(sf::Color::Red);
+			// 拖尾颜色
+			tail_.setFillColor({255, 100, 100, 150});
+			// 中心对齐
+			shape_.setOrigin({shape_.getRadius(), shape_.getRadius()});
+			// 不需要初始化位置(因为我们会在update中更新位置)
+			// 不过其实初始化也无所谓?
+			shape_.setPosition(position);
+		}
+
+		auto update(const float delta) noexcept -> void override
+		{
+			ProjectileEntity::update(delta);
+
+			// 低速弹跳飞弹直接销毁
+			// todo: 低速阈值
+			constexpr auto min_velocity_2 = 5 * 5;
+			if (const auto velocity = body_->GetLinearVelocity();
+				velocity.LengthSquared() < min_velocity_2)
+			{
+				active_ = false;
+			}
+
+			if (not active_)
+			{
+				return;
+			}
+
+			// 同步位置/旋转
+			sync_position_and_rotation();
+		}
+
+		auto render(sf::RenderWindow& window) noexcept -> void override
+		{
+			const auto position = shape_.getPosition();
+			const auto radius = shape_.getRadius();
+
+			auto physics_velocity = body_->GetLinearVelocity();
+			physics_velocity.Normalize();
+
+			const auto direction = sf::Vector2f{physics_velocity.x, physics_velocity.y};
+			const auto left_perpendicular = sf::Vector2f{-direction.y, direction.x};
+
+			// 先渲染拖尾
+			tail_.setPoint(0, position + direction * radius);
+			tail_.setPoint(1, position - direction * (radius * 2) + left_perpendicular * radius);
+			tail_.setPoint(2, position - direction * (radius * 2) - left_perpendicular * radius);
+			window.draw(tail_);
+
+			// 再渲染主体(可以遮住拖尾与主体重叠部分)
+			window.draw(shape_);
 		}
 
 		// 处理反弹
-		auto on_bounce() noexcept -> void
+		auto on_collide(Entity& entity) noexcept -> void override
 		{
+			// todo: 碰撞特效/音效?
+
 			bounces_current_ += 1;
 			if (bounces_current_ >= bounces_)
 			{
-				// 达到最大反弹次数后,标记为下次碰撞时销毁
-				destroy_on_next_collision_ = true;
+				active_ = false;
+			}
 
-				// 进一步降低弹性,让飞弹更快停止
-				// for (auto* f = body_->GetFixtureList(); f; f = f->GetNext())
-				// {
-				// 	f->SetRestitution(0.1f);
-				// }
+			// todo: 在这里结算伤害?
+			if (const auto type = entity.type();
+				type == EntityType::WALL)
+			{
+				std::println("命中WALL");
+			}
+			else if (type == EntityType::DECORATION)
+			{
+				std::println("命中DECORATION");
+			}
+			else if (type == EntityType::ENEMY)
+			{
+				std::println("命中ENEMY");
+				// 命中后直接销毁飞弹
+				active_ = false;
+			}
+			else if (type == EntityType::PLAYER)
+			{
+				std::println("命中PLAYER");
+				// 命中后直接销毁飞弹
+				active_ = false;
+			}
+
+			if (not active_)
+			{
+				return;
 			}
 
 			// 每次反弹都稍微降低弹性
 			for (auto* f = body_->GetFixtureList(); f; f = f->GetNext())
 			{
 				// todo: 弹性减少系数
+				constexpr auto restitution_factor = 0.9f;
 				const auto restitution = f->GetRestitution();
-				f->SetRestitution(restitution * 0.9f);
+				f->SetRestitution(restitution * restitution_factor);
 			}
 
 			// 每次反弹后稍微减少速度
@@ -715,10 +1052,376 @@ namespace playground
 			velocity *= slowdown_factor;
 			body_->SetLinearVelocity(std::ranges::max(slowdown_factor, 0.3f) * velocity);
 		}
+
+		auto position() const noexcept -> sf::Vector2f override
+		{
+			return shape_.getPosition();
+		}
+
+		[[nodiscard]] auto size() const noexcept -> sf::Vector2f override
+		{
+			return {shape_.getRadius(), shape_.getRadius()};
+		}
+
+		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f override
+		{
+			const auto physics_velocity = body_->GetLinearVelocity();
+			return pd::Constant::from_physics(physics_velocity);
+		}
 	};
 
+	class ChainProjectileEntity final : public ProjectileEntity
+	{
+	public:
+		//
+
+	private:
+		[[nodiscard]] static auto create_shapes(const std::span<const float> segment_radii) noexcept -> std::vector<sf::CircleShape>
+		{
+			std::vector<sf::CircleShape> shapes{};
+			shapes.reserve(segment_radii.size());
+
+			std::ranges::transform(
+				segment_radii,
+				std::back_inserter(shapes),
+				[](const float radius) noexcept -> sf::CircleShape
+				{
+					return sf::CircleShape{radius};
+				}
+			);
+
+			return shapes;
+		}
+
+		[[nodiscard]] static auto create_segment(
+			b2World& world,
+			const b2Vec2 physics_position,
+			const float physics_radius,
+			const float mass_multiplier = 1.f
+		) noexcept -> b2Body*
+		{
+			b2Body* body;
+			// 创建BODY
+			{
+				b2BodyDef def{};
+				def.type = b2_dynamicBody;
+				def.position = physics_position;
+				def.linearDamping = 0.1f;
+				def.angularDamping = 0.5f;
+
+				body = world.CreateBody(&def);
+			}
+			// 创建FIXTURE
+			{
+				b2CircleShape shape{};
+				shape.m_radius = physics_radius;
+
+				b2FixtureDef def{};
+				def.shape = &shape;
+				def.density = 0.5f * mass_multiplier;
+				def.friction = 0.1f;
+				def.restitution = 0.6f;
+				def.filter.categoryBits = static_cast<uint16>(EntityType::PROJECTILE);
+				// 可以和墙壁/装饰物/敌人/玩家/碰撞
+				def.filter.maskBits = static_cast<uint16>(
+					EntityType::WALL | EntityType::DECORATION |
+					EntityType::ENEMY | EntityType::PLAYER
+				);
+
+				body->CreateFixture(&def);
+			}
+
+			return body;
+		}
+
+		[[nodiscard]] static auto create_segments(
+			b2World& world,
+			const sf::Vector2f position,
+			const std::span<const float> segment_radii,
+			const sf::Vector2f velocity
+		) noexcept -> std::vector<b2Body*>
+		{
+			std::vector<b2Body*> segments{};
+			segments.reserve(segment_radii.size());
+
+			// head
+			{
+				const auto radius = segment_radii[0];
+
+				const auto physics_position = pd::Constant::to_physics(position);
+				const auto physics_radius = pd::Constant::to_physics(radius);
+				const auto physics_velocity = pd::Constant::to_physics(velocity);
+
+				auto* segment = create_segment(world, physics_position, physics_radius, 2);
+				segment->SetLinearVelocity(physics_velocity);
+				segments.emplace_back(segment);
+			}
+			// reset
+			{
+				const auto direction = velocity.normalized();
+				auto previous_position = position;
+				for (std::size_t i = 1; i < segment_radii.size(); ++i)
+				{
+					const auto previous_radius = segment_radii[i - 1];
+					const auto radius = segment_radii[i];
+					const auto spacing = previous_radius + radius + 5.f;
+					const auto this_position = previous_position - direction * spacing;
+
+					const auto this_physics_radius = pd::Constant::to_physics(radius);
+					const auto this_physics_position = pd::Constant::to_physics(this_position);
+
+					auto* segment = create_segment(world, this_physics_position, this_physics_radius);
+					segments.emplace_back(segment);
+
+					previous_position = this_position;
+				}
+			}
+
+			return segments;
+		}
+
+		[[nodiscard]] static auto create_joint(
+			b2World& world,
+			b2Body& body_a,
+			b2Body& body_b,
+			const float physics_length,
+			const float break_force
+		) noexcept -> b2DistanceJoint*
+		{
+			b2DistanceJointDef def{};
+			def.Initialize(&body_a, &body_b, body_a.GetWorldCenter(), body_b.GetWorldCenter());
+			def.collideConnected = false;
+			def.length = physics_length;
+
+			auto* joint = world.CreateJoint(&def);
+			// joint储存自身断裂的力量
+			joint->GetUserData().pointer = std::bit_cast<std::uint32_t>(break_force);
+
+			return static_cast<b2DistanceJoint*>(joint);
+		}
+
+		[[nodiscard]] static auto create_joints(
+			b2World& world,
+			const std::span<const float> segment_radii,
+			const std::span<const float> break_forces,
+			const std::span<b2Body*>& segments
+		) noexcept -> std::vector<b2DistanceJoint*>
+		{
+			PD_ASSERT(segment_radii.size() == break_forces.size());
+			PD_ASSERT(segment_radii.size() == segments.size());
+
+			std::vector<b2DistanceJoint*> joints{};
+			joints.reserve(segment_radii.size() - 1);
+
+			for (std::size_t i = 0; i < segment_radii.size() - 1; ++i)
+			{
+				const auto radius = segment_radii[i];
+				const auto next_radius = segment_radii[i + 1];
+				const auto joint_length = radius + next_radius + 2;
+
+				const auto break_force = break_forces[i];
+
+				auto* segment = segments[i];
+				auto* next_segment = segments[i + 1];
+
+				const auto physics_joint_length = pd::Constant::to_physics(joint_length);
+
+				auto* joint = create_joint(world, *segment, *next_segment, physics_joint_length, break_force);
+				joints.emplace_back(joint);
+			}
+
+			return joints;
+		}
+
+		[[nodiscard]] static auto create_physics(
+			b2World& world,
+			const sf::Vector2f position,
+			const std::span<const float> segment_radii,
+			const sf::Vector2f velocity,
+			const std::span<const float> break_force,
+			std::vector<sf::CircleShape>& out_shapes,
+			std::vector<b2Body*>& out_segments,
+			std::vector<b2DistanceJoint*>& out_joints
+		) noexcept -> b2Body*
+		{
+			out_shapes = create_shapes(segment_radii);
+			out_segments = create_segments(world, position, segment_radii, velocity);
+			out_joints = create_joints(world, segment_radii, break_force, out_segments);
+
+			// 使用第一个segment作为主body
+			return out_segments.front();
+		}
+
+		std::vector<sf::CircleShape> shapes_;
+		std::vector<b2Body*> segments_;
+		std::vector<b2DistanceJoint*> joints_;
+
+		auto on_chain_break(std::size_t broken_joint_index) const noexcept -> void;
+
+		auto sync_position_and_rotation() noexcept -> void
+		{
+			for (auto [shape, segment]: std::views::zip(shapes_, segments_))
+			{
+				const auto position = body_->GetPosition();
+				const auto radians = body_->GetAngle();
+
+				shape.setPosition(pd::Constant::from_physics(position));
+				shape.setRotation(sf::radians(radians));
+			}
+		}
+
+	public:
+		ChainProjectileEntity(
+			b2World& world,
+			const sf::Vector2f position,
+			const std::span<float> segment_radii,
+			const sf::Vector2f velocity,
+			const std::span<const float> break_force,
+			const float lifetime
+		) noexcept
+			: ProjectileEntity{lifetime}
+		{
+			// 创建body
+			body_ = create_physics(world, position, segment_radii, velocity, break_force, shapes_, segments_, joints_);
+
+			// 设置UserData
+			std::ranges::for_each(
+				segments_,
+				[p = reinterpret_cast<uintptr_t>(this)](auto* body) noexcept -> void
+				{
+					body->GetUserData().pointer = p;
+				}
+			);
+
+			std::ranges::for_each(
+				shapes_,
+				[](auto& shape) noexcept -> void
+				{
+					// 飞弹颜色
+					shape.setFillColor(sf::Color::Red);
+					// 中心对齐
+					shape.setOrigin({shape.getRadius(), shape.getRadius()});
+					// 不需要初始化位置(因为我们会在update中更新位置)
+					// 更何况这里也不方便直接拿到位置 :)
+				}
+			);
+		}
+
+		~ChainProjectileEntity() noexcept override
+		{
+			// 销毁所有关节
+			std::ranges::for_each(
+				joints_,
+				[](auto* joint) noexcept -> void
+				{
+					auto* body_a = joint->GetBodyA();
+					auto* world = body_a->GetWorld();
+
+					world->DestroyJoint(joint);
+				}
+			);
+
+			// 销毁所有segment的body(头部由基类析构销毁)
+			std::ranges::for_each(
+				segments_ | std::views::drop(1),
+				[](auto& segment) noexcept -> void
+				{
+					// 避免ContactListener出问题
+					segment->GetUserData().pointer = 0;
+
+					auto* world = segment->GetWorld();
+					world->DestroyBody(segment);
+				}
+			);
+		}
+
+		auto update(const float delta) noexcept -> void override
+		{
+			ProjectileEntity::update(delta);
+
+			if (not active_)
+			{
+				return;
+			}
+
+			// 检查关节是否断裂
+			for (std::size_t i = 0; i < joints_.size(); ++i)
+			{
+				auto* joint = joints_[i];
+
+				// 检查关节受力
+				const auto force = joint->GetReactionForce(1.f / delta);
+				const auto force_magnitude = force.Length();
+
+				if (const auto break_force = std::bit_cast<float>(static_cast<std::uint32_t>(joint->GetUserData().pointer));
+					force_magnitude > break_force)
+				{
+					on_chain_break(i);
+
+					active_ = false;
+					break;
+				}
+			}
+
+			if (not active_)
+			{
+				return;
+			}
+
+			// 同步位置/旋转
+			sync_position_and_rotation();
+		}
+
+		auto render(sf::RenderWindow& window) noexcept -> void override
+		{
+			if (not active_)
+			{
+				return;
+			}
+
+			std::ranges::for_each(
+				shapes_,
+				[&](const auto& shape) noexcept -> void
+				{
+					window.draw(shape);
+				}
+			);
+		}
+
+		// 处理碰撞
+		auto on_collide(Entity& entity) noexcept -> void override
+		{
+			// 第一个节点与其他物体碰撞
+			on_chain_break(0);
+
+			active_ = false;
+		}
+
+		auto position() const noexcept -> sf::Vector2f override
+		{
+			const auto& shape = shapes_[0];
+			return shape.getPosition();
+		}
+
+		[[nodiscard]] auto size() const noexcept -> sf::Vector2f override
+		{
+			const auto& shape = shapes_[0];
+			return {shape.getRadius(), shape.getRadius()};
+		}
+
+		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f override
+		{
+			const auto physics_velocity = body_->GetLinearVelocity();
+			return pd::Constant::from_physics(physics_velocity);
+		}
+	};
+
+	// todo: 其他类型飞弹
+	// 可以直接穿过地形/装饰物的飞弹?
+	// 范围性飞弹?
+
 	// 碰撞监听器
-	class ContactListener : public b2ContactListener
+	class ContactListener final : public b2ContactListener
 	{
 	public:
 		using list_type = std::vector<Entity*>;
@@ -750,9 +1453,9 @@ namespace playground
 			if (type_a == EntityType::FLOOR or type_b == EntityType::FLOOR)
 			{
 				const auto handle_projectile_collision = [this]<typename T>(const FloorEntity* floor, T* entity) noexcept -> void //
-							requires std::is_same_v<T, PlayerEntity> // or std::is_same_v<T, EnemyEntity>
+							requires std::is_same_v<T, EnemyEntity> or std::is_same_v<T, PlayerEntity>
 				{
-					// todo: 引用地板的效果
+					// todo: 应用地板的效果
 					std::ignore = floor;
 					std::ignore = entity;
 				};
@@ -761,66 +1464,41 @@ namespace playground
 				{
 					std::println("接触地板: A: FLOOR, B: {}", type_b == EntityType::ENEMY ? "ENEMY" : "PLAYER");
 
-					handle_projectile_collision(
-						static_cast<const FloorEntity*>(entity_a),
-						// type_b == EntityType::ENEMY ? static_cast<EnemyEntity*>(entity_b) : static_cast<PlayerEntity*>(entity_b)
-						static_cast<PlayerEntity*>(entity_b)
-					);
+					if (type_b == EntityType::ENEMY)
+					{
+						handle_projectile_collision(static_cast<const FloorEntity*>(entity_a), static_cast<EnemyEntity*>(entity_b));
+					}
+					else
+					{
+						PD_ASSERT(type_b == EntityType::PLAYER);
+						handle_projectile_collision(static_cast<const FloorEntity*>(entity_a), static_cast<PlayerEntity*>(entity_b));
+					}
 				}
 				else
 				{
 					std::println("接触地板: A: {}, B: FLOOR", type_a == EntityType::ENEMY ? "ENEMY" : "PLAYER");
 
-					handle_projectile_collision(
-						static_cast<const FloorEntity*>(entity_b),
-						// type_a == EntityType::ENEMY ? static_cast<EnemyEntity*>(entity_a) : static_cast<PlayerEntity*>(entity_a)
-						static_cast<PlayerEntity*>(entity_a)
-					);
+					if (type_a == EntityType::ENEMY)
+					{
+						handle_projectile_collision(static_cast<const FloorEntity*>(entity_b), static_cast<EnemyEntity*>(entity_a));
+					}
+					else
+					{
+						PD_ASSERT(type_a == EntityType::PLAYER);
+						handle_projectile_collision(static_cast<const FloorEntity*>(entity_b), static_cast<PlayerEntity*>(entity_a));
+					}
 				}
 			}
 			// 飞弹碰撞
 			else if (type_a == EntityType::PROJECTILE or type_b == EntityType::PROJECTILE)
 			{
-				const auto handle_projectile_collision = [this](ProjectileEntity* projectile, const Entity* entity) noexcept -> void
-				{
-					// 碰撞特效/音效
-
-					if (const auto type = entity->type();
-						type == EntityType::WALL or type == EntityType::DECORATION)
-					{
-						// 触发反弹
-						projectile->on_bounce();
-						std::println("命中{}", type == EntityType::WALL ? "WALL" : "DECORATION");
-					}
-					else if (type == EntityType::ENEMY)
-					{
-						std::println("命中ENEMY");
-						// 命中后直接销毁飞弹
-						inactive_entities_.push_back(projectile);
-					}
-					else if (type == EntityType::PLAYER)
-					{
-						std::println("命中PLAYER");
-						// 命中后直接销毁飞弹
-						inactive_entities_.push_back(projectile);
-					}
-				};
-
 				if (type_a == EntityType::PROJECTILE)
 				{
-					handle_projectile_collision(
-						static_cast<ProjectileEntity*>(entity_a),
-						// NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-						entity_b
-					);
+					static_cast<ProjectileEntity*>(entity_a)->on_collide(*entity_b);
 				}
 				else
 				{
-					handle_projectile_collision(
-						static_cast<ProjectileEntity*>(entity_b),
-						// NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-						entity_a
-					);
+					static_cast<ProjectileEntity*>(entity_b)->on_collide(*entity_a);
 				}
 			}
 		}
@@ -869,7 +1547,8 @@ namespace playground
 	class Playground final
 	{
 	public:
-		//
+		// 简化代码
+		inline static Playground* playground;
 
 	private:
 		enum class Movement : std::uint16_t
@@ -959,32 +1638,6 @@ namespace playground
 					sf::Vector2f{400 + 8 * size.x, 350},
 					sf::Vector2f{400 + 9 * size.x, 350},
 			};
-			constexpr std::array sticky_positions
-			{
-					sf::Vector2f{400 + 0 * size.x, 450},
-					sf::Vector2f{400 + 1 * size.x, 450},
-					sf::Vector2f{400 + 2 * size.x, 450},
-					sf::Vector2f{400 + 3 * size.x, 450},
-					sf::Vector2f{400 + 4 * size.x, 450},
-					sf::Vector2f{400 + 5 * size.x, 450},
-					sf::Vector2f{400 + 6 * size.x, 450},
-					sf::Vector2f{400 + 7 * size.x, 450},
-					sf::Vector2f{400 + 8 * size.x, 450},
-					sf::Vector2f{400 + 9 * size.x, 450},
-			};
-			constexpr std::array bounce_positions
-			{
-					sf::Vector2f{400 + 0 * size.x, 550},
-					sf::Vector2f{400 + 1 * size.x, 550},
-					sf::Vector2f{400 + 2 * size.x, 550},
-					sf::Vector2f{400 + 3 * size.x, 550},
-					sf::Vector2f{400 + 4 * size.x, 550},
-					sf::Vector2f{400 + 5 * size.x, 550},
-					sf::Vector2f{400 + 6 * size.x, 550},
-					sf::Vector2f{400 + 7 * size.x, 550},
-					sf::Vector2f{400 + 8 * size.x, 550},
-					sf::Vector2f{400 + 9 * size.x, 550},
-			};
 
 			auto do_create = [this, size](const auto& positions, const FloorEntity::Type type) noexcept -> void
 			{
@@ -998,8 +1651,6 @@ namespace playground
 			do_create(normal_positions, FloorEntity::Type::NORMAL);
 			do_create(ice_positions, FloorEntity::Type::ICE);
 			do_create(mud_positions, FloorEntity::Type::MUD);
-			do_create(sticky_positions, FloorEntity::Type::STICKY);
-			do_create(bounce_positions, FloorEntity::Type::BOUNCE);
 		}
 
 		auto create_decoration() noexcept -> void
@@ -1038,8 +1689,8 @@ namespace playground
 				// 房间中心
 				sf::Vector2f{pd::Constant::window_width / 2.f, pd::Constant::window_height / 2.f},
 				// todo: 玩家大小
-				sf::Vector2f{40, 40},
-				// todo: 玩家速度
+				sf::Vector2f{35, 35},
+				// todo: 玩家最大速度
 				300.f
 			);
 
@@ -1124,29 +1775,7 @@ namespace playground
 			{
 				if (mbp->button == sf::Mouse::Button::Left)
 				{
-					const auto player_position = player_->get_position();
-					const auto player_size = player_->get_size();
-					const auto target_position = sf::Vector2f{mbp->position};
-
-					const auto direction = target_position - player_position;
-					const auto direction_normalized = direction.normalized();
-					// 偏移一定要足够,避免发射时直接碰撞本体
-					const auto offset = sf::Vector2f{direction_normalized.x * player_size.x, direction_normalized.y * player_size.y};
-					const auto spawn_position = player_position + offset;
-
-					auto projectile = std::make_unique<ProjectileEntity>(
-						*physics_world_,
-						spawn_position,
-						// todo: 飞弹半径
-						10.f,
-						// todo: 飞弹速度
-						direction_normalized * 500.f,
-						// 存在5秒
-						5.f,
-						// 弹跳3次
-						3
-					);
-					entities_.emplace_back(std::move(projectile));
+					spawn_projectile_to(sf::Vector2f{mbp->position});
 				}
 
 				return;
@@ -1211,7 +1840,7 @@ namespace playground
 		auto render(sf::RenderWindow& window) noexcept -> void
 		{
 			// 按渲染层排序
-			std::ranges::sort(entities_, std::ranges::less{}, &Entity::get_render_layer);
+			std::ranges::sort(entities_, std::ranges::less{}, &Entity::render_layer);
 
 			// 渲染所有实体
 			for (const auto& entity: entities_)
@@ -1229,10 +1858,10 @@ namespace playground
 
 			// 显示玩家信息
 			{
-				const auto position = player_->get_position();
-				const auto velocity = player_->get_velocity();
+				const auto position = player_->position();
+				const auto velocity = player_->velocity();
 
-				ImGui::Text("玩家位置: (%.1f, %.1f), 玩家速度: (%.1f, %.1f)", position.x, position.y, velocity.x, velocity.y);
+				ImGui::Text("Position: (%.1f, %.1f), Velocity: (%.1f, %.1f)[%.1f]", position.x, position.y, velocity.x, velocity.y, velocity.length());
 			}
 
 			// 显示敌人信息
@@ -1240,21 +1869,29 @@ namespace playground
 				const auto count = std::ranges::count(entities_, EntityType::ENEMY, &Entity::type);
 				ImGui::Text("活动敌人: %td", count);
 
-				std::ranges::for_each(
-					entities_ | std::views::filter(
-						[](const auto& entity) noexcept -> bool
-						{
-							return entity->type() == EntityType::ENEMY;
-						}
-					),
-					[](const auto& entity) noexcept -> void
-					{
-						const auto position = entity->get_position();
-						const auto velocity = entity->get_velocity();
+				// ReSharper disable once CppLocalVariableMayBeConst
+				auto enemies =
+						entities_ |
+						std::views::transform(
+							[](const auto& entity) noexcept -> EnemyEntity*
+							{
+								if (const auto type = entity->type();
+									type == EntityType::ENEMY)
+								{
+									return static_cast<EnemyEntity*>(entity.get());
+								}
 
-						ImGui::Text("敌人位置: (%.1f, %.1f), 敌人速度: (%.1f, %.1f)", position.x, position.y, velocity.x, velocity.y);
-					}
-				);
+								return nullptr;
+							}
+						) |
+						std::views::filter(std::identity{});
+				for (const auto& enemy: enemies)
+				{
+					const auto position = enemy->position();
+					const auto velocity = enemy->velocity();
+
+					ImGui::Text("Position: (%.1f, %.1f), Velocity: (%.1f, %.1f)[%.1f]", position.x, position.y, velocity.x, velocity.y, velocity.length());
+				}
 			}
 
 			// 显示飞弹信息
@@ -1262,25 +1899,142 @@ namespace playground
 				const auto count = std::ranges::count(entities_, EntityType::PROJECTILE, &Entity::type);
 				ImGui::Text("活动飞弹: %td", count);
 
-				std::ranges::for_each(
-					entities_ |
-					std::views::filter(
-						[](const auto& entity) noexcept -> bool
-						{
-							return entity->type() == EntityType::PROJECTILE;
-						}
-					),
-					[](const auto& entity) noexcept -> void
-					{
-						const auto position = entity->get_position();
-						const auto velocity = entity->get_velocity();
+				// ReSharper disable once CppLocalVariableMayBeConst
+				auto projectiles =
+						entities_ |
+						std::views::transform(
+							[](const auto& entity) noexcept -> ProjectileEntity*
+							{
+								if (const auto type = entity->type(); type == EntityType::PROJECTILE)
+								{
+									return static_cast<ProjectileEntity*>(entity.get());
+								}
 
-						ImGui::Text("飞弹位置: (%.1f, %.1f), 飞弹速度: (%.1f, %.1f)", position.x, position.y, velocity.x, velocity.y);
-					}
-				);
+								return nullptr;
+							}
+						) |
+						std::views::filter(std::identity{});
+				for (const auto projectile: projectiles)
+				{
+					const auto position = projectile->position();
+					const auto velocity = projectile->velocity();
+
+					ImGui::Text("Position: (%.1f, %.1f), Velocity: (%.1f, %.1f)[%.1f]", position.x, position.y, velocity.x, velocity.y, velocity.length());
+				}
 			}
 
 			ImGui::End();
 		}
+
+		// 往目标方向发射
+		auto spawn_projectile_toward(const sf::Vector2f direction) noexcept -> void
+		{
+			static std::mt19937 random_engine{};
+			static std::uniform_int_distribution random{};
+
+			const auto player_position = player_->position();
+			const auto player_size = player_->size();
+
+			const auto direction_normalized = direction.normalized();
+			// 偏移一定要足够,避免发射时直接碰撞本体
+			const auto offset = sf::Vector2f{direction_normalized.x * player_size.x, direction_normalized.y * player_size.y};
+			const auto spawn_position = player_position + offset;
+
+			auto projectile = [&](const auto r) noexcept -> std::unique_ptr<ProjectileEntity>
+			{
+				enum class Type
+				{
+					BASE = 0,
+					BOUNCE,
+					CHAIN,
+
+					COUNT,
+				};
+
+				switch (const auto type = static_cast<Type>(r % static_cast<int>(Type::COUNT));
+					type)
+				{
+					case Type::BASE:
+					{
+						return std::make_unique<BaseProjectileEntity>(
+							*physics_world_,
+							spawn_position,
+							// todo: 飞弹半径
+							10.f,
+							// todo: 飞弹速度
+							direction_normalized * 500.f,
+							// 存在5秒
+							5.f
+						);
+					}
+					case Type::BOUNCE:
+					{
+						return std::make_unique<BounceProjectileEntity>(
+							*physics_world_,
+							spawn_position,
+							// todo: 飞弹半径
+							10.f,
+							// todo: 飞弹速度
+							direction_normalized * 500.f,
+							// 存在5秒
+							5.f,
+							// 弹跳3次
+							3
+						);
+					}
+					case Type::CHAIN:
+					{
+						// todo: 数量/半径/断裂力
+						// 1大3小
+						static std::array segment_radii{15.f, 10.f, 10.f, 10.f};
+						static std::array break_force{150.f, 100.f, 100.f, 100.f};
+
+						return std::make_unique<ChainProjectileEntity>(
+							*physics_world_,
+							spawn_position,
+							segment_radii,
+							// todo: 飞弹速度
+							direction_normalized * 400.f,
+							break_force,
+							// 存在5秒
+							5.f
+						);
+					}
+					default:
+					{
+						PD_COMPILER_UNREACHABLE();
+					}
+				}
+			}(random(random_engine));
+
+			entities_.emplace_back(std::move(projectile));
+		}
+
+		// 往目标位置发射
+		auto spawn_projectile_to(const sf::Vector2f target_position) noexcept -> void
+		{
+			const auto player_position = player_->position();
+			const auto direction = target_position - player_position;
+
+			spawn_projectile_toward(direction);
+		}
 	};
+
+	inline auto ChainProjectileEntity::on_chain_break(const std::size_t broken_joint_index) const noexcept -> void
+	{
+		// todo: b2World::Step --> b2ContactListener --> on_chain_break --> b2World::CreateBody
+		// 不能在b2World::Step期间创建实体
+		std::println("因关节[{}]断裂而解体", broken_joint_index);
+
+		// 创建分散的小子弹
+		for (std::size_t i = 0; i < segments_.size(); ++i)
+		{
+			const auto& segment = segments_[i];
+
+			const auto physics_velocity = segment->GetLinearVelocity();
+			const auto velocity = pd::Constant::from_physics(physics_velocity);
+
+			Playground::playground->spawn_projectile_toward(velocity);
+		}
+	}
 }

@@ -38,6 +38,7 @@ auto main() noexcept -> int
 
 	// 初始化场景
 	playground::Playground playground{};
+	playground::Playground::playground = &playground;
 
 	while (window.isOpen())
 	{
