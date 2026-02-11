@@ -10,6 +10,7 @@
 #include <print>
 
 #include <prometheus/functional/enumeration.hpp>
+#include <prometheus/platform/os.hpp>
 
 #include <box2d/box2d.h>
 
@@ -17,8 +18,8 @@
 
 #include <imgui.h>
 
-#include <pd/defines.hpp>
-#include <pd/constants.hpp>
+#include <game/defines.hpp>
+#include <game/constants.hpp>
 
 namespace playground
 {
@@ -1046,7 +1047,7 @@ namespace playground
 			// 每次反弹都稍微降低弹性
 			// todo: create_physics保存shape id?假定只有一个?
 			{
-				PD_ASSERT(b2Body_GetShapeCount(body_) == 1);
+				PROMETHEUS_PLATFORM_ASSUME(b2Body_GetShapeCount(body_) == 1);
 
 				b2ShapeId shape_id;
 				b2Body_GetShapes(body_, &shape_id, 1);
@@ -1119,7 +1120,7 @@ namespace playground
 				auto* sensor_user_data = b2Body_GetUserData(sensor_body);
 				auto* visitor_user_data = b2Body_GetUserData(visitor_body);
 
-				PD_ASSERT(sensor_user_data != nullptr and visitor_user_data != nullptr);
+				PROMETHEUS_PLATFORM_ASSUME(sensor_user_data != nullptr and visitor_user_data != nullptr);
 
 				auto* sensor_entity = static_cast<Entity*>(sensor_user_data);
 				auto* visitor_entity = static_cast<Entity*>(visitor_user_data);
@@ -1145,7 +1146,7 @@ namespace playground
 				auto* sensor_user_data = b2Body_GetUserData(sensor_body);
 				auto* visitor_user_data = b2Body_GetUserData(visitor_body);
 
-				PD_ASSERT(sensor_user_data != nullptr and visitor_user_data != nullptr);
+				PROMETHEUS_PLATFORM_ASSUME(sensor_user_data != nullptr and visitor_user_data != nullptr);
 
 				auto* sensor_entity = static_cast<Entity*>(sensor_user_data);
 				auto* visitor_entity = static_cast<Entity*>(visitor_user_data);
@@ -1188,7 +1189,7 @@ namespace playground
 				auto* user_data_a = b2Body_GetUserData(body_a);
 				auto* user_data_b = b2Body_GetUserData(body_b);
 
-				PD_ASSERT(user_data_a != nullptr and user_data_b != nullptr);
+				PROMETHEUS_PLATFORM_ASSUME(user_data_a != nullptr and user_data_b != nullptr);
 
 				auto* entity_a = static_cast<Entity*>(user_data_a);
 				auto* entity_b = static_cast<Entity*>(user_data_b);
@@ -1217,7 +1218,7 @@ namespace playground
 						}
 						else
 						{
-							PD_ASSERT(type_b == EntityType::PLAYER);
+							PROMETHEUS_PLATFORM_ASSUME(type_b == EntityType::PLAYER);
 							handle_projectile_collision(static_cast<const FloorEntity*>(entity_a), static_cast<PlayerEntity*>(entity_b));
 						}
 					}
@@ -1229,7 +1230,7 @@ namespace playground
 						}
 						else
 						{
-							PD_ASSERT(type_a == EntityType::PLAYER);
+							PROMETHEUS_PLATFORM_ASSUME(type_a == EntityType::PLAYER);
 							handle_projectile_collision(static_cast<const FloorEntity*>(entity_b), static_cast<PlayerEntity*>(entity_a));
 						}
 					}
@@ -1258,7 +1259,7 @@ namespace playground
 				auto* user_data_a = b2Body_GetUserData(body_a);
 				auto* user_data_b = b2Body_GetUserData(body_b);
 
-				PD_ASSERT(user_data_a != nullptr and user_data_b != nullptr);
+				PROMETHEUS_PLATFORM_ASSUME(user_data_a != nullptr and user_data_b != nullptr);
 
 				const auto* entity_a = static_cast<Entity*>(user_data_a);
 				const auto* entity_b = static_cast<Entity*>(user_data_b);
@@ -1284,7 +1285,7 @@ namespace playground
 				auto* user_data_a = b2Body_GetUserData(body_a);
 				auto* user_data_b = b2Body_GetUserData(body_b);
 
-				PD_ASSERT(user_data_a != nullptr and user_data_b != nullptr);
+				PROMETHEUS_PLATFORM_ASSUME(user_data_a != nullptr and user_data_b != nullptr);
 
 				const auto* entity_a = static_cast<Entity*>(user_data_a);
 				const auto* entity_b = static_cast<Entity*>(user_data_b);
@@ -1737,7 +1738,7 @@ namespace playground
 				}
 				else
 				{
-					PD_COMPILER_UNREACHABLE();
+					PROMETHEUS_COMPILER_UNREACHABLE();
 				}
 			}();
 

@@ -38,9 +38,6 @@ project(
 )
 
 # ===================================================================================================
-# OPTION
-
-# ===================================================================================================
 # DEFINES
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/defines.cmake)
@@ -83,7 +80,7 @@ find_package(spdlog CONFIG REQUIRED)
 # ===================================================================================================
 # PACK
 
-set(PD_VERSION_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/include/pd/version.hpp)
+set(PD_VERSION_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/game/version.hpp)
 
 configure_file(
 		${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.hpp.in
@@ -98,16 +95,51 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-add_executable(${PROJECT_NAME})
+add_executable(
+	${PROJECT_NAME}
+		
+	# ============================
+	# EXTERNAL
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/external/imgui-SFML.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/external/imgui-SFML.cpp
+	
+	# ============================
+	# GAME
+	# ============================
+
+	# 宏定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/defines.hpp
+	# 常量定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/constants.hpp
+	# 测试用
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/playground.hpp
+
+	# 游戏场景
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/scene.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/scene.cpp
+	# 游戏主场景
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/main_scene.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/main_scene.cpp
+
+	# 游戏
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/game.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/game.cpp
+
+	# ============================
+	# MAIN
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+)
 
 target_include_directories(
 		${PROJECT_NAME}
 
 		PUBLIC
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		# version header file
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		${CMAKE_CURRENT_SOURCE_DIR}/src
+		${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_compile_options(
@@ -116,12 +148,6 @@ target_compile_options(
 
 		${PD_COMPILE_FLAGS}
 )
-
-#target_compile_definitions(
-#	${PROJECT_NAME}
-#	PUBLIC
-#
-#)
 
 target_compile_features(
 		${PROJECT_NAME}
@@ -139,70 +165,4 @@ target_link_libraries(
 		EnTT::EnTT
 		box2d::box2d
 		spdlog::spdlog
-)
-
-set(
-		PD_PUBLIC_FILES
-
-		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/defines.hpp
-		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/constants.hpp
-		
-		# ============================
-		# UTILITY
-		# ============================
-
-		# ============================
-		# EXTERNAL
-		# ============================
-
-		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/external/imgui-SFML.hpp
-
-		# ============================
-		# MAIN
-		# ============================
-
-		${CMAKE_CURRENT_SOURCE_DIR}/include/pd/playground.hpp
-)
-
-set(
-		PD_PRIVATE_FILES
-
-		# ============================
-		# EXTERNAL
-		# ============================
-
-		${CMAKE_CURRENT_SOURCE_DIR}/src/external/imgui-SFML.cpp
-
-		# ============================
-		# MAIN
-		# ============================
-
-		${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-)
-
-set_source_files_properties(
-		${PD_PUBLIC_FILES}
-		${PD_PRIVATE_FILES}
-		PROPERTIES
-		LANGUAGE CXX
-)
-
-target_sources(
-		${PROJECT_NAME}
-		PUBLIC
-		FILE_SET public_header_files
-		TYPE HEADERS
-		BASE_DIRS
-		${CMAKE_CURRENT_SOURCE_DIR}/include
-		# version header file
-		${CMAKE_CURRENT_BINARY_DIR}/include
-		FILES
-		${PD_PUBLIC_FILES}
-		${PD_VERSION_HEADER_FILE}
-)
-
-target_sources(
-		${PROJECT_NAME}
-		PRIVATE
-		${PD_PRIVATE_FILES}
 )
