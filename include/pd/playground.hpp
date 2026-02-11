@@ -9,6 +9,8 @@
 #include <ranges>
 #include <print>
 
+#include <prometheus/functional/enumeration.hpp>
+
 #include <box2d/box2d.h>
 
 #include <SFML/Graphics.hpp>
@@ -17,7 +19,6 @@
 
 #include <pd/defines.hpp>
 #include <pd/constants.hpp>
-#include <pd/utility/enumeration.hpp>
 
 namespace playground
 {
@@ -44,7 +45,7 @@ namespace playground
 		// 飞弹
 		PROJECTILE = 0b0000'0001'0000'0000,
 
-		PD_MAGIC_ENUM_FLAG
+		PROMETHEUS_MAGIC_ENUM_FLAG
 	};
 
 	enum class RenderLayer : std::uint8_t
@@ -79,14 +80,14 @@ namespace playground
 	protected:
 		// box2d --> 米
 		// SFML --> 像素
-		b2Body* body_;
+		b2BodyId body_;
 
 		bool active_;
 		RenderLayer render_layer_;
 
 	public:
 		explicit Entity(const RenderLayer render_layer) noexcept
-			: body_{nullptr},
+			: body_{b2_nullBodyId},
 			  active_{true},
 			  render_layer_{render_layer} {}
 
@@ -98,11 +99,8 @@ namespace playground
 
 		virtual ~Entity() noexcept
 		{
-			// 避免ContactListener::EndContact出问题
-			body_->GetUserData().pointer = 0;
-
-			auto* world = body_->GetWorld();
-			world->DestroyBody(body_);
+			// 销毁body
+			b2DestroyBody(body_);
 		}
 
 		[[nodiscard]] virtual auto type() const noexcept -> EntityType = 0;
@@ -112,7 +110,7 @@ namespace playground
 		virtual auto render(sf::RenderWindow& window) noexcept -> void = 0;
 
 		// 这个接口本不应该,不过简化逻辑
-		[[nodiscard]] auto body() const noexcept -> b2Body*
+		[[nodiscard]] auto body() const noexcept -> b2BodyId
 		{
 			return body_;
 		}
@@ -134,43 +132,50 @@ namespace playground
 		//
 
 	private:
-		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size, const EntityType type) noexcept -> b2Body*
+		[[nodiscard]] static auto create_physics(
+			const b2WorldId world,
+			const sf::Vector2f position,
+			const sf::Vector2f size,
+			const EntityType type
+		) noexcept -> b2BodyId
 		{
-			b2Body* body;
+			const auto physics_position = pd::Constant::to_physics(position);
+			const auto physics_size = pd::Constant::to_physics(size);
+
+			b2BodyId body;
 			// 创建BODY
 			{
-				const auto physics_position = pd::Constant::to_physics(position);
-
-				b2BodyDef def{};
+				auto def = b2DefaultBodyDef();
 				def.type = b2_dynamicBody;
 				def.position = physics_position;
 				// todo: 需不需要可以旋转?
 				def.fixedRotation = true;
 				def.linearDamping = 5;
 
-				body = world.CreateBody(&def);
+				body = b2CreateBody(world, &def);
 			}
-			// 创建FIXTURE
+			// 创建SHAPE
 			{
-				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
-
-				b2PolygonShape shape{};
-				shape.SetAsBox(physics_size.x, physics_size.y);
-
-				b2FixtureDef def{};
-				def.shape = &shape;
+				auto def = b2DefaultShapeDef();
 				def.density = 1;
-				def.friction = 0.3f;
-				def.restitution = 0.05f;
-				def.filter.categoryBits = static_cast<uint16>(type);
+				def.material.friction = 0.3f;
+				def.material.restitution = 0.05f;
+				def.filter.categoryBits = static_cast<uint64_t>(type);
 				// 可以和墙壁/地板/装饰物/敌人/玩家/飞弹碰撞
-				def.filter.maskBits = static_cast<uint16>(
+				def.filter.maskBits = static_cast<uint64_t>(
 					EntityType::WALL | EntityType::FLOOR | EntityType::DECORATION |
 					EntityType::ENEMY | EntityType::PLAYER |
 					EntityType::PROJECTILE
 				);
+				// todo
+				// 踩地板触发传感器
+				def.enableSensorEvents = true;
+				// 与敌人/玩家/飞弹碰撞
+				def.enableContactEvents = true;
+				def.enableHitEvents = true;
+				const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
-				body->CreateFixture(&def);
+				b2CreatePolygonShape(body, &def, &box);
 			}
 
 			return body;
@@ -190,30 +195,31 @@ namespace playground
 
 		auto limit_max_speed() const noexcept -> void
 		{
-			auto physics_velocity = body_->GetLinearVelocity();
+			auto physics_velocity = b2Body_GetLinearVelocity(body_);
 
-			if (const auto physics_speed_squared = physics_velocity.LengthSquared();
+			if (const auto physics_speed_squared = b2LengthSquared(physics_velocity);
 				physics_speed_squared > move_speed_current_physics_max_squared_)
 			{
 				const auto physics_speed = std::sqrt(physics_speed_squared);
 
 				physics_velocity *= move_speed_current_physics_max_ / physics_speed;
-				body_->SetLinearVelocity(physics_velocity);
+				b2Body_SetLinearVelocity(body_, physics_velocity);
 			}
 		}
 
 		auto sync_position_and_rotation() noexcept -> void
 		{
-			const auto position = body_->GetPosition();
-			const auto radians = body_->GetAngle();
+			const auto physics_position = b2Body_GetPosition(body_);
+			const auto physics_rotation = b2Body_GetRotation(body_);
+			const auto physics_rotation_radians = b2Rot_GetAngle(physics_rotation);
 
-			shape_.setPosition(pd::Constant::from_physics(position));
-			shape_.setRotation(sf::radians(radians));
+			shape_.setPosition(pd::Constant::from_physics(physics_position));
+			shape_.setRotation(sf::radians(physics_rotation_radians));
 		}
 
 	public:
 		ActorEntity(
-			b2World& world,
+			const b2WorldId world,
 			const sf::Vector2f position,
 			const sf::Vector2f size,
 			const float move_speed_max,
@@ -230,7 +236,7 @@ namespace playground
 			body_ = create_physics(world, position, size, type);
 
 			// 设置UserData
-			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+			b2Body_SetUserData(body_, this);
 
 			// 敌人/玩家颜色
 			shape_.setFillColor(type == EntityType::ENEMY ? sf::Color::Red : sf::Color::Green);
@@ -269,21 +275,22 @@ namespace playground
 
 		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f
 		{
-			const auto physics_velocity = body_->GetLinearVelocity();
+			const auto physics_velocity = b2Body_GetLinearVelocity(body_);
+
 			return pd::Constant::from_physics(physics_velocity);
 		}
 
-		auto apply_force(b2Vec2 force) const noexcept -> void
+		auto apply_force(const b2Vec2 direction) const noexcept -> void
 		{
-			if (force == b2Vec2_zero)
+			if (direction == b2Vec2_zero)
 			{
 				return;
 			}
 
-			force.Normalize();
+			const auto direction_normalized = b2Normalize(direction);
+			const auto force = b2Body_GetMass(body_) * direction_normalized * move_speed_current_max_;
 
-			force *= body_->GetMass() * move_speed_current_max_;
-			body_->ApplyForceToCenter(force, true);
+			b2Body_ApplyForceToCenter(body_, force, true);
 		}
 	};
 
@@ -292,7 +299,7 @@ namespace playground
 	{
 	public:
 		EnemyEntity(
-			b2World& world,
+			const b2WorldId world,
 			const sf::Vector2f position,
 			const sf::Vector2f size,
 			const float move_speed_max
@@ -310,7 +317,7 @@ namespace playground
 	{
 	public:
 		PlayerEntity(
-			b2World& world,
+			const b2WorldId world,
 			const sf::Vector2f position,
 			const sf::Vector2f size,
 			const float move_speed_max
@@ -330,40 +337,40 @@ namespace playground
 		//
 
 	private:
-		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept -> b2Body*
+		[[nodiscard]] static auto create_physics(
+			const b2WorldId world,
+			const sf::Vector2f position,
+			const sf::Vector2f size
+		) noexcept -> b2BodyId
 		{
-			b2Body* body;
+			const auto physics_position = pd::Constant::to_physics(position);
+			const auto physics_size = pd::Constant::to_physics(size);
+
+			b2BodyId body;
 			// 创建BODY
 			{
-				const auto physics_position = pd::Constant::to_physics(position);
-
-				b2BodyDef def{};
+				auto def = b2DefaultBodyDef();
 				def.type = b2_staticBody;
 				def.position = physics_position;
 				def.fixedRotation = true;
 
-				body = world.CreateBody(&def);
+				body = b2CreateBody(world, &def);
 			}
-			// 创建FIXTURE
+			// 创建SHAPE
 			{
-				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
-
-				b2PolygonShape shape{};
-				shape.SetAsBox(physics_size.x, physics_size.y);
-
-				b2FixtureDef def{};
-				def.shape = &shape;
+				auto def = b2DefaultShapeDef();
 				def.density = 0;
-				def.friction = 0.5f;
-				def.restitution = 0.7f;
-				def.filter.categoryBits = static_cast<uint16>(EntityType::WALL);
+				def.material.friction = 0.5f;
+				def.material.restitution = 0.7f;
+				def.filter.categoryBits = static_cast<uint64_t>(EntityType::WALL);
 				// 可以和敌人/玩家/飞弹碰撞
-				def.filter.maskBits = static_cast<uint16>(
+				def.filter.maskBits = static_cast<uint64_t>(
 					EntityType::ENEMY | EntityType::PLAYER |
 					EntityType::PROJECTILE
 				);
+				const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
-				body->CreateFixture(&def);
+				b2CreatePolygonShape(body, &def, &box);
 			}
 
 			return body;
@@ -373,7 +380,7 @@ namespace playground
 
 	public:
 		WallEntity(
-			b2World& world,
+			const b2WorldId world,
 			const sf::Vector2f position,
 			const sf::Vector2f size
 		) noexcept
@@ -384,7 +391,7 @@ namespace playground
 			body_ = create_physics(world, position, size);
 
 			// 设置UserData
-			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+			b2Body_SetUserData(body_, this);
 
 			// 墙颜色
 			shape_.setFillColor(sf::Color::Black);
@@ -426,37 +433,41 @@ namespace playground
 		};
 
 	private:
-		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept -> b2Body*
+		[[nodiscard]] static auto create_physics(
+			const b2WorldId world,
+			const sf::Vector2f position,
+			const sf::Vector2f size
+		) noexcept -> b2BodyId
 		{
-			b2Body* body;
+			const auto physics_position = pd::Constant::to_physics(position);
+			const auto physics_size = pd::Constant::to_physics(size);
+
+			b2BodyId body;
 			// 创建BODY
 			{
-				const auto physics_position = pd::Constant::to_physics(position);
-
-				b2BodyDef def{};
+				auto def = b2DefaultBodyDef();
 				def.type = b2_staticBody;
 				def.position = physics_position;
 				def.fixedRotation = true;
 				def.linearDamping = 5;
 
-				body = world.CreateBody(&def);
+				body = b2CreateBody(world, &def);
 			}
-			// 创建FIXTURE
+			// 创建SHAPE
 			{
-				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
-
-				b2PolygonShape shape{};
-				shape.SetAsBox(physics_size.x, physics_size.y);
-
-				b2FixtureDef def{};
-				def.shape = &shape;
+				auto def = b2DefaultShapeDef();
 				// 传感器不阻止移动,可以检测接触
 				def.isSensor = true;
-				def.filter.categoryBits = static_cast<uint16>(EntityType::FLOOR);
+				def.filter.categoryBits = static_cast<uint64_t>(EntityType::FLOOR);
 				// 可以和敌人/玩家碰撞
-				def.filter.maskBits = static_cast<uint16>(EntityType::ENEMY | EntityType::PLAYER);
+				def.filter.maskBits = static_cast<uint64_t>(
+					EntityType::ENEMY | EntityType::PLAYER
+				);
+				// 踩地板触发传感器
+				def.enableSensorEvents = true;
+				const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
-				body->CreateFixture(&def);
+				b2CreatePolygonShape(body, &def, &box);
 			}
 
 			return body;
@@ -466,7 +477,7 @@ namespace playground
 
 	public:
 		FloorEntity(
-			b2World& world,
+			const b2WorldId world,
 			const sf::Vector2f position,
 			const sf::Vector2f size,
 			const Type type
@@ -478,7 +489,7 @@ namespace playground
 			body_ = create_physics(world, position, size);
 
 			// 设置UserData
-			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+			b2Body_SetUserData(body_, this);
 
 			// 地板颜色
 			switch (type)
@@ -541,41 +552,41 @@ namespace playground
 		//
 
 	private:
-		[[nodiscard]] static auto create_physics(b2World& world, const sf::Vector2f position, const sf::Vector2f size) noexcept -> b2Body*
+		[[nodiscard]] static auto create_physics(
+			const b2WorldId world,
+			const sf::Vector2f position,
+			const sf::Vector2f size
+		) noexcept -> b2BodyId
 		{
-			b2Body* body;
+			const auto physics_position = pd::Constant::to_physics(position);
+			const auto physics_size = pd::Constant::to_physics(size);
+
+			b2BodyId body;
 			// 创建BODY
 			{
-				const auto physics_position = pd::Constant::to_physics(position);
-
-				b2BodyDef def{};
+				auto def = b2DefaultBodyDef();
 				def.type = b2_staticBody;
 				def.position = physics_position;
 				def.fixedRotation = true;
 
-				body = world.CreateBody(&def);
+				body = b2CreateBody(world, &def);
 			}
-			// 创建FIXTURE
+			// 创建SHAPE
 			{
-				const auto physics_size = 0.5f * pd::Constant::to_physics(size);
-
-				b2PolygonShape shape{};
-				shape.SetAsBox(physics_size.x, physics_size.y);
-
-				b2FixtureDef def{};
-				def.shape = &shape;
+				auto def = b2DefaultShapeDef();
 				def.density = 0;
-				def.friction = 0.5f;
-				def.restitution = 0.7f;
-				def.filter.categoryBits = static_cast<uint16>(EntityType::DECORATION);
+				def.material.friction = 0.5f;
+				def.material.restitution = 0.7f;
+				def.filter.categoryBits = static_cast<uint64_t>(EntityType::DECORATION);
 				// 可以和敌人/玩家/飞弹碰撞
 				// todo: 如果是一个可以移动的装饰物呢?如果可以移动,则还可以和墙壁/装饰物碰撞
-				def.filter.maskBits = static_cast<uint16>(
+				def.filter.maskBits = static_cast<uint64_t>(
 					EntityType::ENEMY | EntityType::PLAYER |
 					EntityType::PROJECTILE
 				);
+				const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
-				body->CreateFixture(&def);
+				b2CreatePolygonShape(body, &def, &box);
 			}
 
 			return body;
@@ -585,7 +596,7 @@ namespace playground
 
 	public:
 		DecorationEntity(
-			b2World& world,
+			const b2WorldId world,
 			const sf::Vector2f position,
 			const sf::Vector2f size
 		) noexcept
@@ -596,7 +607,7 @@ namespace playground
 			body_ = create_physics(world, position, size);
 
 			// 设置UserData
-			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+			b2Body_SetUserData(body_, this);
 
 			// 地形/装饰物颜色
 			shape_.setFillColor(sf::Color::Yellow);
@@ -697,49 +708,48 @@ namespace playground
 
 	private:
 		[[nodiscard]] static auto create_physics(
-			b2World& world,
+			const b2WorldId world,
 			const EntityType owner,
 			const sf::Vector2f position,
 			const float radius,
 			const sf::Vector2f velocity
-		) noexcept -> b2Body*
+		) noexcept -> b2BodyId
 		{
-			b2Body* body;
+			const auto physics_position = pd::Constant::to_physics(position);
+			const auto physics_radius = pd::Constant::to_physics(radius);
+			const auto physics_velocity = pd::Constant::to_physics(velocity);
+
+			b2BodyId body;
 			// 创建BODY
 			{
-				const auto physics_position = pd::Constant::to_physics(position);
-				const auto physics_velocity = pd::Constant::to_physics(velocity);
-
-				b2BodyDef def{};
+				auto def = b2DefaultBodyDef();
 				def.type = b2_dynamicBody;
 				def.position = physics_position;
 				def.linearVelocity = physics_velocity;
 				def.linearDamping = 0.05f;
 				def.fixedRotation = false;
-				def.bullet = true;
+				def.isBullet = true;
 
-				body = world.CreateBody(&def);
+				body = b2CreateBody(world, &def);
 			}
-			// 创建FIXTURE
+			// 创建SHAPE
 			{
-				const auto physics_radius = pd::Constant::to_physics(radius);
-
-				b2CircleShape shape{};
-				shape.m_radius = physics_radius;
-
-				b2FixtureDef def{};
-				def.shape = &shape;
+				auto def = b2DefaultShapeDef();
 				def.density = 0.5f;
-				def.friction = 0;
-				def.restitution = 0.8f;
-				def.filter.categoryBits = static_cast<uint16>(EntityType::PROJECTILE);
+				def.material.friction = 0;
+				def.material.restitution = 0.8f;
+				def.filter.categoryBits = static_cast<uint64_t>(EntityType::PROJECTILE);
 				// 可以和墙壁/装饰物/敌人/玩家/碰撞
-				def.filter.maskBits = static_cast<uint16>(
+				def.filter.maskBits = static_cast<uint64_t>(
 					EntityType::WALL | EntityType::DECORATION |
 					(owner == EntityType::ENEMY ? EntityType::PLAYER : EntityType::ENEMY)
 				);
+				// 与敌人/玩家碰撞
+				def.enableContactEvents = true;
+				def.enableHitEvents = true;
+				const auto circle = b2Circle{.center = b2Vec2_zero, .radius = physics_radius};
 
-				body->CreateFixture(&def);
+				b2CreateCircleShape(body, &def, &circle);
 			}
 
 			return body;
@@ -752,16 +762,17 @@ namespace playground
 
 		auto sync_position_and_rotation() noexcept -> void
 		{
-			const auto position = body_->GetPosition();
-			const auto radians = body_->GetAngle();
+			const auto physics_position = b2Body_GetPosition(body_);
+			const auto physics_rotation = b2Body_GetRotation(body_);
+			const auto physics_rotation_radians = b2Rot_GetAngle(physics_rotation);
 
-			shape_.setPosition(pd::Constant::from_physics(position));
-			shape_.setRotation(sf::radians(radians));
+			shape_.setPosition(pd::Constant::from_physics(physics_position));
+			shape_.setRotation(sf::radians(physics_rotation_radians));
 		}
 
 	public:
 		BaseProjectileEntity(
-			b2World& world,
+			const b2WorldId world,
 			const EntityType owner,
 			const sf::Vector2f position,
 			const float radius,
@@ -777,7 +788,7 @@ namespace playground
 			body_ = create_physics(world, owner, position, radius, velocity);
 
 			// 设置UserData
-			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+			b2Body_SetUserData(body_, this);
 
 			// 飞弹颜色
 			shape_.setFillColor(sf::Color::Red);
@@ -797,8 +808,8 @@ namespace playground
 			// 低速弹跳飞弹直接销毁
 			// todo: 低速阈值
 			constexpr auto min_velocity_2 = 5 * 5;
-			if (const auto velocity = body_->GetLinearVelocity();
-				velocity.LengthSquared() < min_velocity_2)
+			if (const auto velocity = b2Body_GetLinearVelocity(body_);
+				b2LengthSquared(velocity) < min_velocity_2)
 			{
 				active_ = false;
 			}
@@ -822,10 +833,10 @@ namespace playground
 			const auto position = shape_.getPosition();
 			const auto radius = shape_.getRadius();
 
-			auto physics_velocity = body_->GetLinearVelocity();
-			physics_velocity.Normalize();
+			const auto physics_velocity = b2Body_GetLinearVelocity(body_);
+			const auto physics_velocity_normalized = b2Normalize(physics_velocity);
 
-			const auto direction = sf::Vector2f{physics_velocity.x, physics_velocity.y};
+			const auto direction = sf::Vector2f{physics_velocity_normalized.x, physics_velocity_normalized.y};
 			const auto left_perpendicular = sf::Vector2f{-direction.y, direction.x};
 
 			// 先渲染拖尾
@@ -858,7 +869,8 @@ namespace playground
 
 		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f override
 		{
-			const auto physics_velocity = body_->GetLinearVelocity();
+			const auto physics_velocity = b2Body_GetLinearVelocity(body_);
+
 			return pd::Constant::from_physics(physics_velocity);
 		}
 	};
@@ -872,49 +884,48 @@ namespace playground
 
 	private:
 		[[nodiscard]] static auto create_physics(
-			b2World& world,
+			const b2WorldId world,
 			const EntityType owner,
 			const sf::Vector2f position,
 			const float radius,
 			const sf::Vector2f velocity
-		) noexcept -> b2Body*
+		) noexcept -> b2BodyId
 		{
-			b2Body* body;
+			const auto physics_position = pd::Constant::to_physics(position);
+			const auto physics_radius = pd::Constant::to_physics(radius);
+			const auto physics_velocity = pd::Constant::to_physics(velocity);
+
+			b2BodyId body;
 			// 创建BODY
 			{
-				const auto physics_position = pd::Constant::to_physics(position);
-				const auto physics_velocity = pd::Constant::to_physics(velocity);
-
-				b2BodyDef def{};
+				auto def = b2DefaultBodyDef();
 				def.type = b2_dynamicBody;
 				def.position = physics_position;
 				def.linearVelocity = physics_velocity;
 				def.linearDamping = 0.05f;
 				def.fixedRotation = false;
-				def.bullet = true;
+				def.isBullet = true;
 
-				body = world.CreateBody(&def);
+				body = b2CreateBody(world, &def);
 			}
-			// 创建FIXTURE
+			// 创建SHAPE
 			{
-				const auto physics_radius = pd::Constant::to_physics(radius);
-
-				b2CircleShape shape{};
-				shape.m_radius = physics_radius;
-
-				b2FixtureDef def{};
-				def.shape = &shape;
+				auto def = b2DefaultShapeDef();
 				def.density = 0.5f;
-				def.friction = 0;
-				def.restitution = 0.8f;
-				def.filter.categoryBits = static_cast<uint16>(EntityType::PROJECTILE);
+				def.material.friction = 0;
+				def.material.restitution = 0.8f;
+				def.filter.categoryBits = static_cast<uint64_t>(EntityType::PROJECTILE);
 				// 可以和墙壁/装饰物/敌人/玩家/碰撞
-				def.filter.maskBits = static_cast<uint16>(
+				def.filter.maskBits = static_cast<uint64_t>(
 					EntityType::WALL | EntityType::DECORATION |
 					(owner == EntityType::ENEMY ? EntityType::PLAYER : EntityType::ENEMY)
 				);
+				// 与敌人/玩家碰撞
+				def.enableContactEvents = true;
+				def.enableHitEvents = true;
+				const auto circle = b2Circle{.center = b2Vec2_zero, .radius = physics_radius};
 
-				body->CreateFixture(&def);
+				b2CreateCircleShape(body, &def, &circle);
 			}
 
 			return body;
@@ -931,16 +942,17 @@ namespace playground
 
 		auto sync_position_and_rotation() noexcept -> void
 		{
-			const auto position = body_->GetPosition();
-			const auto radians = body_->GetAngle();
+			const auto physics_position = b2Body_GetPosition(body_);
+			const auto physics_rotation = b2Body_GetRotation(body_);
+			const auto physics_rotation_radians = b2Rot_GetAngle(physics_rotation);
 
-			shape_.setPosition(pd::Constant::from_physics(position));
-			shape_.setRotation(sf::radians(radians));
+			shape_.setPosition(pd::Constant::from_physics(physics_position));
+			shape_.setRotation(sf::radians(physics_rotation_radians));
 		}
 
 	public:
 		BounceProjectileEntity(
-			b2World& world,
+			const b2WorldId world,
 			const EntityType owner,
 			const sf::Vector2f position,
 			const float radius,
@@ -959,7 +971,7 @@ namespace playground
 			body_ = create_physics(world, owner, position, radius, velocity);
 
 			// 设置UserData
-			body_->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+			b2Body_SetUserData(body_, this);
 
 			// 飞弹颜色
 			shape_.setFillColor(sf::Color::Red);
@@ -979,8 +991,8 @@ namespace playground
 			// 低速弹跳飞弹直接销毁
 			// todo: 低速阈值
 			constexpr auto min_velocity_2 = 5 * 5;
-			if (const auto velocity = body_->GetLinearVelocity();
-				velocity.LengthSquared() < min_velocity_2)
+			if (const auto velocity = b2Body_GetLinearVelocity(body_);
+				b2LengthSquared(velocity) < min_velocity_2)
 			{
 				active_ = false;
 			}
@@ -999,10 +1011,10 @@ namespace playground
 			const auto position = shape_.getPosition();
 			const auto radius = shape_.getRadius();
 
-			auto physics_velocity = body_->GetLinearVelocity();
-			physics_velocity.Normalize();
+			const auto physics_velocity = b2Body_GetLinearVelocity(body_);
+			const auto physics_velocity_normalized = b2Normalize(physics_velocity);
 
-			const auto direction = sf::Vector2f{physics_velocity.x, physics_velocity.y};
+			const auto direction = sf::Vector2f{physics_velocity_normalized.x, physics_velocity_normalized.y};
 			const auto left_perpendicular = sf::Vector2f{-direction.y, direction.x};
 
 			// 先渲染拖尾
@@ -1032,16 +1044,22 @@ namespace playground
 			}
 
 			// 每次反弹都稍微降低弹性
-			for (auto* f = body_->GetFixtureList(); f; f = f->GetNext())
+			// todo: create_physics保存shape id?假定只有一个?
 			{
+				PD_ASSERT(b2Body_GetShapeCount(body_) == 1);
+
+				b2ShapeId shape_id;
+				b2Body_GetShapes(body_, &shape_id, 1);
+
 				// todo: 弹性减少系数
 				constexpr auto restitution_factor = 0.9f;
-				const auto restitution = f->GetRestitution();
-				f->SetRestitution(restitution * restitution_factor);
+				const auto restitution = b2Shape_GetRestitution(shape_id);
+
+				b2Shape_SetRestitution(shape_id, restitution * restitution_factor);
 			}
 
 			// 每次反弹后稍微减少速度
-			auto velocity = body_->GetLinearVelocity();
+			const auto physics_velocity = b2Body_GetLinearVelocity(body_);
 			// todo: 减速系数
 			// 减速系数可以随着反弹次数增加而增大
 			constexpr auto slowdown_factor_default = 0.95f;
@@ -1049,8 +1067,8 @@ namespace playground
 			// 不低于0.3倍
 			slowdown_factor = std::ranges::max(slowdown_factor, 0.3f);
 			// 设置速度
-			velocity *= slowdown_factor;
-			body_->SetLinearVelocity(std::ranges::max(slowdown_factor, 0.3f) * velocity);
+			const auto new_physics_velocity = physics_velocity * slowdown_factor;
+			b2Body_SetLinearVelocity(body_, new_physics_velocity);
 		}
 
 		auto position() const noexcept -> sf::Vector2f override
@@ -1065,401 +1083,8 @@ namespace playground
 
 		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f override
 		{
-			const auto physics_velocity = body_->GetLinearVelocity();
-			return pd::Constant::from_physics(physics_velocity);
-		}
-	};
+			const auto physics_velocity = b2Body_GetLinearVelocity(body_);
 
-	class ChainProjectileEntity final : public ProjectileEntity
-	{
-	public:
-		// ReSharper disable once IdentifierTypo
-		constexpr static auto npos = std::numeric_limits<std::size_t>::max();
-
-	private:
-		[[nodiscard]] static auto create_shapes(const std::span<const float> segment_radii) noexcept -> std::vector<sf::CircleShape>
-		{
-			std::vector<sf::CircleShape> shapes{};
-			shapes.reserve(segment_radii.size());
-
-			std::ranges::transform(
-				segment_radii,
-				std::back_inserter(shapes),
-				[](const float radius) noexcept -> sf::CircleShape
-				{
-					return sf::CircleShape{radius};
-				}
-			);
-
-			return shapes;
-		}
-
-		[[nodiscard]] static auto create_segment(
-			b2World& world,
-			const EntityType owner,
-			const b2Vec2 physics_position,
-			const float physics_radius,
-			const float mass_multiplier = 1.f
-		) noexcept -> b2Body*
-		{
-			b2Body* body;
-			// 创建BODY
-			{
-				b2BodyDef def{};
-				def.type = b2_dynamicBody;
-				def.position = physics_position;
-				def.linearDamping = 0.1f;
-				def.angularDamping = 0.5f;
-
-				body = world.CreateBody(&def);
-			}
-			// 创建FIXTURE
-			{
-				b2CircleShape shape{};
-				shape.m_radius = physics_radius;
-
-				b2FixtureDef def{};
-				def.shape = &shape;
-				def.density = 0.5f * mass_multiplier;
-				def.friction = 0.1f;
-				def.restitution = 0.6f;
-				def.filter.categoryBits = static_cast<uint16>(EntityType::PROJECTILE);
-				// 可以和墙壁/装饰物/敌人/玩家/碰撞
-				def.filter.maskBits = static_cast<uint16>(
-					EntityType::WALL | EntityType::DECORATION |
-					(owner == EntityType::ENEMY ? EntityType::PLAYER : EntityType::ENEMY)
-				);
-
-				body->CreateFixture(&def);
-			}
-
-			return body;
-		}
-
-		[[nodiscard]] static auto create_segments(
-			b2World& world,
-			const EntityType owner,
-			sf::Vector2f position,
-			const std::span<const float> segment_radii,
-			const sf::Vector2f velocity
-		) noexcept -> std::vector<b2Body*>
-		{
-			std::vector<b2Body*> segments{};
-			segments.reserve(segment_radii.size());
-
-			const auto direction = velocity.normalized();
-			const auto total_length = std::ranges::fold_left(
-				segment_radii,
-				0.f,
-				[](const float sum, const float r) noexcept -> float
-				{
-					return sum + r * 2;
-				}
-			);
-
-			position += direction * (total_length * 1.5f);
-
-			// 头部 - 在中心位置
-			{
-				const auto radius = segment_radii[0];
-
-				const auto physics_position = pd::Constant::to_physics(position);
-				const auto physics_radius = pd::Constant::to_physics(radius);
-				const auto physics_velocity = pd::Constant::to_physics(velocity);
-
-				auto* segment = create_segment(world, owner, physics_position, physics_radius, 2);
-				segment->SetLinearVelocity(physics_velocity);
-				segments.emplace_back(segment);
-			}
-			// 其他segment - 按弧线排列
-			{
-				const auto segment_count = static_cast<float>(segment_radii.size());
-
-				const auto perpendicular = sf::Vector2f{-direction.y, direction.x};
-
-				for (std::size_t i = 1; i < segment_radii.size(); ++i)
-				{
-					constexpr auto arc_angle = 30.f;
-
-					const auto this_radius = segment_radii[i];
-					const auto this_physics_radius = pd::Constant::to_physics(this_radius);
-
-					// 计算弧线上的位置
-					const float angle_ratio = static_cast<float>(i - 1) / (segment_count - 2);
-					// 在弧线上均匀分布
-					const float angle = arc_angle * (angle_ratio - 0.5f);
-					// 旋转方向向量
-					// const auto rotated_direction = direction.rotatedBy(sf::degrees(angle));
-					// 计算偏移距离,让整个链看起来更像蛇形
-					// const float offset_distance = this_radius * 2 + 5.f;
-					// const auto offset = rotated_direction * offset_distance;
-
-					// 从头部位置向后偏移
-					const auto this_position = position - direction * (this_radius * i * 0.8f) + perpendicular * (angle_ratio - 0.5f) * (this_radius * 3);
-					const auto this_physics_position = pd::Constant::to_physics(this_position);
-
-					auto* segment = create_segment(world, owner, this_physics_position, this_physics_radius);
-					// 给每个segment不同的初始速度和方向,形成自然摆动
-					const auto segment_velocity = velocity.rotatedBy(sf::degrees(angle * 0.5f)) * (0.85f - i * 0.1f);
-					segment->SetLinearVelocity(pd::Constant::to_physics(segment_velocity));
-
-					segments.emplace_back(segment);
-				}
-			}
-
-			return segments;
-		}
-
-		[[nodiscard]] static auto create_joint(
-			b2World& world,
-			b2Body& body_a,
-			b2Body& body_b,
-			const float physics_length,
-			const float break_force
-		) noexcept -> b2DistanceJoint*
-		{
-			b2DistanceJointDef def{};
-			def.Initialize(&body_a, &body_b, body_a.GetWorldCenter(), body_b.GetWorldCenter());
-			def.collideConnected = false;
-			def.length = physics_length;
-
-			auto* joint = world.CreateJoint(&def);
-			// joint储存自身断裂的力量
-			joint->GetUserData().pointer = std::bit_cast<std::uint32_t>(break_force);
-
-			return static_cast<b2DistanceJoint*>(joint);
-		}
-
-		[[nodiscard]] static auto create_joints(
-			b2World& world,
-			const std::span<const float> segment_radii,
-			const std::span<const float> break_forces,
-			const std::span<b2Body*>& segments
-		) noexcept -> std::vector<b2DistanceJoint*>
-		{
-			PD_ASSERT(segment_radii.size() == break_forces.size());
-			PD_ASSERT(segment_radii.size() == segments.size());
-
-			std::vector<b2DistanceJoint*> joints{};
-			joints.reserve(segment_radii.size() - 1);
-
-			for (std::size_t i = 0; i < segment_radii.size() - 1; ++i)
-			{
-				const auto radius = segment_radii[i];
-				const auto next_radius = segment_radii[i + 1];
-				const auto joint_length = radius + next_radius + 2;
-
-				const auto break_force = break_forces[i];
-
-				auto* segment = segments[i];
-				auto* next_segment = segments[i + 1];
-
-				const auto physics_joint_length = pd::Constant::to_physics(joint_length);
-
-				auto* joint = create_joint(world, *segment, *next_segment, physics_joint_length, break_force);
-				joints.emplace_back(joint);
-			}
-
-			return joints;
-		}
-
-		[[nodiscard]] static auto create_physics(
-			b2World& world,
-			const EntityType owner,
-			const sf::Vector2f position,
-			const std::span<const float> segment_radii,
-			const sf::Vector2f velocity,
-			const std::span<const float> break_force,
-			std::vector<sf::CircleShape>& out_shapes,
-			std::vector<b2Body*>& out_segments,
-			std::vector<b2DistanceJoint*>& out_joints
-		) noexcept -> b2Body*
-		{
-			out_shapes = create_shapes(segment_radii);
-			out_segments = create_segments(world, owner, position, segment_radii, velocity);
-			out_joints = create_joints(world, segment_radii, break_force, out_segments);
-
-			// 使用第一个segment作为主body
-			return out_segments.front();
-		}
-
-		std::vector<sf::CircleShape> shapes_;
-		std::vector<b2Body*> segments_;
-		std::vector<b2DistanceJoint*> joints_;
-		// 断裂位置
-		std::size_t broken_joint_index_;
-
-		auto split_on_broken() noexcept -> void;
-
-		auto sync_position_and_rotation() noexcept -> void
-		{
-			for (auto [shape, segment]: std::views::zip(shapes_, segments_))
-			{
-				const auto position = body_->GetPosition();
-				const auto radians = body_->GetAngle();
-
-				shape.setPosition(pd::Constant::from_physics(position));
-				shape.setRotation(sf::radians(radians));
-			}
-		}
-
-	public:
-		ChainProjectileEntity(
-			b2World& world,
-			const EntityType owner,
-			const sf::Vector2f position,
-			const std::span<float> segment_radii,
-			const sf::Vector2f velocity,
-			const std::span<const float> break_force,
-			const float lifetime
-		) noexcept
-			: ProjectileEntity{lifetime},
-			  broken_joint_index_{npos}
-		{
-			// 创建body
-			body_ = create_physics(world, owner, position, segment_radii, velocity, break_force, shapes_, segments_, joints_);
-
-			// 设置UserData
-			std::ranges::for_each(
-				segments_,
-				[p = reinterpret_cast<uintptr_t>(this)](auto* body) noexcept -> void
-				{
-					body->GetUserData().pointer = p;
-				}
-			);
-
-			std::ranges::for_each(
-				shapes_,
-				[](auto& shape) noexcept -> void
-				{
-					// 飞弹颜色
-					shape.setFillColor(sf::Color::Red);
-					// 中心对齐
-					shape.setOrigin({shape.getRadius(), shape.getRadius()});
-					// 不需要初始化位置(因为我们会在update中更新位置)
-					// 更何况这里也不方便直接拿到位置 :)
-				}
-			);
-		}
-
-		~ChainProjectileEntity() noexcept override
-		{
-			// 销毁所有关节
-			std::ranges::for_each(
-				joints_,
-				[](auto* joint) noexcept -> void
-				{
-					auto* body_a = joint->GetBodyA();
-					auto* world = body_a->GetWorld();
-
-					world->DestroyJoint(joint);
-				}
-			);
-
-			// 销毁所有segment的body(头部由基类析构销毁)
-			std::ranges::for_each(
-				segments_ | std::views::drop(1),
-				[](auto& segment) noexcept -> void
-				{
-					// 避免ContactListener出问题
-					segment->GetUserData().pointer = 0;
-
-					auto* world = segment->GetWorld();
-					world->DestroyBody(segment);
-				}
-			);
-		}
-
-		auto update(const float delta) noexcept -> void override
-		{
-			ProjectileEntity::update(delta);
-
-			if (not active_)
-			{
-				return;
-			}
-
-			// 如果已经断开(例如第一个节点与其他物体碰撞)
-			if (broken_joint_index_ != npos)
-			{
-				split_on_broken();
-				return;
-			}
-
-			// 检查关节是否断裂
-			for (std::size_t i = 0; i < joints_.size(); ++i)
-			{
-				auto* joint = joints_[i];
-
-				// 检查关节受力
-				const auto force = joint->GetReactionForce(1.f / delta);
-				const auto force_magnitude = force.Length();
-
-				if (const auto break_force = std::bit_cast<float>(static_cast<std::uint32_t>(joint->GetUserData().pointer));
-					force_magnitude > break_force)
-				{
-					// 记录断裂位置
-					broken_joint_index_ = i;
-
-					// 直接结束
-					break;
-				}
-			}
-
-			// 关节受力断开
-			if (broken_joint_index_ != npos)
-			{
-				split_on_broken();
-				return;
-			}
-
-			// 同步位置/旋转
-			sync_position_and_rotation();
-		}
-
-		auto render(sf::RenderWindow& window) noexcept -> void override
-		{
-			if (not active_)
-			{
-				return;
-			}
-
-			std::ranges::for_each(
-				shapes_,
-				[&](const auto& shape) noexcept -> void
-				{
-					window.draw(shape);
-				}
-			);
-		}
-
-		// 处理碰撞
-		auto on_collide(Entity& entity) noexcept -> void override
-		{
-			ProjectileEntity::on_collide(entity);
-
-			// 第一个节点与其他物体碰撞
-			broken_joint_index_ = 0;
-
-			// 不要标记为不活跃,因为其会等到下一次update时才进行分裂
-			// active_ = false;
-		}
-
-		auto position() const noexcept -> sf::Vector2f override
-		{
-			const auto& shape = shapes_[0];
-			return shape.getPosition();
-		}
-
-		[[nodiscard]] auto size() const noexcept -> sf::Vector2f override
-		{
-			const auto& shape = shapes_[0];
-			return {shape.getRadius(), shape.getRadius()};
-		}
-
-		[[nodiscard]] auto velocity() const noexcept -> sf::Vector2f override
-		{
-			const auto physics_velocity = body_->GetLinearVelocity();
 			return pd::Constant::from_physics(physics_velocity);
 		}
 	};
@@ -1468,126 +1093,211 @@ namespace playground
 	// 可以直接穿过地形/装饰物的飞弹?
 	// 范围性飞弹?
 
-	// 碰撞监听器
-	class ContactListener final : public b2ContactListener
+	class SensorProcessor final
 	{
 	public:
-		using list_type = std::vector<Entity*>;
-
-	private:
-		list_type inactive_entities_;
-
-	public:
-		void BeginContact(b2Contact* contact) override
+		static auto step(const b2WorldId world) noexcept -> void
 		{
-			const auto* fixture_a = contact->GetFixtureA();
-			const auto* fixture_b = contact->GetFixtureB();
+			const auto events = b2World_GetSensorEvents(world);
 
-			const auto* body_a = fixture_a->GetBody();
-			const auto* body_b = fixture_b->GetBody();
+			// if (events.beginCount != 0)
+			// {
+			// 	std::println("b2SensorEvents::beginCount: {}", events.beginCount);
+			// }
+			// if (events.endCount != 0)
+			// {
+			// 	std::println("b2SensorEvents::endCount: {}", events.endCount);
+			// }
 
-			auto* entity_a = reinterpret_cast<Entity*>(body_a->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
-			auto* entity_b = reinterpret_cast<Entity*>(body_b->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
-
-			PD_ASSERT(entity_a != nullptr and entity_b != nullptr);
-
-			const auto type_a = entity_a->type();
-			const auto type_b = entity_b->type();
-
-			// 踩中地板
-			if (type_a == EntityType::FLOOR or type_b == EntityType::FLOOR)
+			for (int i = 0; i < events.beginCount; ++i)
 			{
-				const auto handle_projectile_collision = [this]<typename T>(const FloorEntity* floor, T* entity) noexcept -> void //
-							requires std::is_same_v<T, EnemyEntity> or std::is_same_v<T, PlayerEntity>
-				{
-					// todo: 应用地板的效果
-					std::ignore = floor;
-					std::ignore = entity;
-				};
+				const auto& event = events.beginEvents[i];
 
-				if (type_a == EntityType::FLOOR)
-				{
-					std::println("接触地板: A: FLOOR, B: {}", type_b == EntityType::ENEMY ? "ENEMY" : "PLAYER");
+				const auto sensor_body = b2Shape_GetBody(event.sensorShapeId);
+				const auto visitor_body = b2Shape_GetBody(event.visitorShapeId);
 
-					if (type_b == EntityType::ENEMY)
-					{
-						handle_projectile_collision(static_cast<const FloorEntity*>(entity_a), static_cast<EnemyEntity*>(entity_b));
-					}
-					else
-					{
-						PD_ASSERT(type_b == EntityType::PLAYER);
-						handle_projectile_collision(static_cast<const FloorEntity*>(entity_a), static_cast<PlayerEntity*>(entity_b));
-					}
-				}
-				else
-				{
-					std::println("接触地板: A: {}, B: FLOOR", type_a == EntityType::ENEMY ? "ENEMY" : "PLAYER");
+				auto* sensor_user_data = b2Body_GetUserData(sensor_body);
+				auto* visitor_user_data = b2Body_GetUserData(visitor_body);
 
-					if (type_a == EntityType::ENEMY)
-					{
-						handle_projectile_collision(static_cast<const FloorEntity*>(entity_b), static_cast<EnemyEntity*>(entity_a));
-					}
-					else
-					{
-						PD_ASSERT(type_a == EntityType::PLAYER);
-						handle_projectile_collision(static_cast<const FloorEntity*>(entity_b), static_cast<PlayerEntity*>(entity_a));
-					}
-				}
-			}
-			// 飞弹碰撞
-			else if (type_a == EntityType::PROJECTILE or type_b == EntityType::PROJECTILE)
-			{
-				if (type_a == EntityType::PROJECTILE)
-				{
-					static_cast<ProjectileEntity*>(entity_a)->on_collide(*entity_b);
-				}
-				else
-				{
-					static_cast<ProjectileEntity*>(entity_b)->on_collide(*entity_a);
-				}
-			}
-		}
+				PD_ASSERT(sensor_user_data != nullptr and visitor_user_data != nullptr);
 
-		void EndContact(b2Contact* contact) override
-		{
-			const auto* fixture_a = contact->GetFixtureA();
-			const auto* fixture_b = contact->GetFixtureB();
+				auto* sensor_entity = static_cast<Entity*>(sensor_user_data);
+				auto* visitor_entity = static_cast<Entity*>(visitor_user_data);
 
-			const auto* body_a = fixture_a->GetBody();
-			const auto* body_b = fixture_b->GetBody();
+				const auto sensor_type = sensor_entity->type();
+				const auto visitor_type = visitor_entity->type();
 
-			auto* entity_a = reinterpret_cast<Entity*>(body_a->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
-			auto* entity_b = reinterpret_cast<Entity*>(body_b->GetUserData().pointer); // NOLINT(performance-no-int-to-ptr)
-
-			// todo: Entity::~Entity销毁body时也会调用该函数,此时再调用Entity的接口将会出问题
-			// PD_ASSERT(entity_a != nullptr and entity_b != nullptr);
-			if (entity_a == nullptr or entity_b == nullptr)
-			{
-				return;
+				std::println("SensorBegin: {} & {}", prometheus::meta::name_of(sensor_type), prometheus::meta::name_of(visitor_type));
 			}
 
-			const auto type_a = entity_a->type();
-			const auto type_b = entity_b->type();
-
-			// 离开地板
-			if (type_a == EntityType::FLOOR or type_b == EntityType::FLOOR)
+			for (int i = 0; i < events.endCount; ++i)
 			{
-				if (type_a == EntityType::FLOOR)
-				{
-					std::println("离开地板: A: FLOOR, B: {}", type_b == EntityType::ENEMY ? "ENEMY" : "PLAYER");
-				}
-				else
-				{
-					std::println("离开地板: A: {}, B: FLOOR", type_a == EntityType::ENEMY ? "ENEMY" : "PLAYER");
-				}
-			}
-		}
+				const auto& event = events.endEvents[i];
 
-		[[nodiscard]] auto inactive_entities() noexcept -> list_type&
-		{
-			return inactive_entities_;
+				if (not b2Shape_IsValid(event.sensorShapeId) or not b2Shape_IsValid(event.visitorShapeId))
+				{
+					continue;
+				}
+
+				const auto sensor_body = b2Shape_GetBody(event.sensorShapeId);
+				const auto visitor_body = b2Shape_GetBody(event.visitorShapeId);
+
+				auto* sensor_user_data = b2Body_GetUserData(sensor_body);
+				auto* visitor_user_data = b2Body_GetUserData(visitor_body);
+
+				PD_ASSERT(sensor_user_data != nullptr and visitor_user_data != nullptr);
+
+				auto* sensor_entity = static_cast<Entity*>(sensor_user_data);
+				auto* visitor_entity = static_cast<Entity*>(visitor_user_data);
+
+				const auto sensor_type = sensor_entity->type();
+				const auto visitor_type = visitor_entity->type();
+
+				std::println("SensorEnd: {} & {}", prometheus::meta::name_of(sensor_type), prometheus::meta::name_of(visitor_type));
+			}
 		}
 	};
+
+	class ContactProcessor final
+	{
+	public:
+		static auto step(const b2WorldId world) noexcept -> void
+		{
+			const auto events = b2World_GetContactEvents(world);
+
+			// if (events.beginCount != 0)
+			// {
+			// 	std::println("b2ContactEvents::beginCount: {}", events.beginCount);
+			// }
+			// if (events.endCount != 0)
+			// {
+			// 	std::println("b2ContactEvents::endCount: {}", events.endCount);
+			// }
+			// if (events.hitCount != 0)
+			// {
+			// 	std::println("b2ContactEvents::hitCount: {}", events.hitCount);
+			// }
+
+			for (int i = 0; i < events.beginCount; ++i)
+			{
+				const auto& event = events.beginEvents[i];
+
+				const auto body_a = b2Shape_GetBody(event.shapeIdA);
+				const auto body_b = b2Shape_GetBody(event.shapeIdB);
+
+				auto* user_data_a = b2Body_GetUserData(body_a);
+				auto* user_data_b = b2Body_GetUserData(body_b);
+
+				PD_ASSERT(user_data_a != nullptr and user_data_b != nullptr);
+
+				auto* entity_a = static_cast<Entity*>(user_data_a);
+				auto* entity_b = static_cast<Entity*>(user_data_b);
+
+				const auto type_a = entity_a->type();
+				const auto type_b = entity_b->type();
+
+				std::println("ContactBegin: {} & {}", prometheus::meta::name_of(type_a), prometheus::meta::name_of(type_b));
+
+				// 踩中地板
+				if (type_a == EntityType::FLOOR or type_b == EntityType::FLOOR)
+				{
+					const auto handle_projectile_collision = []<typename T>(const FloorEntity* floor, T* entity) noexcept -> void //
+								requires std::is_same_v<T, EnemyEntity> or std::is_same_v<T, PlayerEntity>
+					{
+						// todo: 应用地板的效果
+						std::ignore = floor;
+						std::ignore = entity;
+					};
+
+					if (type_a == EntityType::FLOOR)
+					{
+						if (type_b == EntityType::ENEMY)
+						{
+							handle_projectile_collision(static_cast<const FloorEntity*>(entity_a), static_cast<EnemyEntity*>(entity_b));
+						}
+						else
+						{
+							PD_ASSERT(type_b == EntityType::PLAYER);
+							handle_projectile_collision(static_cast<const FloorEntity*>(entity_a), static_cast<PlayerEntity*>(entity_b));
+						}
+					}
+					else
+					{
+						if (type_a == EntityType::ENEMY)
+						{
+							handle_projectile_collision(static_cast<const FloorEntity*>(entity_b), static_cast<EnemyEntity*>(entity_a));
+						}
+						else
+						{
+							PD_ASSERT(type_a == EntityType::PLAYER);
+							handle_projectile_collision(static_cast<const FloorEntity*>(entity_b), static_cast<PlayerEntity*>(entity_a));
+						}
+					}
+				}
+				// 飞弹碰撞
+				else if (type_a == EntityType::PROJECTILE or type_b == EntityType::PROJECTILE)
+				{
+					if (type_a == EntityType::PROJECTILE)
+					{
+						static_cast<ProjectileEntity*>(entity_a)->on_collide(*entity_b);
+					}
+					else
+					{
+						static_cast<ProjectileEntity*>(entity_b)->on_collide(*entity_a);
+					}
+				}
+			}
+
+			for (int i = 0; i < events.hitCount; ++i)
+			{
+				const auto& event = events.hitEvents[i];
+
+				const auto body_a = b2Shape_GetBody(event.shapeIdA);
+				const auto body_b = b2Shape_GetBody(event.shapeIdB);
+
+				auto* user_data_a = b2Body_GetUserData(body_a);
+				auto* user_data_b = b2Body_GetUserData(body_b);
+
+				PD_ASSERT(user_data_a != nullptr and user_data_b != nullptr);
+
+				const auto* entity_a = static_cast<Entity*>(user_data_a);
+				const auto* entity_b = static_cast<Entity*>(user_data_b);
+
+				const auto type_a = entity_a->type();
+				const auto type_b = entity_b->type();
+
+				std::println("ContactHit: {} & {}", prometheus::meta::name_of(type_a), prometheus::meta::name_of(type_b));
+			}
+
+			for (int i = 0; i < events.endCount; ++i)
+			{
+				const auto& event = events.endEvents[i];
+
+				if (not b2Shape_IsValid(event.shapeIdA) or not b2Shape_IsValid(event.shapeIdB))
+				{
+					continue;
+				}
+
+				const auto body_a = b2Shape_GetBody(event.shapeIdA);
+				const auto body_b = b2Shape_GetBody(event.shapeIdB);
+
+				auto* user_data_a = b2Body_GetUserData(body_a);
+				auto* user_data_b = b2Body_GetUserData(body_b);
+
+				PD_ASSERT(user_data_a != nullptr and user_data_b != nullptr);
+
+				const auto* entity_a = static_cast<Entity*>(user_data_a);
+				const auto* entity_b = static_cast<Entity*>(user_data_b);
+
+				const auto type_a = entity_a->type();
+				const auto type_b = entity_b->type();
+
+				std::println("ContactEnd: {} & {}", prometheus::meta::name_of(type_a), prometheus::meta::name_of(type_b));
+			}
+		}
+	};
+
+	// todo: 基于[b2BodyMoveEvent]更新位置,而不是[Entity::update](sync_position_and_rotation)
 
 	class Playground final
 	{
@@ -1603,7 +1313,8 @@ namespace playground
 			BACKWARD,
 		};
 
-		std::unique_ptr<b2World> physics_world_;
+		b2WorldId physics_world_id_;
+		ContactProcessor contact_processor_;
 
 		PlayerEntity* player_;
 		Movement movement_x_;
@@ -1611,7 +1322,14 @@ namespace playground
 
 		std::vector<std::unique_ptr<Entity>> entities_;
 
-		ContactListener contact_listener_;
+		auto create_world() noexcept -> void
+		{
+			auto def = b2DefaultWorldDef();
+			// 无重力世界
+			def.gravity = b2Vec2_zero;
+
+			physics_world_id_ = b2CreateWorld(&def);
+		}
 
 		auto create_room() noexcept -> void
 		{
@@ -1630,10 +1348,10 @@ namespace playground
 			constexpr auto right_position = sf::Vector2f{room_x + room_width + wall_thickness / 2, room_y + room_height / 2};
 			constexpr auto right_size = sf::Vector2f{wall_thickness, room_height};
 
-			auto top_wall = std::make_unique<WallEntity>(*physics_world_, top_position, top_size);
-			auto bottom_wall = std::make_unique<WallEntity>(*physics_world_, bottom_position, bottom_size);
-			auto left_wall = std::make_unique<WallEntity>(*physics_world_, left_position, left_size);
-			auto right_wall = std::make_unique<WallEntity>(*physics_world_, right_position, right_size);
+			auto top_wall = std::make_unique<WallEntity>(physics_world_id_, top_position, top_size);
+			auto bottom_wall = std::make_unique<WallEntity>(physics_world_id_, bottom_position, bottom_size);
+			auto left_wall = std::make_unique<WallEntity>(physics_world_id_, left_position, left_size);
+			auto right_wall = std::make_unique<WallEntity>(physics_world_id_, right_position, right_size);
 
 			entities_.emplace_back(std::move(top_wall));
 			entities_.emplace_back(std::move(bottom_wall));
@@ -1688,7 +1406,7 @@ namespace playground
 			{
 				for (const auto position: positions)
 				{
-					auto entity = std::make_unique<FloorEntity>(*physics_world_, position, size, type);
+					auto entity = std::make_unique<FloorEntity>(physics_world_id_, position, size, type);
 					entities_.emplace_back(std::move(entity));
 				}
 			};
@@ -1722,7 +1440,7 @@ namespace playground
 			for (const auto position: positions)
 			{
 				// todo: 障碍物大小
-				auto decoration = std::make_unique<DecorationEntity>(*physics_world_, position, size);
+				auto decoration = std::make_unique<DecorationEntity>(physics_world_id_, position, size);
 				entities_.emplace_back(std::move(decoration));
 			}
 		}
@@ -1730,7 +1448,7 @@ namespace playground
 		auto create_player() noexcept -> void
 		{
 			auto player = std::make_unique<PlayerEntity>(
-				*physics_world_,
+				physics_world_id_,
 				// 房间中心
 				sf::Vector2f{pd::Constant::window_width / 2.f, pd::Constant::window_height / 2.f},
 				// todo: 玩家大小
@@ -1746,14 +1464,13 @@ namespace playground
 	public:
 		Playground() noexcept
 			:
-			// 无重力世界
-			physics_world_{std::make_unique<b2World>(b2Vec2{0, 0})},
+			physics_world_id_{b2_nullWorldId},
 			player_{nullptr},
 			movement_x_{Movement::STAY},
 			movement_y_{Movement::STAY}
 		{
-			// 设置碰撞监听器
-			physics_world_->SetContactListener(&contact_listener_);
+			// 创建世界
+			create_world();
 
 			// 创建房间墙壁
 			create_room();
@@ -1822,13 +1539,9 @@ namespace playground
 				{
 					spawn_projectile_to<BaseProjectileEntity>(sf::Vector2f{mbp->position});
 				}
-				else if (mbp->button == sf::Mouse::Button::Middle)
-				{
-					spawn_projectile_to<BounceProjectileEntity>(sf::Vector2f{mbp->position});
-				}
 				else if (mbp->button == sf::Mouse::Button::Right)
 				{
-					spawn_projectile_to<ChainProjectileEntity>(sf::Vector2f{mbp->position});
+					spawn_projectile_to<BounceProjectileEntity>(sf::Vector2f{mbp->position});
 				}
 
 				return;
@@ -1841,18 +1554,14 @@ namespace playground
 		{
 			// 移除非活跃实体
 			{
-				auto& inactive_entities = contact_listener_.inactive_entities();
-
 				auto r = std::ranges::remove_if(
 					entities_,
 					[&](const auto& entity) noexcept -> bool
 					{
-						return not entity->is_active() or std::ranges::contains(inactive_entities, entity.get());
+						return not entity->is_active();
 					}
 				);
 				entities_.erase(r.begin(), entities_.end());
-
-				inactive_entities.clear();
 			}
 
 			// 处理玩家输入
@@ -1881,7 +1590,11 @@ namespace playground
 			}
 
 			// 更新物理世界
-			physics_world_->Step(delta, 8, 3);
+			b2World_Step(physics_world_id_, delta, 4);
+
+			// 处理物理世界事件
+			SensorProcessor::step(physics_world_id_);
+			ContactProcessor::step(physics_world_id_);
 
 			// 更新所有实体
 			for (const auto& entity: entities_)
@@ -1995,7 +1708,7 @@ namespace playground
 				if constexpr (std::is_same_v<T, BaseProjectileEntity>)
 				{
 					return std::make_unique<BaseProjectileEntity>(
-						*physics_world_,
+						physics_world_id_,
 						EntityType::PLAYER,
 						spawn_position,
 						// todo: 飞弹半径
@@ -2009,7 +1722,7 @@ namespace playground
 				else if constexpr (std::is_same_v<T, BounceProjectileEntity>)
 				{
 					return std::make_unique<BounceProjectileEntity>(
-						*physics_world_,
+						physics_world_id_,
 						EntityType::PLAYER,
 						spawn_position,
 						// todo: 飞弹半径
@@ -2020,25 +1733,6 @@ namespace playground
 						5.f,
 						// 弹跳3次
 						3
-					);
-				}
-				else if constexpr (std::is_same_v<T, ChainProjectileEntity>)
-				{
-					// todo: 数量/半径/断裂力
-					// 1大3小
-					static std::array segment_radii{30.f, 15.f, 15.f, 15.f};
-					static std::array break_force{150.f, 100.f, 100.f, 100.f};
-
-					return std::make_unique<ChainProjectileEntity>(
-						*physics_world_,
-						EntityType::PLAYER,
-						spawn_position,
-						segment_radii,
-						// todo: 飞弹速度
-						direction_normalized * 400.f,
-						break_force,
-						// 存在5秒
-						5.f
 					);
 				}
 				else
@@ -2060,36 +1754,4 @@ namespace playground
 			spawn_projectile_toward<T>(player_position, direction);
 		}
 	};
-
-	inline auto ChainProjectileEntity::split_on_broken() noexcept -> void
-	{
-		std::println("因关节[{}]断裂而解体", broken_joint_index_);
-
-		// 创建分散的小子弹
-		for (std::size_t i = 0; i < segments_.size(); ++i)
-		{
-			const auto& segment = segments_[i];
-
-			const auto physics_position = segment->GetPosition();
-			const auto physics_velocity = segment->GetLinearVelocity();
-
-			const auto position = pd::Constant::from_physics(physics_position);
-			const auto velocity = pd::Constant::from_physics(physics_velocity);
-
-			std::println(
-				"子飞弹({})> Position: ({:1f},{:1f}), Velocity: ({:1f},{:1f})[{}]",
-				i,
-				position.x,
-				position.y,
-				velocity.x,
-				velocity.y,
-				velocity.length()
-			);
-
-			Playground::playground->spawn_projectile_toward<BaseProjectileEntity>(position, velocity);
-		}
-
-		// 标记当前飞弹不再活跃
-		active_ = false;
-	}
 }
