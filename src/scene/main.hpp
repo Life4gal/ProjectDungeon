@@ -20,11 +20,8 @@ namespace pd::scene
 		// 物理世界
 		b2WorldId physics_world_id_;
 
-		// 创建物理世界
-		auto create_physics_world() noexcept -> void;
-
-		// 注册实体组件
-		auto register_components() noexcept -> void;
+		// 是否暂停
+		bool pause_;
 
 		// 开始一场游戏
 		// 在一个游戏场景中可以开始多次游戏(例如死亡后重开)

@@ -34,6 +34,8 @@ namespace pd::components
 		sf::Time elapsed;
 	};
 
+	// todo: 下面这些组件放在这里也许不太合适?
+
 	// // 游戏字体
 	// class Font final
 	// {

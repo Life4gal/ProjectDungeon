@@ -104,7 +104,47 @@ add_executable(
 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/external/imgui-SFML.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/external/imgui-SFML.cpp
-		
+					
+	# ============================
+	# UTILITY
+	# ============================
+	
+	# id与任意类型的双向映射
+	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/map.hpp
+
+	# ============================
+	# CONFIG
+	# ============================
+
+	# 动画信息(保存于文件中)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.hpp
+					
+	# ============================
+	# BLUEPRINT
+	# ============================
+
+	# 动画信息(保存于组件中)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/animation.hpp
+						
+	# ============================
+	# ASSET
+	# ============================
+
+	# 资源载入器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/asset_loader.hpp
+	# 字体资源载入器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/font_loader.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/font_loader.cpp
+	# 纹理资源载入器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/texture_loader.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/texture_loader.cpp
+	# 音效资源载入器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/sound_loader.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/sound_loader.cpp
+	# 音乐资源载入器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/music_loader.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/music_loader.cpp
+
 	# ============================
 	# COMPONENTS
 	# ============================
@@ -113,10 +153,64 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/game.hpp
 	# 世界信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/world.hpp
-
-	# 方向
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/direction.hpp
 	
+	# 方向(一些静态物体的朝向)
+	#${CMAKE_CURRENT_SOURCE_DIR}/src/components/direction.hpp
+	# 位置/大小/旋转等信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.hpp
+
+	# 动画信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/animation.hpp
+							
+	# ============================
+	# CTX
+	# ============================
+
+	# 辅助管理registry.ctx,避免出错
+
+	# utility::Map
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/map.hpp
+	# asset::AssetLoader
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/asset_loader.hpp
+	# blueprint::Animations
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/animation.hpp
+
+	# ============================
+	# SYSTEMS
+	# ============================
+		
+	#=================
+	# INITIALIZE
+	#=================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/test.hpp
+
+	#=================
+	# UPDATE
+	#=================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.cpp
+
+	#=================
+	# RENDER
+	#=================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/animation.cpp
+
 	# ============================
 	# SCENE
 	# ============================
@@ -185,3 +279,14 @@ target_link_libraries(
 		box2d::box2d
 		spdlog::spdlog
 )
+
+# 复制 config/data/media的文件到输出目录
+add_custom_target(
+    copy_resources 
+    ALL
+    #COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/config ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config
+    #COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/media ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/media
+)
+
+add_dependencies(${PROJECT_NAME} copy_resources)
