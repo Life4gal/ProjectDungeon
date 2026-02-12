@@ -5,7 +5,10 @@
 
 #include <game/game.hpp>
 
-#include <game/main_scene.hpp>
+#include <components/game.hpp>
+
+#include <scene/quit_game.hpp>
+#include <scene/main.hpp>
 
 #include <external/imgui-SFML.hpp>
 #include <imgui.h>
@@ -46,11 +49,24 @@ namespace pd
 			const auto update = ImGui::SFML::UpdateFontTexture();
 			assert(update);
 		}
+		// 注册全局组件
+		{
+			// 游戏实例
+			registry_.ctx().emplace<components::Game>(std::cref(*this));
+			// todo: 其他组件?
+		}
 		// 创建场景
 		{
-			auto scene = std::make_unique<MainScene>(registry_);
+			// 退出场景(占位)
+			quit_game_scene_ = scenes_.emplace_back(std::make_unique<scene::QuitGame>(registry_)).get();
 
+			// todo: 第一个场景应该是主菜单,不过现在还没有 :)
+			
+			// 主场景
+			auto scene = std::make_unique<scene::Main>(registry_);
 			current_scene_ = scenes_.emplace_back(std::move(scene)).get();
+			current_scene_->on_loaded();
+			current_scene_->on_initialized();
 		}
 	}
 
@@ -61,6 +77,9 @@ namespace pd
 
 	auto Game::run() noexcept -> void
 	{
+		// 在这里重置绝对计时器,其计时从此刻开始
+		absolute_clock_.restart();
+
 		while (window_.isOpen())
 		{
 			while (const auto event = window_.pollEvent())
@@ -71,10 +90,17 @@ namespace pd
 
 				if (event->is<sf::Event::Closed>())
 				{
+					// 卸载当前场景
+					current_scene_->on_unloaded();
+					// 切换到退出场景
+					current_scene_ = quit_game_scene_;
+
+					// 关闭窗口
 					window_.close();
 				}
 				else
 				{
+					// 当前场景处理事件
 					current_scene_->handle_event(e);
 				}
 			}
@@ -83,15 +109,36 @@ namespace pd
 
 			// 更新
 			ImGui::SFML::Update(window_, delta);
+			// 当前场景更新
 			current_scene_->update(delta);
 
 			window_.clear({35, 35, 35});
 
-			// 绘制
+			// 当前场景绘制
 			current_scene_->render(window_);
 			ImGui::SFML::Render(window_);
 
 			window_.display();
 		}
+	}
+
+	auto Game::window_size() const noexcept -> sf::Vector2u
+	{
+		return window_.getSize();
+	}
+
+	auto Game::window_width() const noexcept -> unsigned
+	{
+		return window_size().x;
+	}
+
+	auto Game::window_height() const noexcept -> unsigned
+	{
+		return window_size().y;
+	}
+
+	auto Game::time() const noexcept -> sf::Time
+	{
+		return absolute_clock_.getElapsedTime();
 	}
 }

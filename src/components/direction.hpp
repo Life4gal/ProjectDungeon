@@ -3,12 +3,17 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <game/scene.hpp>
+#pragma once
 
-namespace pd
+#include <cstdint>
+
+namespace pd::components
 {
-	Scene::Scene(const std::reference_wrapper<entt::registry> global_registry) noexcept
-		: global_registry_{global_registry} {}
-
-	Scene::~Scene() noexcept = default;
+	enum class Direction : std::uint8_t
+	{
+		LEFT,
+		RIGHT,
+		UP,
+		DOWN,
+	};
 }

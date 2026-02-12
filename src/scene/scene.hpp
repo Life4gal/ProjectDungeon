@@ -15,7 +15,7 @@ namespace sf
 	class RenderWindow;
 }
 
-namespace pd
+namespace pd::scene
 {
 	class Scene
 	{
@@ -36,10 +36,22 @@ namespace pd
 
 		virtual ~Scene() noexcept;
 
+		// 载入场景(刚创建)
+		virtual auto on_loaded() noexcept -> void = 0;
+
+		// 初始化场景
+		virtual auto on_initialized() noexcept -> void = 0;
+
+		// 卸载场景
+		virtual auto on_unloaded() noexcept -> void = 0;
+
+		// 处理事件
 		virtual auto handle_event(const sf::Event& event) noexcept -> void = 0;
 
+		// 帧更新
 		virtual auto update(sf::Time delta) noexcept -> void = 0;
 
+		// 渲染
 		virtual auto render(sf::RenderWindow& window) noexcept -> void = 0;
 	};
 }

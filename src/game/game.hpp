@@ -13,25 +13,33 @@
 
 namespace pd
 {
-	class Scene;
+	namespace scene
+	{
+		class Scene;
+	}
 
 	class Game final
 	{
 	public:
+		using scene_type = scene::Scene;
 
 	private:
 		// 渲染窗口
 		sf::RenderWindow window_;
-		// 计时器(绝对时间)
+		// 绝对时间时钟(不重启)
+		sf::Clock absolute_clock_;
+		// 更新计时器(每帧重置)
 		sf::Clock clock_;
 
 		// 实体世界
 		entt::registry registry_;
 
 		// 游戏场景
-		std::vector<std::unique_ptr<Scene>> scenes_;
+		std::vector<std::unique_ptr<scene_type>> scenes_;
+		// 游戏退出场景
+		scene_type* quit_game_scene_;
 		// 游戏当前场景
-		Scene* current_scene_;
+		scene_type* current_scene_;
 
 	public:
 		Game(
@@ -49,5 +57,21 @@ namespace pd
 		~Game() noexcept;
 
 		auto run() noexcept -> void;
+
+		// ====================================
+		// 一些可能变动,但是不应该(没必要)储存到实体世界的变量,可以直接通过接口获取
+		// ====================================
+
+		// 窗口大小
+		[[nodiscard]] auto window_size() const noexcept -> sf::Vector2u;
+
+		// 窗口宽度
+		[[nodiscard]] auto window_width() const noexcept -> unsigned;
+
+		// 窗口高度
+		[[nodiscard]] auto window_height() const noexcept -> unsigned;
+
+		// 游戏运行的绝对时间
+		[[nodiscard]] auto time() const noexcept -> sf::Time;
 	};
 }

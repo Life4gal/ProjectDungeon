@@ -104,7 +104,33 @@ add_executable(
 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/external/imgui-SFML.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/external/imgui-SFML.cpp
+		
+	# ============================
+	# COMPONENTS
+	# ============================
+
+	# 游戏信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/game.hpp
+	# 世界信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/world.hpp
+
+	# 方向
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/direction.hpp
 	
+	# ============================
+	# SCENE
+	# ============================
+
+	# 游戏场景
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scene/scene.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scene/scene.cpp
+	# 游戏退出场景
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scene/quit_game.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scene/quit_game.cpp
+	# 游戏主场景
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scene/main.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scene/main.cpp
+
 	# ============================
 	# GAME
 	# ============================
@@ -115,13 +141,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/constants.hpp
 	# 测试用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/playground.hpp
-
-	# 游戏场景
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/scene.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/scene.cpp
-	# 游戏主场景
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/main_scene.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/main_scene.cpp
 
 	# 游戏
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/game.hpp
