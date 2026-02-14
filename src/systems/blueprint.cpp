@@ -58,7 +58,7 @@ namespace pd::systems
 				frames.emplace_back(
 					FlipAnimationFrame
 					{
-							.texture_path = "./media/enemy/deep-dive-AntleredRascal.png",
+							.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
 							.duration = 250ms,
 							.frame_x = 0,
 							.frame_y = 0,
@@ -70,7 +70,7 @@ namespace pd::systems
 				frames.emplace_back(
 					FlipAnimationFrame
 					{
-							.texture_path = "./media/enemy/deep-dive-AntleredRascal.png",
+							.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
 							.duration = 250ms,
 							.frame_x = 16,
 							.frame_y = 0,
@@ -82,7 +82,7 @@ namespace pd::systems
 				frames.emplace_back(
 					FlipAnimationFrame
 					{
-							.texture_path = "./media/enemy/deep-dive-AntleredRascal.png",
+							.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
 							.duration = 250ms,
 							.frame_x = 32,
 							.frame_y = 0,
@@ -94,7 +94,7 @@ namespace pd::systems
 				frames.emplace_back(
 					FlipAnimationFrame
 					{
-							.texture_path = "./media/enemy/deep-dive-AntleredRascal.png",
+							.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
 							.duration = 250ms,
 							.frame_x = 48,
 							.frame_y = 0,

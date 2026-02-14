@@ -258,13 +258,11 @@ target_link_libraries(
 		spdlog::spdlog
 )
 
-# 复制 config/data/media的文件到输出目录
+# 复制 assets 文件夹到输出目录
 add_custom_target(
     copy_resources 
     ALL
-    #COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/config ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config
-    #COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/media ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/media
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
 )
 
 add_dependencies(${PROJECT_NAME} copy_resources)
