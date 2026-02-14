@@ -5,12 +5,7 @@
 
 #include <systems/asset.hpp>
 
-#include <game/names.hpp>
-
-#include <asset/font_loader.hpp>
-#include <asset/texture_loader.hpp>
-#include <asset/sound_loader.hpp>
-#include <asset/music_loader.hpp>
+#include <asset/manager.hpp>
 
 #include <entt/entt.hpp>
 
@@ -18,24 +13,24 @@ namespace pd::systems
 {
 	auto Asset::do_loaded(entt::registry& registry) noexcept -> void
 	{
-		// 创建loader
-		auto& font_loader = registry.ctx().emplace<asset::FontLoader>();
-		auto& texture_loader = registry.ctx().emplace<asset::TextureLoader>();
-		auto& sound_loader = registry.ctx().emplace<asset::SoundLoader>();
-		auto& music_loader = registry.ctx().emplace<asset::MusicLoader>();
+		// 创建manager
+		auto& font_manager = registry.ctx().emplace<asset::FontManager>();
+		auto& texture_manager = registry.ctx().emplace<asset::TextureManager>();
+		auto& sound_manager = registry.ctx().emplace<asset::SoundManager>();
+		auto& music_manager = registry.ctx().emplace<asset::MusicManager>();
 
-		// 获取资源
+		// 资源路径映射表
 		// 这些实体由Blueprint::initialize创建
-		auto& font_map = registry.ctx().get<const asset::map_type>(Names::asset_font);
-		auto& texture_map = registry.ctx().get<const asset::map_type>(Names::asset_texture);
-		auto& sound_map = registry.ctx().get<const asset::map_type>(Names::asset_sound);
-		auto& music_map = registry.ctx().get<const asset::map_type>(Names::asset_music);
+		auto& font_map = registry.ctx().get<const asset::FontMap>();
+		auto& texture_map = registry.ctx().get<const asset::TextureMap>();
+		auto& sound_map = registry.ctx().get<const asset::SoundMap>();
+		auto& music_map = registry.ctx().get<const asset::MusicMap>();
 
 		// 载入资源
-		font_loader.load(font_map);
-		texture_loader.load(texture_map);
-		sound_loader.load(sound_map);
-		music_loader.load(music_map);
+		font_manager.load(font_map);
+		texture_manager.load(texture_map);
+		sound_manager.load(sound_map);
+		music_manager.load(music_map);
 	}
 
 	auto Asset::do_initialized([[maybe_unused]] entt::registry& registry) noexcept -> void
@@ -60,29 +55,29 @@ namespace pd::systems
 
 	auto Asset::font(entt::registry& registry, const entt::id_type id) noexcept -> entt::resource<const sf::Font>
 	{
-		const auto& font_loader = registry.ctx().emplace<const asset::FontLoader>();
+		const auto& font_manager = registry.ctx().emplace<const asset::FontManager>();
 
-		return font_loader.get(id);
+		return font_manager.get(id);
 	}
 
 	auto Asset::texture(entt::registry& registry, const entt::id_type id) noexcept -> entt::resource<const sf::Texture>
 	{
-		const auto& texture_loader = registry.ctx().emplace<const asset::TextureLoader>();
+		const auto& texture_manager = registry.ctx().emplace<const asset::TextureManager>();
 
-		return texture_loader.get(id);
+		return texture_manager.get(id);
 	}
 
 	auto Asset::sound(entt::registry& registry, const entt::id_type id) noexcept -> entt::resource<const sf::SoundBuffer>
 	{
-		const auto& sound_loader = registry.ctx().emplace<const asset::SoundLoader>();
+		const auto& sound_manager = registry.ctx().emplace<const asset::SoundManager>();
 
-		return sound_loader.get(id);
+		return sound_manager.get(id);
 	}
 
 	auto Asset::music(entt::registry& registry, const entt::id_type id) noexcept -> entt::resource<const sf::Music>
 	{
-		const auto& music_loader = registry.ctx().emplace<const asset::MusicLoader>();
+		const auto& music_manager = registry.ctx().emplace<const asset::MusicManager>();
 
-		return music_loader.get(id);
+		return music_manager.get(id);
 	}
 }

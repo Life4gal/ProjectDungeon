@@ -17,7 +17,7 @@ namespace pd::utility
 		{
 			{ IdMaker(std::declval<const ValueType&>()) } -> std::same_as<entt::id_type>;
 		}
-	class Map final
+	class Map
 	{
 	public:
 		using key_type = entt::id_type;

@@ -6,9 +6,9 @@
 #include <systems/debug.hpp>
 
 #include <components/transform.hpp>
-#include <components/flip_animation.hpp>
+#include <components/animation.hpp>
 
-#include <systems/flip_animation.hpp>
+#include <systems/animation.hpp>
 
 #include <entt/entt.hpp>
 
@@ -29,12 +29,17 @@ namespace pd::systems
 
 		// animation
 		{
-			const auto frames = FlipAnimation::get(registry, "AntleredRascal");
-			const auto& begin_frame = frames.front();
+			const auto animation = Animation::get(registry, "AntleredRascal");
+			const auto& begin_frame = animation->frames.front();
 
-			registry.emplace<FlipAnimationTimer>(entity, FlipAnimationTimer{.duration = begin_frame.duration, .elapsed = sf::Time::Zero});
-			registry.emplace<FlipAnimationIndex>(entity, FlipAnimationIndex{.total = frames.size(), .current = 0});
-			registry.emplace<FlipAnimationFrames>(entity, frames);
+			registry.emplace<AnimationTimer>(entity, AnimationTimer{.duration = begin_frame.duration, .elapsed = sf::Time::Zero});
+			registry.emplace<AnimationIndex>(entity, AnimationIndex{.total = animation->frames.size(), .current = 0});
+			registry.emplace<AnimationView>(entity, animation);
+
+			if (animation->looping)
+			{
+				registry.emplace<AnimationLooping>(entity);
+			}
 		}
 	}
 

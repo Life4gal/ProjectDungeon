@@ -10,7 +10,7 @@
 #include <systems/world.hpp>
 #include <systems/blueprint.hpp>
 #include <systems/asset.hpp>
-#include <systems/flip_animation.hpp>
+#include <systems/animation.hpp>
 
 #include <systems/debug.hpp>
 
@@ -26,7 +26,7 @@ namespace pd::scene
 		systems::World world_system_;
 		systems::Blueprint blueprint_system_;
 		systems::Asset asset_system_;
-		systems::FlipAnimation flip_animation_system_;
+		systems::Animation animation_system_;
 
 		systems::Debug debug_system_;
 

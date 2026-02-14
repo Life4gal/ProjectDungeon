@@ -14,8 +14,8 @@
 
 namespace pd::config
 {
-	// 一页翻页动画所包含的数据
-	class FlipAnimationFrame final
+	// 一帧动画所包含的数据
+	class AnimationFrame final
 	{
 	public:
 		// 该帧使用纹理路径(通常来说会使用同一张纹理)
@@ -28,17 +28,35 @@ namespace pd::config
 		// 该帧纹理大小
 		int frame_width;
 		int frame_height;
+		// 总是假定原点为正中心(width/2, height/2)
 	};
 
-	// 一个完整翻页动画所包含的数据
-	using flip_animation_frames_type = std::vector<FlipAnimationFrame>;
+	// 完整动画所包含的数据
+	class Animation final
+	{
+	public:
+		using frames_type = std::vector<AnimationFrame>;
 
-	// 所有翻页动画所包含的数据
+		// 所有帧
+		frames_type frames;
+		// 是否循环播放
+		bool looping;
+	};
+
+	// 动画集
 	// 动画名称<->动画数据
-	using flip_animations_type = std::unordered_map<
-		std::string,
-		flip_animation_frames_type,
-		utility::StringHash,
-		std::ranges::equal_to
-	>;
+	class AnimationSet final : public std::unordered_map<
+				std::string,
+				Animation,
+				utility::StringHash,
+				std::ranges::equal_to
+			>
+	{
+	public:
+		using unordered_map::unordered_map;
+	};
+
+	// 从文件中读取动画数据
+	// todo: 指定文件名
+	[[nodiscard]] auto load_animation() noexcept -> AnimationSet;
 }

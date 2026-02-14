@@ -7,11 +7,11 @@
 
 #include <systems/system.hpp>
 
-#include <blueprint/flip_animation.hpp>
+#include <blueprint/animation.hpp>
 
 namespace pd::systems
 {
-	class FlipAnimation final : public System<FlipAnimation>
+	class Animation final : public System<Animation>
 	{
 		friend System;
 
@@ -30,6 +30,19 @@ namespace pd::systems
 		// 定义一套static接口,便于直接读取registry.ctx
 		// ========================================
 
-		[[nodiscard]] static auto get(entt::registry& registry, std::string_view name) noexcept -> blueprint::flip_animation_frames_view_type;
+		// 获取指定动画
+		[[nodiscard]] static auto get(entt::registry& registry, std::string_view name) noexcept -> blueprint::AnimationView;
+
+		// 暂停指定实体的动画
+		static auto pause(entt::registry& registry, entt::entity entity) noexcept -> void;
+
+		// 恢复指定实体的动画
+		static auto unpause(entt::registry& registry, entt::entity entity) noexcept -> void;
+
+		// 使一个动画循环
+		static auto looping(entt::registry& registry, entt::entity entity) noexcept -> void;
+
+		// 使一个动画不再循环(依然会播放到最后一帧,然后不再更新)
+		static auto unlooping(entt::registry& registry, entt::entity entity) noexcept -> void;
 	};
 }

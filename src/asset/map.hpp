@@ -10,7 +10,6 @@
 #include <utility/map.hpp>
 
 #include <entt/core/hashed_string.hpp>
-#include <entt/resource/cache.hpp>
 
 namespace pd::asset
 {
@@ -25,29 +24,27 @@ namespace pd::asset
 
 	using map_type = utility::Map<path_to_id, path_type>;
 
-	template<typename Loader>
-	class AssetLoader
+	class FontMap final : public map_type
 	{
 	public:
-		using resource_type = Loader::result_type::element_type;
-		using cache_type = entt::resource_cache<resource_type, Loader>;
-		using result_type = entt::resource<const resource_type>;
+		using Map::Map;
+	};
 
-	private:
-		cache_type cache_;
-
+	class TextureMap final : public map_type
+	{
 	public:
-		auto load(const map_type& map) noexcept -> void
-		{
-			for (const auto& [id, path]: map)
-			{
-				cache_.force_load(id, path);
-			}
-		}
+		using Map::Map;
+	};
 
-		[[nodiscard]] auto get(const entt::id_type id) const noexcept -> result_type
-		{
-			return cache_[id];
-		}
+	class SoundMap final : public map_type
+	{
+	public:
+		using Map::Map;
+	};
+
+	class MusicMap final : public map_type
+	{
+	public:
+		using Map::Map;
 	};
 }

@@ -111,7 +111,7 @@ add_executable(
 	
 	# transparent string hash
 	# 允许unordered_xxx之类的容器通过string_view查找key为string的元素
-	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/
+	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/string_hash.hpp
 
 	# id与任意类型的双向映射
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/map.hpp
@@ -120,34 +120,29 @@ add_executable(
 	# CONFIG
 	# ============================
 
-	# 翻页(循环)动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/flip_animation.hpp
-
+	# 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.cpp
+	
 	# ============================
 	# BLUEPRINT
 	# ============================
 
-	# 翻页(循环)动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/flip_animation.hpp
+	# 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/animation.cpp
 
 	# ============================
 	# ASSET
 	# ============================
 
+	# 资源路径映射表
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/map.hpp
 	# 资源载入器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/asset_loader.hpp
-	# 字体资源载入器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/font_loader.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/font_loader.cpp
-	# 纹理资源载入器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/texture_loader.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/texture_loader.cpp
-	# 音效资源载入器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/sound_loader.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/sound_loader.cpp
-	# 音乐资源载入器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/music_loader.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/music_loader.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/loader.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/loader.cpp
+	# 资源管理器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/manager.hpp
 
 	# ============================
 	# COMPONENTS
@@ -164,7 +159,7 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.hpp
 
 	# 动画信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/flip_animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/animation.hpp
 	
 	# ============================
 	# SYSTEMS
@@ -181,8 +176,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/asset.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/asset.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/flip_animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/flip_animation.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/animation.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/debug.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/debug.cpp
@@ -209,8 +204,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/defines.hpp
 	# 常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/constants.hpp
-	# 命名实体
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/names.hpp
 	# 测试用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/playground.hpp
 

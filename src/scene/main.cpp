@@ -26,7 +26,7 @@ namespace pd::scene
 		world_system_.on_loaded(scene_registry_);
 		blueprint_system_.on_loaded(scene_registry_);
 		asset_system_.on_loaded(scene_registry_);
-		flip_animation_system_.on_loaded(scene_registry_);
+		animation_system_.on_loaded(scene_registry_);
 
 		debug_system_.on_loaded(scene_registry_);
 	}
@@ -38,7 +38,7 @@ namespace pd::scene
 		world_system_.on_initialized(scene_registry_);
 		blueprint_system_.on_initialized(scene_registry_);
 		asset_system_.on_initialized(scene_registry_);
-		flip_animation_system_.on_initialized(scene_registry_);
+		animation_system_.on_initialized(scene_registry_);
 
 		debug_system_.on_initialized(scene_registry_);
 	}
@@ -50,7 +50,7 @@ namespace pd::scene
 		// 与on_loaded相反顺序执行
 		debug_system_.on_unloaded(scene_registry_);
 
-		flip_animation_system_.on_unloaded(scene_registry_);
+		animation_system_.on_unloaded(scene_registry_);
 		asset_system_.on_unloaded(scene_registry_);
 		blueprint_system_.on_unloaded(scene_registry_);
 		world_system_.on_unloaded(scene_registry_);
@@ -79,7 +79,7 @@ namespace pd::scene
 		world_system_.update(scene_registry_, delta);
 		blueprint_system_.update(scene_registry_, delta);
 		asset_system_.update(scene_registry_, delta);
-		flip_animation_system_.update(scene_registry_, delta);
+		animation_system_.update(scene_registry_, delta);
 
 		debug_system_.update(scene_registry_, delta);
 	}
@@ -91,7 +91,7 @@ namespace pd::scene
 		world_system_.render(scene_registry_, window);
 		blueprint_system_.render(scene_registry_, window);
 		asset_system_.render(scene_registry_, window);
-		flip_animation_system_.render(scene_registry_, window);
+		animation_system_.render(scene_registry_, window);
 
 		debug_system_.render(scene_registry_, window);
 	}
