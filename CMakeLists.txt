@@ -109,6 +109,10 @@ add_executable(
 	# UTILITY
 	# ============================
 	
+	# transparent string hash
+	# 允许unordered_xxx之类的容器通过string_view查找key为string的元素
+	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/
+
 	# id与任意类型的双向映射
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/map.hpp
 
@@ -116,16 +120,16 @@ add_executable(
 	# CONFIG
 	# ============================
 
-	# 动画信息(保存于文件中)
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.hpp
-					
+	# 翻页(循环)动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/flip_animation.hpp
+
 	# ============================
 	# BLUEPRINT
 	# ============================
 
-	# 动画信息(保存于组件中)
-	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/animation.hpp
-						
+	# 翻页(循环)动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/flip_animation.hpp
+
 	# ============================
 	# ASSET
 	# ============================
@@ -160,56 +164,28 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.hpp
 
 	# 动画信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/animation.hpp
-							
-	# ============================
-	# CTX
-	# ============================
-
-	# 辅助管理registry.ctx,避免出错
-
-	# utility::Map
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/map.hpp
-	# asset::AssetLoader
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/asset_loader.hpp
-	# blueprint::Animations
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/animation.hpp
-
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/flip_animation.hpp
+	
 	# ============================
 	# SYSTEMS
 	# ============================
 		
-	#=================
-	# INITIALIZE
-	#=================
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/system.hpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/world.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/blueprint.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/blueprint.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/asset.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/asset.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/test.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/flip_animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/flip_animation.cpp
 
-	#=================
-	# UPDATE
-	#=================
-
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.cpp
-
-	#=================
-	# RENDER
-	#=================
-
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/animation.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/debug.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/debug.cpp
 
 	# ============================
 	# SCENE
@@ -233,6 +209,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/defines.hpp
 	# 常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/constants.hpp
+	# 命名实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/names.hpp
 	# 测试用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/playground.hpp
 

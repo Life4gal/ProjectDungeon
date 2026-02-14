@@ -7,14 +7,14 @@
 
 #include <span>
 
-#include <blueprint/animation.hpp>
+#include <blueprint/flip_animation.hpp>
 
 #include <SFML/System/Time.hpp>
 
 namespace pd::components
 {
-	// 当前动画帧计时器
-	class AnimationTimer final
+	// 当前翻页动画帧计时器
+	class FlipAnimationTimer final
 	{
 	public:
 		// 当前帧总持续时间
@@ -23,8 +23,8 @@ namespace pd::components
 		sf::Time elapsed;
 	};
 
-	// 当前动画帧索引
-	class AnimationIndex final
+	// 当前翻页动画帧索引
+	class FlipAnimationIndex final
 	{
 	public:
 		// 此动画共有多少帧
@@ -33,11 +33,10 @@ namespace pd::components
 		std::size_t current;
 	};
 
-	// 当前动画(直接引用蓝图数据)
-	class Animation final
+	// 当前翻页动画(直接引用蓝图数据)
+	class FlipAnimationFrames final
 	{
 	public:
-		// 对应blueprint::Animation::frames_type
-		std::span<const blueprint::AnimationFrame> frames;
+		blueprint::flip_animation_frames_view_type frames;
 	};
 }

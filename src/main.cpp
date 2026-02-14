@@ -1,4 +1,5 @@
 #include <game/game.hpp>
+#include <game/constants.hpp>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -11,6 +12,8 @@ auto main() noexcept -> int
 	SetConsoleCP(CP_UTF8);
 #endif
 
-	pd::Game game{1920, 1080, "ProjectDungeon", false};
+	using namespace pd;
+
+	Game game{Constant::window_width, Constant::window_height, Constant::window_title, false};
 	game.run();
 }

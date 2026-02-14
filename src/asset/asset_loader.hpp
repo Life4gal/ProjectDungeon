@@ -33,9 +33,6 @@ namespace pd::asset
 		using cache_type = entt::resource_cache<resource_type, Loader>;
 		using result_type = entt::resource<const resource_type>;
 
-		// ctx::Map依赖此别名,定义该别名可以使ctx::Map更加通用(而不是直接以来asset::map_type)
-		using map_type = map_type;
-
 	private:
 		cache_type cache_;
 

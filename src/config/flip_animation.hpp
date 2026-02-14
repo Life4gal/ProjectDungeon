@@ -10,13 +10,15 @@
 #include <vector>
 #include <unordered_map>
 
+#include <utility/string_hash.hpp>
+
 namespace pd::config
 {
-	// 一帧动画所包含的数据
-	class AnimationFrame final
+	// 一页翻页动画所包含的数据
+	class FlipAnimationFrame final
 	{
 	public:
-		// 该帧使用纹理路径
+		// 该帧使用纹理路径(通常来说会使用同一张纹理)
 		std::string texture_path;
 		// 该帧持续时间
 		std::chrono::microseconds duration;
@@ -28,10 +30,15 @@ namespace pd::config
 		int frame_height;
 	};
 
-	// 一个完整动画所包含的数据
-	using animation_frames_type = std::vector<AnimationFrame>;
+	// 一个完整翻页动画所包含的数据
+	using flip_animation_frames_type = std::vector<FlipAnimationFrame>;
 
-	// 所有动画所包含的数据
+	// 所有翻页动画所包含的数据
 	// 动画名称<->动画数据
-	using animations_type = std::unordered_map<std::string, animation_frames_type>;
+	using flip_animations_type = std::unordered_map<
+		std::string,
+		flip_animation_frames_type,
+		utility::StringHash,
+		std::ranges::equal_to
+	>;
 }

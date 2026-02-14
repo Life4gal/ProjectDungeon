@@ -7,8 +7,6 @@
 
 #include <asset/asset_loader.hpp>
 
-#include <game/constants.hpp>
-
 #include <SFML/Graphics/Texture.hpp>
 
 namespace pd::asset
@@ -24,10 +22,5 @@ namespace pd::asset
 		};
 	}
 
-	class TextureLoader final : public AssetLoader<texture_detail::Loader>
-	{
-	public:
-		// ctx::Map需要此name来创建/获取正确的map
-		constexpr static auto name = Constant::asset_texture;
-	};
+	class TextureLoader final : public AssetLoader<texture_detail::Loader> {};
 }

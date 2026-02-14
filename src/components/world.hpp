@@ -5,11 +5,9 @@
 
 #pragma once
 
+#include <box2d/id.h>
+
 #include <SFML/System/Time.hpp>
-// #include <SFML/Graphics/Font.hpp>
-// #include <SFML/Graphics/Text.hpp>
-// #include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Audio/Music.hpp>
 
 namespace pd::components
 {
@@ -17,43 +15,31 @@ namespace pd::components
 	class FrameDelta final
 	{
 	public:
-		sf::Time delta;
+		sf::Time frame_delta;
 	};
 
-	// 总历时
-	class SceneElapsedTime final
+	// 从游戏开始到现在总历时
+	class TotalElapsed final
 	{
 	public:
-		sf::Time elapsed;
+		sf::Time total_elapsed;
 	};
 
-	// 实际总历时(不算暂停时间)
-	class SceneRealElapsedTime final
+	// 从游戏开始到现在游玩历时(如果游戏暂停则停止计时)
+	class PlayElapsed final
 	{
 	public:
-		sf::Time elapsed;
+		sf::Time play_elapsed;
 	};
 
-	// todo: 下面这些组件放在这里也许不太合适?
+	// 标记当前游戏是否暂停
+	// 如果不暂停则不存在该数据
+	class GamePaused final {};
 
-	// // 游戏字体
-	// class Font final
-	// {
-	// public:
-	// 	sf::Font font;
-	// };
-	//
-	// // 游戏文本
-	// class Text final
-	// {
-	// public:
-	// 	sf::Text text;
-	// };
-
-	// 游戏音乐
-	class BackgroundMusic final
+	// 物理世界
+	class PhysicsWorld final
 	{
 	public:
-		sf::Music music;
+		b2WorldId world_id;
 	};
 }

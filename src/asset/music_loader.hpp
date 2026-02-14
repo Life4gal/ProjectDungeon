@@ -7,8 +7,6 @@
 
 #include <asset/asset_loader.hpp>
 
-#include <game/constants.hpp>
-
 #include <SFML/Audio/Music.hpp>
 
 namespace pd::asset
@@ -24,10 +22,5 @@ namespace pd::asset
 		};
 	}
 
-	class MusicLoader final : public AssetLoader<music_detail::Loader>
-	{
-	public:
-		// ctx::Map需要此name来创建/获取正确的map
-		constexpr static auto name = Constant::asset_music;
-	};
+	class MusicLoader final : public AssetLoader<music_detail::Loader> {};
 }
