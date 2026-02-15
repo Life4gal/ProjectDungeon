@@ -76,7 +76,7 @@ namespace pd::config
 					animation.frames.emplace_back(std::move(frame));
 				}
 
-				SPDLOG_INFO("加载动画[{:<20}]成功!共有[{}]帧", name, animation.frames.size());
+				SPDLOG_INFO("加载动画[{}]成功!共有[{}]帧", name, animation.frames.size());
 				animation_set.emplace(name, std::move(animation));
 			}
 		}

@@ -5,8 +5,6 @@
 
 #include<blueprint/animation.hpp>
 
-#include <config/animation.hpp>
-
 namespace pd::blueprint
 {
 	auto load_animation(const config::AnimationSet& data) noexcept -> AnimationSet
@@ -15,6 +13,7 @@ namespace pd::blueprint
 
 		animation_set.reserve(data.size());
 		// 具体纹理数量未知,不过map不reserve问题也不大
+		// texture_map.reserve(...);
 
 		for (auto&& [animation_name, animation_frames]: data /* | std::views::as_rvalue*/)
 		{

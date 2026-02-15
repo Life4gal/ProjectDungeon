@@ -124,6 +124,32 @@ add_executable(
 	# ============================
 	# CONFIG
 	# ============================
+	
+	# 各种(枚举)类型定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/types.hpp
+
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/player.cpp
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/enemy.cpp
+	# 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/wall.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/wall.cpp
+	# 装饰物
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/decoration.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/decoration.cpp
+
+	# 地牢
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.cpp
+
+	# TODO: 
+	#  1.加载player/enenmy/wall/decoration等配置,由它们的内容决定要加载哪些动画
+	#  2.加载动画配置,由它的内容决定player/enenmy/wall/decoration有哪些动画可用
+	#
+	# 理论上我应该给使用做法1,但是目前使用的是做法1
 
 	# 动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.hpp
@@ -132,6 +158,13 @@ add_executable(
 	# ============================
 	# BLUEPRINT
 	# ============================
+
+	# 玩家
+	#${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/player.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/player.cpp
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/enemy.cpp
 
 	# 动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/animation.hpp
@@ -168,14 +201,34 @@ add_executable(
 	# 物理世界信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/physics_world.hpp
 
-	# 位置/大小/旋转等信息
+	# 描述一个实体的位置/大小/旋转等信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.hpp
-
-	# 动画信息
+	# 描述一个实体有哪些物理属性(主要用于碰撞检测)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/physics_body.hpp
+	# 描述一个实体的动画信息(用于切换实体的渲染信息)
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/animation.hpp
-		
 	# 描述一个实体要被渲染需要哪些信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/render.hpp
+	# 描述一个玩家/敌人实体的基本信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/actor.hpp
+
+	# =============
+	# ENTITY
+	# =============
+
+	# 描述地板拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/floor.hpp
+	# 描述墙壁拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/wall.hpp
+	# 描述墙壁装饰物拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/wall_decoration.hpp
+	# 描述门实体拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/door.hpp
+
+	# 描述玩家实体拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/player.hpp
+	# 描述敌人实体拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/enemy.hpp
 
 	# ============================
 	# CTX (直接上下文访问封装,避免出错)
@@ -205,6 +258,26 @@ add_executable(
 	# asset/music
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/music.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/music.cpp
+	
+	# ============================
+	# FACTORY (读取蓝图,基于蓝图生成指定类型的实体)
+	# ============================
+
+	# 生成玩家实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/player.cpp
+	# 生成敌人实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/enemy.cpp
+	# 生成墙壁实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/wall.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/wall.cpp
+	# 生成门实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/door.cpp
+	# 生成装饰物实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/decoration.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/decoration.cpp
 
 	# ============================
 	# SYSTEMS
@@ -272,10 +345,13 @@ add_executable(
 	# GAME
 	# ============================
 
-	# 宏定义
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/defines.hpp
 	# 常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/constants.hpp
+	# 所有实体类型
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/entity_type.hpp
+	# 渲染层级
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/render_layer.hpp
+
 	# 测试用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/playground.hpp
 
@@ -287,6 +363,8 @@ add_executable(
 	# MAIN
 	# ============================
 
+	# 宏定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src/defines.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
