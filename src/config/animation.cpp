@@ -5,69 +5,84 @@
 
 #include <config/animation.hpp>
 
+#include <utility/json_reader.hpp>
+
+#include <spdlog/spdlog.h>
+
 namespace pd::config
 {
-	[[nodiscard]] auto load_animation() noexcept -> AnimationSet
+	[[nodiscard]] auto load_animation(const std::filesystem::path& path) noexcept -> AnimationSet
 	{
-		using namespace config;
-		using namespace std::chrono_literals;
-
 		AnimationSet animation_set{};
 
-		// AntleredRascal
+		// 读取JSON配置文件
+		const auto json_opt = utility::JsonReader::read_file(path);
+		if (not json_opt.has_value())
 		{
-			auto& [frames, looping] = animation_set["AntleredRascal"];
+			return animation_set;
+		}
 
-			// 循环播放
-			looping = true;
-			// 第1帧
-			frames.emplace_back(
-				AnimationFrame
+		const auto& json = json_opt.value();
+
+		// 解析动画数据
+		try
+		{
+			if (not json.contains("animations"))
+			{
+				SPDLOG_ERROR("动画配置格式错误:缺少'animations'字段!");
+				return animation_set;
+			}
+
+			const auto& animations = json["animations"];
+			for (const auto& [name, anim_data]: animations.items())
+			{
+				Animation animation{};
+
+				// 读取循环标记
+				if (anim_data.contains("looping"))
 				{
-						.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
-						.duration = 250ms,
-						.frame_x = 0,
-						.frame_y = 0,
-						.frame_width = 16,
-						.frame_height = 16,
+					animation.looping = anim_data["looping"].get<bool>();
 				}
-			);
-			// 第2帧
-			frames.emplace_back(
-				AnimationFrame
+				else
 				{
-						.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
-						.duration = 250ms,
-						.frame_x = 16,
-						.frame_y = 0,
-						.frame_width = 16,
-						.frame_height = 16,
+					animation.looping = false;
 				}
-			);
-			// 第3帧
-			frames.emplace_back(
-				AnimationFrame
+
+				// 读取帧数据
+				if (not anim_data.contains("frames"))
 				{
-						.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
-						.duration = 250ms,
-						.frame_x = 32,
-						.frame_y = 0,
-						.frame_width = 16,
-						.frame_height = 16,
+					SPDLOG_WARN("动画缺少帧数据,跳过!", name);
+					continue;
 				}
-			);
-			// 第4帧
-			frames.emplace_back(
-				AnimationFrame
+
+				const auto& frames = anim_data["frames"];
+				animation.frames.reserve(frames.size());
+
+				for (const auto& frame_data: frames)
 				{
-						.texture_path = "./assets/characters/enemies/deep-dive-AntleredRascal.png",
-						.duration = 250ms,
-						.frame_x = 48,
-						.frame_y = 0,
-						.frame_width = 16,
-						.frame_height = 16,
+					AnimationFrame frame{};
+
+					frame.texture_path = frame_data["texture_path"].get<std::string>();
+
+					// duration_ms转换为microseconds
+					const auto duration_ms = frame_data["duration_ms"].get<int>();
+					frame.duration = std::chrono::milliseconds(duration_ms);
+
+					frame.frame_x = frame_data["frame_x"].get<int>();
+					frame.frame_y = frame_data["frame_y"].get<int>();
+					frame.frame_width = frame_data["frame_width"].get<int>();
+					frame.frame_height = frame_data["frame_height"].get<int>();
+
+					animation.frames.emplace_back(std::move(frame));
 				}
-			);
+
+				SPDLOG_INFO("加载动画[{:<20}]成功!共有[{}]帧", name, animation.frames.size());
+				animation_set.emplace(name, std::move(animation));
+			}
+		}
+		catch (const nlohmann::json::exception& e)
+		{
+			SPDLOG_ERROR("解析动画配置失败: {}", e.what());
 		}
 
 		return animation_set;

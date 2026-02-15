@@ -5,11 +5,9 @@
 
 #pragma once
 
-#include <box2d/id.h>
-
 #include <SFML/System/Time.hpp>
 
-namespace pd::components
+namespace pd::components::world
 {
 	// 此帧历时
 	class FrameDelta final
@@ -35,11 +33,4 @@ namespace pd::components
 	// 标记当前游戏是否暂停
 	// 如果不暂停则不存在该数据
 	class GamePaused final {};
-
-	// 物理世界
-	class PhysicsWorld final
-	{
-	public:
-		b2WorldId world_id;
-	};
 }

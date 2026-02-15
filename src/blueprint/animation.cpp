@@ -6,18 +6,17 @@
 #include<blueprint/animation.hpp>
 
 #include <config/animation.hpp>
-#include <asset/map.hpp>
 
 namespace pd::blueprint
 {
-	auto load_animation(const config::AnimationSet& in_animation_set, asset::TextureMap& out_texture_map) noexcept -> AnimationSet
+	auto load_animation(const config::AnimationSet& data) noexcept -> AnimationSet
 	{
 		AnimationSet animation_set{};
 
-		animation_set.reserve(in_animation_set.size());
+		animation_set.reserve(data.size());
 		// 具体纹理数量未知,不过map不reserve问题也不大
 
-		for (auto&& [animation_name, animation_frames]: in_animation_set /* | std::views::as_rvalue*/)
+		for (auto&& [animation_name, animation_frames]: data /* | std::views::as_rvalue*/)
 		{
 			Animation animation{};
 
@@ -27,10 +26,10 @@ namespace pd::blueprint
 			for (auto&& frame: animation_frames.frames /* | std::views::as_rvalue*/)
 			{
 				// 注册纹理
-				const auto texture_id = out_texture_map.id_of(frame.texture_path);
+				// const auto texture_id = texture_map.id_of(frame.texture_path);
 
 				animation.frames.emplace_back(
-					texture_id,
+					frame.texture_path,
 					frame.duration,
 					frame.frame_x,
 					frame.frame_y,

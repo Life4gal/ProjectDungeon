@@ -5,32 +5,21 @@
 
 #pragma once
 
-#include <systems/system.hpp>
-
 #include <blueprint/animation.hpp>
 
-namespace pd::systems
+#include <entt/fwd.hpp>
+
+namespace pd::ctx
 {
-	class Animation final : public System<Animation>
+	class Animation final
 	{
-		friend System;
-
-		static auto do_loaded(entt::registry& registry) noexcept -> void;
-
-		static auto do_initialized(entt::registry& registry) noexcept -> void;
-
-		static auto do_unloaded(entt::registry& registry) noexcept -> void;
-
-		static auto do_update(entt::registry& registry, sf::Time delta) noexcept -> void;
-
-		static auto do_render(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
-
 	public:
-		// ========================================
-		// 定义一套static接口,便于直接读取registry.ctx
-		// ========================================
+		// 添加新的动画集
+		static auto add_set(entt::registry& registry, blueprint::AnimationSet&& sub_set) noexcept -> void;
 
-		// 获取指定动画
+		// 获取动画集(应该仅在systems::initialize::asset中使用)
+		[[nodiscard]] static auto get_set(entt::registry& registry) noexcept -> const blueprint::AnimationSet&;
+
 		[[nodiscard]] static auto get(entt::registry& registry, std::string_view name) noexcept -> blueprint::AnimationView;
 
 		// 暂停指定实体的动画

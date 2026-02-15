@@ -9,10 +9,10 @@
 
 #include <SFML/System/Time.hpp>
 
-namespace pd::components
+namespace pd::components::animation
 {
 	// 当前动画帧计时器
-	class AnimationTimer final
+	class Timer final
 	{
 	public:
 		// 当前帧总持续时间
@@ -22,7 +22,7 @@ namespace pd::components
 	};
 
 	// 当前动画帧索引
-	class AnimationIndex final
+	class Index final
 	{
 	public:
 		// 此动画共有多少帧
@@ -32,7 +32,7 @@ namespace pd::components
 	};
 
 	// 当前动画
-	class AnimationView final
+	class Animation final
 	{
 	public:
 		blueprint::AnimationView animation;
@@ -40,13 +40,13 @@ namespace pd::components
 
 	// 标记当前动画是否循环
 	// 如果不循环则不存在该数据
-	class AnimationLooping final {};
+	class Looping final {};
 
 	// 标记当前动画是否暂停
 	// 如果不暂停则不存在该数据
-	class AnimationPaused final {};
+	class Paused final {};
 
 	// 标记当前动画已经结束(此数据可以避免那些非循环动画也参与更新)
 	// 如果未结束则不存在该数据
-	class AnimationEnded final {};
+	class Ended final {};
 }

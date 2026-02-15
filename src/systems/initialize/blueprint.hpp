@@ -5,15 +5,9 @@
 
 #pragma once
 
-#include <cstdint>
+#include <entt/fwd.hpp>
 
-namespace pd::components
+namespace pd::systems::initialize
 {
-	enum class Direction : std::uint8_t
-	{
-		LEFT,
-		RIGHT,
-		UP,
-		DOWN,
-	};
+	auto blueprint(entt::registry& registry) noexcept -> void;
 }

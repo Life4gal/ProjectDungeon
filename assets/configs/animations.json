@@ -1,0 +1,41 @@
+{
+  "animations": {
+    "AntleredRascal": {
+      "looping": true,
+      "frames": [
+        {
+          "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+          "duration_ms": 250,
+          "frame_x": 0,
+          "frame_y": 0,
+          "frame_width": 16,
+          "frame_height": 16
+        },
+        {
+          "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+          "duration_ms": 250,
+          "frame_x": 16,
+          "frame_y": 0,
+          "frame_width": 16,
+          "frame_height": 16
+        },
+        {
+          "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+          "duration_ms": 250,
+          "frame_x": 32,
+          "frame_y": 0,
+          "frame_width": 16,
+          "frame_height": 16
+        },
+        {
+          "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+          "duration_ms": 250,
+          "frame_x": 48,
+          "frame_y": 0,
+          "frame_width": 16,
+          "frame_height": 16
+        }
+      ]
+    }
+  }
+}

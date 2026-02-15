@@ -113,8 +113,13 @@ add_executable(
 	# 允许unordered_xxx之类的容器通过string_view查找key为string的元素
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/string_hash.hpp
 
-	# id与任意类型的双向映射
-	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/map.hpp
+	# JSON读取器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/json_reader.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/json_reader.cpp
+
+	# 如果后续不使用string/filesystem::path作为key,而是改用ID的话,这两个文件会有用
+	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/string_to_id.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/path_to_id.hpp
 
 	# ============================
 	# CONFIG
@@ -136,13 +141,21 @@ add_executable(
 	# ASSET
 	# ============================
 
-	# 资源路径映射表
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/map.hpp
-	# 资源载入器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/loader.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/loader.cpp
-	# 资源管理器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/manager.hpp
+	# entt::resource_cache的包装类
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/resource_cache.hpp
+
+	# 字体资源
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/font.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/font.cpp
+	# 纹理资源
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/texture.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/texture.cpp
+	# 音效资源
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/sound.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/sound.cpp
+	# 音乐资源
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/music.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/asset/music.cpp
 
 	# ============================
 	# COMPONENTS
@@ -152,35 +165,94 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/game.hpp
 	# 世界信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/world.hpp
-	
-	# 方向(一些静态物体的朝向)
-	#${CMAKE_CURRENT_SOURCE_DIR}/src/components/direction.hpp
+	# 物理世界信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/physics_world.hpp
+
 	# 位置/大小/旋转等信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.hpp
 
 	# 动画信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/animation.hpp
+		
+	# 描述一个实体要被渲染需要哪些信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/render.hpp
+
+	# ============================
+	# CTX (直接上下文访问封装,避免出错)
+	# ============================
+
+	# components/world
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/world.cpp
+
+	# components/physics_world
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/physics_world.cpp
 	
+	# components/animation
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/animation.cpp
+
+	# asset/font
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/font.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/font.cpp
+	# asset/texture
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/texture.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/texture.cpp
+	# asset/sound
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/sound.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/sound.cpp
+	# asset/music
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/music.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/music.cpp
+
 	# ============================
 	# SYSTEMS
 	# ============================
+				
+	# ==========
+	# INITIALIZE
+	# ==========
+
+	# 载入所有蓝图
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.cpp	
+
+	# 载入蓝图所需的资源
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.cpp	
+
+	# 测试用
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/debug.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/debug.cpp	
+
+	# ==========
+	# UPDATE
+	# ==========
 		
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/system.hpp
+	# 更新世界(主要是涉及帧时长/游戏历时等信息)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/world.cpp
+	# 更新动画帧(同时根据动画帧设置渲染纹理)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/blueprint.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/blueprint.cpp
+	# 测试用
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/debug.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/debug.cpp	
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/asset.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/asset.cpp
+	# ==========
+	# RENDER
+	# ==========
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/animation.cpp
+	# 渲染实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/entity.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/entity.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/debug.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/debug.cpp
+	# 测试用
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/debug.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/debug.cpp	
 
 	# ============================
 	# SCENE

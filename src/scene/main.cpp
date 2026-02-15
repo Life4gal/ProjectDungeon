@@ -7,6 +7,59 @@
 
 #include <print>
 
+// ======================================
+// ASSET
+// ======================================
+
+#include <asset/font.hpp>
+#include <asset/texture.hpp>
+#include <asset/sound.hpp>
+#include <asset/music.hpp>
+
+// ======================================
+// BLUEPRINT
+// ======================================
+
+#include <blueprint/animation.hpp>
+
+// ======================================
+// COMPONENTS
+// ======================================
+
+#include <components/world.hpp>
+#include <components/physics_world.hpp>
+
+// ======================================
+// SYSTEMS::INITIALIZE
+// ======================================
+
+#include <systems/initialize/blueprint.hpp>
+#include <systems/initialize/asset.hpp>
+
+#include <systems/initialize/debug.hpp>
+
+// ======================================
+// SYSTEMS::UPDATE
+// ======================================
+
+#include <systems/update/world.hpp>
+#include <systems/update/animation.hpp>
+
+#include <systems/update/debug.hpp>
+
+// ======================================
+// SYSTEMS::RENDER
+// ======================================
+
+#include <systems/render/entity.hpp>
+
+#include <systems/render/debug.hpp>
+
+// ======================================
+// DEPENDENCIES
+// ======================================
+
+#include <box2d/box2d.h>
 #include <imgui.h>
 
 namespace pd::scene
@@ -23,37 +76,89 @@ namespace pd::scene
 	{
 		std::println("MainScene::on_loaded");
 
-		world_system_.on_loaded(scene_registry_);
-		blueprint_system_.on_loaded(scene_registry_);
-		asset_system_.on_loaded(scene_registry_);
-		animation_system_.on_loaded(scene_registry_);
+		// ==========================
+		// 将所有涉及registry.ctx的组件全部在这里创建
+		// 其他*所有*地方都不应该创建,且应该通过ctx中的辅助类来访问
+		// ==========================
 
-		debug_system_.on_loaded(scene_registry_);
+		auto& registry = scene_registry_;
+
+		// =========
+		// World
+		{
+			using namespace components::world;
+
+			// 避免可能的除0,初始delta设置为非0值
+			registry.ctx().emplace<FrameDelta>(sf::seconds(1));
+			registry.ctx().emplace<TotalElapsed>(sf::Time::Zero);
+			registry.ctx().emplace<PlayElapsed>(sf::Time::Zero);
+		}
+		// =========
+		// PhysicsWorld
+		{
+			using namespace components::physics_world;
+
+			auto def = b2DefaultWorldDef();
+			// 无重力世界
+			def.gravity = b2Vec2_zero;
+			const auto id = b2CreateWorld(&def);
+
+			registry.ctx().emplace<Id>(id);
+		}
+		// =========
+		// Asset
+		{
+			registry.ctx().emplace<asset::FontManager>();
+			registry.ctx().emplace<asset::TextureManager>();
+			registry.ctx().emplace<asset::SoundManager>();
+			registry.ctx().emplace<asset::MusicManager>();
+		}
+		// =========
+		// Blueprint
+		{
+			registry.ctx().emplace<blueprint::AnimationSet>();
+		}
+
+		using namespace systems;
+
+		// ========================
+		// 1.载入所有蓝图
+		initialize::blueprint(registry);
+		// ========================
+		// 2.载入蓝图所需的资源
+		initialize::asset(registry);
+
+		// ========================
+		// n.测试用
+		initialize::debug(registry);
 	}
 
 	auto Main::on_initialized() noexcept -> void
 	{
 		std::println("MainScene::on_initialized");
 
-		world_system_.on_initialized(scene_registry_);
-		blueprint_system_.on_initialized(scene_registry_);
-		asset_system_.on_initialized(scene_registry_);
-		animation_system_.on_initialized(scene_registry_);
-
-		debug_system_.on_initialized(scene_registry_);
+		auto& registry = scene_registry_;
+		//
 	}
 
 	auto Main::on_unloaded() noexcept -> void
 	{
 		std::println("MainScene::on_unloaded");
 
-		// 与on_loaded相反顺序执行
-		debug_system_.on_unloaded(scene_registry_);
+		// ==========================
+		// 将所有涉及registry.ctx的组件全部在这里销毁(如果需要)
+		// ==========================
 
-		animation_system_.on_unloaded(scene_registry_);
-		asset_system_.on_unloaded(scene_registry_);
-		blueprint_system_.on_unloaded(scene_registry_);
-		world_system_.on_unloaded(scene_registry_);
+		auto& registry = scene_registry_;
+
+		// =========
+		// PhysicsWorld
+		{
+			using namespace components::physics_world;
+
+			const auto id = scene_registry_.ctx().get<Id>().id;
+			b2DestroyWorld(id);
+		}
 
 		// todo: 更新全局统计数据等信息?
 	}
@@ -69,6 +174,7 @@ namespace pd::scene
 			return;
 		}
 
+		auto& registry = scene_registry_;
 		// todo: 处理事件
 	}
 
@@ -76,23 +182,21 @@ namespace pd::scene
 	{
 		using namespace systems;
 
-		world_system_.update(scene_registry_, delta);
-		blueprint_system_.update(scene_registry_, delta);
-		asset_system_.update(scene_registry_, delta);
-		animation_system_.update(scene_registry_, delta);
+		auto& registry = scene_registry_;
 
-		debug_system_.update(scene_registry_, delta);
+		// 更新世界
+		update::world(registry, delta);
+		// 更新动画
+		update::animation(registry, delta);
 	}
 
 	auto Main::render(sf::RenderWindow& window) noexcept -> void
 	{
 		using namespace systems;
 
-		world_system_.render(scene_registry_, window);
-		blueprint_system_.render(scene_registry_, window);
-		asset_system_.render(scene_registry_, window);
-		animation_system_.render(scene_registry_, window);
+		auto& registry = scene_registry_;
 
-		debug_system_.render(scene_registry_, window);
+		// 渲染实体
+		render::entity(registry, window);
 	}
 }

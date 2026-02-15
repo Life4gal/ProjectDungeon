@@ -8,7 +8,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Angle.hpp>
 
-namespace pd::components
+namespace pd::components::transform
 {
 	class Position
 	{

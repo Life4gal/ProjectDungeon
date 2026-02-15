@@ -6,7 +6,7 @@
 #pragma once
 
 #include <chrono>
-#include <string>
+#include <filesystem>
 #include <vector>
 #include <unordered_map>
 
@@ -19,7 +19,7 @@ namespace pd::config
 	{
 	public:
 		// 该帧使用纹理路径(通常来说会使用同一张纹理)
-		std::string texture_path;
+		std::filesystem::path texture_path;
 		// 该帧持续时间
 		std::chrono::microseconds duration;
 		// 该帧纹理位置
@@ -57,6 +57,5 @@ namespace pd::config
 	};
 
 	// 从文件中读取动画数据
-	// todo: 指定文件名
-	[[nodiscard]] auto load_animation() noexcept -> AnimationSet;
+	[[nodiscard]] auto load_animation(const std::filesystem::path& path) noexcept -> AnimationSet;
 }

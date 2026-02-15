@@ -5,36 +5,22 @@
 
 #pragma once
 
-#include <chrono>
-#include <string>
-#include <vector>
-#include <unordered_map>
-
-#include <utility/string_hash.hpp>
-
-#include <entt/core/fwd.hpp>
-
-namespace pd
-{
-	namespace config
-	{
-		class AnimationSet;
-	}
-
-	namespace asset
-	{
-		class TextureMap;
-	}
-}
+#include <config/animation.hpp>
 
 namespace pd::blueprint
 {
+	// TODO: 
+	//  1.AnimationFrame使用纹理路径,这里如果转换为纹理ID则不需要每次获取纹理都要计算一次ID
+	//  2.AnimationSet使用字符串动画名,这里如果转换为动画ID则不需要每次获取动画都要计算一次ID
+	//  3.load_animation当前主需要传入config::AnimationSet,因为AnimationFrame会保存纹理路径,
+	//  如果转换为纹理ID则需要再传入一个映射表,接收纹理路径,返回纹理ID
+
 	// 一帧动画所包含的数据(对应config::AnimationFrame)
 	class AnimationFrame final
 	{
 	public:
-		// 该帧使用纹理id(通过systems::FlipAnimation::get(id)获取纹理资源)
-		entt::id_type texture;
+		// 该帧使用纹理路径(通常来说会使用同一张纹理)
+		std::filesystem::path texture_path;
 		// 该帧持续时间
 		std::chrono::microseconds duration;
 		// 该帧纹理位置
@@ -89,5 +75,5 @@ namespace pd::blueprint
 	};
 
 	// 将config数据转换为蓝图数据
-	[[nodiscard]] auto load_animation(const config::AnimationSet& in_animation_set, asset::TextureMap& out_texture_map) noexcept -> AnimationSet;
+	[[nodiscard]] auto load_animation(const config::AnimationSet& data) noexcept -> AnimationSet;
 }
