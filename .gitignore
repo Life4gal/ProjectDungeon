@@ -1,19 +1,17 @@
 # ==============================
 # IDE
-.idea/*
 .idea
-.vs/*
 .vs
 
 # ==============================
 # scripts
 
 # CPM.cmake & CPM.cmake.tmp
-# see scripts/external_installer.cmake
+# see cmake/find_cpm.cmake
 CPM.cmake*
 
 # ==============================
 # OUTPUT
-out/*
 out
+build
 *.pdb

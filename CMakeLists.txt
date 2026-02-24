@@ -216,7 +216,7 @@ add_executable(
 	# ENTITY
 	# =============
 
-	# 描述地板拥有哪些内容/信息
+	# 描述地板/地板洞拥有哪些内容/信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/floor.hpp
 	# 描述墙壁拥有哪些内容/信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/wall.hpp
@@ -224,6 +224,14 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/wall_decoration.hpp
 	# 描述门实体拥有哪些内容/信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/door.hpp
+	# 描述地面装饰物拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/floor_decoration.hpp
+	# 描述地形实体拥有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/terrain.hpp
+	# 描述房间实体有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/room.hpp
+	# 描述关卡实体有哪些内容/信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/level.hpp
 
 	# 描述玩家实体拥有哪些内容/信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/player.hpp
@@ -231,58 +239,58 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/enemy.hpp
 
 	# ============================
-	# CTX (直接上下文访问封装,避免出错)
-	# ============================
-
-	# components/world
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/world.cpp
-
-	# components/physics_world
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/physics_world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/physics_world.cpp
-	
-	# components/animation
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/animation.cpp
-
-	# asset/font
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/font.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/font.cpp
-	# asset/texture
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/texture.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/texture.cpp
-	# asset/sound
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/sound.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/sound.cpp
-	# asset/music
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/music.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ctx/music.cpp
-	
-	# ============================
-	# FACTORY (读取蓝图,基于蓝图生成指定类型的实体)
-	# ============================
-
-	# 生成玩家实体
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/player.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/player.cpp
-	# 生成敌人实体
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/enemy.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/enemy.cpp
-	# 生成墙壁实体
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/wall.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/wall.cpp
-	# 生成门实体
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/door.cpp
-	# 生成装饰物实体
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/decoration.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/factory/decoration.cpp
-
-	# ============================
 	# SYSTEMS
 	# ============================
-				
+			
+	# ==========
+	# HELPER
+	# ==========
+	
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/font_manager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/font_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/texture_manager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/texture_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/sound_manager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/sound_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/music_manager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/music_manager.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/world.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_world.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/animation.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/floor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/floor.cpp	
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/wall.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/wall.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/door.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/decoration.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/decoration.cpp
+	
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/terrain.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/terrain.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/room.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/level.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/level.cpp
+
+	#${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/enemy.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/enemy.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/player.cpp
+
 	# ==========
 	# INITIALIZE
 	# ==========
@@ -295,6 +303,14 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.cpp	
 
+	# 初始化世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.cpp	
+
+	# 初始化物理世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/physics_world.cpp	
+
 	# 测试用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/debug.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/debug.cpp	
@@ -306,6 +322,26 @@ add_executable(
 	# 更新世界(主要是涉及帧时长/游戏历时等信息)
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.cpp
+	
+	# 检查房间状态(确定敌人是否被清空,如果清空则打开所有门)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/check_room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/check_room.cpp
+
+	# 应用玩家移动
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/apply_player_movement.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/apply_player_movement.cpp
+
+	# 更新物理世界(主要是调用box2d的step函数)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/physics_world.cpp
+
+	# 同步物理世界更新的变换(transform)信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/sync_transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/sync_transform.cpp
+
+	# 处理接触事件
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/process_contact_and_sensor_events.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/process_contact_and_sensor_events.cpp
 
 	# 更新动画帧(同时根据动画帧设置渲染纹理)
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.hpp
@@ -351,6 +387,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/entity_type.hpp
 	# 渲染层级
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/render_layer.hpp
+	# EnTT实体与box2d::userData转换
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/user_data_entity.hpp
 
 	# 测试用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/playground.hpp

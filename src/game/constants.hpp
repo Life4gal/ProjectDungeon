@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <SFML/System/Vector2.hpp>
 
 #include <box2d/math_functions.h>

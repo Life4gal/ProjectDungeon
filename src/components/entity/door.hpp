@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <string>
+
+#include <config/types.hpp>
+
 #include <entt/entity/fwd.hpp>
 
 namespace pd::components::door
@@ -27,9 +31,27 @@ namespace pd::components::door
 		entt::entity key;
 	};
 
-	// 门连接的下一个房间
-	class NextRoom final
+	// 门的方向
+	class Direction final
 	{
-		entt::entity next_room;
+	public:
+		config::DoorDirection direction;
+	};
+
+	// 门连接的下一个房间(使用房间ID字符串)
+	class TargetRoom final
+	{
+	public:
+		std::string room_id;
+	};
+
+	// 门的碰撞体尺寸(物理世界单位,半宽半高)
+	// box2d不允许简单地将shape从传感器改为一般碰撞体(反之亦然),只能销毁原有shape并创建新shape
+	// 所以我们需要保存门的碰撞体大小,以避免解锁/锁定门时需要再次指定门信息
+	class CollisionSize final
+	{
+	public:
+		float half_width;
+		float half_height;
 	};
 }

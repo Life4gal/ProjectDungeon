@@ -8,7 +8,7 @@
 #include <components/transform.hpp>
 #include <components/render.hpp>
 
-#include <ctx/texture.hpp>
+#include <systems/helper/texture_manager.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -32,13 +32,13 @@ namespace pd::systems::render
 		     const auto [entity, position, scale, rotation, texture, color]: view.each())
 		{
 			// 获取纹理资源
-			const auto texture_resource = ctx::Texture::get(registry, texture.texture_path);
+			const auto texture_resource = helper::TextureManager::get(registry, texture.texture_path);
 
 			if (not texture_resource)
 			{
 				// todo: 默认纹理?
 				SPDLOG_ERROR(
-					"无法渲染位于({:.3f}:{:.3f})的实体[{}],纹理[{}]不存在",
+					"无法渲染位于({:.1f}:{:.1f})的实体[0x{:08x}],纹理[{}]不存在",
 					position.position.x,
 					position.position.y,
 					entt::to_integral(entity),

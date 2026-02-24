@@ -45,8 +45,13 @@ namespace pd::config
 
 	// 敌人集
 	// 敌人名称<->敌人数据
-	class EnemySet final : public std::unordered_map<std::string, Enemy, utility::StringHash, std::ranges::equal_to> {};
+	class EnemySet final : public std::unordered_map<
+				std::string,
+				Enemy,
+				utility::StringHash,
+				std::ranges::equal_to
+			> {};
 
 	// 从文件中读取敌人数据
-	[[nodiscard]] auto load_enemy(const std::filesystem::path& file_path) noexcept -> EnemySet;
+	[[nodiscard]] auto load_enemy(const std::filesystem::path& path) noexcept -> EnemySet;
 } // namespace pd::config

@@ -5,13 +5,14 @@
 
 #include <systems/initialize/debug.hpp>
 
-#include <factory/player.hpp>
+#include <systems/helper/player.hpp>
 
 namespace pd::systems::initialize
 {
 	auto debug(entt::registry& registry) noexcept -> void
 	{
 		// 创建一个测试用实体
-		factory::player(registry, sf::Vector2f{500, 500}, sf::Vector2f{10, 10});
+		// 64 / 16 == 4
+		helper::Player::spawn(registry, sf::Vector2f{500, 500}, sf::Vector2f{4, 4});
 	}
 } // namespace pd::systems::initialize

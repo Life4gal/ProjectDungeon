@@ -24,7 +24,6 @@ namespace pd::config
 
 		const auto& json = json_opt.value();
 
-		// 解析动画数据
 		try
 		{
 			if (not json.contains("animations"))
@@ -33,12 +32,11 @@ namespace pd::config
 				return animation_set;
 			}
 
-			const auto& animations = json["animations"];
-			for (const auto& [name, anim_data]: animations.items())
+			for (const auto& animations = json["animations"];
+			     const auto& [name, anim_data]: animations.items())
 			{
 				Animation animation{};
 
-				// 读取循环标记
 				if (anim_data.contains("looping"))
 				{
 					animation.looping = anim_data["looping"].get<bool>();
@@ -48,7 +46,6 @@ namespace pd::config
 					animation.looping = false;
 				}
 
-				// 读取帧数据
 				if (not anim_data.contains("frames"))
 				{
 					SPDLOG_WARN("动画缺少帧数据,跳过!", name);

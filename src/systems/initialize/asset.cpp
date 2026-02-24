@@ -8,12 +8,12 @@
 #include <algorithm>
 #include <ranges>
 
-#include <ctx/animation.hpp>
+#include <systems/helper/animation.hpp>
 
-#include <ctx/font.hpp>
-#include <ctx/texture.hpp>
-#include <ctx/sound.hpp>
-#include <ctx/music.hpp>
+#include <systems/helper/font_manager.hpp>
+#include <systems/helper/texture_manager.hpp>
+#include <systems/helper/sound_manager.hpp>
+#include <systems/helper/music_manager.hpp>
 
 #include <entt/entt.hpp>
 
@@ -21,9 +21,14 @@ namespace pd::systems::initialize
 {
 	auto asset(entt::registry& registry) noexcept -> void
 	{
+		registry.ctx().emplace<asset::FontManager>();
+		registry.ctx().emplace<asset::TextureManager>();
+		registry.ctx().emplace<asset::SoundManager>();
+		registry.ctx().emplace<asset::MusicManager>();
+
 		// 动画
 		{
-			const auto& set = ctx::Animation::get_set(registry);
+			const auto& set = helper::Animation::get_set(registry);
 
 			// 载入用到的纹理资源
 			std::ranges::for_each(
@@ -31,7 +36,7 @@ namespace pd::systems::initialize
 				[&registry](const blueprint::AnimationFrame& frame) noexcept -> void
 				{
 					// 等我们使用ID而不是路径时这里的id就有用了
-					[[maybe_unused]] const auto id = ctx::Texture::load(registry, frame.texture_path);
+					[[maybe_unused]] const auto id = helper::TextureManager::load(registry, frame.texture_path);
 				}
 			);
 		}

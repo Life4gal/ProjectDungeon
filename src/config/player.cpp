@@ -11,7 +11,7 @@
 
 namespace pd::config
 {
-	auto load_player(const std::filesystem::path& file_path) noexcept -> PlayerSet
+	auto load_player(const std::filesystem::path& path) noexcept -> PlayerSet
 	{
 		PlayerSet player_set{};
 

@@ -9,10 +9,12 @@
 
 namespace pd::components::physics_body
 {
-	// 刚体ID
-	class Id final
+	// 所有碰撞体都有刚体id
+	class BodyId final
 	{
 	public:
 		b2BodyId id;
 	};
+
+	// todo: 是否需要保存ShapeId?还是在需要时通过BodyId查询当前所有shape?
 } // namespace pd::components::physics_body

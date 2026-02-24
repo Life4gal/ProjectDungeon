@@ -1,0 +1,76 @@
+{
+    "tiles": {
+      "floor_stone": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 0,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "FLOOR"
+      },
+      "wall_stone": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 64,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "WALL"
+      },
+      "wall_corner_tl": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 128,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "WALL"
+      },
+      "wall_corner_tr": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 192,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "WALL"
+      },
+      "wall_corner_bl": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 128,
+        "texture_y": 64,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "WALL"
+      },
+      "wall_corner_br": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 192,
+        "texture_y": 64,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "WALL"
+      },
+      "door_closed": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 0,
+        "texture_y": 64,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "DOOR"
+      },
+      "door_open": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 64,
+        "texture_y": 64,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "DOOR"
+      },
+      "floor_decoration": {
+        "texture_path": "assets/placeholder/tiles.png",
+        "texture_x": 0,
+        "texture_y": 128,
+        "texture_width": 64,
+        "texture_height": 64,
+        "type": "FLOOR_DECORATION"
+      }
+    }
+}

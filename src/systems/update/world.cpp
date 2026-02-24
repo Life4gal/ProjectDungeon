@@ -7,20 +7,20 @@
 
 #include <components/world.hpp>
 
-#include <ctx/world.hpp>
+#include <systems/helper/world.hpp>
 
 namespace pd::systems::update
 {
 	auto world(entt::registry& registry, const sf::Time delta) noexcept -> void
 	{
-		using namespace components::world;
+		using namespace systems;
 
-		ctx::World::update_frame_delta(registry, delta);
-		ctx::World::update_total_elapsed(registry, delta);
+		helper::World::update_frame_delta(registry, delta);
+		helper::World::update_total_elapsed(registry, delta);
 
-		if (not ctx::World::is_pause(registry))
+		if (not helper::World::is_pause(registry))
 		{
-			ctx::World::update_play_elapsed(registry, delta);
+			helper::World::update_play_elapsed(registry, delta);
 		}
 	}
 }

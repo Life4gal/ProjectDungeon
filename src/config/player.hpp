@@ -38,8 +38,13 @@ namespace pd::config
 
 	// 玩家集
 	// 玩家名称<->玩家数据
-	class PlayerSet final : public std::unordered_map<std::string, Player, utility::StringHash, std::ranges::equal_to> {};
+	class PlayerSet final : public std::unordered_map<
+				std::string,
+				Player,
+				utility::StringHash,
+				std::ranges::equal_to
+			> {};
 
 	// 从文件中读取玩家数据
-	[[nodiscard]] auto load_player(const std::filesystem::path& file_path) noexcept -> PlayerSet;
+	[[nodiscard]] auto load_player(const std::filesystem::path& path) noexcept -> PlayerSet;
 }

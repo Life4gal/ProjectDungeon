@@ -7,9 +7,8 @@
 
 #include <array>
 #include <algorithm>
-#include <ranges>
 
-#include <ctx/animation.hpp>
+#include <systems/helper/animation.hpp>
 
 #include <entt/entt.hpp>
 
@@ -17,6 +16,8 @@ namespace pd::systems::initialize
 {
 	auto blueprint(entt::registry& registry) noexcept -> void
 	{
+		registry.ctx().emplace<blueprint::AnimationSet>();
+
 		// 动画
 		{
 			const std::array paths
@@ -36,7 +37,7 @@ namespace pd::systems::initialize
 					auto animation_blueprint = blueprint::load_animation(animation_config);
 
 					// 合并动画
-					ctx::Animation::add_set(registry, std::move(animation_blueprint));
+					helper::Animation::add_set(registry, std::move(animation_blueprint));
 				}
 			);
 		}

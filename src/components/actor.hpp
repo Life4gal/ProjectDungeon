@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <SFML/System/Vector2.hpp>
+// #include <SFML/System/Vector2.hpp>
 
 namespace pd::components::actor
 {
@@ -26,6 +26,7 @@ namespace pd::components::actor
 	};
 
 	// 速度
+	// todo: 这里的速度是当前最大速度?(即可能被修正的最大速度),还是正常情况下(无干扰)的最大速度?
 	class Speed final
 	{
 	public:
@@ -35,17 +36,19 @@ namespace pd::components::actor
 		float speed_squared;
 	};
 
-	// 当前速度
-	class Velocity final
-	{
-	public:
-		sf::Vector2f value;
-	};
+	// 我们当前通过b2World_GetBodyEvents通过实体的transform信息,我们需要下面这些组件吗?
 
-	// 当前速度方向(已归一化)
-	class Direction final
-	{
-	public:
-		sf::Vector2f direction;
-	};
+	// // 当前速度
+	// class Velocity final
+	// {
+	// public:
+	// 	sf::Vector2f value;
+	// };
+	//
+	// // 当前速度方向(已归一化)
+	// class Direction final
+	// {
+	// public:
+	// 	sf::Vector2f direction;
+	// };
 } // namespace pd::components::actor

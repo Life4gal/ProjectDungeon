@@ -8,26 +8,20 @@
 #include <print>
 
 // ======================================
-// ASSET
+// CONFIG
 // ======================================
 
-#include <asset/font.hpp>
-#include <asset/texture.hpp>
-#include <asset/sound.hpp>
-#include <asset/music.hpp>
+#include <config/dungeon.hpp>
 
 // ======================================
-// BLUEPRINT
+// SYSTEMS::HELPER
 // ======================================
 
-#include <blueprint/animation.hpp>
+#include <systems/helper/physics_world.hpp>
 
-// ======================================
-// COMPONENTS
-// ======================================
+#include <systems/helper/level.hpp>
 
-#include <components/world.hpp>
-#include <components/physics_world.hpp>
+#include <systems/helper/player.hpp>
 
 // ======================================
 // SYSTEMS::INITIALIZE
@@ -35,6 +29,8 @@
 
 #include <systems/initialize/blueprint.hpp>
 #include <systems/initialize/asset.hpp>
+#include <systems/initialize/world.hpp>
+#include <systems/initialize/physics_world.hpp>
 
 #include <systems/initialize/debug.hpp>
 
@@ -43,6 +39,11 @@
 // ======================================
 
 #include <systems/update/world.hpp>
+#include <systems/update/check_room.hpp>
+#include <systems/update/apply_player_movement.hpp>
+#include <systems/update/physics_world.hpp>
+#include <systems/update/sync_transform.hpp>
+#include <systems/update/process_contact_and_sensor_events.hpp>
 #include <systems/update/animation.hpp>
 
 #include <systems/update/debug.hpp>
@@ -59,14 +60,39 @@
 // DEPENDENCIES
 // ======================================
 
-#include <box2d/box2d.h>
 #include <imgui.h>
 
 namespace pd::scene
 {
 	auto Main::start_game() noexcept -> void
 	{
-		// todo
+		using namespace systems;
+
+		auto& registry = scene_registry_;
+
+		// 加载瓦片集
+		const auto tileset = config::load_tileset("assets/configs/tileset.json");
+		if (tileset.empty())
+		{
+			std::println("[错误] 无法加载瓦片集");
+			return;
+		}
+
+		// 加载关卡
+		const auto level = config::load_level("assets/configs/levels/level_01.json");
+		if (level.id.empty())
+		{
+			std::println("[错误] 无法加载关卡");
+			return;
+		}
+
+		if (not helper::Level::load_level(registry, level, tileset))
+		{
+			std::println("[错误] 加载关卡失败");
+			return;
+		}
+
+		std::println("游戏开始! 当前房间: {}-{}", level.id, helper::Level::get_room_id(registry));
 	}
 
 	Main::Main(const std::reference_wrapper<entt::registry> global_registry) noexcept
@@ -76,57 +102,25 @@ namespace pd::scene
 	{
 		std::println("MainScene::on_loaded");
 
-		// ==========================
-		// 将所有涉及registry.ctx的组件全部在这里创建
-		// 其他*所有*地方都不应该创建,且应该通过ctx中的辅助类来访问
-		// ==========================
-
 		auto& registry = scene_registry_;
-
-		// =========
-		// World
-		{
-			using namespace components::world;
-
-			// 避免可能的除0,初始delta设置为非0值
-			registry.ctx().emplace<FrameDelta>(sf::seconds(1));
-			registry.ctx().emplace<TotalElapsed>(sf::Time::Zero);
-			registry.ctx().emplace<PlayElapsed>(sf::Time::Zero);
-		}
-		// =========
-		// PhysicsWorld
-		{
-			using namespace components::physics_world;
-
-			auto def = b2DefaultWorldDef();
-			// 无重力世界
-			def.gravity = b2Vec2_zero;
-			const auto id = b2CreateWorld(&def);
-
-			registry.ctx().emplace<Id>(id);
-		}
-		// =========
-		// Asset
-		{
-			registry.ctx().emplace<asset::FontManager>();
-			registry.ctx().emplace<asset::TextureManager>();
-			registry.ctx().emplace<asset::SoundManager>();
-			registry.ctx().emplace<asset::MusicManager>();
-		}
-		// =========
-		// Blueprint
-		{
-			registry.ctx().emplace<blueprint::AnimationSet>();
-		}
 
 		using namespace systems;
 
 		// ========================
 		// 1.载入所有蓝图
 		initialize::blueprint(registry);
+
 		// ========================
 		// 2.载入蓝图所需的资源
 		initialize::asset(registry);
+
+		// ========================
+		// 3.初始化世界
+		initialize::world(registry);
+
+		// ========================
+		// 3.初始化物理世界
+		initialize::physics_world(registry);
 
 		// ========================
 		// n.测试用
@@ -137,27 +131,30 @@ namespace pd::scene
 	{
 		std::println("MainScene::on_initialized");
 
-		auto& registry = scene_registry_;
-		//
+		// 开始游戏
+		start_game();
 	}
 
 	auto Main::on_unloaded() noexcept -> void
 	{
 		std::println("MainScene::on_unloaded");
 
-		// ==========================
-		// 将所有涉及registry.ctx的组件全部在这里销毁(如果需要)
-		// ==========================
-
 		auto& registry = scene_registry_;
+
+		// =========
+		// Dungeon
+		{
+			using namespace systems::helper;
+
+			Level::unload_level(registry);
+		}
 
 		// =========
 		// PhysicsWorld
 		{
-			using namespace components::physics_world;
+			using namespace systems::helper;
 
-			const auto id = scene_registry_.ctx().get<Id>().id;
-			b2DestroyWorld(id);
+			PhysicsWorld::destroy(registry);
 		}
 
 		// todo: 更新全局统计数据等信息?
@@ -165,6 +162,8 @@ namespace pd::scene
 
 	auto Main::handle_event(const sf::Event& event) noexcept -> void
 	{
+		using namespace systems;
+
 		const auto& io = ImGui::GetIO();
 		const auto want_capture_keyboard = io.WantCaptureKeyboard;
 		const auto want_capture_mouse = io.WantCaptureMouse;
@@ -175,7 +174,8 @@ namespace pd::scene
 		}
 
 		auto& registry = scene_registry_;
-		// todo: 处理事件
+
+		helper::Player::handle_event(registry, event);
 	}
 
 	auto Main::update(const sf::Time delta) noexcept -> void
@@ -186,6 +186,16 @@ namespace pd::scene
 
 		// 更新世界
 		update::world(registry, delta);
+		// 检测房间是否清空
+		update::check_room(registry);
+		// 应用玩家移动
+		update::apply_player_movement(registry, delta);
+		// 更新物理世界
+		update::physics_world(registry, delta);
+		// 同步物理世界实体变换(transform)信息
+		update::sync_transform(registry, delta);
+		// 处理接触事件
+		update::process_contact_and_sensor_events(registry, delta);
 		// 更新动画
 		update::animation(registry, delta);
 	}

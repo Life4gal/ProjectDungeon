@@ -9,4 +9,5 @@ namespace pd::components::floor
 {
 	// transform --> 地板的位置/缩放/旋转
 	// render --> 地板的纹理/颜色
+	// physics --> 地板[洞]的物理属性
 }

@@ -8,7 +8,8 @@
 #include <components/animation.hpp>
 #include <components/render.hpp>
 
-#include <ctx/world.hpp>
+#include <systems/helper/world.hpp>
+#include <systems/helper/animation.hpp>
 
 #include <entt/entt.hpp>
 
@@ -17,9 +18,10 @@ namespace pd::systems::update
 	auto animation(entt::registry& registry, const sf::Time delta) noexcept -> void
 	{
 		using namespace components;
+		using namespace systems;
 
 		// 如果暂停游戏则无需更新动画
-		if (ctx::World::is_pause(registry))
+		if (helper::World::is_pause(registry))
 		{
 			return;
 		}
