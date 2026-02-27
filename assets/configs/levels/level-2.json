@@ -1,0 +1,10 @@
+{
+	"name": "关卡2",
+	"animations": "assets/configs/animations/animation-1.json",
+	"tiles": "assets/configs/tileset/tileset-1.json",
+	"rooms": {
+		"room-id-1": "assets/configs/rooms/room-starting-1.json",
+		"room-id-2": "assets/configs/rooms/room-normal-1.json"
+	},
+	"starting_room": "room-id-1"
+}

@@ -5,16 +5,11 @@
 
 #pragma once
 
-#include <filesystem>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include <utility/string_hash.hpp>
+#include <config/config_reader.hpp>
+#include <config/set.hpp>
 
 namespace pd::config
 {
-	// 玩家的数据
 	class Player final
 	{
 	public:
@@ -22,8 +17,8 @@ namespace pd::config
 		float scale_x;
 		float scale_y;
 
-		// 动画名称
-		std::string animation_name;
+		// 动画ID
+		std::string animation_id;
 
 		// 生命值
 		float health;
@@ -33,18 +28,20 @@ namespace pd::config
 		float speed;
 
 		// 武器的名称列表
-		std::vector<std::string> weapons;
+		std::vector<std::string> weapon_ids;
 	};
 
 	// 玩家集
-	// 玩家名称<->玩家数据
-	class PlayerSet final : public std::unordered_map<
-				std::string,
-				Player,
-				utility::StringHash,
-				std::ranges::equal_to
-			> {};
+	// 玩家ID -> 玩家配置
+	class PlayerSet final : public Set<Player>
+	{
+	public:
+		using Set::Set;
+	};
 
-	// 从文件中读取玩家数据
-	[[nodiscard]] auto load_player(const std::filesystem::path& path) noexcept -> PlayerSet;
+	[[nodiscard]] auto load_player_from_json(Player& player, const ConfigReader::json_format& json) noexcept -> bool;
+	[[nodiscard]] auto load_player_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<Player>;
+
+	[[nodiscard]] auto load_player_set_from_json(PlayerSet& player_set, const ConfigReader::json_format& json) noexcept -> bool;
+	[[nodiscard]] auto load_player_set_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<PlayerSet>;
 }

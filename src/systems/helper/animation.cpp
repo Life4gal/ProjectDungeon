@@ -5,66 +5,88 @@
 
 #include <systems/helper/animation.hpp>
 
+#include <config/dungeon.hpp>
+
 #include <components/animation.hpp>
 
+#include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 
 namespace pd::systems::helper
 {
-	auto Animation::add_set(entt::registry& registry, blueprint::AnimationSet&& sub_set) noexcept -> void
+	auto Animation::attach(entt::registry& registry, const entt::entity entity, const config::Animation& animation) noexcept -> void
 	{
-		auto& set = registry.ctx().get<blueprint::AnimationSet>();
+		using namespace components;
 
-		set.merge(std::move(sub_set));
-	}
+		PROMETHEUS_PLATFORM_ASSUME(not registry.all_of<animation::Animation>(entity));
 
-	auto Animation::get_set(entt::registry& registry) noexcept -> const blueprint::AnimationSet&
-	{
-		return registry.ctx().get<const blueprint::AnimationSet>();
-	}
+		const auto& first_frame = animation.frames[0];
+		const auto total_frames = animation.frames.size();
 
-	auto Animation::get(entt::registry& registry, const std::string_view name) noexcept -> blueprint::AnimationView
-	{
-		const auto& set = registry.ctx().get<const blueprint::AnimationSet>();
+		registry.emplace_or_replace<animation::Animation>(entity, std::cref(animation));
+		registry.emplace_or_replace<animation::Timer>(entity, animation::Timer{.duration = sf::milliseconds(first_frame.duration_ms), .elapsed = sf::Time::Zero});
+		registry.emplace_or_replace<animation::Index>(entity, animation::Index{.total = total_frames, .current = 0});
 
-		if (const auto it = set.find(name);
-			it != set.end())
+		if (animation.looping)
 		{
-			return it->second;
+			registry.emplace_or_replace<animation::Looping>(entity);
+		}
+		else
+		{
+			registry.emplace_or_replace<animation::Ended>(entity);
 		}
 
-		// todo: 备用动画?
-		return set.begin()->second;
+		// pause标签按需调用接口添加
 	}
 
-	auto Animation::pause(entt::registry& registry, const entt::entity entity) noexcept -> void
+	auto Animation::deattach(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		using namespace components::animation;
+		using namespace components;
 
-		registry.emplace_or_replace<Paused>(entity);
+		registry.remove<animation::Animation>(entity_with_animation);
+		registry.remove<animation::Timer>(entity_with_animation);
+		registry.remove<animation::Index>(entity_with_animation);
+		registry.remove<animation::Looping>(entity_with_animation);
+		registry.remove<animation::Paused>(entity_with_animation);
+		registry.remove<animation::Ended>(entity_with_animation);
 	}
 
-	auto Animation::unpause(entt::registry& registry, const entt::entity entity) noexcept -> void
+	auto Animation::pause(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		using namespace components::animation;
+		using namespace components;
 
-		registry.remove<Paused>(entity);
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<animation::Animation>(entity_with_animation));
+
+		registry.emplace_or_replace<animation::Paused>(entity_with_animation);
 	}
 
-	auto Animation::looping(entt::registry& registry, const entt::entity entity) noexcept -> void
+	auto Animation::unpause(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		using namespace components::animation;
+		using namespace components;
 
-		registry.emplace_or_replace<Looping>(entity);
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<animation::Animation>(entity_with_animation));
+
+		registry.remove<animation::Paused>(entity_with_animation);
+	}
+
+	auto Animation::looping(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<animation::Animation>(entity_with_animation));
+
+		registry.emplace_or_replace<animation::Looping>(entity_with_animation);
 
 		// 如果非循环动画之前已经播放完毕,则需要移除已结束的标记
-		registry.remove<Ended>(entity);
+		registry.remove<animation::Ended>(entity_with_animation);
 	}
 
-	auto Animation::unlooping(entt::registry& registry, const entt::entity entity) noexcept -> void
+	auto Animation::unlooping(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		using namespace components::animation;
+		using namespace components;
 
-		registry.remove<Looping>(entity);
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<animation::Animation>(entity_with_animation));
+
+		registry.remove<animation::Looping>(entity_with_animation);
 	}
 }

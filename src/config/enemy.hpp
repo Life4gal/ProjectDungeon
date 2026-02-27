@@ -5,18 +5,11 @@
 
 #pragma once
 
-#include <filesystem>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include <config/types.hpp>
-
-#include <utility/string_hash.hpp>
+#include <config/config_reader.hpp>
+#include <config/set.hpp>
 
 namespace pd::config
 {
-	// 一个敌人的数据
 	class Enemy final
 	{
 	public:
@@ -24,8 +17,8 @@ namespace pd::config
 		float scale_x;
 		float scale_y;
 
-		// 动画名称
-		std::string animation_name;
+		// 动画ID
+		std::string animation_id;
 
 		// 生命值
 		float health;
@@ -38,20 +31,15 @@ namespace pd::config
 
 		// 武器的名称列表
 		std::vector<std::string> weapons;
-
-		// 移动类型
-		Movement movement;
 	};
 
 	// 敌人集
-	// 敌人名称<->敌人数据
-	class EnemySet final : public std::unordered_map<
-				std::string,
-				Enemy,
-				utility::StringHash,
-				std::ranges::equal_to
-			> {};
+	// 敌人ID -> 敌人配置
+	class EnemySet final : public Set<Enemy> {};
 
-	// 从文件中读取敌人数据
-	[[nodiscard]] auto load_enemy(const std::filesystem::path& path) noexcept -> EnemySet;
-} // namespace pd::config
+	[[nodiscard]] auto load_enemy_from_json(Enemy& player, const ConfigReader::json_format& json) noexcept -> bool;
+	[[nodiscard]] auto load_enemy_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<Enemy>;
+
+	[[nodiscard]] auto load_enemy_set_from_json(EnemySet& player_set, const ConfigReader::json_format& json) noexcept -> bool;
+	[[nodiscard]] auto load_enemy_set_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<EnemySet>;
+}

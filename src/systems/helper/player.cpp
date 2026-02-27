@@ -5,19 +5,21 @@
 
 #include <systems/helper/player.hpp>
 
-#include <components/entity/player.hpp>
+#include <components/player.hpp>
 
-#include <components/animation.hpp>
-#include <components/actor.hpp>
-#include <components/transform.hpp>
-#include <components/render.hpp>
-#include <components/physics_body.hpp>
+#include <config/collision_mask.hpp>
+// 快速测试用
+#include <config/level.hpp>
+#include <components/level.hpp>
 
 #include <systems/helper/physics_world.hpp>
+#include <systems/helper/transform.hpp>
+#include <systems/helper/render.hpp>
 #include <systems/helper/animation.hpp>
+#include <systems/helper/physics_body.hpp>
+#include <systems/helper/actor.hpp>
 
 #include <game/constants.hpp>
-#include <game/entity_type.hpp>
 #include <game/user_data_entity.hpp>
 
 #include <entt/entt.hpp>
@@ -35,71 +37,41 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
+		// 快速测试用
+		const auto& level = registry.ctx().get<const level::Level>().level.get();
+		const auto& animation_set = level.animation_set;
+
+		constexpr auto animation_id = std::string_view{"AntleredRascal"};
+		const auto animation_it = animation_set.find(animation_id);
+		if (animation_it == animation_set.end())
+		{
+			// todo
+			return entt::null;
+		}
+		const auto& animation = animation_it->second;
+		const auto& first_frame = animation.frames.front();
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
+		const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
+
+		const auto half_width = half_texture_width * scale.x;
+		const auto half_height = half_texture_height * scale.y;
+		const auto half_physics_width = Constant::to_physics(half_width);
+		const auto half_physics_height = Constant::to_physics(half_height);
+
 		const auto entity = registry.create();
 
 		// todo: 读取数据
 
-		// animation
-		{
-			using namespace animation;
-
-			const auto animation = Animation::get(registry, "AntleredRascal");
-			const auto& begin_frame = animation->frames[0];
-
-			registry.emplace<Timer>(entity, Timer{.duration = begin_frame.duration, .elapsed = sf::Time::Zero});
-			registry.emplace<Index>(entity, Index{.total = animation->frames.size(), .current = 0});
-			registry.emplace<animation::Animation>(entity, animation);
-
-			if (animation->looping)
-			{
-				registry.emplace<Looping>(entity);
-			}
-		}
-		// actor
-		{
-			registry.emplace<actor::Health>(entity, actor::Health{.current = 100, .max = 100});
-			registry.emplace<actor::Mana>(entity, actor::Mana{.current = 20, .max = 20});
-			registry.emplace<actor::Speed>(entity, actor::Speed{.speed = 200, .speed_squared = 200 * 200});
-
-			// registry.emplace<actor::Velocity>(entity, sf::Vector2f{0, 0});
-			// registry.emplace<actor::Direction>(entity, sf::Vector2f{0, 0});
-		}
 		// transform
-		{
-			using namespace transform;
-
-			registry.emplace<Position>(entity, position);
-			registry.emplace<Scale>(entity, scale);
-			registry.emplace<Rotation>(entity, rotation);
-		}
+		Transform::attach(registry, entity, position, scale, rotation);
 		// render
+		Render::attach(registry, entity, first_frame, config::RenderLayer::PLAYER_GROUND);
+		// animation
+		Animation::attach(registry, entity, animation);
+		// physics_body
 		{
-			using namespace render;
-
-			const auto& index = registry.get<const animation::Index>(entity);
-			const auto& [animation] = registry.get<const animation::Animation>(entity);
-
-			const auto& frame = animation->frames[index.current];
-
-			// 纹理
-			registry.emplace<Texture>(
-				entity,
-				Texture
-				{
-						.texture_path = frame.texture_path,
-						.frame_x = frame.frame_x,
-						.frame_y = frame.frame_y,
-						.frame_width = frame.frame_width,
-						.frame_height = frame.frame_height
-				}
-			);
-			// 颜色
-			registry.emplace<Color>(entity, sf::Color::White);
-		}
-		// physics
-		{
-			using namespace physics_body;
-
 			const auto world_id = PhysicsWorld::id(registry);
 
 			// 创建动态刚体
@@ -111,42 +83,42 @@ namespace pd::systems::helper
 			body_def.fixedRotation = true;
 			body_def.userData = entity_to_user_data(entity);
 
-			const auto body_id = b2CreateBody(world_id, &body_def);
-
-			// 创建矩形碰撞体
-			// todo: 如果动画的大小不一致,需要每帧更新碰撞体的大小吗? 还是说只根据第一帧的大小创建碰撞体就行了?
-			const auto& texture = registry.get<const render::Texture>(entity);
-			const auto half_width = Constant::to_physics(static_cast<float>(texture.frame_width) * scale.x * 0.5f);
-			const auto half_height = Constant::to_physics(static_cast<float>(texture.frame_height) * scale.y * 0.5f);
-
 			auto shape_def = b2DefaultShapeDef();
 			// 设置碰撞过滤
-			shape_def.filter.categoryBits = static_cast<std::uint64_t>(EntityType::PLAYER_GROUND);
-			shape_def.filter.maskBits = CollisionMask::player_ground;
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::PLAYER_GROUND);
+			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::PLAYER_GROUND);
 			shape_def.density = 1.0f;
 			shape_def.material.friction = 0.0f;
 
-			const auto box = b2MakeBox(half_width, half_height);
+			// 创建矩形碰撞体
+			const auto box = b2MakeBox(half_physics_width, half_physics_height);
 
-			b2CreatePolygonShape(body_id, &shape_def, &box);
-
-			registry.emplace<BodyId>(entity, body_id);
+			PhysicsBody::attach(registry, entity, world_id, body_def);
+			PhysicsBody::attach_shape(registry, entity, shape_def, box);
 		}
+		// actor
+		Actor::attach(registry, entity, 100, 20, 200);
 		// player
-		{
-			registry.ctx().emplace<player::Entity>(entity);
-			registry.emplace<player::Movement>(entity);
-		}
+		registry.emplace<player::Movement>(entity);
 
 		return entity;
 	}
 
-	auto Player::handle_event(entt::registry& registry, const sf::Event& event) noexcept -> void
+	auto Player::kill(entt::registry& registry, const entt::entity player_entity) noexcept -> void
 	{
 		using namespace components;
 
-		const auto [entity] = registry.ctx().get<const player::Entity>();
-		auto& [movement_x, movement_y] = registry.get<player::Movement>(entity);
+		// physics_body
+		PhysicsBody::deattach(registry, player_entity);
+
+		registry.destroy(player_entity);
+	}
+
+	auto Player::handle_event(entt::registry& registry, const entt::entity player_entity, const sf::Event& event) noexcept -> void
+	{
+		using namespace components;
+
+		auto& [movement_x, movement_y] = registry.get<player::Movement>(player_entity);
 
 		if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
 		{
@@ -197,15 +169,14 @@ namespace pd::systems::helper
 		}
 	}
 
-	auto Player::apply_movement(entt::registry& registry) noexcept -> void
+	auto Player::apply_movement(entt::registry& registry, const entt::entity player_entity) noexcept -> void
 	{
 		using namespace components;
 		using enum player::Movement::Type;
 
-		const auto [entity] = registry.ctx().get<const player::Entity>();
-		const auto [movement_x, movement_y] = registry.get<const player::Movement>(entity);
+		const auto [movement_x, movement_y] = registry.get<const player::Movement>(player_entity);
 
-		b2Vec2 direction{0, 0};
+		sf::Vector2f direction{0, 0};
 		if (movement_x == FORWARD)
 		{
 			direction.x = 1;
@@ -224,18 +195,15 @@ namespace pd::systems::helper
 			direction.y = -1;
 		}
 
-		if (direction == b2Vec2_zero)
+		if (direction == sf::Vector2f{0, 0})
 		{
 			return;
 		}
 
-		const auto [body_id] = registry.get<const physics_body::BodyId>(entity);
-		const auto speed = registry.get<const actor::Speed>(entity);
-		const auto direction_normalized = b2Normalize(direction);
-		const auto mass = b2Body_GetMass(body_id);
+		const auto speed = Actor::get_speed(registry, player_entity);
+		const auto direction_normalized = direction.normalized();
+		const auto factor = direction_normalized * speed;
 
-		const auto force = mass * direction_normalized * speed.speed;
-
-		b2Body_ApplyForceToCenter(body_id, force, true);
+		PhysicsBody::apply_force_to_center(registry, player_entity, factor);
 	}
 }

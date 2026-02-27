@@ -29,8 +29,8 @@ namespace pd::asset
 	private:
 		cache_type cache_;
 
-		// todo: 当前blueprint依然保存资源路径,所以每次查找都要进行一次ID计算
-		// 后续会将相关内容替换为ID,不过当前不着急
+		// todo: 当前保存资源路径,所以每次查找都要进行一次ID计算
+		//  后续会将相关内容替换为ID,不过当前不着急
 		[[nodiscard]] static auto make_id(const std::filesystem::path& path) noexcept -> entt::id_type
 		{
 			const auto& s = path.native();
@@ -42,21 +42,15 @@ namespace pd::asset
 		[[nodiscard]] auto load(const std::filesystem::path& path) -> entt::id_type
 		{
 			const auto id = make_id(path);
+			[[maybe_unused]] const auto [it, loaded] = cache_.load(id, path);
 
-			if (const auto [it, loaded] = cache_.load(id, path);
-				loaded)
-			{
-				return id;
-			}
-
-			return entt::null;
+			return id;
 		}
 
 		auto force_load(const std::filesystem::path& path) -> entt::id_type
 		{
 			const auto id = make_id(path);
-
-			cache_.force_load(id, path);
+			[[maybe_unused]] const auto [it, loaded] = cache_.force_load(id, path);
 
 			return id;
 		}

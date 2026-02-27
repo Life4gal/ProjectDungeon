@@ -5,6 +5,8 @@
 
 #include <systems/update/animation.hpp>
 
+#include <config/animation.hpp>
+
 #include <components/animation.hpp>
 #include <components/render.hpp>
 
@@ -30,7 +32,7 @@ namespace pd::systems::update
 			     animation::Timer,
 			     animation::Index,
 			     animation::Animation,
-			     render::Texture
+			     render::AnimationFrame
 		     >(
 			     entt::exclude<
 				     // 如果动画暂停则无需更新动画
@@ -39,7 +41,7 @@ namespace pd::systems::update
 				     animation::Ended
 			     >
 		     );
-		     const auto [entity, timer, index, animation, texture]: view.each())
+		     const auto [entity, timer, index, animation, animation_frame]: view.each())
 		{
 			timer.elapsed += delta;
 			if (timer.elapsed < timer.duration)
@@ -64,13 +66,8 @@ namespace pd::systems::update
 			index.current %= index.total;
 
 			// 设置渲染纹理
-			const auto& frame = animation.animation->frames[index.current];
-
-			texture.texture_path = frame.texture_path;
-			texture.frame_x = frame.frame_x;
-			texture.frame_y = frame.frame_y;
-			texture.frame_width = frame.frame_width;
-			texture.frame_height = frame.frame_height;
+			const auto& frame = animation.animation.get().frames[index.current];
+			animation_frame.animation_frame = std::cref(frame);
 		}
 	}
 }

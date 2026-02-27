@@ -5,6 +5,8 @@
 
 #include <systems/render/entity.hpp>
 
+#include <config/animation.hpp>
+
 #include <components/transform.hpp>
 #include <components/render.hpp>
 
@@ -27,12 +29,15 @@ namespace pd::systems::render
 			     const transform::Position,
 			     const transform::Scale,
 			     const transform::Rotation,
-			     const components::render::Texture,
+			     const components::render::AnimationFrame,
+			     const components::render::RenderLayer,
 			     const components::render::Color>();
-		     const auto [entity, position, scale, rotation, texture, color]: view.each())
+		     const auto [entity, position, scale, rotation, animation_frame, render_layer, color]: view.each())
 		{
+			const auto& animation_frame_ref = animation_frame.animation_frame.get();
+
 			// 获取纹理资源
-			const auto texture_resource = helper::TextureManager::get(registry, texture.texture_path);
+			const auto texture_resource = helper::TextureManager::get(registry, animation_frame_ref.texture_path);
 
 			if (not texture_resource)
 			{
@@ -42,15 +47,15 @@ namespace pd::systems::render
 					position.position.x,
 					position.position.y,
 					entt::to_integral(entity),
-					texture.texture_path.string()
+					animation_frame_ref.texture_path
 				);
 				continue;
 			}
 
-			const auto x = static_cast<float>(texture.frame_x);
-			const auto y = static_cast<float>(texture.frame_y);
-			const auto width = static_cast<float>(texture.frame_width);
-			const auto height = static_cast<float>(texture.frame_height);
+			const auto x = static_cast<float>(animation_frame_ref.texture_x);
+			const auto y = static_cast<float>(animation_frame_ref.texture_y);
+			const auto width = static_cast<float>(animation_frame_ref.texture_width);
+			const auto height = static_cast<float>(animation_frame_ref.texture_height);
 			// FIXME: 总是假定原点为正中心(width/2, height/2)
 			const auto origin = sf::Vector2f{width, height} / 2.f;
 

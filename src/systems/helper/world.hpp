@@ -14,6 +14,10 @@ namespace pd::systems::helper
 	class World final
 	{
 	public:
+		static auto create(entt::registry& registry) noexcept -> void;
+
+		static auto destroy(entt::registry& registry) noexcept -> void;
+
 		[[nodiscard]] static auto frame_delta(entt::registry& registry) noexcept -> sf::Time;
 
 		static auto update_frame_delta(entt::registry& registry, sf::Time this_frame_delta) noexcept -> void;

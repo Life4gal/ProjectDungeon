@@ -113,10 +113,6 @@ add_executable(
 	# 允许unordered_xxx之类的容器通过string_view查找key为string的元素
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/string_hash.hpp
 
-	# JSON读取器
-	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/json_reader.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/json_reader.cpp
-
 	# 如果后续不使用string/filesystem::path作为key,而是改用ID的话,这两个文件会有用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/string_to_id.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utility/path_to_id.hpp
@@ -125,8 +121,34 @@ add_executable(
 	# CONFIG
 	# ============================
 	
-	# 各种(枚举)类型定义
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/types.hpp
+	# 配置文件读取器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/config_reader.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/config_reader.cpp
+
+	# 集合
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/set.hpp
+	# 渲染层级
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/render_layer.hpp
+	# 碰撞掩码
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/collision_mask.hpp
+	# 位置
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/position.hpp
+
+	# 地下城 -- 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.cpp
+	# 地下城 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/tile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/tile.cpp
+	# 地下城 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/room.cpp
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/level.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/level.cpp
+	# 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.cpp
 
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/player.hpp
@@ -134,41 +156,6 @@ add_executable(
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/enemy.cpp
-	# 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/wall.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/wall.cpp
-	# 装饰物
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/decoration.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/decoration.cpp
-
-	# 地牢
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.cpp
-
-	# TODO: 
-	#  1.加载player/enenmy/wall/decoration等配置,由它们的内容决定要加载哪些动画
-	#  2.加载动画配置,由它的内容决定player/enenmy/wall/decoration有哪些动画可用
-	#
-	# 理论上我应该给使用做法1,但是目前使用的是做法1
-
-	# 动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.cpp
-	
-	# ============================
-	# BLUEPRINT
-	# ============================
-
-	# 玩家
-	#${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/player.hpp
-	#${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/player.cpp
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/enemy.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/enemy.cpp
-
-	# 动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/blueprint/animation.cpp
 
 	# ============================
 	# ASSET
@@ -194,49 +181,34 @@ add_executable(
 	# COMPONENTS
 	# ============================
 
-	# 游戏信息
+	# 游戏信息组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/game.hpp
-	# 世界信息
+	# 世界信息组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/world.hpp
-	# 物理世界信息
+	# 物理世界信息组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/physics_world.hpp
+	
+	# 地下城 -- 房间组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/room.hpp
+	# 地下城 -- 关卡组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/level.hpp
+	# 地下城 -- 地下城组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/dungeon.hpp
 
-	# 描述一个实体的位置/大小/旋转等信息
+	# 变换组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.hpp
-	# 描述一个实体有哪些物理属性(主要用于碰撞检测)
+	# 物理体组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/physics_body.hpp
-	# 描述一个实体的动画信息(用于切换实体的渲染信息)
+	# 动画组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/animation.hpp
-	# 描述一个实体要被渲染需要哪些信息
+	# 渲染组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/render.hpp
-	# 描述一个玩家/敌人实体的基本信息
+	# 玩家/敌人实体通用组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/actor.hpp
-
-	# =============
-	# ENTITY
-	# =============
-
-	# 描述地板/地板洞拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/floor.hpp
-	# 描述墙壁拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/wall.hpp
-	# 描述墙壁装饰物拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/wall_decoration.hpp
-	# 描述门实体拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/door.hpp
-	# 描述地面装饰物拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/floor_decoration.hpp
-	# 描述地形实体拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/terrain.hpp
-	# 描述房间实体有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/room.hpp
-	# 描述关卡实体有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/level.hpp
-
-	# 描述玩家实体拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/player.hpp
-	# 描述敌人实体拥有哪些内容/信息
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity/enemy.hpp
+	# 敌人组件
+	#${CMAKE_CURRENT_SOURCE_DIR}/src/components/enemy.hpp
+	# 玩家组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/player.hpp
 
 	# ============================
 	# SYSTEMS
@@ -261,59 +233,38 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_world.cpp
 
+	# 为实体附加动画组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/animation.cpp
+	# 为实体附加渲染组件(不含变换组件的实体即使有渲染组件也不会渲染)(不含动画组件的实体不会更新渲染组件的纹理)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/render.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/render.cpp
+	# 为实体附加物理组件(不含变换组件的实体即使有物理组件也不会参与物理世界的更新)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_body.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_body.cpp
+	# 为实体附加变换组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/transform.cpp
+	# 为实体附加actor组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/actor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/actor.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/floor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/floor.cpp	
-
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/wall.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/wall.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/door.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/decoration.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/decoration.cpp
-	
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/terrain.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/terrain.cpp
-
+	# 地下城 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/room.cpp
-
+	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/level.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/level.cpp
+	# 地下城 -- 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/dungeon.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/dungeon.cpp
 
+	# 敌人
 	#${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/enemy.hpp
 	#${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/enemy.cpp
-
+	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/player.cpp
-
-	# ==========
-	# INITIALIZE
-	# ==========
-
-	# 载入所有蓝图
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/blueprint.cpp	
-
-	# 载入蓝图所需的资源
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/asset.cpp	
-
-	# 初始化世界
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/world.cpp	
-
-	# 初始化物理世界
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/physics_world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/physics_world.cpp	
-
-	# 测试用
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/debug.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/initialize/debug.cpp	
 
 	# ==========
 	# UPDATE
@@ -323,9 +274,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/world.cpp
 	
-	# 检查房间状态(确定敌人是否被清空,如果清空则打开所有门)
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/check_room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/check_room.cpp
+	# 更新房间状态(确定敌人是否被清空,如果清空则打开所有门)
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/update_room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/update_room.cpp
 
 	# 应用玩家移动
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/apply_player_movement.hpp
@@ -340,16 +291,12 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/sync_transform.cpp
 
 	# 处理接触事件
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/process_contact_and_sensor_events.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/process_contact_and_sensor_events.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/process_contact_events.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/process_contact_events.cpp
 
 	# 更新动画帧(同时根据动画帧设置渲染纹理)
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/animation.cpp
-
-	# 测试用
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/debug.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/update/debug.cpp	
 
 	# ==========
 	# RENDER
@@ -358,10 +305,6 @@ add_executable(
 	# 渲染实体
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/entity.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/entity.cpp
-
-	# 测试用
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/debug.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/debug.cpp	
 
 	# ============================
 	# SCENE
@@ -383,10 +326,6 @@ add_executable(
 
 	# 常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/constants.hpp
-	# 所有实体类型
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/entity_type.hpp
-	# 渲染层级
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/render_layer.hpp
 	# EnTT实体与box2d::userData转换
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/user_data_entity.hpp
 

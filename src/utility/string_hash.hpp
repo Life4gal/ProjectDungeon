@@ -14,12 +14,12 @@ namespace pd::utility
 	public:
 		using is_transparent = int;
 
-		[[nodiscard]] auto operator()(const std::string& string) const noexcept -> std::size_t
+		[[nodiscard]] static auto operator()(const std::string& string) noexcept -> std::size_t
 		{
 			return std::hash<std::string>{}(string);
 		}
 
-		[[nodiscard]] auto operator()(const std::string_view string) const noexcept -> std::size_t
+		[[nodiscard]] static auto operator()(const std::string_view string) noexcept -> std::size_t
 		{
 			return std::hash<std::string_view>{}(string);
 		}

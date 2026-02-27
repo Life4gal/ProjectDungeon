@@ -5,19 +5,10 @@
 
 #include <config/player.hpp>
 
-#include <utility/json_reader.hpp>
-
+#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
 namespace pd::config
 {
-	auto load_player(const std::filesystem::path& path) noexcept -> PlayerSet
-	{
-		PlayerSet player_set{};
-
-		// todo
-
-
-		return player_set;
-	}
+	
 }

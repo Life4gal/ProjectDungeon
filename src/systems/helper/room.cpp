@@ -8,17 +8,19 @@
 #include <algorithm>
 #include <ranges>
 
+#include <config/collision_mask.hpp>
 #include <config/dungeon.hpp>
 
-#include <components/entity/room.hpp>
+#include <components/room.hpp>
 
-#include <components/physics_body.hpp>
+#include <systems/helper/physics_world.hpp>
+#include <systems/helper/transform.hpp>
+#include <systems/helper/render.hpp>
+#include <systems/helper/animation.hpp>
+#include <systems/helper/physics_body.hpp>
 
-#include <systems/helper/floor.hpp>
-#include <systems/helper/wall.hpp>
-#include <systems/helper/decoration.hpp>
-#include <systems/helper/door.hpp>
-#include <systems/helper/terrain.hpp>
+#include <game/constants.hpp>
+#include <game/user_data_entity.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
@@ -29,8 +31,10 @@ namespace pd::systems::helper
 	auto Room::create(
 		entt::registry& registry,
 		const config::Room& room,
-		const config::TileSet& tileset,
-		const sf::Vector2f offset
+		// config::Dungeon::animation_set
+		const config::AnimationSet& animation_set,
+		// config::Dungeon::tile_set
+		const config::TileSet& tile_set
 	) noexcept -> entt::entity
 	{
 		using namespace components;
@@ -38,234 +42,220 @@ namespace pd::systems::helper
 		const auto entity = registry.create();
 
 		// room
+		registry.emplace<room::Room>(entity, std::cref(room));
+
+		// 计算房间偏移,使房间居中显示
+		const auto room_width = static_cast<float>(room.width * room.tile_size);
+		const auto room_height = static_cast<float>(room.height * room.tile_size);
+		const auto room_offset_x = (static_cast<float>(Constant::window_width) - room_width) * 0.5f;
+		const auto room_offset_y = (static_cast<float>(Constant::window_height) - room_height) * 0.5f;
+
+		// tiles
 		{
-			const auto tile_size = static_cast<float>(room.tile_size);
+			const auto room_tile_size = static_cast<float>(room.tile_size);
+			const auto room_half_tile_size = room_tile_size * 0.5f;
 
-			registry.emplace<room::Id>(entity, room.id);
-
-			// entities
-			{
-				auto& [tile_entities] = registry.emplace<room::TileEntities>(entity);
-
-				const auto& layout = room.layout;
-				const auto& tile_mapping = room.tile_mapping;
-
-				const auto total_tiles = std::ranges::fold_left(
-					layout,
-					std::size_t{0},
-					[](const std::size_t total, const std::string& line) noexcept -> std::size_t
-					{
-						return total + line.size();
-					}
-				);
-				tile_entities.reserve(total_tiles);
-
-				for (std::size_t row = 0; row < layout.size(); ++row)
-				{
-					const auto& line = layout[row];
-					for (std::size_t column = 0; column < line.size(); ++column)
-					{
-						const auto tile_char = line[column];
-
-						const auto mapping_it = tile_mapping.find(tile_char);
-						if (mapping_it == tile_mapping.end())
+			const auto do_create_tile = [&]<typename PositionToDataMapping, typename TileIdToTileMapping>(
+				const std::string_view type,
+				// map: position --> T
+				const PositionToDataMapping& tiles,
+				// map: tile_id --> XxxTile
+				const TileIdToTileMapping& set,
+				// T + XxxTile + tile-position --> entity
+				auto tile_entity_maker,
+				// entity container
+				auto& entity_container
+			) noexcept -> void //
+						requires requires
 						{
-							SPDLOG_WARN("房间[{}]中发现未映射的字符:'{}'", room.id, tile_char);
-							continue;
-						}
-
-						const auto& tile_id = mapping_it->second;
-						const auto tile_it = tileset.find(tile_id);
-						if (tile_it == tileset.end())
-						{
-							SPDLOG_WARN("房间[{}]引用了不存在的瓦片:{}", room.id, tile_id);
-							continue;
-						}
-
-						const auto& tile = tile_it->second;
-
-						// 计算瓦片位置(中心点)
-						// 瓦片从左上角开始排列,位置为瓦片中心
-						const auto x = offset.x + static_cast<float>(column) * tile_size + tile_size * 0.5f;
-						const auto y = offset.y + static_cast<float>(row) * tile_size + tile_size * 0.5f;
-						const auto position = sf::Vector2f{x, y};
-
-						const auto tile_entity = [&] noexcept -> entt::entity
-						{
-							switch (tile.type)
 							{
-								case config::TileType::FLOOR:
-								{
-									return Floor::spawn(registry, tile, position);
-								}
-								case config::TileType::WALL:
-								{
-									return Wall::spawn(registry, tile, position);
-								}
-								case config::TileType::WALL_DECORATION:
-								{
-									return Decoration::spawn_wall(registry, tile, position);
-								}
-								case config::TileType::FLOOR_DECORATION:
-								{
-									return Decoration::spawn_floor(registry, tile, position);
-								}
-								case config::TileType::FLOOR_HOLE:
-								{
-									return Floor::spawn_hole(registry, tile, position);
-								}
-								case config::TileType::LOW_TERRAIN:
-								{
-									return Terrain::spawn_low(registry, tile, position);
-								}
-								case config::TileType::HIGH_TERRAIN:
-								{
-									return Terrain::spawn_high(registry, tile, position);
-								}
-								default: // NOLINT(clang-diagnostic-covered-switch-default)
-								{
-									std::unreachable();
-								}
-							}
-						}();
-
-						tile_entities.emplace_back(tile_entity);
-					}
-				}
-			}
-
-			// doors
+								tile_entity_maker(
+									typename PositionToDataMapping::mapped_type{},
+									typename TileIdToTileMapping::mapped_type{},
+									sf::Vector2f{}
+								)
+							} -> std::same_as<entt::entity>;
+						}
 			{
-				auto& [door_entities] = registry.emplace<room::DoorEntities>(entity);
-				door_entities.reserve(room.doors.size());
+				entity_container.reserve(tiles.size());
 
-				for (const auto& doors = room.doors;
-				     const auto& door: doors)
+				for (const auto& [position, data]: tiles)
 				{
-					// 查找瓦片集中的门瓦片
-					const auto tile_it = tileset.find(door.tile_id);
-					if (tile_it == tileset.end())
+					// config::Wall::tile_id
+					// config::Floor::tile_id
+					// config::Decoration::tile_id
+					// config::Trigger::tile_id
+					// config::Door::tile_id
+					const auto& tile_id = data.tile_id;
+					const auto tile_it = set.find(tile_id);
+					if (tile_it == set.end())
 					{
-						SPDLOG_WARN("房间[{}]引用了不存在的门瓦片:{}", room.id, door.tile_id);
-						// todo: 怎么办?有没有默认纹理?
+						SPDLOG_WARN("房间[{}]引用了不存在的{}瓦片[{}]", room.name, type, tile_id);
 						continue;
 					}
 
 					const auto& tile = tile_it->second;
 
-					const auto half_width = static_cast<float>(room.width) * tile_size * 0.5f;
-					const auto half_height = static_cast<float>(room.height) * tile_size * 0.5f;
-					const auto center_x = offset.x + half_width;
-					const auto center_y = offset.y + half_height;
+					const auto tile_x = room_offset_x + static_cast<float>(position.x) * room_tile_size + room_half_tile_size;
+					const auto tile_y = room_offset_y + static_cast<float>(position.y) * room_tile_size + room_half_tile_size;
+					const auto tile_position = sf::Vector2f{tile_x, tile_y};
 
-					const auto position = [&] noexcept -> sf::Vector2f
-					{
-						switch (door.direction)
-						{
-							case config::DoorDirection::UP:
-							{
-								return {center_x, offset.y + tile_size * 0.5f};
-							}
-							case config::DoorDirection::DOWN:
-							{
-								return {center_x, offset.y + static_cast<float>(room.height - 1) * tile_size + tile_size * 0.5f};
-							}
-							case config::DoorDirection::LEFT:
-							{
-								return {offset.x + tile_size * 0.5f, center_y};
-							}
-							case config::DoorDirection::RIGHT:
-							{
-								return {offset.y + static_cast<float>(room.width - 1) * tile_size + tile_size * 0.5f, center_y};
-							}
-							default: // NOLINT(clang-diagnostic-covered-switch-default)
-							{
-								std::unreachable();
-							}
-						}
-					}();
-
-					const auto door_entity = Door::spawn_locked(
-						registry,
-						tile,
-						door.direction,
-						door.target_room_id,
-						position
-					);
-
-					if (door.requires_key)
-					{
-						// todo: 钥匙如何实现?
-					}
-					Door::set_key(registry, door_entity, entt::null);
-
-					door_entities.emplace_back(door_entity);
+					const auto tile_entity = tile_entity_maker(data, tile, tile_position);
+					entity_container.emplace_back(tile_entity);
 				}
-			}
+			};
 
-			// enemies
+			// walls
 			{
-				auto& [enemy_entities] = registry.emplace<room::EnemyEntities>(entity);
+				const auto& tiles = room.wall_tiles;
+				auto& [walls] = registry.emplace<room::Walls>(entity);
 
-				// todo: 生成敌人
+				do_create_tile(
+					"墙壁",
+					tiles,
+					tile_set.wall_tiles,
+					[&](const config::Wall& wall, const config::WallTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+					{
+						return create_wall(registry, wall, tile, animation_set, position);
+					},
+					walls
+				);
+			}
+			// floors
+			{
+				const auto& tiles = room.floor_tiles;
+				auto& [floors] = registry.emplace<room::Floors>(entity);
+
+				do_create_tile(
+					"地板",
+					tiles,
+					tile_set.floor_tiles,
+					[&](const config::Floor& floor, const config::FloorTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+					{
+						return create_floor(registry, floor, tile, animation_set, position);
+					},
+					floors
+				);
+			}
+			// decorations
+			{
+				const auto& tiles = room.decoration_tiles;
+				auto& [decorations] = registry.emplace<room::Decorations>(entity);
+
+				do_create_tile(
+					"装饰物",
+					tiles,
+					tile_set.decoration_tiles,
+					[&](const config::Decoration& decoration, const config::DecorationTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+					{
+						return create_decoration(registry, decoration, tile, animation_set, position);
+					},
+					decorations
+				);
+			}
+			// triggers
+			{
+				const auto& tiles = room.trigger_tiles;
+				auto& [triggers] = registry.emplace<room::Triggers>(entity);
+
+				do_create_tile(
+					"触发器",
+					tiles,
+					tile_set.trigger_tiles,
+					[&](const config::Trigger& trigger, const config::TriggerTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+					{
+						return create_trigger(registry, trigger, tile, animation_set, position);
+					},
+					triggers
+				);
+			}
+			// rooms
+			{
+				const auto& tiles = room.door_tiles;
+				auto& [doors] = registry.emplace<room::Doors>(entity);
+
+				do_create_tile(
+					"门",
+					tiles,
+					tile_set.door_tiles,
+					[&](const config::Door& door, const config::DoorTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+					{
+						if (room.type == config::RoomType::STARTING)
+						{
+							return create_unlocked_door(registry, door, tile, animation_set, position);
+						}
+
+						return create_locked_door(registry, door, tile, animation_set, position);
+					},
+					doors
+				);
 			}
 		}
 
-		SPDLOG_INFO("生成房间[{}]成功!", room.id);
+		// enemies
+		registry.emplace<room::Enemies>(entity);
+
+		// offset
+		registry.emplace<room::CenteringOffset>(entity, room_offset_x, room_offset_y);
+
+		SPDLOG_INFO("生成房间[{}]成功!", room.name);
 
 		return entity;
 	}
 
-	auto Room::destroy(entt::registry& registry, const entt::entity entity) noexcept -> void
+	auto Room::destroy(entt::registry& registry, const entt::entity room_entity) noexcept -> void
 	{
 		using namespace components;
 
-		// 销毁所有实体的物理体
-		const auto destroy_entity_physics = [&](const entt::entity e) noexcept -> void
+		const auto destroy_entities = [&]<typename T>(auto destroyer) noexcept -> void //
+					requires requires { destroyer(registry, entt::entity{}); }
 		{
-			if (not registry.valid(e))
-			{
-				return;
-			}
+			const auto& [entities] = registry.get<T>(room_entity);
 
-			// 有的tile实体没有物理体,所以要先判断一下
-			if (const auto* body_id = registry.try_get<physics_body::BodyId>(e))
-			{
-				b2DestroyBody(body_id->id);
-			}
-
-			registry.destroy(e);
+			std::ranges::for_each(
+				entities,
+				[&](const entt::entity e) noexcept -> void
+				{
+					if (registry.valid(e))
+					{
+						destroyer(registry, e);
+					}
+				}
+			);
 		};
 
-		auto& [tile_entities] = registry.get<room::TileEntities>(entity);
-		auto& [door_entities] = registry.get<room::DoorEntities>(entity);
+		// walls
+		destroy_entities.operator()<room::Walls>(&destroy_wall);
+		// floors
+		destroy_entities.operator()<room::Floors>(&destroy_floor);
+		// decorations
+		destroy_entities.operator()<room::Decorations>(&destroy_decoration);
+		// triggers
+		destroy_entities.operator()<room::Triggers>(&destroy_trigger);
+		// doors
+		destroy_entities.operator()<room::Doors>(&destroy_door);
 
-		std::ranges::for_each(tile_entities, destroy_entity_physics);
-		std::ranges::for_each(door_entities, destroy_entity_physics);
+		// todo: Enemies需不需要处理?
 
-		tile_entities.clear();
-		door_entities.clear();
+		const auto& room = registry.get<const room::Room>(room_entity).room.get();
+		SPDLOG_INFO("销毁房间[{}]完成", room.name);
 
-		// todo: EnemyEntities需不需要处理?
-
-		const auto& [id] = registry.get<const room::Id>(entity);
-		SPDLOG_INFO("销毁房间[{}]完成", id);
-
-		registry.destroy(entity);
+		registry.destroy(room_entity);
 	}
 
-	auto Room::id(entt::registry& registry, const entt::entity entity) noexcept -> std::string_view
+	// ReSharper disable once CppParameterMayBeConstPtrOrRef
+	auto Room::is_cleared(entt::registry& registry, const entt::entity room_entity) noexcept -> bool
 	{
 		using namespace components;
 
-		return registry.get<const room::Id>(entity).room_id;
+		return registry.all_of<room::Cleared>(room_entity);
 	}
 
-	auto Room::update_enemy_entities(entt::registry& registry, const entt::entity entity) noexcept -> bool
+	auto Room::update_enemy_entities(entt::registry& registry, const entt::entity room_entity) noexcept -> bool
 	{
 		using namespace components;
 
-		auto& [enemy_entities] = registry.get<room::EnemyEntities>(entity);
+		auto& [enemy_entities] = registry.get<room::Enemies>(room_entity);
 		if (enemy_entities.empty())
 		{
 			return true;
@@ -284,21 +274,473 @@ namespace pd::systems::helper
 		return enemy_entities.empty();
 	}
 
-	auto Room::unlock_doors(entt::registry& registry, const entt::entity entity) noexcept -> void
+	auto Room::unlock_doors(entt::registry& registry, const entt::entity room_entity) noexcept -> void
 	{
 		using namespace components;
 
-		auto& [door_entities] = registry.get<room::DoorEntities>(entity);
+		auto& [doors] = registry.get<room::Doors>(room_entity);
 
 		std::ranges::for_each(
-			door_entities,
+			doors,
 			[&registry](const entt::entity door_entity) noexcept -> void
 			{
 				if (registry.valid(door_entity))
 				{
-					Door::unlock(registry, door_entity);
+					unlock_door(registry, door_entity);
 				}
 			}
 		);
+	}
+
+	auto Room::create_wall(
+		entt::registry& registry,
+		const config::Wall& wall,
+		const config::WallTile& wall_tile,
+		const config::AnimationSet& animation_set,
+		const sf::Vector2f position,
+		const sf::Vector2f scale,
+		const sf::Angle rotation
+	) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		const auto animation_it = animation_set.find(wall_tile.animation_id);
+		if (animation_it == animation_set.end())
+		{
+			SPDLOG_ERROR("找不到墙壁[{}]的动画[{}]!", wall.tile_id, wall_tile.animation_id);
+			// todo: 怎么办?有没有备用方案?
+			return entt::null;
+		}
+		const auto& animation = animation_it->second;
+		const auto& first_frame = animation.frames.front();
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
+		const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
+
+		const auto entity = registry.create();
+
+		// transform
+		Transform::attach(registry, entity, position, scale, rotation);
+		// render
+		Render::attach(registry, entity, first_frame, config::RenderLayer::WALL);
+		// animation
+		Animation::attach(registry, entity, animation);
+		// physics_body
+		{
+			const auto world_id = PhysicsWorld::id(registry);
+
+			// 创建静态刚体
+			auto body_def = b2DefaultBodyDef();
+			body_def.type = b2_staticBody;
+			body_def.position = Constant::to_physics(position);
+			body_def.rotation = b2MakeRot(rotation.asRadians());
+			body_def.userData = entity_to_user_data(entity);
+
+			auto shape_def = b2DefaultShapeDef();
+			// 设置碰撞过滤
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::WALL);
+			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::WALL);
+
+			// 创建矩形碰撞体
+			const auto half_width = Constant::to_physics(half_texture_width * scale.x);
+			const auto half_height = Constant::to_physics(half_texture_height * scale.y);
+			const auto box = b2MakeBox(half_width, half_height);
+
+			PhysicsBody::attach(registry, entity, world_id, body_def);
+			PhysicsBody::attach_shape(registry, entity, shape_def, box);
+		}
+
+		return entity;
+	}
+
+	auto Room::destroy_wall(entt::registry& registry, const entt::entity wall_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// physics_body
+		PhysicsBody::deattach(registry, wall_entity);
+
+		registry.destroy(wall_entity);
+	}
+
+	auto Room::create_floor(
+		entt::registry& registry,
+		const config::Floor& floor,
+		const config::FloorTile& floor_tile,
+		const config::AnimationSet& animation_set,
+		sf::Vector2f position,
+		sf::Vector2f scale,
+		sf::Angle rotation
+	) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		const auto animation_it = animation_set.find(floor_tile.animation_id);
+		if (animation_it == animation_set.end())
+		{
+			SPDLOG_ERROR("找不到地板[{}]的动画[{}]!", floor.tile_id, floor_tile.animation_id);
+			// todo: 怎么办?有没有备用方案?
+			return entt::null;
+		}
+		const auto& animation = animation_it->second;
+		const auto& first_frame = animation.frames.front();
+
+		const auto entity = registry.create();
+
+		// transform
+		Transform::attach(registry, entity, position, scale, rotation);
+		// render
+		Render::attach(registry, entity, first_frame, config::RenderLayer::FLOOR);
+		// animation
+		Animation::attach(registry, entity, animation);
+
+		return entity;
+	}
+
+	auto Room::destroy_floor(entt::registry& registry, const entt::entity floor_entity) noexcept -> void
+	{
+		using namespace components;
+
+		registry.destroy(floor_entity);
+	}
+
+	auto Room::create_decoration(
+		entt::registry& registry,
+		const config::Decoration& decoration,
+		const config::DecorationTile& decoration_tile,
+		const config::AnimationSet& animation_set,
+		const sf::Vector2f position,
+		const sf::Vector2f scale,
+		const sf::Angle rotation
+	) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		const auto animation_it = animation_set.find(decoration_tile.animation_id);
+		if (animation_it == animation_set.end())
+		{
+			SPDLOG_ERROR("找不到装饰物[{}]的动画[{}]!", decoration.tile_id, decoration_tile.animation_id);
+			// todo: 怎么办?有没有备用方案?
+			return entt::null;
+		}
+		const auto& animation = animation_it->second;
+		const auto& first_frame = animation.frames.front();
+
+		const auto entity = registry.create();
+
+		// transform
+		Transform::attach(registry, entity, position, scale, rotation);
+		// render
+		Render::attach(registry, entity, first_frame, config::RenderLayer::DECORATION);
+		// animation
+		Animation::attach(registry, entity, animation);
+
+		return entity;
+	}
+
+	auto Room::destroy_decoration(entt::registry& registry, const entt::entity decoration_entity) noexcept -> void
+	{
+		using namespace components;
+
+		registry.destroy(decoration_entity);
+	}
+
+	auto Room::create_trigger(
+		entt::registry& registry,
+		const config::Trigger& trigger,
+		const config::TriggerTile& trigger_tile,
+		const config::AnimationSet& animation_set,
+		const sf::Vector2f position,
+		const sf::Vector2f scale,
+		const sf::Angle rotation
+	) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		const auto animation_it = animation_set.find(trigger_tile.animation_id);
+		if (animation_it == animation_set.end())
+		{
+			SPDLOG_ERROR("找不到触发器[{}]的动画[{}]!", trigger.tile_id, trigger_tile.animation_id);
+			// todo: 怎么办?有没有备用方案?
+			return entt::null;
+		}
+		const auto& animation = animation_it->second;
+		const auto& first_frame = animation.frames.front();
+
+		const auto entity = registry.create();
+
+		// transform
+		Transform::attach(registry, entity, position, scale, rotation);
+		// render
+		Render::attach(registry, entity, first_frame, config::RenderLayer::TRIGGER);
+		// animation
+		Animation::attach(registry, entity, animation);
+		// physics_body
+		{
+			const auto world_id = PhysicsWorld::id(registry);
+
+			// 创建静态刚体
+			auto body_def = b2DefaultBodyDef();
+			body_def.type = b2_staticBody;
+			body_def.position = Constant::to_physics(position);
+			body_def.userData = entity_to_user_data(entity);
+
+			auto shape_def = b2DefaultShapeDef();
+			// 设置碰撞过滤
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::TRIGGER);
+			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::TRIGGER);
+			// 传感器
+			if (trigger_tile.is_sensor)
+			{
+				shape_def.isSensor = true;
+				shape_def.enableSensorEvents = true;
+			}
+			else
+			{
+				shape_def.enableContactEvents = true;
+			}
+
+			// 创建矩形碰撞体
+			const auto texture_width = first_frame.texture_width;
+			const auto texture_height = first_frame.texture_height;
+			const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
+			const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
+
+			const auto half_width = half_texture_width * scale.x;
+			const auto half_height = half_texture_height * scale.y;
+			const auto half_physics_width = Constant::to_physics(half_width);
+			const auto half_physics_height = Constant::to_physics(half_height);
+			const auto box = b2MakeBox(half_physics_width, half_physics_height);
+
+			PhysicsBody::attach(registry, entity, world_id, body_def);
+			PhysicsBody::attach_shape(registry, entity, shape_def, box);
+		}
+
+		return entity;
+	}
+
+	auto Room::destroy_trigger(entt::registry& registry, const entt::entity trigger_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// physics_body
+		PhysicsBody::deattach(registry, trigger_entity);
+
+		registry.destroy(trigger_entity);
+	}
+
+	namespace
+	{
+		template<bool Lock>
+		auto do_create_door(
+			entt::registry& registry,
+			const config::Door& door,
+			const config::DoorTile& door_tile,
+			const config::AnimationSet& animation_set,
+			const sf::Vector2f position,
+			const sf::Vector2f scale
+		) noexcept -> entt::entity
+		{
+			using namespace components;
+
+			const auto animation_it = animation_set.find(door_tile.animation_id);
+			if (animation_it == animation_set.end())
+			{
+				SPDLOG_ERROR("找不到门[{}]的动画[{}]!", door.tile_id, door_tile.animation_id);
+				// todo: 怎么办?有没有备用方案?
+				return entt::null;
+			}
+			const auto& animation = animation_it->second;
+			const auto& first_frame = animation.frames.front();
+
+			const auto entity = registry.create();
+
+			// transform
+			{
+				// 根据门的方向设置旋转
+				const auto rotation = [&] noexcept -> sf::Angle
+				{
+					switch (door.direction)
+					{
+						case config::DoorDirection::UP:
+						{
+							return sf::degrees(0);
+						}
+						case config::DoorDirection::DOWN:
+						{
+							return sf::degrees(180);
+						}
+						case config::DoorDirection::LEFT:
+						{
+							return sf::degrees(270);
+						}
+						case config::DoorDirection::RIGHT:
+						{
+							return sf::degrees(90);
+						}
+						default: // NOLINT(clang-diagnostic-covered-switch-default)
+						{
+							std::unreachable();
+						}
+					}
+				}();
+
+				Transform::attach(registry, entity, position, scale, rotation);
+			}
+			// render
+			Render::attach(registry, entity, first_frame, config::RenderLayer::DOOR);
+			// animation
+			Animation::attach(registry, entity, animation);
+			// physics_body
+			{
+				const auto world_id = PhysicsWorld::id(registry);
+
+				// 创建静态刚体
+				auto body_def = b2DefaultBodyDef();
+				body_def.type = b2_staticBody;
+				body_def.position = Constant::to_physics(position);
+				body_def.userData = entity_to_user_data(entity);
+
+				auto shape_def = b2DefaultShapeDef();
+				// 设置碰撞过滤
+				shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
+				if constexpr (Lock)
+				{
+					shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_CLOSE);
+				}
+				else
+				{
+					shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_OPEN);
+					// 传感器
+					shape_def.isSensor = true;
+					shape_def.enableSensorEvents = true;
+				}
+
+				// 创建矩形碰撞体
+				// todo: 根据方向设置触发区域
+				const auto texture_width = first_frame.texture_width;
+				const auto texture_height = first_frame.texture_height;
+				const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
+				const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
+
+				const auto half_width = half_texture_width * scale.x;
+				const auto half_height = half_texture_height * scale.y;
+				const auto half_physics_width = Constant::to_physics(half_width);
+				const auto half_physics_height = Constant::to_physics(half_height);
+				const auto box = b2MakeBox(half_physics_width, half_physics_height);
+
+				PhysicsBody::attach(registry, entity, world_id, body_def);
+				PhysicsBody::attach_shape(registry, entity, shape_def, box);
+
+				// door
+				registry.emplace<door::CollisionSize>(entity, half_physics_width, half_physics_height);
+			}
+			// door
+			{
+				if constexpr (Lock)
+				{
+					registry.emplace<door::Locked>(entity);
+				}
+
+				// Key组件由外部调用set_key函数设置,这里不处理
+				// 保险起见先添加该组件?
+				registry.emplace<door::Key>(entity, entt::null);
+
+				registry.emplace<door::Direction>(entity, door.direction);
+				registry.emplace<door::TargetRoom>(entity, door.target_room);
+			}
+
+			return entity;
+		}
+	}
+
+	auto Room::create_locked_door(
+		entt::registry& registry,
+		const config::Door& door,
+		const config::DoorTile& door_tile,
+		const config::AnimationSet& animation_set,
+		const sf::Vector2f position,
+		const sf::Vector2f scale
+	) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		return do_create_door<true>(registry, door, door_tile, animation_set, position, scale);
+	}
+
+	auto Room::create_unlocked_door(
+		entt::registry& registry,
+		const config::Door& door,
+		const config::DoorTile& door_tile,
+		const config::AnimationSet& animation_set,
+		const sf::Vector2f position,
+		const sf::Vector2f scale
+	) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		return do_create_door<false>(registry, door, door_tile, animation_set, position, scale);
+	}
+
+	auto Room::destroy_door(entt::registry& registry, const entt::entity door_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// physics_body
+		PhysicsBody::deattach(registry, door_entity);
+
+		registry.destroy(door_entity);
+	}
+
+	auto Room::set_door_key(entt::registry& registry, const entt::entity door_entity, const entt::entity key_entity) noexcept -> void
+	{
+		using namespace components;
+
+		registry.emplace_or_replace<door::Key>(door_entity, key_entity);
+	}
+
+	auto Room::unlock_door(entt::registry& registry, const entt::entity door_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 移除Locked组件
+		registry.remove<door::Locked>(door_entity);
+		// 移除已有shape
+		PhysicsBody::deattach_shape(registry, door_entity);
+		// 创建sensor
+		{
+			auto shape_def = b2DefaultShapeDef();
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
+			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_OPEN);
+			shape_def.isSensor = true;
+			shape_def.enableSensorEvents = true;
+
+			const auto [half_width, half_height] = registry.get<const door::CollisionSize>(door_entity);
+			const auto box = b2MakeBox(half_width, half_height);
+
+			PhysicsBody::attach_shape(registry, door_entity, shape_def, box);
+		}
+	}
+
+	auto Room::lock_door(entt::registry& registry, const entt::entity door_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 添加Locked组件
+		registry.emplace_or_replace<door::Locked>(door_entity);
+		// 移除已有shape
+		PhysicsBody::deattach_shape(registry, door_entity);
+		// 创建solid shape
+		{
+			auto shape_def = b2DefaultShapeDef();
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
+			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_CLOSE);
+
+			const auto [half_width, half_height] = registry.get<const door::CollisionSize>(door_entity);
+			const auto box = b2MakeBox(half_width, half_height);
+
+			PhysicsBody::attach_shape(registry, door_entity, shape_def, box);
+		}
 	}
 }

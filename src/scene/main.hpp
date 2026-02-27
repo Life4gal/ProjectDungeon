@@ -18,7 +18,7 @@ namespace pd::scene
 		// 开始一场游戏
 		// 在一个游戏场景中可以开始多次游戏(例如死亡后重开)
 		// 此时不需要切换场景,只需要打扫战场,重新生成对应实体即可
-		auto start_game() noexcept -> void;
+		auto start_game() noexcept -> bool;
 
 	public:
 		explicit Main(std::reference_wrapper<entt::registry> global_registry) noexcept;

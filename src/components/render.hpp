@@ -5,36 +5,55 @@
 
 #pragma once
 
-#include <filesystem>
+#include <functional>
+
+#include <config/render_layer.hpp>
 
 #include <SFML/Graphics/Color.hpp>
 
+namespace pd::config
+{
+	class AnimationFrame;
+}
+
 namespace pd::components::render
 {
+	// ==========================================
+	// 上下文组件
+	// ==========================================
+
+	//
+
+	// ==========================================
+	// 实体组件
+	// ==========================================
+
+	// 对config::AnimationFrame的引用
+	class AnimationFrame final
+	{
+	public:
+		std::reference_wrapper<const config::AnimationFrame> animation_frame;
+	};
+
 	// transform::Position --> 渲染的位置
 	// transform::Scale --> 渲染的缩放
 	// transform::Rotation --> 渲染的旋转
 
-	// 当前渲染的纹理
-	class Texture final
+	// 渲染层级
+	class RenderLayer final
 	{
 	public:
-		// 当前使用纹理路径
-		std::filesystem::path texture_path;
-
-		// 当前纹理位置(如果是一整张图一般为0/0,否则为在图集中的位置)
-		int frame_x;
-		int frame_y;
-
-		// 当前纹理大小(如果是一整张图一般为纹理大小,否则为在图集中的大小)
-		int frame_width;
-		int frame_height;
+		config::RenderLayer render_layer;
 	};
 
-	// 当前渲染的颜色
+	// 颜色
 	class Color final
 	{
 	public:
 		sf::Color color;
 	};
+
+	// 标记实体是否应该渲染
+	// 仅有包含该标记的实体才会渲染
+	class Visible final {};
 } // namespace pd::components::render

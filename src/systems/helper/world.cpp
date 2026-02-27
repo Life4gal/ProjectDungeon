@@ -11,71 +11,88 @@
 
 namespace pd::systems::helper
 {
+	auto World::create(entt::registry& registry) noexcept -> void
+	{
+		using namespace components;
+
+		// 避免可能的除0,初始delta设置为非0值
+		registry.ctx().emplace<world::FrameDelta>(sf::seconds(1));
+		registry.ctx().emplace<world::TotalElapsed>(sf::Time::Zero);
+		registry.ctx().emplace<world::PlayElapsed>(sf::Time::Zero);
+	}
+
+	auto World::destroy(entt::registry& registry) noexcept -> void
+	{
+		using namespace components;
+
+		std::ignore = registry;
+	}
+
 	auto World::frame_delta(entt::registry& registry) noexcept -> sf::Time
 	{
-		using namespace components::world;
+		using namespace components;
 
-		auto& [frame_delta] = registry.ctx().get<FrameDelta>();
+		auto& [frame_delta] = registry.ctx().get<world::FrameDelta>();
 		return frame_delta;
 	}
 
 	auto World::update_frame_delta(entt::registry& registry, const sf::Time this_frame_delta) noexcept -> void
 	{
-		using namespace components::world;
+		using namespace components;
 
-		registry.ctx().emplace<FrameDelta>(this_frame_delta);
+		registry.ctx().emplace<world::FrameDelta>(this_frame_delta);
 	}
 
 	auto World::total_elapsed(entt::registry& registry) noexcept -> sf::Time
 	{
-		using namespace components::world;
+		using namespace components;
 
-		const auto [total_elapsed] = registry.ctx().get<const TotalElapsed>();
+		const auto [total_elapsed] = registry.ctx().get<const world::TotalElapsed>();
 		return total_elapsed;
 	}
 
 	auto World::update_total_elapsed(entt::registry& registry, const sf::Time this_frame_delta) noexcept -> void
 	{
-		using namespace components::world;
+		using namespace components;
 
-		auto& [total_elapsed] = registry.ctx().get<TotalElapsed>();
+		auto& [total_elapsed] = registry.ctx().get<world::TotalElapsed>();
 		total_elapsed += this_frame_delta;
 	}
 
 	auto World::play_elapsed(entt::registry& registry) noexcept -> sf::Time
 	{
-		using namespace components::world;
+		using namespace components;
 
-		const auto [play_elapsed] = registry.ctx().get<const PlayElapsed>();
+		const auto [play_elapsed] = registry.ctx().get<const world::PlayElapsed>();
 		return play_elapsed;
 	}
 
 	auto World::update_play_elapsed(entt::registry& registry, const sf::Time this_frame_delta) noexcept -> void
 	{
-		using namespace components::world;
+		using namespace components;
 
-		auto& [play_elapsed] = registry.ctx().get<PlayElapsed>();
+		auto& [play_elapsed] = registry.ctx().get<world::PlayElapsed>();
 		play_elapsed += this_frame_delta;
 	}
 
 	auto World::pause(entt::registry& registry) noexcept -> void
 	{
-		using namespace components::world;
+		using namespace components;
 
-		registry.ctx().emplace<GamePaused>();
+		registry.ctx().emplace<world::GamePaused>();
 	}
 
 	auto World::unpause(entt::registry& registry) noexcept -> void
 	{
-		using namespace components::world;
+		using namespace components;
 
-		registry.ctx().erase<GamePaused>();
+		registry.ctx().erase<world::GamePaused>();
 	}
 
 	auto World::is_pause(entt::registry& registry) noexcept -> bool
 	{
-		using namespace components::world;
+		using namespace components;
 
-		return registry.ctx().contains<GamePaused>();
+		return registry.ctx().contains<world::GamePaused>();
 	}
 } // namespace pd::systems::helper

@@ -8,6 +8,7 @@
 #include <components/transform.hpp>
 
 #include <systems/helper/physics_world.hpp>
+#include <systems/helper/transform.hpp>
 
 #include <game/constants.hpp>
 #include <game/user_data_entity.hpp>
@@ -44,8 +45,8 @@ namespace pd::systems::update
 				const auto position = Constant::from_physics(physics_position);
 				const auto angle = sf::radians(b2Rot_GetAngle(physics_rotation));
 
-				registry.replace<transform::Position>(entity, transform::Position{position});
-				registry.replace<transform::Rotation>(entity, transform::Rotation{angle});
+				helper::Transform::set_position(registry, entity, position);
+				helper::Transform::set_rotation(registry, entity, angle);
 			}
 		}
 	}

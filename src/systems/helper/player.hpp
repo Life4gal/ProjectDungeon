@@ -20,17 +20,19 @@ namespace pd::systems::helper
 	{
 	public:
 		// 在指定位置生成玩家
-		static auto spawn(
+		[[nodiscard]] static auto spawn(
 			entt::registry& registry,
 			sf::Vector2f position,
 			sf::Vector2f scale = sf::Vector2f{1, 1},
 			sf::Angle rotation = sf::degrees(0)
 		) noexcept -> entt::entity;
 
+		static auto kill(entt::registry& registry, entt::entity player_entity) noexcept -> void;
+
 		// 处理事件
-		static auto handle_event(entt::registry& registry, const sf::Event& event) noexcept -> void;
+		static auto handle_event(entt::registry& registry, entt::entity player_entity, const sf::Event& event) noexcept -> void;
 
 		// 应用玩家移动
-		static auto apply_movement(entt::registry& registry) noexcept -> void;
+		static auto apply_movement(entt::registry& registry, entt::entity player_entity) noexcept -> void;
 	};
 }

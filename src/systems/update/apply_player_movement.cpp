@@ -9,11 +9,11 @@
 
 namespace pd::systems::update
 {
-	auto apply_player_movement(entt::registry& registry, [[maybe_unused]] const sf::Time delta) noexcept -> void
+	auto apply_player_movement(entt::registry& registry, const entt::entity player_entity, [[maybe_unused]] const sf::Time delta) noexcept -> void
 	{
 		using namespace systems;
 
 		// 应用由Player::handler_event设置的玩家移动状态
-		helper::Player::apply_movement(registry);
+		helper::Player::apply_movement(registry, player_entity);
 	}
 }

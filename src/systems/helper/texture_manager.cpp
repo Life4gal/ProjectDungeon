@@ -16,6 +16,13 @@ namespace pd::systems::helper
 		return texture_manager.load(path);
 	}
 
+	auto TextureManager::unload(entt::registry& registry, const std::filesystem::path& path) noexcept -> bool
+	{
+		auto& texture_manager = registry.ctx().get<asset::TextureManager>();
+
+		return texture_manager.erase(path);
+	}
+
 	auto TextureManager::get(entt::registry& registry, const std::filesystem::path& path) noexcept -> result_type
 	{
 		const auto& texture_manager = registry.ctx().get<const asset::TextureManager>();

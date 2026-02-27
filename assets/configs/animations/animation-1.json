@@ -1,0 +1,130 @@
+{
+  "wall_stone": {
+    "looping": false,
+    "frames": [
+      {
+        "texture_path": "./assets/placeholder/tiles.png",
+        "duration_ms": 1000,
+        "texture_x": 64,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64
+      }
+    ]
+  },
+  "wall_corner_tl": {
+    "looping": false,
+    "frames": [
+      {
+        "texture_path": "./assets/placeholder/tiles.png",
+        "duration_ms": 1000,
+        "texture_x": 128,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64
+      }
+    ]
+  },
+  "wall_corner_tr": {
+    "looping": false,
+    "frames": [
+      {
+        "texture_path": "./assets/placeholder/tiles.png",
+        "duration_ms": 1000,
+        "texture_x": 192,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64
+      }
+    ]
+  },
+  "wall_corner_bl": {
+    "looping": false,
+    "frames": [
+      {
+        "texture_path": "./assets/placeholder/tiles.png",
+        "duration_ms": 1000,
+        "texture_x": 128,
+        "texture_y": 64,
+        "texture_width": 64,
+        "texture_height": 64
+      }
+    ]
+  },
+  "wall_corner_br": {
+    "looping": false,
+    "frames": [
+      {
+        "texture_path": "./assets/placeholder/tiles.png",
+        "duration_ms": 1000,
+        "texture_x": 192,
+        "texture_y": 64,
+        "texture_width": 64,
+        "texture_height": 64
+      }
+    ]
+  },
+  "floor_stone": {
+    "looping": false,
+    "frames": [
+      {
+        "texture_path": "./assets/placeholder/tiles.png",
+        "duration_ms": 1000,
+        "texture_x": 0,
+        "texture_y": 0,
+        "texture_width": 64,
+        "texture_height": 64
+      }
+    ]
+  },
+  "door_stone": {
+    "looping": false,
+    "frames": [
+      {
+        "texture_path": "./assets/placeholder/tiles.png",
+        "duration_ms": 1000,
+        "texture_x": 64,
+        "texture_y": 64,
+        "texture_width": 64,
+        "texture_height": 64
+      }
+    ]
+  },
+  "AntleredRascal": {
+    "looping": true,
+    "frames": [
+      {
+        "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+        "duration_ms": 250,
+        "texture_x": 0,
+        "texture_y": 0,
+        "texture_width": 16,
+        "texture_height": 16
+      },
+      {
+        "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+        "duration_ms": 250,
+        "texture_x": 16,
+        "texture_y": 0,
+        "texture_width": 16,
+        "texture_height": 16
+      },
+      {
+        "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+        "duration_ms": 250,
+        "texture_x": 32,
+        "texture_y": 0,
+        "texture_width": 16,
+        "texture_height": 16
+      },
+      {
+        "texture_path": "./assets/characters/enemies/deep-dive-AntleredRascal.png",
+        "duration_ms": 250,
+        "texture_x": 48,
+        "texture_y": 0,
+        "texture_width": 16,
+        "texture_height": 16
+      }
+    ]
+  }
+}

@@ -11,8 +11,10 @@
 
 namespace pd::config
 {
-	class Level;
+	class AnimationSet;
 	class TileSet;
+
+	class Level;
 }
 
 namespace pd::systems::helper
@@ -20,22 +22,33 @@ namespace pd::systems::helper
 	class Level final
 	{
 	public:
-		// 加载关卡
-		static auto load_level(entt::registry& registry, const config::Level& level, const config::TileSet& tileset) noexcept -> bool;
+		// =====================================
+		// 关卡
+		// =====================================
 
-		// 卸载当前关卡
-		static auto unload_level(entt::registry& registry) noexcept -> void;
+		// 创建关卡
+		static auto create(entt::registry& registry, const config::Level& level) noexcept -> entt::entity;
 
-		// 切换到指定房间
-		static auto switch_room(entt::registry& registry, const std::string& room_id) noexcept -> bool;
+		// 销毁关卡
+		static auto destroy(entt::registry& registry, entt::entity level_entity) noexcept -> void;
+
+		// =====================================
+		// 房间
+		// =====================================
+
+		// 创建房间
+		static auto create_room(entt::registry& registry, entt::entity level_entity, const std::string& room_id) noexcept -> bool;
+
+		// 销毁房间
+		static auto destroy_room(entt::registry& registry, entt::entity level_entity, const std::string& room_id) noexcept -> void;
+
+		// 切换到指定房间(如果房间不存在则切换失败,不会创建)
+		static auto switch_room(entt::registry& registry, entt::entity level_entity, const std::string& room_id) noexcept -> bool;
 
 		// 检查当前房间是否已清空(无敌人)
 		[[nodiscard]] static auto is_room_cleared(entt::registry& registry) noexcept -> bool;
 
-		// 检查当前房间状态
-		static auto check_room(entt::registry& registry) noexcept -> void;
-
-		// 获取当前房间id
-		[[nodiscard]] static auto get_room_id(entt::registry& registry) noexcept -> std::string_view;
+		// 更新当前房间(检查是否已经清除所有敌人,如果是则开启所有门)
+		static auto update_room(entt::registry& registry) noexcept -> void;
 	};
 }

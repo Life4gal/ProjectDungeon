@@ -18,6 +18,8 @@ namespace pd::systems::helper
 
 		[[nodiscard]] static auto load(entt::registry& registry, const std::filesystem::path& path) noexcept -> entt::id_type;
 
+		static auto unload(entt::registry& registry, const std::filesystem::path& path) noexcept -> bool;
+
 		[[nodiscard]] static auto get(entt::registry& registry, const std::filesystem::path& path) noexcept -> result_type;
 	};
 }

@@ -1,0 +1,63 @@
+{
+	"walls": {
+		"wall_stone": {
+			"animation": "wall_stone",
+			"collision": {
+				"width": 64,
+				"height": 64
+			}
+		},
+		"wall_corner_tl": {
+			"animation": "wall_corner_tl",
+			"collision": {
+				"width": 64,
+				"height": 64
+			}
+		},
+		"wall_corner_tr": {
+			"animation": "wall_corner_tr",
+			"collision": {
+				"width": 64,
+				"height": 64
+			}
+		},
+		"wall_corner_bl": {
+			"animation": "wall_corner_bl",
+			"collision": {
+				"width": 64,
+				"height": 64
+			}
+		},
+		"wall_corner_br": {
+			"animation": "wall_corner_br",
+			"collision": {
+				"width": 64,
+				"height": 64
+			}
+		}
+	},
+	"floors": {
+		"floor_stone": {
+			"animation": "floor_stone",
+			"collision": {
+				"width": 64,
+				"height": 64
+			}
+		}
+	},
+	"decorations": {
+
+	},
+	"triggers": {
+
+	},
+	"doors": {
+		"door_stone": {
+			"animation": "door_stone",
+			"collision": {
+				"width": 64,
+				"height": 64
+			}
+		}
+	}
+}
