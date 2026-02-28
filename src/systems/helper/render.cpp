@@ -27,15 +27,17 @@ namespace pd::systems::helper
 		registry.emplace_or_replace<render::AnimationFrame>(entity, std::cref(animation_frame));
 		registry.emplace_or_replace<render::RenderLayer>(entity, render_layer);
 		registry.emplace_or_replace<render::Color>(entity, color);
-		registry.emplace_or_replace<render::Visible>(entity);
+
+		registry.ctx().emplace<render::SortRequired>();
 	}
 
 	auto Render::deattach(entt::registry& registry, const entt::entity entity_with_render) noexcept -> void
 	{
 		using namespace components;
 
+		registry.remove<render::AnimationFrame>(entity_with_render);
+		registry.remove<render::RenderLayer>(entity_with_render);
 		registry.remove<render::Color>(entity_with_render);
-		registry.remove<render::Visible>(entity_with_render);
 	}
 
 	auto Render::hide(entt::registry& registry, const entt::entity entity_with_render) noexcept -> void
@@ -44,7 +46,7 @@ namespace pd::systems::helper
 
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
 
-		registry.remove<render::Visible>(entity_with_render);
+		registry.emplace_or_replace<render::Invisible>(entity_with_render);
 	}
 
 	auto Render::show(entt::registry& registry, const entt::entity entity_with_render) noexcept -> void
@@ -53,7 +55,7 @@ namespace pd::systems::helper
 
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
 
-		registry.emplace_or_replace<render::Visible>(entity_with_render);
+		registry.remove<render::Invisible>(entity_with_render);
 	}
 
 	auto Render::change_layer(entt::registry& registry, const entt::entity entity_with_render, const config::RenderLayer new_layer) noexcept -> void
@@ -63,6 +65,8 @@ namespace pd::systems::helper
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
 
 		registry.emplace_or_replace<render::RenderLayer>(entity_with_render, new_layer);
+
+		registry.ctx().emplace<render::SortRequired>();
 	}
 
 	auto Render::change_color(entt::registry& registry, const entt::entity entity_with_render, sf::Color new_color) noexcept -> void

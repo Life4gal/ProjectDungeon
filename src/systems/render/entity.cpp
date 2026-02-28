@@ -22,17 +22,34 @@ namespace pd::systems::render
 	{
 		using namespace components;
 
+		const auto group = registry.group<components::render::RenderLayer>(
+			entt::get<
+				components::render::AnimationFrame,
+				components::render::Color,
+				transform::Position,
+				transform::Scale,
+				transform::Rotation
+			>,
+			entt::exclude<components::render::Invisible>
+		);
+
+		// 检查是否需要排序
+		if (registry.ctx().contains<components::render::SortRequired>())
+		{
+			group.sort<components::render::RenderLayer>(
+				[](const components::render::RenderLayer lhs, const components::render::RenderLayer rhs) noexcept -> bool
+				{
+					return std::to_underlying(lhs.render_layer) < std::to_underlying(rhs.render_layer);
+				}
+			);
+
+			registry.ctx().erase<components::render::SortRequired>();
+		}
+
 		// 当前共用RenderStates
 		static sf::RenderStates states{};
 
-		for (const auto view = registry.view<
-			     const transform::Position,
-			     const transform::Scale,
-			     const transform::Rotation,
-			     const components::render::AnimationFrame,
-			     const components::render::RenderLayer,
-			     const components::render::Color>();
-		     const auto [entity, position, scale, rotation, animation_frame, render_layer, color]: view.each())
+		for (const auto [entity, render_layer, animation_frame, color, position, scale, rotation]: group.each())
 		{
 			const auto& animation_frame_ref = animation_frame.animation_frame.get();
 

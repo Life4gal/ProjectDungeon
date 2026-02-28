@@ -22,7 +22,9 @@ namespace pd::components::render
 	// 上下文组件
 	// ==========================================
 
-	//
+	// 标记渲染视图需要进行排序
+	// 这会在创建/改动RenderLayer组件时设置
+	class SortRequired final {};
 
 	// ==========================================
 	// 实体组件
@@ -53,7 +55,6 @@ namespace pd::components::render
 		sf::Color color;
 	};
 
-	// 标记实体是否应该渲染
-	// 仅有包含该标记的实体才会渲染
-	class Visible final {};
+	// 标记实体隐藏(不渲染)
+	class Invisible final {};
 } // namespace pd::components::render
