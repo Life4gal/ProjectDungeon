@@ -29,59 +29,59 @@ namespace pd::config
 				}
 				catch (const nlohmann::json::exception& e)
 				{
-					SPDLOG_ERROR("解析AnimationFrame配置失败: {}", e.what());
+					SPDLOG_ERROR("解析动画帧配置时发生错误: {}", e.what());
 					return false;
 				}
 			}
 
 			[[nodiscard]] auto load_animation(Animation& animation, const ConfigReader::json_format& json) noexcept -> bool
 			{
-				const auto frames_it = json.find("frames");
-				if (frames_it == json.end())
-				{
-					SPDLOG_ERROR("解析Animation配置失败: 缺少'frames'字段!\n{}", json.dump(4));
-					return false;
-				}
-
-				const auto& frames = frames_it.value();
-				animation.frames.reserve(json.size());
-
 				try
 				{
-					for (const auto& data: frames)
+					// frames
 					{
-						AnimationFrame frame{};
-						// 调用完整接口,如此即使后续支持格式有变,此处也无需改动
-						if (not load_animation_frame_from_json(frame, data))
+						const auto frames_it = json.find("frames");
+						if (frames_it == json.end())
 						{
+							SPDLOG_ERROR("动画配置格式错误: 缺少'frames'字段!\n{}", json.dump(4));
 							return false;
 						}
 
-						animation.frames.emplace_back(std::move(frame));
+						const auto& frames = frames_it.value();
+
+						animation.frames.reserve(json.size());
+						for (const auto& data: frames)
+						{
+							AnimationFrame frame{};
+							// 调用完整接口,如此即使后续支持格式有变,此处也无需改动
+							if (not load_animation_frame_from_json(frame, data))
+							{
+								return false;
+							}
+
+							animation.frames.emplace_back(std::move(frame));
+						}
 					}
 
+					// looping
 					animation.looping = json.value("looping", false);
 
 					return true;
 				}
 				catch (const nlohmann::json::exception& e)
 				{
-					SPDLOG_ERROR("解析Animation配置失败: {}", e.what());
+					SPDLOG_ERROR("解析动画配置时发生错误: {}", e.what());
 					return false;
 				}
 			}
 
 			[[nodiscard]] auto load_animation_set(AnimationSet& animation_set, const ConfigReader::json_format& json) noexcept -> bool
 			{
-				SPDLOG_INFO("===========================================");
-				SPDLOG_INFO("=============== ->ANIMATION-SET-> ===============");
-				SPDLOG_INFO("===========================================");
-
 				animation_set.reserve(json.size());
 
 				for (const auto& [id, data]: json.items())
 				{
-					SPDLOG_INFO("加载动画[{}]...", id);
+					SPDLOG_INFO("正在加载动画[{}]数据...", id);
 
 					Animation animation{};
 					// 调用完整接口,如此即使后续支持格式有变,此处也无需改动
@@ -95,10 +95,6 @@ namespace pd::config
 
 					SPDLOG_INFO("加载动画[{}]]完毕!", id);
 				}
-
-				SPDLOG_INFO("===========================================");
-				SPDLOG_INFO("=============== <-ANIMATION-SET<- ===============");
-				SPDLOG_INFO("===========================================");
 
 				return true;
 			}
@@ -141,19 +137,21 @@ namespace pd::config
 
 	auto load_animation_set_from_json(AnimationSet& animation_set, const ConfigReader::json_format& json) noexcept -> bool
 	{
+		// "animations": "/path/to/animations.xxx"
 		if (json.is_string())
 		{
+			const auto& config_path = json.get_ref<const std::string&>();
+			SPDLOG_INFO("正在加载动画集指定配置文件[{}]...", config_path);
+
 			// todo: 链接支持其他格式
 
-			// json
+			// "animations": "/path/to/animations.json"
 			{
-				// "animations": "/path/to/animations.json"
-				const auto& config_path = json.get_ref<const std::string&>();
 				const auto config = ConfigReader::read_json(config_path);
 
 				if (not config.has_value())
 				{
-					SPDLOG_ERROR("AnimationSet的配置文件[{}]加载失败!", config_path);
+					SPDLOG_ERROR("动画集指定的配置文件[{}]加载失败!", config_path);
 					return false;
 				}
 

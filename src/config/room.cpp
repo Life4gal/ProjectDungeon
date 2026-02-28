@@ -72,24 +72,76 @@ namespace pd::config
 			{
 				try
 				{
-					room.name = json["name"].get<std::string>();
+					// name + tile_size + width + height
 					{
-						const auto& type_str = json["type"].get_ref<const std::string&>();
+						const auto do_load = [&]<typename T>(const std::string_view name, const std::string_view key, T& dest) noexcept -> bool
+						{
+							const auto it = json.find(key);
+							if (it == json.end())
+							{
+								SPDLOG_ERROR("房间配置格式错误: 缺少'{}'字段!\n{}", key, json.dump(4));
+								return false;
+							}
+
+							const auto& value = it.value();
+
+							dest = value.get<T>();
+							SPDLOG_INFO("读取到房间{}: [{}]", name, dest);
+							return true;
+						};
+
+						// name
+						if (not do_load("名称", "name", room.name))
+						{
+							return false;
+						}
+						// tile_size
+						if (not do_load("瓦片大小", "tile_size", room.tile_size))
+						{
+							return false;
+						}
+						// width
+						if (not do_load("房间宽度", "width", room.width))
+						{
+							return false;
+						}
+						// height
+						if (not do_load("房间高度", "height", room.height))
+						{
+							return false;
+						}
+					}
+					// type
+					{
+						const auto type_it = json.find("type");
+						if (type_it == json.end())
+						{
+							SPDLOG_ERROR("房间配置格式错误: 缺少'type'字段!\n{}", json.dump(4));
+							return false;
+						}
+
+						const auto& type = type_it.value();
+						const auto& type_str = type.get_ref<const std::string&>();
+
 						room.type = parse_room_type(type_str);
 					}
-					room.tile_size = json["tile_size"].get<int>();
-					room.width = json["width"].get<int>();
-					room.height = json["height"].get<int>();
 
 					// tiles
 					{
-						const auto do_load_tiles = [&](const std::string_view name, const std::string_view key, auto& dest) noexcept -> bool
+						const auto do_load_tiles = [&]<typename T>(const std::string_view name, const std::string_view key, T& dest) noexcept -> bool
 						{
 							// "xxx": { "name": [ { "x":0, "y": 0 }, ... ] }
-							const auto& data = json[key];
+							const auto it = json.find(key);
+							if (it == json.end())
+							{
+								SPDLOG_ERROR("房间配置格式错误: 缺少'{}'字段!\n{}", key, json.dump(4));
+								return false;
+							}
+
+							const auto& data = it.value();
 							if (not data.is_object())
 							{
-								SPDLOG_ERROR("房间[{}]的{}配置格式错误!\n{}", room.name, name, json.dump(4));
+								SPDLOG_ERROR("房间配置格式错误: '{}'的数据类型'{}'错误!\n{}", name, data.type_name(), data.dump(4));
 								return false;
 							}
 
@@ -141,10 +193,17 @@ namespace pd::config
 					// doors
 					{
 						// "doors": { "name": [ { "x": 0, "y": 0, "target_room": "room-id", "key": "key-name", "direction": "UP" }, ... ] }
-						const auto& doors = json["doors"];
+						const auto doors_it = json.find("doors");
+						if (doors_it == json.end())
+						{
+							SPDLOG_ERROR("房间配置格式错误: 缺少'doors'字段!\n{}", json.dump(4));
+							return false;
+						}
+
+						const auto& doors = doors_it.value();
 						if (not doors.is_object())
 						{
-							SPDLOG_ERROR("房间[{}]的门配置格式错误!\n{}", room.name, doors.dump(4));
+							SPDLOG_ERROR("房间配置格式错误: 'doors'的数据类型'{}'错误!\n{}", doors.type_name(), doors.dump(4));
 							return false;
 						}
 
@@ -240,22 +299,18 @@ namespace pd::config
 				}
 				catch (const nlohmann::json::exception& e)
 				{
-					SPDLOG_ERROR("解析房间配置时发生错误:{}", e.what());
+					SPDLOG_ERROR("解析房间配置时发生错误: {}\n{}", e.what(), json.dump(4));
 					return false;
 				}
 			}
 
 			[[nodiscard]] auto load_room_set(RoomSet& room_set, const ConfigReader::json_format& json) noexcept -> bool
 			{
-				SPDLOG_INFO("===========================================");
-				SPDLOG_INFO("=============== ->ROOM-SET-> ===============");
-				SPDLOG_INFO("===========================================");
-
 				room_set.reserve(json.size());
 
 				for (const auto& [id, data]: json.items())
 				{
-					SPDLOG_INFO("加载房间[{}]...", id);
+					SPDLOG_INFO("正在加载房间[{}]数据...", id);
 
 					Room room{};
 					// 调用完整接口,如此即使后续支持格式有变,此处也无需改动
@@ -270,10 +325,6 @@ namespace pd::config
 					SPDLOG_INFO("加载房间[{}]完毕!", id);
 				}
 
-				SPDLOG_INFO("===========================================");
-				SPDLOG_INFO("=============== <-ROOM-SET<- ===============");
-				SPDLOG_INFO("===========================================");
-
 				return true;
 			}
 		}
@@ -283,20 +334,21 @@ namespace pd::config
 
 	auto load_room_from_json(Room& room, const ConfigReader::json_format& json) noexcept -> bool
 	{
-		// 先检查是不是链接
+		// "room-id": "/path/to/room-config.xxx"
 		if (json.is_string())
 		{
+			const auto& config_path = json.get_ref<const std::string&>();
+			SPDLOG_INFO("正在加载房间指定配置文件[{}]...", config_path);
+
 			// todo: 链接支持其他格式
 
-			// json
+			// "room-id": "/path/to/room-config.json"
 			{
-				// "room-id": "/path/to/room-config.json"
-				const auto& config_path = json.get_ref<const std::string&>();
 				const auto config = ConfigReader::read_json(config_path);
 
 				if (not config.has_value())
 				{
-					SPDLOG_ERROR("房间的配置文件[{}]加载失败!", config_path);
+					SPDLOG_ERROR("房间指定的配置文件[{}]加载失败!", config_path);
 					return false;
 				}
 
@@ -320,28 +372,21 @@ namespace pd::config
 
 	auto load_room_set_from_json(RoomSet& room_set, const ConfigReader::json_format& json) noexcept -> bool
 	{
-		const auto rooms_it = json.find("rooms");
-		if (rooms_it == json.end())
+		// "rooms": /path/to/rooms.xxx"
+		if (json.is_string())
 		{
-			SPDLOG_ERROR("RoomSet配置格式错误: 缺少'rooms'字段!\n{}", json.dump(4));
-			return false;
-		}
+			const auto& config_path = json.get_ref<const std::string&>();
+			SPDLOG_INFO("正在加载房间集指定配置文件[{}]...", config_path);
 
-		const auto& rooms = rooms_it.value();
-
-		if (rooms.is_string())
-		{
 			// todo: 链接支持其他格式
 
-			// json
+			// "rooms": "/path/to/rooms.json"
 			{
-				// "rooms": "/path/to/rooms.json"
-				const auto& config_path = rooms.get_ref<const std::string&>();
 				const auto config = ConfigReader::read_json(config_path);
 
 				if (not config.has_value())
 				{
-					SPDLOG_ERROR("RoomSet的配置文件[{}]加载失败!", config_path);
+					SPDLOG_ERROR("房间集指定的配置文件[{}]加载失败!", config_path);
 					return false;
 				}
 
@@ -349,7 +394,7 @@ namespace pd::config
 			}
 		}
 
-		return from_json::load_room_set(room_set, rooms);
+		return from_json::load_room_set(room_set, json);
 	}
 
 	auto load_room_set_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<RoomSet>

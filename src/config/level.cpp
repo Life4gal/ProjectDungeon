@@ -18,50 +18,66 @@ namespace pd::config
 			{
 				try
 				{
-					level.name = json["name"].get<std::string>();
+					// name
+					{
+						const auto name_it = json.find("name");
+						if (name_it == json.end())
+						{
+							SPDLOG_ERROR("关卡配置格式错误: 缺少'name'字段!\n{}", json.dump(4));
+							return false;
+						}
+
+						const auto& name = name_it.value();
+						level.name = name.get<std::string>();
+						SPDLOG_INFO("读取到关卡名称: [{}]...", level.name);
+					}
 
 					// animation_set
 					{
+						SPDLOG_INFO("\n==| 正在加载动画集数据 |==");
+
 						const auto animations_it = json.find("animations");
 						if (animations_it == json.end())
 						{
-							SPDLOG_ERROR("AnimationSet配置格式错误: 缺少'animations'字段!\n{}", json.dump(4));
+							SPDLOG_ERROR("关卡配置格式错误: 缺少'animations'字段!\n{}", json.dump(4));
 							return false;
 						}
 
 						const auto& animations = animations_it.value();
-
 						if (auto animation_set = load_animation_set_from_json(animations);
 							not animation_set.has_value())
 						{
-							SPDLOG_ERROR("关卡[{}]的动画集加载失败!", level.name);
+							SPDLOG_INFO("\n==| 动画集数据加载失败 |==");
 							return false;
 						}
 						else
 						{
+							SPDLOG_INFO("\n==| 动画集数据加载成功 |==");
 							level.animation_set = *std::move(animation_set);
 						}
 					}
 
 					// tile_set
 					{
+						SPDLOG_INFO("\n==| 正在加载瓦片集数据 |==");
+
 						const auto& tiles_it = json.find("tiles");
 						if (tiles_it == json.end())
 						{
-							SPDLOG_ERROR("TileSet配置格式错误: 缺少'tiles'字段!\n{}", json.dump(4));
+							SPDLOG_ERROR("关卡配置格式错误: 缺少'tiles'字段!\n{}", json.dump(4));
 							return false;
 						}
 
 						const auto& tiles = tiles_it.value();
-
 						if (auto tile_set = load_tile_set_from_json(tiles);
 							not tile_set.has_value())
 						{
-							SPDLOG_ERROR("关卡[{}]的瓦片集加载失败!", level.name);
+							SPDLOG_INFO("\n==| 瓦片集数据加载失败 |==");
 							return false;
 						}
 						else
 						{
+							SPDLOG_INFO("\n==| 瓦片集数据加载成功 |==");
 							level.tile_set = *std::move(tile_set);
 
 							// 对于那些具有Collision的瓦片,我们需要设置其collision_width/collision_height(如果它们未设置)
@@ -106,24 +122,46 @@ namespace pd::config
 					}
 
 					// room_set
-					if (auto room_set = load_room_set_from_json(json);
-						not room_set.has_value())
 					{
-						return false;
-					}
-					else
-					{
-						level.room_set = *std::move(room_set);
+						SPDLOG_INFO("\n==| 正在加载房间集数据 |==");
+
+						const auto& rooms_it = json.find("rooms");
+						if (rooms_it == json.end())
+						{
+							SPDLOG_ERROR("关卡配置格式错误: 缺少'rooms'字段!\n{}", json.dump(4));
+							return false;
+						}
+
+						const auto& rooms = rooms_it.value();
+						if (auto room_set = load_room_set_from_json(rooms);
+							not room_set.has_value())
+						{
+							SPDLOG_INFO("\n==| 房间集数据加载失败 |==");
+							return false;
+						}
+						else
+						{
+							SPDLOG_INFO("\n==| 房间集数据加载成功 |==");
+							level.room_set = *std::move(room_set);
+						}
 					}
 
 					// starting_room
 					{
-						level.starting_room = json["starting_room"].get<std::string>();
+						const auto starting_room_it = json.find("starting_room");
+						if (starting_room_it == json.end())
+						{
+							SPDLOG_ERROR("关卡的配置格式错误: 缺少'starting_room'字段!\n{}", json.dump(4));
+							return false;
+						}
+
+						const auto& starting_room = starting_room_it.value();
+						level.starting_room = starting_room.get<std::string>();
 
 						if (const auto it = level.room_set.find(level.starting_room);
 							it == level.room_set.end())
 						{
-							SPDLOG_ERROR("加载关卡[{}]的初始房间失败!初始房间[{}]不存在!", level.name, level.starting_room);
+							SPDLOG_ERROR("关卡的初始房间失败!初始房间[{}]不存在!", level.starting_room);
 							return false;
 						}
 					}
@@ -132,39 +170,31 @@ namespace pd::config
 				}
 				catch (const nlohmann::json::exception& e)
 				{
-					SPDLOG_ERROR("解析关卡配置时发生错误:{}", e.what());
+					SPDLOG_ERROR("解析关卡配置时发生错误: {}\n{}", e.what(), json.dump(4));
 					return false;
 				}
 			}
 
 			auto load_level_set(LevelSet& level_set, const ConfigReader::json_format& json) noexcept -> bool
 			{
-				SPDLOG_INFO("===========================================");
-				SPDLOG_INFO("=============== ->LEVEL-SET-> ===============");
-				SPDLOG_INFO("===========================================");
-
 				level_set.reserve(json.size());
 
 				for (const auto& [id, data]: json.items())
 				{
-					SPDLOG_INFO("加载关卡[{}]...", id);
+					SPDLOG_INFO("\n======== 正在加载关卡[{}]数据 ========\n", id);
 
 					Level level{};
 					// 调用完整接口,如此即使后续支持格式有变,此处也无需改动
 					if (not load_level_from_json(level, data))
 					{
-						SPDLOG_ERROR("加载关卡[{}]失败!", id);
+						SPDLOG_ERROR("\n======== 加载关卡[{}]失败 ========\n", id);
 						continue;
 					}
 
 					level_set.emplace(id, std::move(level));
 
-					SPDLOG_INFO("加载关卡[{}]完毕!", id);
+					SPDLOG_INFO("\n======== 加载关卡[{}]完毕 ========\n", id);
 				}
-
-				SPDLOG_INFO("===========================================");
-				SPDLOG_INFO("=============== <-LEVEL-SET<- ===============");
-				SPDLOG_INFO("===========================================");
 
 				return true;
 			}
@@ -175,20 +205,21 @@ namespace pd::config
 
 	auto load_level_from_json(Level& level, const ConfigReader::json_format& json) noexcept -> bool
 	{
-		// 先检查是不是链接
+		// "level-id": "/path/to/level.xxx"
 		if (json.is_string())
 		{
+			const auto& config_path = json.get_ref<const std::string&>();
+			SPDLOG_INFO("正在加载关卡指定配置文件[{}]...", config_path);
+
 			// todo: 链接支持其他格式
 
-			// json
+			// "level-id": "/path/to/level.json"
 			{
-				// "level-id": "/path/to/level-config.json"
-				const auto& config_path = json.get_ref<const std::string&>();
 				const auto config = ConfigReader::read_json(config_path);
 
 				if (not config.has_value())
 				{
-					SPDLOG_ERROR("关卡的配置文件[{}]加载失败!", config_path);
+					SPDLOG_ERROR("关卡指定的配置文件[{}]加载失败!", config_path);
 					return false;
 				}
 
@@ -212,28 +243,23 @@ namespace pd::config
 
 	auto load_level_set_from_json(LevelSet& level_set, const ConfigReader::json_format& json) noexcept -> bool
 	{
-		const auto levels_it = json.find("levels");
-		if (levels_it == json.end())
-		{
-			SPDLOG_ERROR("关卡集配置格式错误: 缺少'levels'字段!");
-			return false;
-		}
+		SPDLOG_INFO("正在加载关卡集数据...");
 
-		const auto& levels = levels_it.value();
-
-		if (levels.is_string())
+		// "levels": "/path/to/levels.xxx"
+		if (json.is_string())
 		{
+			const auto& config_path = json.get_ref<const std::string&>();
+			SPDLOG_INFO("正在加载关卡集指定配置文件[{}]...", config_path);
+
 			// todo: 链接支持其他格式
 
-			// json
+			// "levels": "/path/to/levels.json"
 			{
-				// "levels": "/path/to/levels.json"
-				const auto& config_path = levels.get_ref<const std::string&>();
 				const auto config = ConfigReader::read_json(config_path);
 
 				if (not config.has_value())
 				{
-					SPDLOG_ERROR("LevelSet的配置文件[{}]加载失败!", config_path);
+					SPDLOG_ERROR("关卡集指定的配置文件[{}]加载失败!", config_path);
 					return false;
 				}
 
@@ -241,7 +267,7 @@ namespace pd::config
 			}
 		}
 
-		return from_json::load_level_set(level_set, levels);
+		return from_json::load_level_set(level_set, json);
 	}
 
 	auto load_level_set_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<LevelSet>

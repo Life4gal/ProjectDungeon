@@ -20,17 +20,23 @@ namespace pd::systems::helper
 {
 	auto Dungeon::load(entt::registry& registry, const std::filesystem::path& path) noexcept -> bool
 	{
+		SPDLOG_INFO("正在加载地下城文件[{}]...", path.string());
+
 		const auto dungeon_json_data = config::ConfigReader::read_json(path);
 		if (not dungeon_json_data.has_value())
 		{
 			return false;
 		}
 
+		SPDLOG_INFO("正在加载地下城数据...");
+
 		auto dungeon_data = config::load_dungeon_from_json(*dungeon_json_data);
 		if (not dungeon_data.has_value())
 		{
 			return false;
 		}
+
+		SPDLOG_INFO("正在创建地下城...");
 
 		return load(registry, *std::move(dungeon_data));
 	}
