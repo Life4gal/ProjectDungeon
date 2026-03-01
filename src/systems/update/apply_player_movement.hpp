@@ -11,5 +11,5 @@
 
 namespace pd::systems::update
 {
-	auto apply_player_movement(entt::registry& registry, entt::entity player_entity, sf::Time delta) noexcept -> void;
+	auto apply_player_movement(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

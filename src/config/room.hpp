@@ -50,7 +50,18 @@ namespace pd::config
 		std::string tile_id;
 	};
 
-	// 门配置数据
+	// 钥匙的配置数据
+	class Key final
+	{
+	public:
+		// KeyTileSet::key
+		std::string tile_id;
+
+		// 钥匙名称
+		std::string name;
+	};
+
+	// 门的配置数据
 	class Door final
 	{
 	public:
@@ -59,7 +70,7 @@ namespace pd::config
 
 		// 连接的房间ID(穿过该门进入的房间)
 		std::string target_room;
-		// 开启该门的钥匙名称(如果为空则表示不需要钥匙?)
+		// 开启该门的钥匙名称,与Key::name对应(如果为空则表示不需要钥匙?)
 		std::string key;
 		// 门的所在方向(这控制了门感应/碰撞区域的位置)
 		DoorDirection direction;
@@ -75,6 +86,7 @@ namespace pd::config
 	//   "floors": { "floor-id-1": [ { "x": 0, "y": 0 }, ... ], ... }, 
 	//   "decorations": { "decoration-id-1": [ { "x": 0, "y": 0 }, ... ], ... }, 
 	//   "triggers": { "trigger-id-1": [ { "x": 0, "y": 0 }, ... ], ... }, 
+	//   "keys": { "key-id-1": [ { "x": 0, "y": 0, "name": "key-name" }, ... ], ... }, 
 	//   "doors": { "door-id-1": [ { "x": 0, "y": 0, "target_room": "room-id", "key": "key-name", "direction": "UP/DOWN/LEFT/RIGHT" }, ... ], ... }, 
 	//   "player_spawn_point": { "tile_x": 0, "tile_y": 0 }, 
 	//   "enemy_spawn_points": [ { "x": 0, "y": 0 }, ... ], 
@@ -108,6 +120,8 @@ namespace pd::config
 		std::unordered_map<Position, Decoration> decoration_tiles;
 		// 触发器位置与瓦片的映射表
 		std::unordered_map<Position, Trigger> trigger_tiles;
+		// 钥匙位置与钥匙配置的映射表
+		std::unordered_map<Position, Key> key_tiles;
 		// 门位置与门配置的映射表
 		std::unordered_map<Position, Door> door_tiles;
 

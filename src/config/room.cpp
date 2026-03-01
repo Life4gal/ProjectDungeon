@@ -130,7 +130,7 @@ namespace pd::config
 					{
 						const auto do_load_tiles = [&]<typename T>(const std::string_view name, const std::string_view key, T& dest) noexcept -> bool
 						{
-							// "xxx": { "name": [ { "x":0, "y": 0 }, ... ] }
+							// "xxx": { "tile-id": [ { "x":0, "y": 0 }, ... ] }
 							const auto it = json.find(key);
 							if (it == json.end())
 							{
@@ -190,9 +190,55 @@ namespace pd::config
 						}
 					}
 
+					// keys
+					{
+						// "keys": { "key-id-1": [ { "x": 0, "y": 0, "name": "key-name" }, ... ], ... }
+						const auto keys_it = json.find("keys");
+						if (keys_it == json.end())
+						{
+							SPDLOG_ERROR("房间配置格式错误: 缺少'keys'字段!\n{}", json.dump(4));
+							return false;
+						}
+
+						const auto& keys = keys_it.value();
+						if (not keys.is_object())
+						{
+							SPDLOG_ERROR("房间配置格式错误: 'keys'的数据类型'{}'错误!\n{}", keys.type_name(), keys.dump(4));
+							return false;
+						}
+
+						const auto total_count = std::ranges::fold_left(
+							keys.items(),
+							std::size_t{0},
+							[](const std::size_t total, const auto& item) noexcept -> std::size_t
+							{
+								return total + item.value().size();
+							}
+						);
+						room.key_tiles.reserve(total_count);
+
+						for (const auto& [tile_id, items]: keys.items())
+						{
+							for (const auto& item: items)
+							{
+								Position item_position{.x = item["x"].get<int>(), .y = item["y"].get<int>()};
+								auto item_name = item["name"].get<std::string>();
+
+								room.key_tiles.emplace(
+									item_position,
+									Key
+									{
+											.tile_id = tile_id,
+											.name = std::move(item_name)
+									}
+								);
+							}
+						}
+					}
+
 					// doors
 					{
-						// "doors": { "name": [ { "x": 0, "y": 0, "target_room": "room-id", "key": "key-name", "direction": "UP" }, ... ] }
+						// "doors": { "door-id": [ { "x": 0, "y": 0, "target_room": "room-id", "key": "key-name", "direction": "UP" }, ... ] }
 						const auto doors_it = json.find("doors");
 						if (doors_it == json.end())
 						{
@@ -226,6 +272,18 @@ namespace pd::config
 								auto item_key = item.value("key", "");
 								auto item_direction_str = item["direction"].get<std::string>();
 								const auto item_direction = parse_door_direction(item_direction_str);
+
+								// 检查钥匙是否存在
+								if (not item_key.empty())
+								{
+									const auto keys = room.key_tiles | std::views::values;
+									if (const auto it = std::ranges::find(keys, item_key, &Key::name);
+										it == keys.end())
+									{
+										SPDLOG_ERROR("房间配置内容错误: 房间[{}]前往房间[{}]的门指定的钥匙[{}]不存在", room.name, item_target_room, item_key);
+										continue;
+									}
+								}
 
 								room.door_tiles.emplace(
 									item_position,

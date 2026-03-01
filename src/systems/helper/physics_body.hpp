@@ -44,6 +44,12 @@ namespace pd::systems::helper
 		// 为一个实体移除物理刚体组件
 		static auto deattach(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> void;
 
+		// 禁用一个已经附加了物理刚体组件的实体的物理刚体(使其休眠,不参与物理模拟)
+		static auto disable(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> void;
+
+		// 启用一个已经附加了物理刚体组件的实体的物理刚体(使其参与物理模拟)
+		static auto enable(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> void;
+
 		// 获取一个已经附加了物理刚体组件的实体的物理位置
 		[[nodiscard]] static auto get_position(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> b2Vec2;
 

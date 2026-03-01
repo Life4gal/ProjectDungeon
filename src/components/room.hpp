@@ -73,6 +73,14 @@ namespace pd::components
 			std::vector<entt::entity> entities;
 		};
 
+		// 房间内钥匙实体
+		// 对应config::Room::key_tiles
+		class Keys final
+		{
+		public:
+			std::vector<entt::entity> entities;
+		};
+
 		// 房间内门瓦片实体
 		// 对应config::Room::door_tiles
 		class Doors final
@@ -97,10 +105,26 @@ namespace pd::components
 			float y;
 		};
 
-		// 当前房间是否被清空
-		// 房间满足清空条件则会添加该标签
-		// 同时,如果房间含义该标记,进入该房间不再会进行生成(例如进入别的房间后再次回到该房间)
-		class Cleared final {};
+		// 当前房间是否通过
+		// 通过 = 清除所有敌人 + 收集了房间所有钥匙(如果有)
+		class Passed final {};
+
+		// // 当前房间是否被清空
+		// // 房间满足清空条件则会添加该标签
+		// // 同时,如果房间含义该标记,进入该房间不再会进行生成(例如进入别的房间后再次回到该房间)
+		// class Cleared final {};
+		//
+		// // 房间被挂起(不参与update/render)
+		// // 当玩家离开房间时添加该标签
+		// class Suspended final {};
+		//
+		// // 房间切换请求
+		// // 当玩家进入门触发器时,存储该请求,由Level系统在适当时机处理
+		// class SwitchRequest final
+		// {
+		// public:
+		// 	entt::entity door_entity;
+		// };
 	}
 
 	// 房间墙壁
@@ -137,6 +161,22 @@ namespace pd::components
 		// physics_body 
 	}
 
+	// 房间钥匙
+	namespace key
+	{
+		// transform
+		// render
+		// animation (可选,如果无需更新的话)
+		// physics_body 
+
+		// 钥匙名称
+		class Name final
+		{
+		public:
+			std::string name;
+		};
+	}
+
 	// 房间门
 	namespace door
 	{
@@ -149,14 +189,13 @@ namespace pd::components
 		// 如果未锁住则不存在该数据
 		class Locked final {};
 
-		// 标记当前门的钥匙
-		// 如果是null则表示不需要钥匙
-		// 即使有钥匙也需要消灭当前房间所有敌人才能解锁门
-		// 也就是说需要同时满足拥有钥匙(如果需要)和消灭敌人这两个条件才能解锁门
+		// 在玩家进入一个房间时,会检测当前持有的钥匙
+		// 如果玩家持有开启该门的钥匙,则会销毁该组件
+		// 在房间更新,或者进入房间时,如果房间通过,则会开启所有门
 		class Key final
 		{
 		public:
-			entt::entity key;
+			std::string key;
 		};
 
 		// 门的方向

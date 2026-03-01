@@ -5,7 +5,11 @@
 
 #include <systems/update/process_contact_events.hpp>
 
+#include <components/tags.hpp>
+#include <components/name.hpp>
+
 #include <systems/helper/physics_world.hpp>
+#include <systems/helper/dungeon.hpp>
 
 #include <prometheus/platform/os.hpp>
 
@@ -19,6 +23,7 @@ namespace pd::systems::update
 	{
 		auto process_contact_events(entt::registry& registry, const b2WorldId world_id) noexcept -> void
 		{
+			using namespace components;
 			using namespace systems;
 
 			const auto contact_events = b2World_GetContactEvents(world_id);
@@ -38,12 +43,44 @@ namespace pd::systems::update
 
 					PROMETHEUS_PLATFORM_ASSUME(user_data_a != nullptr and user_data_b != nullptr);
 
-					const auto sensor_entity = helper::PhysicsWorld::to_entity(user_data_a);
-					const auto visitor_entity = helper::PhysicsWorld::to_entity(user_data_b);
+					const auto entity_a = helper::PhysicsWorld::to_entity(user_data_a);
+					const auto entity_b = helper::PhysicsWorld::to_entity(user_data_b);
 
-					SPDLOG_INFO("ContactBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					const auto& [name_a] = registry.get<name::Name>(entity_a);
+					const auto& [name_b] = registry.get<name::Name>(entity_b);
 
-					//
+					SPDLOG_INFO("ContactBegin: {} & {}", name_a, name_b);
+
+					// trigger
+					{
+						const auto is_trigger_a = registry.all_of<tags::trigger>(entity_a);
+						const auto is_trigger_b = registry.all_of<tags::trigger>(entity_b);
+						if (is_trigger_a or is_trigger_b)
+						{
+							helper::Dungeon::on_trigger_contact(registry, is_trigger_a ? entity_a : entity_b, is_trigger_a ? entity_b : entity_a);
+							continue;
+						}
+					}
+					// key
+					{
+						const auto is_key_a = registry.all_of<tags::key>(entity_a);
+						const auto is_key_b = registry.all_of<tags::key>(entity_b);
+						if (is_key_a or is_key_b)
+						{
+							helper::Dungeon::on_key_contact(registry, is_key_a ? entity_a : entity_b, is_key_a ? entity_b : entity_a);
+							continue;
+						}
+					}
+					// door
+					{
+						const auto is_door_a = registry.all_of<tags::door>(entity_a);
+						const auto is_door_b = registry.all_of<tags::door>(entity_b);
+						if (is_door_a or is_door_b)
+						{
+							helper::Dungeon::on_locked_door_contact(registry, is_door_a ? entity_a : entity_b, is_door_a ? entity_b : entity_a);
+							continue;
+						}
+					}
 				}
 			}
 
@@ -57,15 +94,18 @@ namespace pd::systems::update
 					const auto body_a = b2Shape_GetBody(event.shapeIdA);
 					const auto body_b = b2Shape_GetBody(event.shapeIdB);
 
-					auto* user_data_a = b2Body_GetUserData(body_a);
-					auto* user_data_b = b2Body_GetUserData(body_b);
+					const auto* user_data_a = b2Body_GetUserData(body_a);
+					const auto* user_data_b = b2Body_GetUserData(body_b);
 
 					PROMETHEUS_PLATFORM_ASSUME(user_data_a != nullptr and user_data_b != nullptr);
 
-					const auto sensor_entity = helper::PhysicsWorld::to_entity(user_data_a);
-					const auto visitor_entity = helper::PhysicsWorld::to_entity(user_data_b);
+					const auto entity_a = helper::PhysicsWorld::to_entity(user_data_a);
+					const auto entity_b = helper::PhysicsWorld::to_entity(user_data_b);
 
-					SPDLOG_INFO("ContactEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					const auto& [name_a] = registry.get<name::Name>(entity_a);
+					const auto& [name_b] = registry.get<name::Name>(entity_b);
+
+					SPDLOG_INFO("ContactEnd: {} & {}", name_a, name_b);
 
 					//
 				}
@@ -74,6 +114,7 @@ namespace pd::systems::update
 
 		auto process_sensor_events(entt::registry& registry, const b2WorldId world_id) noexcept -> void
 		{
+			using namespace components;
 			using namespace systems;
 
 			const auto sensor_events = b2World_GetSensorEvents(world_id);
@@ -96,9 +137,18 @@ namespace pd::systems::update
 					const auto sensor_entity = helper::PhysicsWorld::to_entity(sensor_user_data);
 					const auto visitor_entity = helper::PhysicsWorld::to_entity(visitor_user_data);
 
-					SPDLOG_INFO("SensorBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					const auto& [sensor_name] = registry.get<name::Name>(sensor_entity);
+					const auto& [visitor_name] = registry.get<name::Name>(visitor_entity);
 
-					// todo: 处理玩家进入门
+					SPDLOG_INFO("SensorBegin: {} & {}", sensor_name, visitor_name);
+
+					// 处理玩家进入门
+					if (registry.all_of<tags::door>(sensor_entity))
+					{
+						// 只有打开的门才是传感器
+						helper::Dungeon::on_unlocked_door_contact(registry, sensor_entity, visitor_entity);
+					}
+
 					// todo: 处理敌人/玩家接触地板装饰物
 				}
 			}
@@ -126,7 +176,10 @@ namespace pd::systems::update
 					const auto sensor_entity = helper::PhysicsWorld::to_entity(sensor_user_data);
 					const auto visitor_entity = helper::PhysicsWorld::to_entity(visitor_user_data);
 
-					SPDLOG_INFO("SensorEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					const auto& [sensor_name] = registry.get<name::Name>(sensor_entity);
+					const auto& [visitor_name] = registry.get<name::Name>(visitor_entity);
+
+					SPDLOG_INFO("SensorEnd: {} & {}", sensor_name, visitor_name);
 
 					//
 				}

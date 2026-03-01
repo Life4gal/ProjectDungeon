@@ -23,8 +23,10 @@ namespace pd::config
 		DECORATION = 0b0000'0100,
 		// 触发器
 		TRIGGER = 0b0000'1000,
+		// 钥匙
+		KEY = 0b0001'0000,
 		// 门
-		DOOR = 0b0001'0000,
+		DOOR = 0b0010'0000,
 
 		// [8~15]
 

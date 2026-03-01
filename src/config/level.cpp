@@ -143,6 +143,20 @@ namespace pd::config
 						{
 							SPDLOG_INFO("\n==| 房间集数据加载成功 |==");
 							level.room_set = *std::move(room_set);
+
+							// 检查所有房间的门的目标房间是否存在
+							for (const auto& [room_id, room]: level.room_set)
+							{
+								for (const auto& door: room.door_tiles | std::views::values)
+								{
+									if (const auto it = level.room_set.find(door.target_room);
+										it == level.room_set.end())
+									{
+										SPDLOG_ERROR("房间[{}]的门的目标房间[{}]不存在!", room_id, door.target_room);
+										return false;
+									}
+								}
+							}
 						}
 					}
 
@@ -161,7 +175,12 @@ namespace pd::config
 						if (const auto it = level.room_set.find(level.starting_room);
 							it == level.room_set.end())
 						{
-							SPDLOG_ERROR("关卡的初始房间失败!初始房间[{}]不存在!", level.starting_room);
+							SPDLOG_ERROR("关卡的初始房间错误!初始房间[{}]不存在!", level.starting_room);
+							return false;
+						}
+						else if (it->second.type != RoomType::STARTING)
+						{
+							SPDLOG_ERROR("关卡的初始房间错误![{}]房间的类型不正确!", level.starting_room);
 							return false;
 						}
 					}

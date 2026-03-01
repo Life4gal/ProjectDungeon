@@ -146,6 +146,33 @@ namespace pd::config
 				{
 					return false;
 				}
+				// key_tiles
+				if (not do_load(
+					"钥匙",
+					"keys",
+					tile_set.key_tiles,
+					[](const ConfigReader::json_format& data) noexcept(false) -> KeyTile
+					{
+						KeyTile tile{};
+
+						//Animation
+						tile.animation_id = data.value("animation", std::string{});
+						// Collision
+						{
+							const auto& collision = data["collision"];
+							tile.collision_width = collision.value("width", 0);
+							tile.collision_height = collision.value("height", 0);
+							tile.enable_contact_event = true;
+							// 传感器与否无所谓,反正接触之后就会销毁
+							// 不过如果要修改应该对应地修改systems::update::process_contact_events
+						}
+
+						return tile;
+					}
+				))
+				{
+					return false;
+				}
 				// door_tiles
 				if (not do_load(
 					"门",

@@ -1,5 +1,5 @@
 {
-	"name": "普通房间",
+	"name": "普通房间1",
 	"type": "NORMAL",
 	"tile_size": 64,
 	"width": 9,
@@ -329,39 +329,26 @@
 		]
 	},
 	"decorations": {
-
+		"wall_stone": [
+			{
+				"x": 1,
+				"y": 1
+			}
+		]
 	},
 	"triggers": {
+
+	},
+	"keys": {
 
 	},
 	"doors": {
 		"door_stone": [
 			{
 				"x": 4,
-				"y": 0,
-				"direction": "UP",
-				"target_room": "room_normal_01",
-				"key": ""
-			},
-			{
-				"x": 0,
-				"y": 4,
-				"direction": "LEFT",
-				"target_room": "room_normal_02",
-				"key": ""
-			},
-			{
-				"x": 8,
-				"y": 4,
-				"direction": "RIGHT",
-				"target_room": "room_normal_03",
-				"key": ""
-			},
-			{
-				"x": 4,
 				"y": 8,
 				"direction": "DOWN",
-				"target_room": "room_normal_04",
+				"target_room": "room-id-0",
 				"key": ""
 			}
 		]

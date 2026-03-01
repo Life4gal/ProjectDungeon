@@ -5,12 +5,14 @@
 
 #include <systems/helper/player.hpp>
 
+#include <components/tags.hpp>
 #include <components/name.hpp>
 #include <components/player.hpp>
 
 #include <config/collision_mask.hpp>
 // 快速测试用
 #include <config/level.hpp>
+#include <components/dungeon.hpp>
 #include <components/level.hpp>
 
 #include <systems/helper/physics_world.hpp>
@@ -21,6 +23,8 @@
 #include <systems/helper/actor.hpp>
 
 #include <game/log_entity.hpp>
+
+#include <prometheus/platform/os.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Window/Event.hpp>
@@ -37,10 +41,13 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
+		PROMETHEUS_PLATFORM_ASSUME(not registry.ctx().contains<player::Player>());
+
 		// todo: 读取数据
 
 		// 快速测试用
-		const auto& level = registry.ctx().get<const level::Level>().level.get();
+		const auto [level_entity] = registry.ctx().get<const dungeon::Level>();
+		const auto& level = registry.get<const level::Level>(level_entity).level.get();
 		const auto& animation_set = level.animation_set;
 
 		constexpr auto animation_id = std::string_view{"AntleredRascal"};
@@ -64,6 +71,8 @@ namespace pd::systems::helper
 		const auto physics_size = PhysicsWorld::physics_size_of(size);
 		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+		// tags
+		registry.emplace<tags::player>(entity);
 		// name
 		registry.emplace<name::Name>(entity, std::format("玩家{}", entt::to_integral(entity)));
 		// transform
@@ -92,6 +101,7 @@ namespace pd::systems::helper
 			shape_def.density = 1.0f;
 			shape_def.material.friction = 0.0f;
 			shape_def.enableContactEvents = true;
+			shape_def.enableSensorEvents = true;
 
 			// 创建矩形碰撞体
 			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
@@ -106,12 +116,17 @@ namespace pd::systems::helper
 
 		log::on_create("玩家", entity, position, size, rotation, physics_position, physics_size);
 
+		// 注册到上下文
+		registry.ctx().emplace<player::Player>(entity);
+
 		return entity;
 	}
 
-	auto Player::kill(entt::registry& registry, const entt::entity player_entity) noexcept -> void
+	auto Player::kill(entt::registry& registry) noexcept -> void
 	{
 		using namespace components;
+
+		const auto player_entity = get(registry);
 
 		// physics_body
 		PhysicsBody::deattach(registry, player_entity);
@@ -119,12 +134,16 @@ namespace pd::systems::helper
 		log::on_destroy("玩家", player_entity);
 
 		registry.destroy(player_entity);
+
+		// 从上下文中移除
+		registry.ctx().erase<player::Player>();
 	}
 
-	auto Player::handle_event(entt::registry& registry, const entt::entity player_entity, const sf::Event& event) noexcept -> void
+	auto Player::handle_event(entt::registry& registry, const sf::Event& event) noexcept -> void
 	{
 		using namespace components;
 
+		const auto player_entity = get(registry);
 		auto& [movement_x, movement_y] = registry.get<player::Movement>(player_entity);
 
 		if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
@@ -176,11 +195,12 @@ namespace pd::systems::helper
 		}
 	}
 
-	auto Player::apply_movement(entt::registry& registry, const entt::entity player_entity) noexcept -> void
+	auto Player::apply_movement(entt::registry& registry) noexcept -> void
 	{
 		using namespace components;
 		using enum player::Movement::Type;
 
+		const auto player_entity = get(registry);
 		const auto [movement_x, movement_y] = registry.get<const player::Movement>(player_entity);
 
 		sf::Vector2f direction{0, 0};
@@ -212,5 +232,14 @@ namespace pd::systems::helper
 		const auto factor = direction_normalized * speed;
 
 		PhysicsBody::apply_force_to_center(registry, player_entity, factor);
+	}
+
+	auto Player::get(entt::registry& registry) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<player::Player>());
+
+		return registry.ctx().get<const player::Player>().entity;
 	}
 }

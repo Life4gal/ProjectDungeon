@@ -1,6 +1,6 @@
 {
-	"name": "初始房间",
-	"type": "STARTING",
+	"name": "普通房间4",
+	"type": "NORMAL",
 	"tile_size": 64,
 	"width": 9,
 	"height": 9,
@@ -329,7 +329,12 @@
 		]
 	},
 	"decorations": {
-
+		"wall_stone": [
+			{
+				"x": 4,
+				"y": 4
+			}
+		]
 	},
 	"triggers": {
 
@@ -343,28 +348,7 @@
 				"x": 4,
 				"y": 0,
 				"direction": "UP",
-				"target_room": "room-id-1",
-				"key": ""
-			},
-			{
-				"x": 0,
-				"y": 4,
-				"direction": "LEFT",
-				"target_room": "room-id-2",
-				"key": ""
-			},
-			{
-				"x": 8,
-				"y": 4,
-				"direction": "RIGHT",
-				"target_room": "room-id-3",
-				"key": ""
-			},
-			{
-				"x": 4,
-				"y": 8,
-				"direction": "DOWN",
-				"target_room": "room-id-4",
+				"target_room": "room-id-0",
 				"key": ""
 			}
 		]

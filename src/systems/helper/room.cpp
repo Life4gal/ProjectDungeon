@@ -11,6 +11,7 @@
 #include <config/collision_mask.hpp>
 #include <config/dungeon.hpp>
 
+#include <components/tags.hpp>
 #include <components/name.hpp>
 #include <components/room.hpp>
 
@@ -22,6 +23,8 @@
 #include <systems/helper/physics_body.hpp>
 
 #include <game/log_entity.hpp>
+
+#include <prometheus/platform/os.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
@@ -85,6 +88,7 @@ namespace pd::systems::helper
 					// config::Floor::tile_id
 					// config::Decoration::tile_id
 					// config::Trigger::tile_id
+					// config::Key::tile_id
 					// config::Door::tile_id
 					const auto& tile_id = data.tile_id;
 					const auto tile_it = set.find(tile_id);
@@ -169,7 +173,23 @@ namespace pd::systems::helper
 					triggers
 				);
 			}
-			// rooms
+			// keys
+			{
+				const auto& tiles = room.key_tiles;
+				auto& [keys] = registry.emplace<room::Keys>(entity);
+
+				do_create_tile(
+					"钥匙",
+					tiles,
+					tile_set.key_tiles,
+					[&](const config::Key& key, const config::KeyTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+					{
+						return create_key(registry, key, tile, animation_set, position);
+					},
+					keys
+				);
+			}
+			// doors
 			{
 				const auto& tiles = room.door_tiles;
 				auto& [doors] = registry.emplace<room::Doors>(entity);
@@ -243,53 +263,354 @@ namespace pd::systems::helper
 		registry.destroy(room_entity);
 	}
 
-	// ReSharper disable once CppParameterMayBeConstPtrOrRef
-	auto Room::is_cleared(entt::registry& registry, const entt::entity room_entity) noexcept -> bool
+	auto Room::on_enter(entt::registry& registry, const entt::entity room_entity, const entt::entity player_entity, const std::span<const std::string> keys) noexcept -> void
 	{
 		using namespace components;
 
-		return registry.all_of<room::Cleared>(room_entity);
-	}
-
-	auto Room::update_enemy_entities(entt::registry& registry, const entt::entity room_entity) noexcept -> bool
-	{
-		using namespace components;
-
-		auto& [enemy_entities] = registry.get<room::Enemies>(room_entity);
-		if (enemy_entities.empty())
 		{
-			return true;
+			const auto& room = registry.get<const room::Room>(room_entity).room.get();
+			SPDLOG_INFO("进入房间[{}]", room.name);
 		}
 
-		const auto invalid_r = std::ranges::remove_if(
-			enemy_entities,
-			[&registry](const entt::entity e) noexcept -> bool
+		// 显示所有实体
+		show(registry, room_entity);
+
+		// 设置玩家位置
+		{
+			// todo: 一边的墙只有一个门吗?上个房间的门对应这个房间的哪个门?
+
+			PhysicsBody::set_position(registry, player_entity, {10, 10});
+		}
+
+		// 门需要根据玩家当前持有的钥匙进行解锁
+		const auto& [door_entities] = registry.get<room::Doors>(room_entity);
+
+		// 如果房间已通过则表示是再次进入该房间
+		if (registry.all_of<room::Passed>(room_entity))
+		{
+			// 如果当前房间还存在锁住的门,检查当前是否带有需要的钥匙
+			std::ranges::for_each(
+				door_entities,
+				[&registry, &keys](const entt::entity door_entity) noexcept -> void
+				{
+					if (registry.all_of<door::Locked>(door_entity))
+					{
+						if (const auto& [key] = registry.get<const door::Key>(door_entity);
+							std::ranges::contains(keys, key))
+						{
+							unlock_door(registry, door_entity);
+						}
+					}
+				}
+			);
+		}
+		else
+		{
+			// 如果是未通过的房间则关闭所有门(除非是初始房间)
+			if (const auto& room = registry.get<const room::Room>(room_entity).room.get();
+				room.type == config::RoomType::STARTING)
 			{
-				return not registry.valid(e);
+				std::ranges::for_each(
+					door_entities,
+					[&registry](const entt::entity door_entity) noexcept -> void
+					{
+						unlock_door(registry, door_entity);
+					}
+				);
 			}
-		);
+			else
+			{
+				std::ranges::for_each(
+					door_entities,
+					[&registry](const entt::entity door_entity) noexcept -> void
+					{
+						lock_door(registry, door_entity);
+					}
+				);
+			}
+		}
+	}
 
-		enemy_entities.erase(invalid_r.begin(), enemy_entities.end());
+	auto Room::on_exit(entt::registry& registry, const entt::entity room_entity, const entt::entity player_entity) noexcept -> void
+	{
+		using namespace components;
 
-		return enemy_entities.empty();
+		{
+			const auto& room = registry.get<const room::Room>(room_entity).room.get();
+			SPDLOG_INFO("离开房间[{}]", room.name);
+		}
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<room::Passed>(room_entity));
+
+		// 隐藏所有实体
+		hide(registry, room_entity);
+
+		std::ignore = player_entity;
+	}
+
+	auto Room::on_update(entt::registry& registry, const entt::entity room_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 如果房间已通过则无需更新
+		if (registry.all_of<room::Passed>(room_entity))
+		{
+			return;
+		}
+
+		auto& [enemy_entities] = registry.get<room::Enemies>(room_entity);
+		auto& [key_entities] = registry.get<room::Keys>(room_entity);
+
+		// 检查是否还存在敌人实体
+		if (not enemy_entities.empty())
+		{
+			// 检查失效的敌人实体并移除
+			const auto invalid_r = std::ranges::remove_if(
+				enemy_entities,
+				[&registry](const entt::entity e) noexcept -> bool
+				{
+					return not registry.valid(e);
+				}
+			);
+
+			enemy_entities.erase(invalid_r.begin(), enemy_entities.end());
+		}
+
+		// 检查是否还存在钥匙实体
+		if (not key_entities.empty())
+		{
+			// 检查失效的钥匙实体并移除
+			const auto invalid_r = std::ranges::remove_if(
+				key_entities,
+				[&registry](const entt::entity e) noexcept -> bool
+				{
+					return not registry.valid(e);
+				}
+			);
+
+			key_entities.erase(invalid_r.begin(), key_entities.end());
+		}
+
+		// 如果既不存在敌人实体,又不存在钥匙实体,则认为房间已通过
+		if (enemy_entities.empty() and key_entities.empty())
+		{
+			// 开启所有门
+			unlock_doors(registry, room_entity);
+
+			registry.emplace<room::Passed>(room_entity);
+		}
+	}
+
+	auto Room::on_key_collected(entt::registry& registry, const entt::entity room_entity, const entt::entity key_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 钥匙实体应该属于当前房间
+		PROMETHEUS_PLATFORM_ASSUME(std::ranges::contains(registry.get<room::Keys>(room_entity).entities, key_entity));
+
+		// 应用钥匙
+		apply_key(registry, room_entity, key_entity);
+		// 销毁钥匙实体
+		destroy_key(registry, key_entity);
+		// 无需修改room::Keys,on_update会检测
+	}
+
+	auto Room::hide(entt::registry& registry, const entt::entity room_entity) noexcept -> void
+	{
+		using namespace components;
+
+		const auto do_hide = [&]<bool HasPhysics>(auto& entities) noexcept -> void
+		{
+			std::ranges::for_each(
+				entities,
+				[&registry](const entt::entity e) noexcept -> void
+				{
+					if (registry.valid(e))
+					{
+						Render::hide(registry, e);
+
+						if constexpr (HasPhysics)
+						{
+							PhysicsBody::disable(registry, e);
+						}
+					}
+				}
+			);
+		};
+
+		auto& [wall_entities] = registry.get<room::Walls>(room_entity);
+		auto& [floor_entities] = registry.get<room::Floors>(room_entity);
+		auto& [decoration_entities] = registry.get<room::Decorations>(room_entity);
+		auto& [trigger_entities] = registry.get<room::Triggers>(room_entity);
+		auto& [door_entities] = registry.get<room::Doors>(room_entity);
+
+		do_hide.operator()<true>(wall_entities);
+		do_hide.operator()<false>(floor_entities);
+		do_hide.operator()<false>(decoration_entities);
+		do_hide.operator()<true>(trigger_entities);
+		do_hide.operator()<true>(door_entities);
+	}
+
+	auto Room::show(entt::registry& registry, const entt::entity room_entity) noexcept -> void
+	{
+		using namespace components;
+
+		const auto do_show = [&]<bool HasPhysics>(auto& entities) noexcept -> void
+		{
+			std::ranges::for_each(
+				entities,
+				[&registry](const entt::entity e) noexcept -> void
+				{
+					if (registry.valid(e))
+					{
+						Render::show(registry, e);
+
+						if constexpr (HasPhysics)
+						{
+							PhysicsBody::enable(registry, e);
+						}
+					}
+				}
+			);
+		};
+
+		auto& [wall_entities] = registry.get<room::Walls>(room_entity);
+		auto& [floor_entities] = registry.get<room::Floors>(room_entity);
+		auto& [decoration_entities] = registry.get<room::Decorations>(room_entity);
+		auto& [trigger_entities] = registry.get<room::Triggers>(room_entity);
+		auto& [door_entities] = registry.get<room::Doors>(room_entity);
+
+		do_show.operator()<true>(wall_entities);
+		do_show.operator()<false>(floor_entities);
+		do_show.operator()<false>(decoration_entities);
+		do_show.operator()<true>(trigger_entities);
+		do_show.operator()<true>(door_entities);
+	}
+
+	auto Room::apply_key(entt::registry& registry, const entt::entity room_entity, const std::string& key_name) noexcept -> void
+	{
+		using namespace components;
+
+		const auto& [door_entities] = registry.get<room::Doors>(room_entity);
+		for (const entt::entity door_entity: door_entities)
+		{
+			if (registry.all_of<door::Locked>(door_entity))
+			{
+				if (const auto* key = registry.try_get<const door::Key>(door_entity))
+				{
+					if (key->key == key_name)
+					{
+						registry.erase<door::Key>(door_entity);
+
+						// 不考虑多个门需求同一把钥匙?
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	auto Room::apply_key(entt::registry& registry, const entt::entity room_entity, const entt::entity key_entity) noexcept -> void
+	{
+		using namespace components;
+
+		const auto& [key_name] = registry.get<const name::Name>(key_entity);
+
+		apply_key(registry, room_entity, key_name);
 	}
 
 	auto Room::unlock_doors(entt::registry& registry, const entt::entity room_entity) noexcept -> void
 	{
 		using namespace components;
 
-		auto& [doors] = registry.get<room::Doors>(room_entity);
-
+		auto& [door_entities] = registry.get<room::Doors>(room_entity);
 		std::ranges::for_each(
-			doors,
+			door_entities,
 			[&registry](const entt::entity door_entity) noexcept -> void
 			{
-				if (registry.valid(door_entity))
+				if (not registry.all_of<door::Key>(door_entity))
 				{
 					unlock_door(registry, door_entity);
 				}
 			}
 		);
+	}
+
+	auto Room::lock_doors(entt::registry& registry, const entt::entity room_entity) noexcept -> void
+	{
+		using namespace components;
+
+		auto& [door_entities] = registry.get<room::Doors>(room_entity);
+		std::ranges::for_each(
+			door_entities,
+			[&](const entt::entity door_entity) noexcept -> void
+			{
+				lock_door(registry, door_entity);
+			}
+		);
+	}
+
+	auto Room::unlock_door(entt::registry& registry, const entt::entity door_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 如果没有锁住则什么也不做
+		if (not registry.all_of<door::Locked>(door_entity))
+		{
+			return;
+		}
+
+		// 必须是不需要钥匙的门
+		PROMETHEUS_PLATFORM_ASSUME(not registry.all_of<door::Key>(door_entity));
+
+		// name
+		registry.emplace_or_replace<name::Name>(door_entity, std::format("开启的门{}", entt::to_integral(door_entity)));
+		// 移除Locked组件
+		registry.remove<door::Locked>(door_entity);
+		// 移除已有shape
+		PhysicsBody::deattach_shape(registry, door_entity);
+		// 创建sensor
+		{
+			auto shape_def = b2DefaultShapeDef();
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
+			shape_def.filter.maskBits = config::CollisionMask::door_open;
+			shape_def.isSensor = true;
+			shape_def.enableSensorEvents = true;
+
+			const auto [half_width, half_height] = registry.get<const door::CollisionSize>(door_entity);
+			const auto box = b2MakeBox(half_width, half_height);
+
+			PhysicsBody::attach_shape(registry, door_entity, shape_def, box);
+		}
+	}
+
+	auto Room::lock_door(entt::registry& registry, const entt::entity door_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 如果已经锁住则什么也不做
+		if (registry.all_of<door::Locked>(door_entity))
+		{
+			return;
+		}
+
+		// name
+		registry.emplace_or_replace<name::Name>(door_entity, std::format("关闭的门{}", entt::to_integral(door_entity)));
+		// 添加Locked组件
+		registry.emplace_or_replace<door::Locked>(door_entity);
+		// 移除已有shape
+		PhysicsBody::deattach_shape(registry, door_entity);
+		// 创建solid shape
+		{
+			auto shape_def = b2DefaultShapeDef();
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
+			shape_def.filter.maskBits = config::CollisionMask::door_close;
+
+			const auto [half_width, half_height] = registry.get<const door::CollisionSize>(door_entity);
+			const auto box = b2MakeBox(half_width, half_height);
+
+			PhysicsBody::attach_shape(registry, door_entity, shape_def, box);
+		}
 	}
 
 	auto Room::create_wall(
@@ -325,6 +646,8 @@ namespace pd::systems::helper
 		const auto physics_size = PhysicsWorld::physics_size_of(size);
 		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+		// tags
+		registry.emplace<tags::wall>(entity);
 		// name
 		registry.emplace<name::Name>(entity, std::format("墙壁{}", entt::to_integral(entity)));
 		// transform
@@ -401,6 +724,8 @@ namespace pd::systems::helper
 		const auto texture_height = first_frame.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
+		// tags
+		registry.emplace<tags::floor>(entity);
 		// name
 		registry.emplace<name::Name>(entity, std::format("地板{}", entt::to_integral(entity)));
 		// transform
@@ -452,6 +777,8 @@ namespace pd::systems::helper
 		const auto texture_height = first_frame.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
+		// tags
+		registry.emplace<tags::decoration>(entity);
 		// name
 		registry.emplace<name::Name>(entity, std::format("装饰物{}", entt::to_integral(entity)));
 		// transform
@@ -508,6 +835,8 @@ namespace pd::systems::helper
 		const auto physics_size = PhysicsWorld::physics_size_of(size);
 		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+		// tags
+		registry.emplace<tags::trigger>(entity);
 		// name
 		registry.emplace<name::Name>(entity, std::format("触发器{}", entt::to_integral(entity)));
 		// transform
@@ -565,6 +894,89 @@ namespace pd::systems::helper
 		log::on_destroy("触发器", trigger_entity);
 
 		registry.destroy(trigger_entity);
+	}
+
+	auto Room::create_key(
+		entt::registry& registry,
+		const config::Key& key,
+		const config::KeyTile& key_tile,
+		const config::AnimationSet& animation_set,
+		const sf::Vector2f position,
+		const sf::Vector2f scale,
+		const sf::Angle rotation
+	) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		const auto animation_it = animation_set.find(key_tile.animation_id);
+		if (animation_it == animation_set.end())
+		{
+			SPDLOG_ERROR("找不到钥匙[{}]的动画[{}]!", key.tile_id, key_tile.animation_id);
+			// todo: 怎么办?有没有备用方案?
+			return entt::null;
+		}
+		const auto& animation = animation_it->second;
+		const auto& first_frame = animation.frames.front();
+
+		const auto entity = registry.create();
+
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
+
+		auto* physics_user_data = PhysicsWorld::to_user_data(entity);
+		const auto physics_position = PhysicsWorld::physics_position_of(position);
+		const auto physics_size = PhysicsWorld::physics_size_of(size);
+		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
+
+		// tags
+		registry.emplace<tags::key>(entity);
+		// name
+		registry.emplace<name::Name>(entity, std::format("钥匙{}", entt::to_integral(entity)));
+		// transform
+		Transform::attach(registry, entity, position, scale, rotation);
+		// render
+		Render::attach(registry, entity, first_frame, config::RenderLayer::KEY);
+		// animation
+		Animation::attach(registry, entity, animation);
+		// physics_body
+		{
+			const auto world_id = PhysicsWorld::id(registry);
+
+			// 创建静态刚体
+			auto body_def = b2DefaultBodyDef();
+			body_def.type = b2_staticBody;
+			body_def.position = physics_position;
+			body_def.rotation = physics_rotation;
+			body_def.userData = physics_user_data;
+
+			auto shape_def = b2DefaultShapeDef();
+			// 设置碰撞过滤
+			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::KEY);
+			shape_def.filter.maskBits = config::CollisionMask::key;
+
+			// 创建矩形碰撞体
+			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
+
+			PhysicsBody::attach(registry, entity, world_id, body_def);
+			PhysicsBody::attach_shape(registry, entity, shape_def, box);
+		}
+
+		log::on_create("钥匙", entity, position, size, rotation, physics_position, physics_size);
+
+		return entity;
+	}
+
+	auto Room::destroy_key(entt::registry& registry, const entt::entity key_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// physics_body
+		PhysicsBody::deattach(registry, key_entity);
+
+		log::on_destroy("钥匙", key_entity);
+
+		registry.destroy(key_entity);
 	}
 
 	namespace
@@ -630,6 +1042,8 @@ namespace pd::systems::helper
 			const auto physics_size = PhysicsWorld::physics_size_of(size);
 			const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+			// tags
+			registry.emplace<tags::door>(entity);
 			// name
 			registry.emplace<name::Name>(entity, std::format("{}门{}", Lock ? "关闭的" : "开启的", entt::to_integral(entity)));
 			// transform
@@ -658,6 +1072,7 @@ namespace pd::systems::helper
 				if constexpr (Lock)
 				{
 					shape_def.filter.maskBits = config::CollisionMask::door_close;
+					shape_def.enableContactEvents = true;
 				}
 				else
 				{
@@ -683,9 +1098,10 @@ namespace pd::systems::helper
 					registry.emplace<door::Locked>(entity);
 				}
 
-				// Key组件由外部调用set_key函数设置,这里不处理
-				// 保险起见先添加该组件?
-				registry.emplace<door::Key>(entity, entt::null);
+				if (not door.key.empty())
+				{
+					registry.emplace<door::Key>(entity, door.key);
+				}
 
 				registry.emplace<door::Direction>(entity, door.direction);
 				registry.emplace<door::TargetRoom>(entity, door.target_room);
@@ -735,56 +1151,5 @@ namespace pd::systems::helper
 		log::on_destroy("门", door_entity);
 
 		registry.destroy(door_entity);
-	}
-
-	auto Room::set_door_key(entt::registry& registry, const entt::entity door_entity, const entt::entity key_entity) noexcept -> void
-	{
-		using namespace components;
-
-		registry.emplace_or_replace<door::Key>(door_entity, key_entity);
-	}
-
-	auto Room::unlock_door(entt::registry& registry, const entt::entity door_entity) noexcept -> void
-	{
-		using namespace components;
-
-		// 移除Locked组件
-		registry.remove<door::Locked>(door_entity);
-		// 移除已有shape
-		PhysicsBody::deattach_shape(registry, door_entity);
-		// 创建sensor
-		{
-			auto shape_def = b2DefaultShapeDef();
-			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
-			shape_def.filter.maskBits = config::CollisionMask::door_open;
-			shape_def.isSensor = true;
-			shape_def.enableSensorEvents = true;
-
-			const auto [half_width, half_height] = registry.get<const door::CollisionSize>(door_entity);
-			const auto box = b2MakeBox(half_width, half_height);
-
-			PhysicsBody::attach_shape(registry, door_entity, shape_def, box);
-		}
-	}
-
-	auto Room::lock_door(entt::registry& registry, const entt::entity door_entity) noexcept -> void
-	{
-		using namespace components;
-
-		// 添加Locked组件
-		registry.emplace_or_replace<door::Locked>(door_entity);
-		// 移除已有shape
-		PhysicsBody::deattach_shape(registry, door_entity);
-		// 创建solid shape
-		{
-			auto shape_def = b2DefaultShapeDef();
-			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
-			shape_def.filter.maskBits = config::CollisionMask::door_close;
-
-			const auto [half_width, half_height] = registry.get<const door::CollisionSize>(door_entity);
-			const auto box = b2MakeBox(half_width, half_height);
-
-			PhysicsBody::attach_shape(registry, door_entity, shape_def, box);
-		}
 	}
 }

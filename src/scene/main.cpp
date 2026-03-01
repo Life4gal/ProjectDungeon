@@ -45,12 +45,6 @@
 
 namespace pd::scene
 {
-	namespace
-	{
-		// 快速测试用
-		entt::entity g_player_entity;
-	}
-
 	auto Main::start_game() noexcept -> bool
 	{
 		using namespace systems;
@@ -66,11 +60,7 @@ namespace pd::scene
 
 		std::println("游戏开始!");
 
-		// 创建一个测试用实体
-		// 64 / 16 == 4
-		g_player_entity = helper::Player::spawn(registry, sf::Vector2f{500, 500}, sf::Vector2f{4, 4});
-
-		return g_player_entity != entt::null;
+		return true;
 	}
 
 	Main::Main(const std::reference_wrapper<entt::registry> global_registry) noexcept
@@ -107,9 +97,6 @@ namespace pd::scene
 
 		auto& registry = scene_registry_;
 
-		// 销毁测试用实体
-		helper::Player::kill(registry, g_player_entity);
-
 		// 销毁物理世界
 		helper::PhysicsWorld::destroy(registry);
 
@@ -134,10 +121,7 @@ namespace pd::scene
 
 		auto& registry = scene_registry_;
 
-		if (g_player_entity != entt::null)
-		{
-			helper::Player::handle_event(registry, g_player_entity, event);
-		}
+		helper::Player::handle_event(registry, event);
 	}
 
 	auto Main::update(const sf::Time delta) noexcept -> void
@@ -151,10 +135,7 @@ namespace pd::scene
 		// 检测房间是否清空
 		update::update_room(registry);
 		// 应用玩家移动
-		if (g_player_entity != entt::null)
-		{
-			update::apply_player_movement(registry, g_player_entity, delta);
-		}
+		update::apply_player_movement(registry, delta);
 		// 更新物理世界
 		update::physics_world(registry, delta);
 		// 同步物理世界实体变换(transform)信息

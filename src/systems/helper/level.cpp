@@ -12,10 +12,14 @@
 #include <asset/sound.hpp>
 #include <asset/music.hpp>
 
+#include <components/tags.hpp>
 #include <components/level.hpp>
+#include <components/room.hpp>
 
 #include <systems/helper/texture_manager.hpp>
 #include <systems/helper/room.hpp>
+
+#include <prometheus/platform/os.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -25,10 +29,6 @@ namespace pd::systems::helper
 	auto Level::create(entt::registry& registry, const config::Level& level) noexcept -> entt::entity
 	{
 		using namespace components;
-
-		// 创建上下文
-		registry.ctx().emplace<level::Level>(std::cref(level));
-		registry.ctx().emplace<level::Rooms>();
 
 		// 创建资源管理器
 		// todo: 在这里创建吗?
@@ -78,29 +78,32 @@ namespace pd::systems::helper
 			do_check_tiles("触发器", level.tile_set.trigger_tiles);
 		}
 
-		// 虽然当前关卡没有实体组件,不过也可以先创建
-		const auto level_entity = registry.create();
+		const auto entity = registry.create();
+
+		registry.emplace<level::Level>(entity, std::cref(level));
+		registry.emplace<level::Rooms>(entity);
+		registry.emplace<level::CollectedKeys>(entity);
 
 		// 创建初始房间
-		if (not create_room(registry, level_entity, level.starting_room))
+		const auto room_entity = create_room(registry, entity, level.starting_room);
+		if (room_entity == entt::null)
 		{
-			SPDLOG_ERROR("关卡[{}]创建初始房间[{}]失败!", level.name, level.starting_room);
+			return entt::null;
 		}
 
-		// 切换到初始房间
-		if (not switch_room(registry, level_entity, level.starting_room))
-		{
-			SPDLOG_ERROR("关卡[{}]切换初始房间[{}]失败!", level.name, level.starting_room);
-		}
+		// 理论上应该由switch_room设置该组件
+		// 如果先设置改组件房间我们join :)
+		registry.emplace<level::Room>(entity, room_entity);
 
-		return level_entity;
+		return entity;
 	}
 
 	auto Level::destroy(entt::registry& registry, const entt::entity level_entity) noexcept -> void
 	{
 		using namespace components;
 
-		const auto& level = registry.ctx().get<const level::Level>().level.get();
+		const auto& level = registry.get<const level::Level>(level_entity).level.get();
+		const auto& [rooms] = registry.get<const level::Rooms>(level_entity);
 
 		// 卸载动画集
 		{
@@ -119,16 +122,11 @@ namespace pd::systems::helper
 		}
 
 		// 销毁所有房间实体
-		const auto& [rooms] = registry.ctx().get<const level::Rooms>();
 		for (const auto& [room_id, room_entity]: rooms)
 		{
 			Room::destroy(registry, room_entity);
 			SPDLOG_INFO("销毁关卡[{}]的房间[{}]", level.name, room_id);
 		}
-
-		// 清除上下文组件
-		registry.ctx().erase<level::Level>();
-		registry.ctx().erase<level::Rooms>();
 
 		// 销毁资源管理器
 		{
@@ -142,26 +140,140 @@ namespace pd::systems::helper
 		registry.destroy(level_entity);
 	}
 
-	auto Level::create_room(entt::registry& registry, const entt::entity level_entity, const std::string& room_id) noexcept -> bool
+	auto Level::join(entt::registry& registry, const entt::entity level_entity, const entt::entity player_entity) noexcept -> bool
 	{
 		using namespace components;
 
-		std::ignore = level_entity;
+		if (not registry.all_of<tags::player>(player_entity))
+		{
+			// 应该不会出这么低级的错误吧 :)
+			return false;
+		}
 
-		const auto& level = registry.ctx().get<const level::Level>().level.get();
-		auto& [rooms] = registry.ctx().get<level::Rooms>();
+		const auto [room_entity] = registry.get<const level::Room>(level_entity);
+
+		// 切换到初始房间
+		switch_room(registry, level_entity, entt::null, room_entity, player_entity);
+		return true;
+	}
+
+	auto Level::on_update(entt::registry& registry, const entt::entity level_entity) noexcept -> void
+	{
+		using namespace components;
+
+		const auto [room_entity] = registry.get<const level::Room>(level_entity);
+
+		Room::on_update(registry, room_entity);
+	}
+
+	auto Level::on_trigger_contact(entt::registry& registry, const entt::entity level_entity, const entt::entity trigger_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		std::ignore = registry;
+		std::ignore = level_entity;
+		std::ignore = trigger_entity;
+		std::ignore = other_entity;
+	}
+
+	auto Level::on_key_contact(entt::registry& registry, const entt::entity level_entity, const entt::entity key_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 如果不是玩家接触了钥匙,则不处理
+		if (not registry.all_of<tags::player>(other_entity))
+		{
+			return;
+		}
+
+		const auto [room_entity] = registry.get<const level::Room>(level_entity);
+		auto& [collected_keys] = registry.get<level::CollectedKeys>(level_entity);
+		const auto& [key_name] = registry.get<const key::Name>(key_entity);
+
+		collected_keys.push_back(key_name);
+
+		// 销毁钥匙
+		Room::on_key_collected(registry, room_entity, key_entity);
+	}
+
+	auto Level::on_locked_door_contact(entt::registry& registry, const entt::entity level_entity, const entt::entity door_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 如果不是玩家接触了门,则不处理
+		if (not registry.all_of<tags::player>(other_entity))
+		{
+			return;
+		}
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Locked>(door_entity));
+
+		// 目前没什么需要做的
+		// 也许我们可以显示提示信息,例如要求玩家拥有对应的钥匙?
+		std::ignore = level_entity;
+		std::ignore = door_entity;
+
+		SPDLOG_INFO("玩家接触锁定的门");
+	}
+
+	auto Level::on_unlocked_door_contact(entt::registry& registry, const entt::entity level_entity, const entt::entity door_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		// 如果不是玩家接触了门,则不处理
+		// 理论上只有玩家能接触到开启的门
+		if (not registry.all_of<tags::player>(other_entity))
+		{
+			return;
+		}
+
+		PROMETHEUS_PLATFORM_ASSUME(not registry.all_of<door::Locked>(door_entity));
+
+		const auto& [rooms] = registry.get<const level::Rooms>(level_entity);
+		const auto [this_room_entity] = registry.get<const level::Room>(level_entity);
+		const auto& [target_room_id] = registry.get<const door::TargetRoom>(door_entity);
+
+		const auto target_room_entity = [&] noexcept -> entt::entity
+		{
+			// 检查目标房间是否已创建
+			if (const auto room_it = rooms.find(target_room_id);
+				room_it != rooms.end())
+			{
+				return room_it->second;
+			}
+
+			// 创建房间
+			return create_room(registry, level_entity, target_room_id);
+		}();
+
+		// todo: 如果create_room失败怎么办?
+		if (target_room_entity == entt::null)
+		{
+			return;
+		}
+
+		// 进入目标房间
+		switch_room(registry, level_entity, this_room_entity, target_room_entity, other_entity);
+	}
+
+	auto Level::create_room(entt::registry& registry, const entt::entity level_entity, const std::string& room_id) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		const auto& level = registry.get<const level::Level>(level_entity).level.get();
+		auto& [rooms] = registry.get<level::Rooms>(level_entity);
 
 		if (rooms.contains(room_id))
 		{
 			SPDLOG_ERROR("关卡[{}]的房间[{}]已创建!", level.name, room_id);
-			return false;
+			return entt::null;
 		}
 
-		const auto room_it = level.room_set.find(level.starting_room);
+		const auto room_it = level.room_set.find(room_id);
 		if (room_it == level.room_set.end())
 		{
-			SPDLOG_ERROR("关卡[{}]创建房间[{}]失败!房间不存在!", level.name, level.starting_room);
-			return false;
+			SPDLOG_ERROR("关卡[{}]创建房间[{}]失败!房间不存在!", level.name, room_id);
+			return entt::null;
 		}
 
 		const auto& room = room_it->second;
@@ -172,88 +284,60 @@ namespace pd::systems::helper
 		// 保存房间实体
 		rooms.emplace(room_id, room_entity);
 
-		return true;
+		return room_entity;
 	}
 
-	auto Level::destroy_room(entt::registry& registry, const entt::entity level_entity, const std::string& room_id) noexcept -> void
+	// auto Level::destroy_room(entt::registry& registry, const entt::entity level_entity, const std::string& room_id) noexcept -> void
+	// {
+	// 	using namespace components;
+	//
+	// 	const auto& level = registry.get<const level::Level>(level_entity).level.get();
+	// 	auto& [rooms] = registry.get<level::Rooms>(level_entity);
+	//
+	// 	const auto room_it = rooms.find(room_id);
+	// 	if (room_it == rooms.end())
+	// 	{
+	// 		SPDLOG_WARN("关卡[{}]销毁房间[{}]失败!房间未创建!", level.name, room_id);
+	// 		return;
+	// 	}
+	//
+	// 	const auto room_entity = room_it->second;
+	//
+	// 	// 销毁房间实体
+	// 	Room::destroy(registry, room_entity);
+	//
+	// 	// 移除房间实体
+	// 	rooms.erase(room_it);
+	// }
+
+	auto Level::switch_room(
+		entt::registry& registry,
+		const entt::entity level_entity,
+		const entt::entity this_room_entity,
+		const entt::entity target_room_entity,
+		const entt::entity player_entity
+	) noexcept -> void
 	{
 		using namespace components;
 
-		std::ignore = level_entity;
+		const auto& [collected_keys] = registry.get<const level::CollectedKeys>(level_entity);
 
-		const auto& level = registry.ctx().get<const level::Level>().level.get();
-		auto& [rooms] = registry.ctx().get<level::Rooms>();
-
-		const auto room_it = rooms.find(room_id);
-		if (room_it == rooms.end())
+		// 离开当前房间
+		// 当且仅当目标房间是初始房间时,this_room_entity才会是entt::null
+		if (this_room_entity == entt::null)
 		{
-			SPDLOG_WARN("关卡[{}]销毁房间[{}]失败!房间未创建!", level.name, room_id);
-			return;
+			const auto& target_room = registry.get<const room::Room>(target_room_entity).room.get();
+			PROMETHEUS_PLATFORM_ASSUME(target_room.type == config::RoomType::STARTING);
+		}
+		else
+		{
+			Room::on_exit(registry, this_room_entity, player_entity);
 		}
 
-		const auto room_entity = room_it->second;
-
-		// 销毁房间实体
-		Room::destroy(registry, room_entity);
-
-		// 移除房间实体
-		rooms.erase(room_it);
-	}
-
-	auto Level::switch_room(entt::registry& registry, const entt::entity level_entity, const std::string& room_id) noexcept -> bool
-	{
-		using namespace components;
-
-		std::ignore = level_entity;
-
-		const auto& level = registry.ctx().get<const level::Level>().level.get();
-		auto& [rooms] = registry.ctx().get<level::Rooms>();
-
-		const auto room_it = rooms.find(room_id);
-		if (room_it == rooms.end())
-		{
-			SPDLOG_WARN("关卡[{}]切换房间[{}]失败!房间未创建!", level.name, room_id);
-			return false;
-		}
-
-		// 如果之前存在房间,则隐藏其内容
-		{
-			// todo
-		}
-
-		// 让新房间内容显示
-		{
-			// todo
-		}
+		// 进入目标房间
+		Room::on_enter(registry, target_room_entity, player_entity, collected_keys);
 
 		// 设置当前房间
-		registry.ctx().insert_or_assign<level::Room>({room_it->second});
-
-		return true;
-	}
-
-	auto Level::is_room_cleared(entt::registry& registry) noexcept -> bool
-	{
-		using namespace components;
-
-		const auto [room_entity] = registry.ctx().get<const level::Room>();
-
-		return Room::is_cleared(registry, room_entity);
-	}
-
-	auto Level::update_room(entt::registry& registry) noexcept -> void
-	{
-		using namespace components;
-
-		if (is_room_cleared(registry))
-		{
-			// 如果房间已经清空了,就不需要更新了
-			return;
-		}
-
-		const auto [room_entity] = registry.ctx().get<const level::Room>();
-
-		// 更新房间状态
-		Room::update_enemy_entities(registry, room_entity);
+		registry.emplace_or_replace<level::Room>(level_entity, target_room_entity);
 	}
 }

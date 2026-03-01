@@ -28,6 +28,9 @@ namespace pd::config
 				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
 				std::to_underlying(RenderLayer::PLAYER_AERIAL);
 
+		constexpr static auto key = //
+				std::to_underlying(RenderLayer::PLAYER_GROUND);
+
 		constexpr static auto door_close = //
 				wall;
 

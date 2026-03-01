@@ -47,7 +47,29 @@ namespace pd::systems::helper
 		}
 	}
 
-	auto PhysicsBody::get_position(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> b2Vec2
+	auto PhysicsBody::disable(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_body::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<const physics_body::BodyId>(entity_with_physics_body);
+
+		b2Body_Disable(body_id);
+	}
+
+	auto PhysicsBody::enable(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_body::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<const physics_body::BodyId>(entity_with_physics_body);
+
+		b2Body_Enable(body_id);
+	}
+
+	auto PhysicsBody::get_position(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> b2Vec2
 	{
 		using namespace components;
 

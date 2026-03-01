@@ -197,6 +197,8 @@ add_executable(
 	# 地下城 -- 地下城组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/dungeon.hpp
 
+	# 实体标签,用于快速确定实体类型
+	${CMAKE_CURRENT_SOURCE_DIR}/src/components/tags.hpp
 	# 名称组件
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/name.hpp
 	# 变换组件

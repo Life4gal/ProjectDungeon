@@ -114,6 +114,24 @@ namespace pd::config
 	};
 
 	// ================================================
+	// 钥匙瓦片
+	// ================================================
+
+	// "key-id": {
+	//   "animation": "animation-id",
+	//   "collision": { "width": 16, "height": 16 } // <- 钥匙本质就是一个触发器,不过在玩家接触后会销毁
+	// }
+	class KeyTile final : public detail::Animation, public detail::Collision {};
+
+	// 钥匙集
+	// "keys": { "key-id-1": { KeyTile }, "key-id-2": { KeyTile }, ... }
+	class KeyTileSet final : public Set<KeyTile>
+	{
+	public:
+		using Set::Set;
+	};
+
+	// ================================================
 	// 门瓦片
 	// ================================================
 
@@ -139,7 +157,7 @@ namespace pd::config
 	// 瓦片集
 	// JSON:
 	// { "tiles": "/path/to/tiles.json" }
-	// { "tiles": { "walls": { ... }, "floors": { ... }, "decorations": { ... }, "triggers": { ... }, "doors": { ... } } }
+	// { "tiles": { "walls": { ... }, "floors": { ... }, "decorations": { ... }, "triggers": { ... }, "keys": { ... }, "doors": { ... } } }
 	class TileSet final
 	{
 	public:
@@ -147,6 +165,7 @@ namespace pd::config
 		FloorTileSet floor_tiles;
 		DecorationTileSet decoration_tiles;
 		TriggerTileSet trigger_tiles;
+		KeyTileSet key_tiles;
 		DoorTileSet door_tiles;
 	};
 

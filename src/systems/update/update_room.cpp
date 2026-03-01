@@ -5,7 +5,7 @@
 
 #include <systems/update/update_room.hpp>
 
-#include <systems/helper/level.hpp>
+#include <systems/helper/dungeon.hpp>
 
 namespace pd::systems::update
 {
@@ -13,6 +13,6 @@ namespace pd::systems::update
 	{
 		using namespace systems;
 
-		helper::Level::update_room(registry);
+		helper::Dungeon::on_update(registry);
 	}
 } // namespace pd::systems::update

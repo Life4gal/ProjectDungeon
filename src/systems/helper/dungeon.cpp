@@ -8,9 +8,13 @@
 #include <config/config_reader.hpp>
 #include <config/dungeon.hpp>
 
+#include <components/tags.hpp>
 #include <components/dungeon.hpp>
 
+#include <systems/helper/player.hpp>
 #include <systems/helper/level.hpp>
+
+#include <prometheus/platform/os.hpp>
 
 #include <entt/entt.hpp>
 #include <nlohmann/json.hpp>
@@ -53,10 +57,8 @@ namespace pd::systems::helper
 
 		// 创建关卡
 		const auto level_entity = Level::create(registry, level);
-
 		if (level_entity == entt::null)
 		{
-			// 创建失败
 			return false;
 		}
 
@@ -65,6 +67,15 @@ namespace pd::systems::helper
 
 		// 保存配置
 		registry.ctx().emplace<dungeon::Dungeon>(std::move(dungeon));
+
+		// 创建一个测试用实体
+		// 64 / 16 == 4
+		const auto player_entity = Player::spawn(registry, sf::Vector2f{500, 500}, sf::Vector2f{4, 4});
+		if (player_entity == entt::null)
+		{
+			return false;
+		}
+		Level::join(registry, level_entity, player_entity);
 
 		return true;
 	}
@@ -78,6 +89,9 @@ namespace pd::systems::helper
 			return;
 		}
 
+		// 销毁测试用实体
+		Player::kill(registry);
+
 		// 销毁关卡
 		const auto [level_entity] = registry.ctx().get<const dungeon::Level>();
 		Level::destroy(registry, level_entity);
@@ -87,5 +101,57 @@ namespace pd::systems::helper
 
 		// 移除配置
 		registry.ctx().erase<dungeon::Dungeon>();
+	}
+
+	auto Dungeon::on_update(entt::registry& registry) noexcept -> void
+	{
+		using namespace components;
+
+		Level::on_update(registry, level(registry));
+	}
+
+	auto Dungeon::on_trigger_contact(entt::registry& registry, const entt::entity trigger_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::trigger>(trigger_entity));
+
+		Level::on_trigger_contact(registry, level(registry), trigger_entity, other_entity);
+	}
+
+	auto Dungeon::on_key_contact(entt::registry& registry, const entt::entity key_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::key>(key_entity));
+
+		Level::on_key_contact(registry, level(registry), key_entity, other_entity);
+	}
+
+	auto Dungeon::on_locked_door_contact(entt::registry& registry, const entt::entity door_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::door>(door_entity));
+
+		Level::on_locked_door_contact(registry, level(registry), door_entity, other_entity);
+	}
+
+	auto Dungeon::on_unlocked_door_contact(entt::registry& registry, const entt::entity door_entity, const entt::entity other_entity) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::door>(door_entity));
+
+		Level::on_unlocked_door_contact(registry, level(registry), door_entity, other_entity);
+	}
+
+	auto Dungeon::level(entt::registry& registry) noexcept -> entt::entity
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<dungeon::Level>());
+
+		return registry.ctx().get<const dungeon::Level>().entity;
 	}
 }

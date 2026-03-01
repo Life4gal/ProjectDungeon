@@ -46,9 +46,14 @@
 		}
 	},
 	"decorations": {
-
+		"wall_stone": {
+			"animation": "wall_stone"
+		}
 	},
 	"triggers": {
+
+	},
+	"keys": {
 
 	},
 	"doors": {
