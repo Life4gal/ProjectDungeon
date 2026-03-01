@@ -5,13 +5,12 @@
 
 #include <systems/update/process_contact_events.hpp>
 
-#include <print>
-
 #include <systems/helper/physics_world.hpp>
 
 #include <prometheus/platform/os.hpp>
 
 #include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
 #include <box2d/box2d.h>
 
 namespace pd::systems::update
@@ -42,7 +41,7 @@ namespace pd::systems::update
 					const auto sensor_entity = helper::PhysicsWorld::to_entity(user_data_a);
 					const auto visitor_entity = helper::PhysicsWorld::to_entity(user_data_b);
 
-					std::println("ContactBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					SPDLOG_INFO("ContactBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 
 					//
 				}
@@ -66,7 +65,7 @@ namespace pd::systems::update
 					const auto sensor_entity = helper::PhysicsWorld::to_entity(user_data_a);
 					const auto visitor_entity = helper::PhysicsWorld::to_entity(user_data_b);
 
-					std::println("ContactEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					SPDLOG_INFO("ContactEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 
 					//
 				}
@@ -97,7 +96,7 @@ namespace pd::systems::update
 					const auto sensor_entity = helper::PhysicsWorld::to_entity(sensor_user_data);
 					const auto visitor_entity = helper::PhysicsWorld::to_entity(visitor_user_data);
 
-					std::println("SensorBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					SPDLOG_INFO("SensorBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 
 					// todo: 处理玩家进入门
 					// todo: 处理敌人/玩家接触地板装饰物
@@ -127,7 +126,7 @@ namespace pd::systems::update
 					const auto sensor_entity = helper::PhysicsWorld::to_entity(sensor_user_data);
 					const auto visitor_entity = helper::PhysicsWorld::to_entity(visitor_user_data);
 
-					std::println("SensorEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
+					SPDLOG_INFO("SensorEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 
 					//
 				}

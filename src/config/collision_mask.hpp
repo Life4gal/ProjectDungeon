@@ -35,24 +35,29 @@ namespace pd::config
 				std::to_underlying(RenderLayer::PLAYER_GROUND);
 
 		constexpr static auto enemy_ground = //
+				std::to_underlying(RenderLayer::WALL) |
 				std::to_underlying(RenderLayer::ENEMY_GROUND) |
 				std::to_underlying(RenderLayer::PLAYER_GROUND) |
 				std::to_underlying(RenderLayer::PROJECTILE) |
 				std::to_underlying(RenderLayer::EFFECT);
 
 		constexpr static auto player_ground = //
+				std::to_underlying(RenderLayer::WALL) |
+				std::to_underlying(RenderLayer::DOOR) |
 				std::to_underlying(RenderLayer::ENEMY_GROUND) |
 				std::to_underlying(RenderLayer::PLAYER_GROUND) |
 				std::to_underlying(RenderLayer::PROJECTILE) |
 				std::to_underlying(RenderLayer::EFFECT);
 
 		constexpr static auto enemy_aerial = //
+				std::to_underlying(RenderLayer::WALL) |
 				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
 				std::to_underlying(RenderLayer::PLAYER_AERIAL) |
 				std::to_underlying(RenderLayer::PROJECTILE) |
 				std::to_underlying(RenderLayer::EFFECT);
 
 		constexpr static auto player_aerial = //
+				std::to_underlying(RenderLayer::WALL) |
 				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
 				std::to_underlying(RenderLayer::PLAYER_AERIAL) |
 				std::to_underlying(RenderLayer::PROJECTILE) |

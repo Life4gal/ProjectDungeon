@@ -91,9 +91,10 @@ namespace pd::systems::helper
 			shape_def.filter.maskBits = config::CollisionMask::player_ground;
 			shape_def.density = 1.0f;
 			shape_def.material.friction = 0.0f;
+			shape_def.enableContactEvents = true;
 
 			// 创建矩形碰撞体
-			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
+			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
 			PhysicsBody::attach(registry, entity, world_id, body_def);
 			PhysicsBody::attach_shape(registry, entity, shape_def, box);

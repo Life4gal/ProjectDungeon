@@ -350,7 +350,7 @@ namespace pd::systems::helper
 			shape_def.filter.maskBits = config::CollisionMask::wall;
 
 			// 创建矩形碰撞体
-			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
+			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
 			PhysicsBody::attach(registry, entity, world_id, body_def);
 			PhysicsBody::attach_shape(registry, entity, shape_def, box);
@@ -544,7 +544,7 @@ namespace pd::systems::helper
 			}
 
 			// 创建矩形碰撞体
-			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
+			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
 			PhysicsBody::attach(registry, entity, world_id, body_def);
 			PhysicsBody::attach_shape(registry, entity, shape_def, box);
@@ -631,7 +631,7 @@ namespace pd::systems::helper
 			const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
 			// name
-			registry.emplace<name::Name>(entity, std::format("门{}", entt::to_integral(entity)));
+			registry.emplace<name::Name>(entity, std::format("{}门{}", Lock ? "关闭的" : "开启的", entt::to_integral(entity)));
 			// transform
 			Transform::attach(registry, entity, position, scale, rotation);
 			// render
@@ -668,13 +668,13 @@ namespace pd::systems::helper
 				}
 
 				// 创建矩形碰撞体
-				const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
+				const auto box = b2MakeBox(physics_size.x / 2, physics_size.y / 2);
 
 				PhysicsBody::attach(registry, entity, world_id, body_def);
 				PhysicsBody::attach_shape(registry, entity, shape_def, box);
 
 				// door
-				registry.emplace<door::CollisionSize>(entity, physics_size.x / 2, physics_size.y * 2);
+				registry.emplace<door::CollisionSize>(entity, physics_size.x / 2, physics_size.y / 2);
 			}
 			// door
 			{

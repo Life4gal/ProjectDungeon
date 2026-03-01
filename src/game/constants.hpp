@@ -29,7 +29,7 @@ namespace pd
 		// ===================================================================
 
 		// 多少像素等价于物理世界的一米
-		constexpr static auto pixels_per_meter = 100.f;
+		constexpr static auto pixels_per_meter = 32.f;
 		// 一个像素等价于物理世界多少米
 		constexpr static auto meters_per_pixel = 1.f / pixels_per_meter;
 
