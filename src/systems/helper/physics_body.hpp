@@ -8,6 +8,7 @@
 #include <entt/fwd.hpp>
 
 #include <box2d/id.h>
+#include <box2d/math_functions.h>
 
 #include <SFML/System/Vector2.hpp>
 
@@ -42,6 +43,24 @@ namespace pd::systems::helper
 
 		// 为一个实体移除物理刚体组件
 		static auto deattach(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> void;
+
+		// 获取一个已经附加了物理刚体组件的实体的物理位置
+		[[nodiscard]] static auto get_position(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> b2Vec2;
+
+		// 设置一个已经附加了物理刚体组件的实体的物理位置
+		static auto set_position(entt::registry& registry, entt::entity entity_with_physics_body, b2Vec2 position) noexcept -> void;
+
+		// 获取一个已经附加了物理刚体组件的实体的物理旋转
+		[[nodiscard]] static auto get_rotation(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> b2Rot;
+
+		// 设置一个已经附加了物理刚体组件的实体的物理旋转
+		static auto set_rotation(entt::registry& registry, entt::entity entity_with_physics_body, b2Rot rotation) noexcept -> void;
+
+		// 获取一个已经附加了物理刚体组件的实体的物理变换
+		[[nodiscard]] static auto get_transform(entt::registry& registry, entt::entity entity_with_physics_body) noexcept -> b2Transform;
+
+		// 设置一个已经附加了物理刚体组件的实体的物理变换
+		static auto set_transform(entt::registry& registry, entt::entity entity_with_physics_body, b2Transform transform) noexcept -> void;
 
 		// =============================================
 		// SHAPE

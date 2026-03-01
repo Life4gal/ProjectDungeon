@@ -5,6 +5,7 @@
 
 #include <systems/helper/player.hpp>
 
+#include <components/name.hpp>
 #include <components/player.hpp>
 
 #include <config/collision_mask.hpp>
@@ -63,6 +64,8 @@ namespace pd::systems::helper
 		const auto physics_size = PhysicsWorld::physics_size_of(size);
 		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+		// name
+		registry.emplace<name::Name>(entity, std::format("玩家{}", entt::to_integral(entity)));
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -85,7 +88,7 @@ namespace pd::systems::helper
 			auto shape_def = b2DefaultShapeDef();
 			// 设置碰撞过滤
 			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::PLAYER_GROUND);
-			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::PLAYER_GROUND);
+			shape_def.filter.maskBits = config::CollisionMask::player_ground;
 			shape_def.density = 1.0f;
 			shape_def.material.friction = 0.0f;
 

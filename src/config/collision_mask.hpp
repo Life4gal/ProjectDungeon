@@ -6,70 +6,70 @@
 #pragma once
 
 #include <utility>
-#include <type_traits>
 
 #include <config/render_layer.hpp>
 
 namespace pd::config
 {
-	enum class CollisionMask : std::underlying_type_t<RenderLayer>
+	class CollisionMask final
 	{
-		WALL = //
-		std::to_underlying(RenderLayer::ENEMY_GROUND) |
-		std::to_underlying(RenderLayer::PLAYER_GROUND) |
-		std::to_underlying(RenderLayer::ENEMY_AERIAL) |
-		std::to_underlying(RenderLayer::PLAYER_AERIAL) |
-		std::to_underlying(RenderLayer::PROJECTILE) |
-		std::to_underlying(RenderLayer::EFFECT),
+	public:
+		constexpr static auto wall = //
+				std::to_underlying(RenderLayer::ENEMY_GROUND) |
+				std::to_underlying(RenderLayer::PLAYER_GROUND) |
+				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
+				std::to_underlying(RenderLayer::PLAYER_AERIAL) |
+				std::to_underlying(RenderLayer::PROJECTILE) |
+				std::to_underlying(RenderLayer::EFFECT);
 
-		TRIGGER = //
-		std::to_underlying(RenderLayer::ENEMY_GROUND) |
-		std::to_underlying(RenderLayer::PLAYER_GROUND) |
-		std::to_underlying(RenderLayer::ENEMY_AERIAL) |
-		std::to_underlying(RenderLayer::PLAYER_AERIAL),
+		constexpr static auto trigger = //
+				std::to_underlying(RenderLayer::ENEMY_GROUND) |
+				std::to_underlying(RenderLayer::PLAYER_GROUND) |
+				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
+				std::to_underlying(RenderLayer::PLAYER_AERIAL);
 
-		DOOR_CLOSE = //
-		WALL,
+		constexpr static auto door_close = //
+				wall;
 
-		DOOR_OPEN = //
-		std::to_underlying(RenderLayer::PLAYER_GROUND),
+		constexpr static auto door_open = //
+				std::to_underlying(RenderLayer::PLAYER_GROUND);
 
-		ENEMY_GROUND = //
-		std::to_underlying(RenderLayer::ENEMY_GROUND) |
-		std::to_underlying(RenderLayer::PLAYER_GROUND) |
-		std::to_underlying(RenderLayer::PROJECTILE) |
-		std::to_underlying(RenderLayer::EFFECT),
+		constexpr static auto enemy_ground = //
+				std::to_underlying(RenderLayer::ENEMY_GROUND) |
+				std::to_underlying(RenderLayer::PLAYER_GROUND) |
+				std::to_underlying(RenderLayer::PROJECTILE) |
+				std::to_underlying(RenderLayer::EFFECT);
 
-		PLAYER_GROUND = //
-		std::to_underlying(RenderLayer::ENEMY_GROUND) |
-		std::to_underlying(RenderLayer::PLAYER_GROUND) |
-		std::to_underlying(RenderLayer::PROJECTILE) |
-		std::to_underlying(RenderLayer::EFFECT),
+		constexpr static auto player_ground = //
+				std::to_underlying(RenderLayer::ENEMY_GROUND) |
+				std::to_underlying(RenderLayer::PLAYER_GROUND) |
+				std::to_underlying(RenderLayer::PROJECTILE) |
+				std::to_underlying(RenderLayer::EFFECT);
 
-		ENEMY_AERIAL = //
-		std::to_underlying(RenderLayer::ENEMY_AERIAL) |
-		std::to_underlying(RenderLayer::PLAYER_AERIAL) |
-		std::to_underlying(RenderLayer::PROJECTILE) |
-		std::to_underlying(RenderLayer::EFFECT),
+		constexpr static auto enemy_aerial = //
+				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
+				std::to_underlying(RenderLayer::PLAYER_AERIAL) |
+				std::to_underlying(RenderLayer::PROJECTILE) |
+				std::to_underlying(RenderLayer::EFFECT);
 
-		PLAYER_AERIAL = //
-		std::to_underlying(RenderLayer::ENEMY_AERIAL) |
-		std::to_underlying(RenderLayer::PLAYER_AERIAL) |
-		std::to_underlying(RenderLayer::PROJECTILE) |
-		std::to_underlying(RenderLayer::EFFECT),
+		constexpr static auto player_aerial = //
+				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
+				std::to_underlying(RenderLayer::PLAYER_AERIAL) |
+				std::to_underlying(RenderLayer::PROJECTILE) |
+				std::to_underlying(RenderLayer::EFFECT);
 
-		PROJECTILE = //
-		std::to_underlying(RenderLayer::WALL) |
-		std::to_underlying(RenderLayer::ENEMY_GROUND) |
-		std::to_underlying(RenderLayer::PLAYER_GROUND) |
-		std::to_underlying(RenderLayer::ENEMY_AERIAL) |
-		std::to_underlying(RenderLayer::PLAYER_AERIAL),
+		constexpr static auto projectile = //
+				std::to_underlying(RenderLayer::WALL) |
+				std::to_underlying(RenderLayer::ENEMY_GROUND) |
+				std::to_underlying(RenderLayer::PLAYER_GROUND) |
+				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
+				std::to_underlying(RenderLayer::PLAYER_AERIAL);
 
-		EFFECT = //
-		std::to_underlying(RenderLayer::WALL) |
-		std::to_underlying(RenderLayer::ENEMY_GROUND) |
-		std::to_underlying(RenderLayer::PLAYER_GROUND) |
-		std::to_underlying(RenderLayer::ENEMY_AERIAL) |
-		std::to_underlying(RenderLayer::PLAYER_AERIAL),
+		constexpr static auto effect = //
+				std::to_underlying(RenderLayer::WALL) |
+				std::to_underlying(RenderLayer::ENEMY_GROUND) |
+				std::to_underlying(RenderLayer::PLAYER_GROUND) |
+				std::to_underlying(RenderLayer::ENEMY_AERIAL) |
+				std::to_underlying(RenderLayer::PLAYER_AERIAL);
 	};
 }

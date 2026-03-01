@@ -11,6 +11,7 @@
 #include <config/collision_mask.hpp>
 #include <config/dungeon.hpp>
 
+#include <components/name.hpp>
 #include <components/room.hpp>
 
 #include <systems/helper/world.hpp>
@@ -324,6 +325,8 @@ namespace pd::systems::helper
 		const auto physics_size = PhysicsWorld::physics_size_of(size);
 		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+		// name
+		registry.emplace<name::Name>(entity, std::format("墙壁{}", entt::to_integral(entity)));
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -344,7 +347,7 @@ namespace pd::systems::helper
 			auto shape_def = b2DefaultShapeDef();
 			// 设置碰撞过滤
 			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::WALL);
-			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::WALL);
+			shape_def.filter.maskBits = config::CollisionMask::wall;
 
 			// 创建矩形碰撞体
 			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
@@ -398,6 +401,8 @@ namespace pd::systems::helper
 		const auto texture_height = first_frame.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
+		// name
+		registry.emplace<name::Name>(entity, std::format("地板{}", entt::to_integral(entity)));
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -447,6 +452,8 @@ namespace pd::systems::helper
 		const auto texture_height = first_frame.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
+		// name
+		registry.emplace<name::Name>(entity, std::format("装饰物{}", entt::to_integral(entity)));
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -501,6 +508,8 @@ namespace pd::systems::helper
 		const auto physics_size = PhysicsWorld::physics_size_of(size);
 		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+		// name
+		registry.emplace<name::Name>(entity, std::format("触发器{}", entt::to_integral(entity)));
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -522,7 +531,7 @@ namespace pd::systems::helper
 			auto shape_def = b2DefaultShapeDef();
 			// 设置碰撞过滤
 			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::TRIGGER);
-			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::TRIGGER);
+			shape_def.filter.maskBits = config::CollisionMask::trigger;
 			// 传感器
 			if (trigger_tile.is_sensor)
 			{
@@ -621,6 +630,8 @@ namespace pd::systems::helper
 			const auto physics_size = PhysicsWorld::physics_size_of(size);
 			const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
+			// name
+			registry.emplace<name::Name>(entity, std::format("门{}", entt::to_integral(entity)));
 			// transform
 			Transform::attach(registry, entity, position, scale, rotation);
 			// render
@@ -646,11 +657,11 @@ namespace pd::systems::helper
 				shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
 				if constexpr (Lock)
 				{
-					shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_CLOSE);
+					shape_def.filter.maskBits = config::CollisionMask::door_close;
 				}
 				else
 				{
-					shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_OPEN);
+					shape_def.filter.maskBits = config::CollisionMask::door_open;
 					// 传感器
 					shape_def.isSensor = true;
 					shape_def.enableSensorEvents = true;
@@ -745,7 +756,7 @@ namespace pd::systems::helper
 		{
 			auto shape_def = b2DefaultShapeDef();
 			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
-			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_OPEN);
+			shape_def.filter.maskBits = config::CollisionMask::door_open;
 			shape_def.isSensor = true;
 			shape_def.enableSensorEvents = true;
 
@@ -768,7 +779,7 @@ namespace pd::systems::helper
 		{
 			auto shape_def = b2DefaultShapeDef();
 			shape_def.filter.categoryBits = static_cast<std::uint64_t>(config::RenderLayer::DOOR);
-			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::DOOR_CLOSE);
+			shape_def.filter.maskBits = config::CollisionMask::door_close;
 
 			const auto [half_width, half_height] = registry.get<const door::CollisionSize>(door_entity);
 			const auto box = b2MakeBox(half_width, half_height);
