@@ -9,8 +9,6 @@
 
 #include <systems/helper/physics_world.hpp>
 
-#include <game/user_data_entity.hpp>
-
 #include <prometheus/platform/os.hpp>
 
 #include <entt/entt.hpp>
@@ -41,8 +39,8 @@ namespace pd::systems::update
 
 					PROMETHEUS_PLATFORM_ASSUME(user_data_a != nullptr and user_data_b != nullptr);
 
-					const auto sensor_entity = user_data_to_entity(user_data_a);
-					const auto visitor_entity = user_data_to_entity(user_data_b);
+					const auto sensor_entity = helper::PhysicsWorld::to_entity(user_data_a);
+					const auto visitor_entity = helper::PhysicsWorld::to_entity(user_data_b);
 
 					std::println("ContactBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 
@@ -65,8 +63,8 @@ namespace pd::systems::update
 
 					PROMETHEUS_PLATFORM_ASSUME(user_data_a != nullptr and user_data_b != nullptr);
 
-					const auto sensor_entity = user_data_to_entity(user_data_a);
-					const auto visitor_entity = user_data_to_entity(user_data_b);
+					const auto sensor_entity = helper::PhysicsWorld::to_entity(user_data_a);
+					const auto visitor_entity = helper::PhysicsWorld::to_entity(user_data_b);
 
 					std::println("ContactEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 
@@ -96,8 +94,8 @@ namespace pd::systems::update
 
 					PROMETHEUS_PLATFORM_ASSUME(sensor_user_data != nullptr and visitor_user_data != nullptr);
 
-					const auto sensor_entity = user_data_to_entity(sensor_user_data);
-					const auto visitor_entity = user_data_to_entity(visitor_user_data);
+					const auto sensor_entity = helper::PhysicsWorld::to_entity(sensor_user_data);
+					const auto visitor_entity = helper::PhysicsWorld::to_entity(visitor_user_data);
 
 					std::println("SensorBegin: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 
@@ -126,8 +124,8 @@ namespace pd::systems::update
 
 					PROMETHEUS_PLATFORM_ASSUME(sensor_user_data != nullptr and visitor_user_data != nullptr);
 
-					const auto sensor_entity = user_data_to_entity(sensor_user_data);
-					const auto visitor_entity = user_data_to_entity(visitor_user_data);
+					const auto sensor_entity = helper::PhysicsWorld::to_entity(sensor_user_data);
+					const auto visitor_entity = helper::PhysicsWorld::to_entity(visitor_user_data);
 
 					std::println("SensorEnd: {} & {}", entt::to_integral(sensor_entity), entt::to_integral(visitor_entity));
 

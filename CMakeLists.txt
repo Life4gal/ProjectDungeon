@@ -131,6 +131,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/render_layer.hpp
 	# 碰撞掩码
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/collision_mask.hpp
+	# 一些(枚举)类型定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/types.hpp
 	# 位置
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/position.hpp
 
@@ -306,6 +308,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/entity.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/entity.cpp
 
+	# 测试用
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/debug.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/render/debug.cpp
+
 	# ============================
 	# SCENE
 	# ============================
@@ -326,8 +332,8 @@ add_executable(
 
 	# 常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/constants.hpp
-	# EnTT实体与box2d::userData转换
-	${CMAKE_CURRENT_SOURCE_DIR}/src/game/user_data_entity.hpp
+	# 实体创建/销毁时输出日志
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game/log_entity.hpp
 
 	# 测试用
 	${CMAKE_CURRENT_SOURCE_DIR}/src/game/playground.hpp

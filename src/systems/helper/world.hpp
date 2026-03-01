@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <entt/fwd.hpp>
 
 #include <SFML/System/Time.hpp>
@@ -17,6 +19,20 @@ namespace pd::systems::helper
 		static auto create(entt::registry& registry) noexcept -> void;
 
 		static auto destroy(entt::registry& registry) noexcept -> void;
+
+		// =============================================
+		// WINDOW
+		// =============================================
+
+		[[nodiscard]] static auto window_width(entt::registry& registry) noexcept -> int;
+
+		[[nodiscard]] static auto window_height(entt::registry& registry) noexcept -> int;
+
+		[[nodiscard]] static auto window_title(entt::registry& registry) noexcept -> std::string_view;
+
+		// =============================================
+		// GAME
+		// =============================================
 
 		[[nodiscard]] static auto frame_delta(entt::registry& registry) noexcept -> sf::Time;
 

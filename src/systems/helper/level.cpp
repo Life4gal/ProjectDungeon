@@ -17,8 +17,6 @@
 #include <systems/helper/texture_manager.hpp>
 #include <systems/helper/room.hpp>
 
-#include <game/constants.hpp>
-
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 

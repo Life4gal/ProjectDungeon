@@ -9,6 +9,7 @@
 
 #include <config/config_reader.hpp>
 #include <config/set.hpp>
+#include <config/types.hpp>
 #include <config/position.hpp>
 
 namespace pd::config
@@ -16,37 +17,6 @@ namespace pd::config
 	// ================================================
 	// 房间
 	// ================================================
-
-	// 门的所在方向
-	enum class DoorDirection : std::uint8_t
-	{
-		UP,
-		DOWN,
-		LEFT,
-		RIGHT,
-	};
-
-	// 房间类型
-	enum class RoomType : std::uint8_t
-	{
-		// 初始房间 - 无敌人
-		STARTING,
-
-		// 普通房间 - 包含敌人/道具/机关
-		NORMAL,
-
-		// 宝藏房间(奖励房间) - 无敌人,纯奖励
-		TREASURE,
-
-		// 钥匙房间 - 生成BOSS房钥匙
-		KEY,
-
-		// Boss房间 - 击败BOSS才能继续
-		BOSS,
-
-		// 出口房间 - 进入下一关卡
-		EXIT,
-	};
 
 	// 墙壁的配置数据
 	class Wall final

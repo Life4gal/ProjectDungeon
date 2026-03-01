@@ -13,18 +13,17 @@
 
 #include <components/room.hpp>
 
+#include <systems/helper/world.hpp>
 #include <systems/helper/physics_world.hpp>
 #include <systems/helper/transform.hpp>
 #include <systems/helper/render.hpp>
 #include <systems/helper/animation.hpp>
 #include <systems/helper/physics_body.hpp>
 
-#include <game/constants.hpp>
-#include <game/user_data_entity.hpp>
+#include <game/log_entity.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
-#include <spdlog/spdlog.h>
 
 namespace pd::systems::helper
 {
@@ -47,8 +46,8 @@ namespace pd::systems::helper
 		// 计算房间偏移,使房间居中显示
 		const auto room_width = static_cast<float>(room.width * room.tile_size);
 		const auto room_height = static_cast<float>(room.height * room.tile_size);
-		const auto room_offset_x = (static_cast<float>(Constant::window_width) - room_width) * 0.5f;
-		const auto room_offset_y = (static_cast<float>(Constant::window_height) - room_height) * 0.5f;
+		const auto room_offset_x = (static_cast<float>(World::window_width(registry)) - room_width) * 0.5f;
+		const auto room_offset_y = (static_cast<float>(World::window_height(registry)) - room_height) * 0.5f;
 
 		// tiles
 		{
@@ -313,12 +312,17 @@ namespace pd::systems::helper
 		}
 		const auto& animation = animation_it->second;
 		const auto& first_frame = animation.frames.front();
-		const auto texture_width = first_frame.texture_width;
-		const auto texture_height = first_frame.texture_height;
-		const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
-		const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
 
 		const auto entity = registry.create();
+
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
+
+		auto* physics_user_data = PhysicsWorld::to_user_data(entity);
+		const auto physics_position = PhysicsWorld::physics_position_of(position);
+		const auto physics_size = PhysicsWorld::physics_size_of(size);
+		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
@@ -333,9 +337,9 @@ namespace pd::systems::helper
 			// 创建静态刚体
 			auto body_def = b2DefaultBodyDef();
 			body_def.type = b2_staticBody;
-			body_def.position = Constant::to_physics(position);
-			body_def.rotation = b2MakeRot(rotation.asRadians());
-			body_def.userData = entity_to_user_data(entity);
+			body_def.position = physics_position;
+			body_def.rotation = physics_rotation;
+			body_def.userData = physics_user_data;
 
 			auto shape_def = b2DefaultShapeDef();
 			// 设置碰撞过滤
@@ -343,13 +347,13 @@ namespace pd::systems::helper
 			shape_def.filter.maskBits = static_cast<std::uint64_t>(config::CollisionMask::WALL);
 
 			// 创建矩形碰撞体
-			const auto half_width = Constant::to_physics(half_texture_width * scale.x);
-			const auto half_height = Constant::to_physics(half_texture_height * scale.y);
-			const auto box = b2MakeBox(half_width, half_height);
+			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
 
 			PhysicsBody::attach(registry, entity, world_id, body_def);
 			PhysicsBody::attach_shape(registry, entity, shape_def, box);
 		}
+
+		log::on_create("墙壁", entity, position, size, rotation, physics_position, physics_size);
 
 		return entity;
 	}
@@ -361,6 +365,8 @@ namespace pd::systems::helper
 		// physics_body
 		PhysicsBody::deattach(registry, wall_entity);
 
+		log::on_destroy("墙壁", wall_entity);
+
 		registry.destroy(wall_entity);
 	}
 
@@ -369,9 +375,9 @@ namespace pd::systems::helper
 		const config::Floor& floor,
 		const config::FloorTile& floor_tile,
 		const config::AnimationSet& animation_set,
-		sf::Vector2f position,
-		sf::Vector2f scale,
-		sf::Angle rotation
+		const sf::Vector2f position,
+		const sf::Vector2f scale,
+		const sf::Angle rotation
 	) noexcept -> entt::entity
 	{
 		using namespace components;
@@ -388,6 +394,10 @@ namespace pd::systems::helper
 
 		const auto entity = registry.create();
 
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
+
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -395,12 +405,16 @@ namespace pd::systems::helper
 		// animation
 		Animation::attach(registry, entity, animation);
 
+		log::on_create("地板", entity, position, size, rotation);
+
 		return entity;
 	}
 
 	auto Room::destroy_floor(entt::registry& registry, const entt::entity floor_entity) noexcept -> void
 	{
 		using namespace components;
+
+		log::on_destroy("地板", floor_entity);
 
 		registry.destroy(floor_entity);
 	}
@@ -429,6 +443,10 @@ namespace pd::systems::helper
 
 		const auto entity = registry.create();
 
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
+
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -436,12 +454,16 @@ namespace pd::systems::helper
 		// animation
 		Animation::attach(registry, entity, animation);
 
+		log::on_create("装饰物", entity, position, size, rotation);
+
 		return entity;
 	}
 
 	auto Room::destroy_decoration(entt::registry& registry, const entt::entity decoration_entity) noexcept -> void
 	{
 		using namespace components;
+
+		log::on_destroy("装饰物", decoration_entity);
 
 		registry.destroy(decoration_entity);
 	}
@@ -470,6 +492,15 @@ namespace pd::systems::helper
 
 		const auto entity = registry.create();
 
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
+
+		auto* physics_user_data = PhysicsWorld::to_user_data(entity);
+		const auto physics_position = PhysicsWorld::physics_position_of(position);
+		const auto physics_size = PhysicsWorld::physics_size_of(size);
+		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
+
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
@@ -483,8 +514,10 @@ namespace pd::systems::helper
 			// 创建静态刚体
 			auto body_def = b2DefaultBodyDef();
 			body_def.type = b2_staticBody;
-			body_def.position = Constant::to_physics(position);
-			body_def.userData = entity_to_user_data(entity);
+			body_def.position = physics_position;
+			body_def.rotation = physics_rotation;
+			body_def.fixedRotation = true;
+			body_def.userData = physics_user_data;
 
 			auto shape_def = b2DefaultShapeDef();
 			// 设置碰撞过滤
@@ -502,20 +535,13 @@ namespace pd::systems::helper
 			}
 
 			// 创建矩形碰撞体
-			const auto texture_width = first_frame.texture_width;
-			const auto texture_height = first_frame.texture_height;
-			const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
-			const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
-
-			const auto half_width = half_texture_width * scale.x;
-			const auto half_height = half_texture_height * scale.y;
-			const auto half_physics_width = Constant::to_physics(half_width);
-			const auto half_physics_height = Constant::to_physics(half_height);
-			const auto box = b2MakeBox(half_physics_width, half_physics_height);
+			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
 
 			PhysicsBody::attach(registry, entity, world_id, body_def);
 			PhysicsBody::attach_shape(registry, entity, shape_def, box);
 		}
+
+		log::on_create("触发器", entity, position, size, rotation, physics_position, physics_size);
 
 		return entity;
 	}
@@ -526,6 +552,8 @@ namespace pd::systems::helper
 
 		// physics_body
 		PhysicsBody::deattach(registry, trigger_entity);
+
+		log::on_destroy("触发器", trigger_entity);
 
 		registry.destroy(trigger_entity);
 	}
@@ -544,6 +572,34 @@ namespace pd::systems::helper
 		{
 			using namespace components;
 
+			// 根据门的方向设置旋转
+			const auto rotation = [&] noexcept -> sf::Angle
+			{
+				switch (door.direction)
+				{
+					case config::DoorDirection::UP:
+					{
+						return sf::degrees(0);
+					}
+					case config::DoorDirection::DOWN:
+					{
+						return sf::degrees(180);
+					}
+					case config::DoorDirection::LEFT:
+					{
+						return sf::degrees(270);
+					}
+					case config::DoorDirection::RIGHT:
+					{
+						return sf::degrees(90);
+					}
+					default: // NOLINT(clang-diagnostic-covered-switch-default)
+					{
+						std::unreachable();
+					}
+				}
+			}();
+
 			const auto animation_it = animation_set.find(door_tile.animation_id);
 			if (animation_it == animation_set.end())
 			{
@@ -556,38 +612,17 @@ namespace pd::systems::helper
 
 			const auto entity = registry.create();
 
-			// transform
-			{
-				// 根据门的方向设置旋转
-				const auto rotation = [&] noexcept -> sf::Angle
-				{
-					switch (door.direction)
-					{
-						case config::DoorDirection::UP:
-						{
-							return sf::degrees(0);
-						}
-						case config::DoorDirection::DOWN:
-						{
-							return sf::degrees(180);
-						}
-						case config::DoorDirection::LEFT:
-						{
-							return sf::degrees(270);
-						}
-						case config::DoorDirection::RIGHT:
-						{
-							return sf::degrees(90);
-						}
-						default: // NOLINT(clang-diagnostic-covered-switch-default)
-						{
-							std::unreachable();
-						}
-					}
-				}();
+			const auto texture_width = first_frame.texture_width;
+			const auto texture_height = first_frame.texture_height;
+			const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
-				Transform::attach(registry, entity, position, scale, rotation);
-			}
+			auto* physics_user_data = PhysicsWorld::to_user_data(entity);
+			const auto physics_position = PhysicsWorld::physics_position_of(position);
+			const auto physics_size = PhysicsWorld::physics_size_of(size);
+			const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
+
+			// transform
+			Transform::attach(registry, entity, position, scale, rotation);
 			// render
 			Render::attach(registry, entity, first_frame, config::RenderLayer::DOOR);
 			// animation
@@ -596,11 +631,15 @@ namespace pd::systems::helper
 			{
 				const auto world_id = PhysicsWorld::id(registry);
 
+				// todo: 根据方向设置触发区域
+
 				// 创建静态刚体
 				auto body_def = b2DefaultBodyDef();
 				body_def.type = b2_staticBody;
-				body_def.position = Constant::to_physics(position);
-				body_def.userData = entity_to_user_data(entity);
+				body_def.position = physics_position;
+				body_def.rotation = physics_rotation;
+				body_def.fixedRotation = true;
+				body_def.userData = physics_user_data;
 
 				auto shape_def = b2DefaultShapeDef();
 				// 设置碰撞过滤
@@ -618,23 +657,13 @@ namespace pd::systems::helper
 				}
 
 				// 创建矩形碰撞体
-				// todo: 根据方向设置触发区域
-				const auto texture_width = first_frame.texture_width;
-				const auto texture_height = first_frame.texture_height;
-				const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
-				const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
-
-				const auto half_width = half_texture_width * scale.x;
-				const auto half_height = half_texture_height * scale.y;
-				const auto half_physics_width = Constant::to_physics(half_width);
-				const auto half_physics_height = Constant::to_physics(half_height);
-				const auto box = b2MakeBox(half_physics_width, half_physics_height);
+				const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
 
 				PhysicsBody::attach(registry, entity, world_id, body_def);
 				PhysicsBody::attach_shape(registry, entity, shape_def, box);
 
 				// door
-				registry.emplace<door::CollisionSize>(entity, half_physics_width, half_physics_height);
+				registry.emplace<door::CollisionSize>(entity, physics_size.x / 2, physics_size.y * 2);
 			}
 			// door
 			{
@@ -650,6 +679,8 @@ namespace pd::systems::helper
 				registry.emplace<door::Direction>(entity, door.direction);
 				registry.emplace<door::TargetRoom>(entity, door.target_room);
 			}
+
+			log::on_create("门", entity, position, size, rotation, physics_position, physics_size);
 
 			return entity;
 		}
@@ -689,6 +720,8 @@ namespace pd::systems::helper
 
 		// physics_body
 		PhysicsBody::deattach(registry, door_entity);
+
+		log::on_destroy("门", door_entity);
 
 		registry.destroy(door_entity);
 	}

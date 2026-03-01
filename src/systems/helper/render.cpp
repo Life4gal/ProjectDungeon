@@ -58,6 +58,24 @@ namespace pd::systems::helper
 		registry.remove<render::Invisible>(entity_with_render);
 	}
 
+	auto Render::get_animation_frame(const entt::registry& registry, const entt::entity entity_with_render) noexcept -> const config::AnimationFrame&
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
+
+		return registry.get<const render::AnimationFrame>(entity_with_render).animation_frame;
+	}
+
+	auto Render::get_layer(const entt::registry& registry, const entt::entity entity_with_render) noexcept -> config::RenderLayer
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<render::AnimationFrame, render::RenderLayer>(entity_with_render)));
+
+		return registry.get<const render::RenderLayer>(entity_with_render).render_layer;
+	}
+
 	auto Render::change_layer(entt::registry& registry, const entt::entity entity_with_render, const config::RenderLayer new_layer) noexcept -> void
 	{
 		using namespace components;
@@ -67,6 +85,15 @@ namespace pd::systems::helper
 		registry.emplace_or_replace<render::RenderLayer>(entity_with_render, new_layer);
 
 		registry.ctx().emplace<render::SortRequired>();
+	}
+
+	auto Render::get_color(const entt::registry& registry, const entt::entity entity_with_render) noexcept -> sf::Color
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::Color>(entity_with_render));
+
+		return registry.get<const render::Color>(entity_with_render).color;
 	}
 
 	auto Render::change_color(entt::registry& registry, const entt::entity entity_with_render, sf::Color new_color) noexcept -> void

@@ -40,8 +40,17 @@ namespace pd::systems::helper
 		// 使指定实体可见
 		static auto show(entt::registry& registry, entt::entity entity_with_render) noexcept -> void;
 
+		// 获取指定实体的动画帧
+		[[nodiscard]] static auto get_animation_frame(const entt::registry& registry, entt::entity entity_with_render) noexcept -> const config::AnimationFrame&;
+
+		// 获取指定实体的渲染层级
+		[[nodiscard]] static auto get_layer(const entt::registry& registry, entt::entity entity_with_render) noexcept -> config::RenderLayer;
+
 		// 改变指定实体的渲染层级
 		static auto change_layer(entt::registry& registry, entt::entity entity_with_render, config::RenderLayer new_layer) noexcept -> void;
+
+		// 获取指定实体的颜色
+		[[nodiscard]] static auto get_color(const entt::registry& registry, entt::entity entity_with_render) noexcept -> sf::Color;
 
 		// 改变指定实体的颜色
 		static auto change_color(entt::registry& registry, entt::entity entity_with_render, sf::Color new_color) noexcept -> void;

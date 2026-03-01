@@ -7,6 +7,8 @@
 
 #include <components/world.hpp>
 
+#include <game/constants.hpp>
+
 #include <entt/entt.hpp>
 
 namespace pd::systems::helper
@@ -25,7 +27,24 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
-		std::ignore = registry;
+		registry.ctx().erase<world::FrameDelta>();
+		registry.ctx().erase<world::TotalElapsed>();
+		registry.ctx().erase<world::PlayElapsed>();
+	}
+
+	auto World::window_width([[maybe_unused]] entt::registry& registry) noexcept -> int
+	{
+		return Constant::window_width;
+	}
+
+	auto World::window_height([[maybe_unused]] entt::registry& registry) noexcept -> int
+	{
+		return Constant::window_height;
+	}
+
+	auto World::window_title([[maybe_unused]] entt::registry& registry) noexcept -> std::string_view
+	{
+		return Constant::window_title;
 	}
 
 	auto World::frame_delta(entt::registry& registry) noexcept -> sf::Time

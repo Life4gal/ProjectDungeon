@@ -35,6 +35,8 @@
 
 #include <systems/render/entity.hpp>
 
+#include <systems/render/debug.hpp>
+
 // ======================================
 // DEPENDENCIES
 // ======================================
@@ -171,5 +173,7 @@ namespace pd::scene
 
 		// 渲染实体
 		render::entity(registry, window);
+
+		render::debug(registry, window);
 	}
 }

@@ -10,9 +10,6 @@
 #include <systems/helper/physics_world.hpp>
 #include <systems/helper/transform.hpp>
 
-#include <game/constants.hpp>
-#include <game/user_data_entity.hpp>
-
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 
@@ -34,7 +31,7 @@ namespace pd::systems::update
 			{
 				const auto& event = body_events.moveEvents[i];
 
-				const auto entity = user_data_to_entity(event.userData);
+				const auto entity = helper::PhysicsWorld::to_entity(event.userData);
 				if (not registry.valid(entity))
 				{
 					continue;
@@ -42,11 +39,11 @@ namespace pd::systems::update
 
 				const auto& [physics_position, physics_rotation] = event.transform;
 
-				const auto position = Constant::from_physics(physics_position);
-				const auto angle = sf::radians(b2Rot_GetAngle(physics_rotation));
+				const auto position = helper::PhysicsWorld::position_of(physics_position);
+				const auto rotation = helper::PhysicsWorld::rotation_of(physics_rotation);
 
 				helper::Transform::set_position(registry, entity, position);
-				helper::Transform::set_rotation(registry, entity, angle);
+				helper::Transform::set_rotation(registry, entity, rotation);
 			}
 		}
 	}

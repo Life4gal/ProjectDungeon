@@ -19,8 +19,7 @@
 #include <systems/helper/physics_body.hpp>
 #include <systems/helper/actor.hpp>
 
-#include <game/constants.hpp>
-#include <game/user_data_entity.hpp>
+#include <game/log_entity.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Window/Event.hpp>
@@ -37,6 +36,8 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
+		// todo: 读取数据
+
 		// 快速测试用
 		const auto& level = registry.ctx().get<const level::Level>().level.get();
 		const auto& animation_set = level.animation_set;
@@ -50,19 +51,17 @@ namespace pd::systems::helper
 		}
 		const auto& animation = animation_it->second;
 		const auto& first_frame = animation.frames.front();
-		const auto texture_width = first_frame.texture_width;
-		const auto texture_height = first_frame.texture_height;
-		const auto half_texture_width = static_cast<float>(texture_width) * 0.5f;
-		const auto half_texture_height = static_cast<float>(texture_height) * 0.5f;
-
-		const auto half_width = half_texture_width * scale.x;
-		const auto half_height = half_texture_height * scale.y;
-		const auto half_physics_width = Constant::to_physics(half_width);
-		const auto half_physics_height = Constant::to_physics(half_height);
 
 		const auto entity = registry.create();
 
-		// todo: 读取数据
+		const auto texture_width = first_frame.texture_width;
+		const auto texture_height = first_frame.texture_height;
+		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
+
+		auto* physics_user_data = PhysicsWorld::to_user_data(entity);
+		const auto physics_position = PhysicsWorld::physics_position_of(position);
+		const auto physics_size = PhysicsWorld::physics_size_of(size);
+		const auto physics_rotation = PhysicsWorld::physics_rotation_of(rotation);
 
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
@@ -77,11 +76,11 @@ namespace pd::systems::helper
 			// 创建动态刚体
 			b2BodyDef body_def = b2DefaultBodyDef();
 			body_def.type = b2_dynamicBody;
-			body_def.position = Constant::to_physics(position);
-			body_def.rotation = b2MakeRot(rotation.asRadians());
+			body_def.position = physics_position;
+			body_def.rotation = physics_rotation;
 			body_def.linearDamping = 10.0f;
 			body_def.fixedRotation = true;
-			body_def.userData = entity_to_user_data(entity);
+			body_def.userData = physics_user_data;
 
 			auto shape_def = b2DefaultShapeDef();
 			// 设置碰撞过滤
@@ -91,7 +90,7 @@ namespace pd::systems::helper
 			shape_def.material.friction = 0.0f;
 
 			// 创建矩形碰撞体
-			const auto box = b2MakeBox(half_physics_width, half_physics_height);
+			const auto box = b2MakeBox(physics_size.x / 2, physics_size.y * 2);
 
 			PhysicsBody::attach(registry, entity, world_id, body_def);
 			PhysicsBody::attach_shape(registry, entity, shape_def, box);
@@ -100,6 +99,8 @@ namespace pd::systems::helper
 		Actor::attach(registry, entity, 100, 20, 200);
 		// player
 		registry.emplace<player::Movement>(entity);
+
+		log::on_create("玩家", entity, position, size, rotation, physics_position, physics_size);
 
 		return entity;
 	}
@@ -110,6 +111,8 @@ namespace pd::systems::helper
 
 		// physics_body
 		PhysicsBody::deattach(registry, player_entity);
+
+		log::on_destroy("玩家", player_entity);
 
 		registry.destroy(player_entity);
 	}

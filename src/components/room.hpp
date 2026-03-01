@@ -8,6 +8,8 @@
 #include <functional>
 #include <vector>
 
+#include <config/types.hpp>
+
 #include <entt/entity/fwd.hpp>
 
 namespace pd::config
