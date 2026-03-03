@@ -5,30 +5,40 @@
 
 #include <asset/music.hpp>
 
+#include <filesystem>
+
 #include <SFML/Audio/Music.hpp>
 #include <spdlog/spdlog.h>
 
 namespace pd::asset
 {
-	auto MusicLoader::operator()(const std::filesystem::path& path) noexcept -> result_type
+	auto MusicLoader::operator()(const std::string_view path) noexcept -> result_type
 	{
-		const auto s = path.string();
-
-		if (not exists(path))
+		try
 		{
-			SPDLOG_ERROR("载入音乐[{:<20}]失败!文件不存在!", s);
+			const std::filesystem::path p{path};
+
+			if (not exists(p))
+			{
+				SPDLOG_ERROR("载入音乐[{:<20}]失败!文件不存在!", path);
+				return result_type{};
+			}
+
+			auto music = std::make_shared<sf::Music>();
+			if (not music->openFromFile(p))
+			{
+				SPDLOG_ERROR("载入音乐[{:<20}]失败!", path);
+				return result_type{};
+			}
+
+			SPDLOG_INFO("载入音乐[{:<20}]成功!", path);
+
+			return music;
+		}
+		catch (const std::system_error& e)
+		{
+			SPDLOG_ERROR("载入音乐[{:<20}]失败: {}", path, e.what());
 			return result_type{};
 		}
-
-		auto music = std::make_shared<sf::Music>();
-		if (not music->openFromFile(path))
-		{
-			SPDLOG_ERROR("载入音乐[{:<20}]失败!", s);
-			return result_type{};
-		}
-
-		SPDLOG_INFO("载入音乐[{:<20}]成功!", s);
-
-		return music;
 	}
 } // namespace pd::asset

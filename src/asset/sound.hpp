@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <filesystem>
-
 #include <asset/resource_cache.hpp>
 
 namespace sf
@@ -21,7 +19,7 @@ namespace pd::asset
 	public:
 		using result_type = std::shared_ptr<sf::SoundBuffer>;
 
-		[[nodiscard]] static auto operator()(const std::filesystem::path& path) noexcept -> result_type;
+		[[nodiscard]] static auto operator()(std::string_view path) noexcept -> result_type;
 	};
 
 	class SoundManager final : public ResourceCache<SoundLoader> {};

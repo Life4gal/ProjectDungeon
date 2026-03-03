@@ -5,14 +5,23 @@
 
 #pragma once
 
-#include <filesystem>
-
 #include <entt/core/hashed_string.hpp>
 #include <entt/resource/cache.hpp>
-#include <entt/entity/entity.hpp>
 
 namespace pd::asset
 {
+	enum class AssetId : entt::id_type {};
+
+	[[nodiscard]] constexpr auto to_id(const AssetId id) noexcept -> entt::id_type
+	{
+		return std::to_underlying(id);
+	}
+
+	[[nodiscard]] constexpr auto from_id(const entt::id_type id) noexcept -> AssetId
+	{
+		return static_cast<AssetId>(id);
+	}
+
 	template<typename Loader>
 	class ResourceCache
 	{
@@ -31,38 +40,45 @@ namespace pd::asset
 
 		// todo: 当前保存资源路径,所以每次查找都要进行一次ID计算
 		//  后续会将相关内容替换为ID,不过当前不着急
-		[[nodiscard]] static auto make_id(const std::filesystem::path& path) noexcept -> entt::id_type
+		[[nodiscard]] static auto make_id(const std::string_view path) noexcept -> entt::id_type
 		{
-			const auto& s = path.native();
-
-			return entt::hashed_wstring{s.c_str(), s.size()};
+			return entt::hashed_string{path.data(), path.size()};
 		}
 
 	public:
-		[[nodiscard]] auto load(const std::filesystem::path& path) -> entt::id_type
+		[[nodiscard]] auto load(const std::string_view path) -> AssetId
 		{
 			const auto id = make_id(path);
 			[[maybe_unused]] const auto [it, loaded] = cache_.load(id, path);
 
-			return id;
+			return from_id(id);
 		}
 
-		auto force_load(const std::filesystem::path& path) -> entt::id_type
+		auto force_load(const std::string_view path) -> AssetId
 		{
 			const auto id = make_id(path);
 			[[maybe_unused]] const auto [it, loaded] = cache_.force_load(id, path);
 
-			return id;
+			return from_id(id);
 		}
 
-		[[nodiscard]] auto get(entt::id_type id) const -> result_type
+	private:
+		[[nodiscard]] auto get(const entt::id_type id) const noexcept -> result_type
 		{
 			return cache_[id];
 		}
 
-		[[nodiscard]] auto get(const std::filesystem::path& path) const -> result_type
+	public:
+		[[nodiscard]] auto get(const AssetId id) const noexcept -> result_type
 		{
-			return get(make_id(path));
+			return get(to_id(id));
+		}
+
+		[[nodiscard]] auto get(const std::string_view path) const noexcept -> result_type
+		{
+			const auto id = make_id(path);
+
+			return get(id);
 		}
 
 		[[nodiscard]] auto empty() const noexcept -> bool
@@ -75,24 +91,42 @@ namespace pd::asset
 			return cache_.size();
 		}
 
+	private:
 		[[nodiscard]] auto contains(const entt::id_type id) const noexcept -> bool
 		{
 			return cache_.contains(id);
 		}
 
-		[[nodiscard]] auto contains(const std::filesystem::path& path) const noexcept -> bool
+	public:
+		[[nodiscard]] auto contains(const AssetId id) const noexcept -> bool
 		{
-			return contains(make_id(path));
+			return contains(to_id(id));
 		}
 
+		[[nodiscard]] auto contains(const std::string_view path) const noexcept -> bool
+		{
+			const auto id = make_id(path);
+
+			return contains(id);
+		}
+
+	private:
 		auto erase(const entt::id_type id) noexcept -> bool
 		{
 			return cache_.erase(id) != 0;
 		}
 
-		auto erase(const std::filesystem::path& path) noexcept -> bool
+	public:
+		auto erase(const AssetId id) noexcept -> bool
 		{
-			return erase(make_id(path));
+			return erase(to_id(id));
+		}
+
+		auto erase(const std::string_view path) noexcept -> bool
+		{
+			const auto id = make_id(path);
+
+			return erase(id);
 		}
 
 		auto clear() noexcept -> void

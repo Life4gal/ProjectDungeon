@@ -10,7 +10,7 @@
 #include <components/transform.hpp>
 #include <components/render.hpp>
 
-#include <systems/helper/texture_manager.hpp>
+#include <systems/helper/asset_manager.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -54,7 +54,7 @@ namespace pd::systems::render
 			const auto& animation_frame_ref = animation_frame.animation_frame.get();
 
 			// 获取纹理资源
-			const auto texture_resource = helper::TextureManager::get(registry, animation_frame_ref.texture_path);
+			const auto texture_resource = helper::AssetManager::get_texture(registry, animation_frame_ref.texture_path);
 
 			if (not texture_resource)
 			{

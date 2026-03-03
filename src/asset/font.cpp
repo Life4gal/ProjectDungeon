@@ -5,30 +5,40 @@
 
 #include <asset/font.hpp>
 
+#include <filesystem>
+
 #include <spdlog/spdlog.h>
 #include <SFML/Graphics/Font.hpp>
 
 namespace pd::asset
 {
-	auto FontLoader::operator()(const std::filesystem::path& path) noexcept -> result_type
+	auto FontLoader::operator()(const std::string_view path) noexcept -> result_type
 	{
-		const auto s = path.string();
-
-		if (not exists(path))
+		try
 		{
-			SPDLOG_ERROR("载入字体[{:<20}]失败!文件不存在!", s);
+			const std::filesystem::path p{path};
+
+			if (not exists(p))
+			{
+				SPDLOG_ERROR("载入字体[{:<20}]失败!文件不存在!", path);
+				return result_type{};
+			}
+
+			auto font = std::make_shared<sf::Font>();
+			if (not font->openFromFile(p))
+			{
+				SPDLOG_ERROR("载入字体[{:<20}]失败!", path);
+				return result_type{};
+			}
+
+			// SPDLOG_INFO("载入字体[{:<20}]成功!", path);
+
+			return font;
+		}
+		catch (const std::system_error& e)
+		{
+			SPDLOG_ERROR("载入字体[{:<20}]失败: {}", path, e.what());
 			return result_type{};
 		}
-
-		auto font = std::make_shared<sf::Font>();
-		if (not font->openFromFile(path))
-		{
-			SPDLOG_ERROR("载入字体[{:<20}]失败!", s);
-			return result_type{};
-		}
-
-		SPDLOG_INFO("载入字体[{:<20}]成功!", s);
-
-		return font;
 	}
 }

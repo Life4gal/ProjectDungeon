@@ -224,14 +224,9 @@ add_executable(
 	# HELPER
 	# ==========
 	
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/font_manager.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/font_manager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/texture_manager.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/texture_manager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/sound_manager.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/sound_manager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/music_manager.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/music_manager.cpp
+	# 资源管理器
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/asset_manager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/asset_manager.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/world.cpp
