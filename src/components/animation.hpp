@@ -57,6 +57,10 @@ namespace pd::components::animation
 	// 如果不循环则不存在该数据
 	class Looping final {};
 
+	// 标记当前动画是否反向播放
+	// 如果不反向播放则不存在该数据
+	class Reversed final {};
+
 	// 标记当前动画是否暂停
 	// 如果不暂停则不存在该数据
 	class Paused final {};

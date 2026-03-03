@@ -24,6 +24,7 @@ namespace pd::systems::render
 
 		const auto group = registry.group<components::render::RenderLayer>(
 			entt::get<
+				components::render::Animation,
 				components::render::AnimationFrame,
 				components::render::Color,
 				transform::Position,
@@ -49,8 +50,9 @@ namespace pd::systems::render
 		// 当前共用RenderStates
 		static sf::RenderStates states{};
 
-		for (const auto [entity, render_layer, animation_frame, color, position, scale, rotation]: group.each())
+		for (const auto [entity, render_layer, animation, animation_frame, color, position, scale, rotation]: group.each())
 		{
+			const auto& animation_ref = animation.animation.get();
 			const auto& animation_frame_ref = animation_frame.animation_frame.get();
 
 			// 获取纹理资源
@@ -71,10 +73,10 @@ namespace pd::systems::render
 
 			const auto x = static_cast<float>(animation_frame_ref.texture_x);
 			const auto y = static_cast<float>(animation_frame_ref.texture_y);
-			const auto width = static_cast<float>(animation_frame_ref.texture_width);
-			const auto height = static_cast<float>(animation_frame_ref.texture_height);
-			// FIXME: 总是假定原点为正中心(width/2, height/2)
-			const auto origin = sf::Vector2f{width, height} / 2.f;
+			const auto width = static_cast<float>(animation_ref.texture_width);
+			const auto height = static_cast<float>(animation_ref.texture_height);
+			const auto origin_x = static_cast<float>(animation_ref.origin_x);
+			const auto origin_y = static_cast<float>(animation_ref.origin_y);
 
 			const auto vertices = [&] noexcept -> auto
 			{
@@ -97,7 +99,7 @@ namespace pd::systems::render
 				t.translate(position.position);
 				t.scale(scale.scale);
 				t.rotate(rotation.rotation);
-				t.translate(-origin);
+				t.translate({-origin_x, -origin_y});
 
 				return t;
 			}();

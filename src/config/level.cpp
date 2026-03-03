@@ -96,10 +96,9 @@ namespace pd::config
 								}
 
 								const auto& animation = animation_it->second;
-								const auto& first_frame = animation.frames.front();
 
-								collision.collision_width = first_frame.texture_width;
-								collision.collision_height = first_frame.texture_height;
+								collision.collision_width = animation.texture_width;
+								collision.collision_height = animation.texture_height;
 								return true;
 							};
 

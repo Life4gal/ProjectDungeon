@@ -35,15 +35,15 @@ namespace pd::systems::render
 
 		const auto view = registry.view<
 			const name::Name,
-			const components::render::AnimationFrame,
+			const components::render::Animation,
 			const transform::Position,
 			const transform::Scale>(entt::exclude<components::render::Invisible>);
 
-		for (const auto [entity, name, animation_frame, center_position, scale]: view.each())
+		for (const auto [entity, name, animation, center_position, scale]: view.each())
 		{
-			const auto& frame = animation_frame.animation_frame.get();
-			const auto texture_width = static_cast<float>(frame.texture_width);
-			const auto texture_height = static_cast<float>(frame.texture_height);
+			const auto& animation_ref = animation.animation.get();
+			const auto texture_width = static_cast<float>(animation_ref.texture_width);
+			const auto texture_height = static_cast<float>(animation_ref.texture_height);
 
 			const auto width = texture_width * scale.scale.x;
 			const auto height = texture_height * scale.scale.y;

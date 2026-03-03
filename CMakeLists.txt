@@ -138,7 +138,7 @@ add_executable(
 
 	# 地下城 -- 动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/animation.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/animation.cpp
 	# 地下城 -- 瓦片
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/tile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/tile.cpp
@@ -227,10 +227,12 @@ add_executable(
 	# 资源管理器
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/asset_manager.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/asset_manager.cpp
-
+	
+	# 世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/world.cpp
 
+	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/systems/helper/physics_world.cpp
 

@@ -17,14 +17,17 @@ namespace pd::systems::helper
 	auto Render::attach(
 		entt::registry& registry,
 		const entt::entity entity,
-		const config::AnimationFrame& animation_frame,
+		const config::Animation& animation,
 		config::RenderLayer render_layer,
 		const sf::Color color
 	) noexcept -> void
 	{
 		using namespace components;
 
-		registry.emplace_or_replace<render::AnimationFrame>(entity, std::cref(animation_frame));
+		const auto& first_frame = animation.frames[0];
+
+		registry.emplace_or_replace<render::Animation>(entity, std::cref(animation));
+		registry.emplace_or_replace<render::AnimationFrame>(entity, std::cref(first_frame));
 		registry.emplace_or_replace<render::RenderLayer>(entity, render_layer);
 		registry.emplace_or_replace<render::Color>(entity, color);
 
@@ -35,6 +38,7 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
+		registry.remove<render::Animation>(entity_with_render);
 		registry.remove<render::AnimationFrame>(entity_with_render);
 		registry.remove<render::RenderLayer>(entity_with_render);
 		registry.remove<render::Color>(entity_with_render);
@@ -44,7 +48,7 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::Animation>(entity_with_render));
 
 		registry.emplace_or_replace<render::Invisible>(entity_with_render);
 	}
@@ -53,25 +57,37 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::Animation>(entity_with_render));
 
 		registry.remove<render::Invisible>(entity_with_render);
 	}
 
-	auto Render::get_animation_frame(const entt::registry& registry, const entt::entity entity_with_render) noexcept -> const config::AnimationFrame&
+	// auto Render::get_animation_frame(const entt::registry& registry, const entt::entity entity_with_render) noexcept -> const config::AnimationFrame&
+	// {
+	// 	using namespace components;
+	//
+	// 	PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::Animation>(entity_with_render));
+	//
+	// 	return registry.get<const render::AnimationFrame>(entity_with_render).animation_frame;
+	// }
+
+	auto Render::set_animation_frame(entt::registry& registry, const entt::entity entity_with_render, const std::size_t frame_index) noexcept -> void
 	{
 		using namespace components;
 
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::Animation>(entity_with_render));
 
-		return registry.get<const render::AnimationFrame>(entity_with_render).animation_frame;
+		const auto& animation = registry.get<const render::Animation>(entity_with_render).animation.get();
+		const auto& target_frame = animation.frames[frame_index];
+
+		registry.emplace_or_replace<render::AnimationFrame>(entity_with_render, std::cref(target_frame));
 	}
 
 	auto Render::get_layer(const entt::registry& registry, const entt::entity entity_with_render) noexcept -> config::RenderLayer
 	{
 		using namespace components;
 
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<render::AnimationFrame, render::RenderLayer>(entity_with_render)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<render::RenderLayer>(entity_with_render)));
 
 		return registry.get<const render::RenderLayer>(entity_with_render).render_layer;
 	}
@@ -80,7 +96,7 @@ namespace pd::systems::helper
 	{
 		using namespace components;
 
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::AnimationFrame>(entity_with_render));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<render::Animation>(entity_with_render));
 
 		registry.emplace_or_replace<render::RenderLayer>(entity_with_render, new_layer);
 

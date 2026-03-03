@@ -633,12 +633,11 @@ namespace pd::systems::helper
 			return entt::null;
 		}
 		const auto& animation = animation_it->second;
-		const auto& first_frame = animation.frames.front();
 
 		const auto entity = registry.create();
 
-		const auto texture_width = first_frame.texture_width;
-		const auto texture_height = first_frame.texture_height;
+		const auto texture_width = animation.texture_width;
+		const auto texture_height = animation.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
 		auto* physics_user_data = PhysicsWorld::to_user_data(entity);
@@ -653,7 +652,7 @@ namespace pd::systems::helper
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
-		Render::attach(registry, entity, first_frame, config::RenderLayer::WALL);
+		Render::attach(registry, entity, animation, config::RenderLayer::WALL);
 		// animation
 		Animation::attach(registry, entity, animation);
 		// physics_body
@@ -716,12 +715,11 @@ namespace pd::systems::helper
 			return entt::null;
 		}
 		const auto& animation = animation_it->second;
-		const auto& first_frame = animation.frames.front();
 
 		const auto entity = registry.create();
 
-		const auto texture_width = first_frame.texture_width;
-		const auto texture_height = first_frame.texture_height;
+		const auto texture_width = animation.texture_width;
+		const auto texture_height = animation.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
 		// tags
@@ -731,7 +729,7 @@ namespace pd::systems::helper
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
-		Render::attach(registry, entity, first_frame, config::RenderLayer::FLOOR);
+		Render::attach(registry, entity, animation, config::RenderLayer::FLOOR);
 		// animation
 		Animation::attach(registry, entity, animation);
 
@@ -769,12 +767,11 @@ namespace pd::systems::helper
 			return entt::null;
 		}
 		const auto& animation = animation_it->second;
-		const auto& first_frame = animation.frames.front();
 
 		const auto entity = registry.create();
 
-		const auto texture_width = first_frame.texture_width;
-		const auto texture_height = first_frame.texture_height;
+		const auto texture_width = animation.texture_width;
+		const auto texture_height = animation.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
 		// tags
@@ -784,7 +781,7 @@ namespace pd::systems::helper
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
-		Render::attach(registry, entity, first_frame, config::RenderLayer::DECORATION);
+		Render::attach(registry, entity, animation, config::RenderLayer::DECORATION);
 		// animation
 		Animation::attach(registry, entity, animation);
 
@@ -822,12 +819,11 @@ namespace pd::systems::helper
 			return entt::null;
 		}
 		const auto& animation = animation_it->second;
-		const auto& first_frame = animation.frames.front();
 
 		const auto entity = registry.create();
 
-		const auto texture_width = first_frame.texture_width;
-		const auto texture_height = first_frame.texture_height;
+		const auto texture_width = animation.texture_width;
+		const auto texture_height = animation.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
 		auto* physics_user_data = PhysicsWorld::to_user_data(entity);
@@ -842,7 +838,7 @@ namespace pd::systems::helper
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
-		Render::attach(registry, entity, first_frame, config::RenderLayer::TRIGGER);
+		Render::attach(registry, entity, animation, config::RenderLayer::TRIGGER);
 		// animation
 		Animation::attach(registry, entity, animation);
 		// physics_body
@@ -916,12 +912,11 @@ namespace pd::systems::helper
 			return entt::null;
 		}
 		const auto& animation = animation_it->second;
-		const auto& first_frame = animation.frames.front();
 
 		const auto entity = registry.create();
 
-		const auto texture_width = first_frame.texture_width;
-		const auto texture_height = first_frame.texture_height;
+		const auto texture_width = animation.texture_width;
+		const auto texture_height = animation.texture_height;
 		const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
 		auto* physics_user_data = PhysicsWorld::to_user_data(entity);
@@ -936,7 +931,7 @@ namespace pd::systems::helper
 		// transform
 		Transform::attach(registry, entity, position, scale, rotation);
 		// render
-		Render::attach(registry, entity, first_frame, config::RenderLayer::KEY);
+		Render::attach(registry, entity, animation, config::RenderLayer::KEY);
 		// animation
 		Animation::attach(registry, entity, animation);
 		// physics_body
@@ -1029,12 +1024,11 @@ namespace pd::systems::helper
 				return entt::null;
 			}
 			const auto& animation = animation_it->second;
-			const auto& first_frame = animation.frames.front();
 
 			const auto entity = registry.create();
 
-			const auto texture_width = first_frame.texture_width;
-			const auto texture_height = first_frame.texture_height;
+			const auto texture_width = animation.texture_width;
+			const auto texture_height = animation.texture_height;
 			const auto size = sf::Vector2f{static_cast<float>(texture_width) * scale.x, static_cast<float>(texture_height) * scale.y};
 
 			auto* physics_user_data = PhysicsWorld::to_user_data(entity);
@@ -1049,7 +1043,7 @@ namespace pd::systems::helper
 			// transform
 			Transform::attach(registry, entity, position, scale, rotation);
 			// render
-			Render::attach(registry, entity, first_frame, config::RenderLayer::DOOR);
+			Render::attach(registry, entity, animation, config::RenderLayer::DOOR);
 			// animation
 			Animation::attach(registry, entity, animation);
 			// physics_body

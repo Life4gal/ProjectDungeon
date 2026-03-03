@@ -16,7 +16,7 @@
 #include <components/level.hpp>
 #include <components/room.hpp>
 
-#include <systems/helper/texture_manager.hpp>
+#include <systems/helper/asset_manager.hpp>
 #include <systems/helper/room.hpp>
 
 #include <prometheus/platform/os.hpp>
@@ -47,7 +47,7 @@ namespace pd::systems::helper
 				for (const auto& frame: animation.frames)
 				{
 					SPDLOG_INFO("加载动画[{}]的纹理[{}]...", animation_id, frame.texture_path);
-					[[maybe_unused]] const auto texture_id = TextureManager::load(registry, frame.texture_path);
+					[[maybe_unused]] const auto texture_id = AssetManager::load_texture(registry, frame.texture_path);
 				}
 			}
 		}
@@ -111,7 +111,7 @@ namespace pd::systems::helper
 			{
 				for (const auto& frame: animation.frames)
 				{
-					TextureManager::unload(registry, frame.texture_path);
+					AssetManager::unload_texture(registry, frame.texture_path);
 				}
 			}
 		}

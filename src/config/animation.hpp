@@ -13,7 +13,7 @@
 namespace pd::config
 {
 	// JSON:
-	// { "texture_path": "path/to/texture.png", "texture_x": 0, "texture_y": 0, "texture_width": 32, "texture_height": 32, "duration_ms": 100 }
+	// { "texture_path": "path/to/texture.png", "texture_x": 0, "texture_y": 0, "duration_ms": 100 }
 	class AnimationFrame final
 	{
 	public:
@@ -22,22 +22,25 @@ namespace pd::config
 		// 纹理位置
 		int texture_x;
 		int texture_y;
-		// 纹理大小
-		int texture_width;
-		int texture_height;
-		// 总是假定原点为正中心(width/2, height/2)
-		// int origin_x;
-		// int origin_y;
 		// 持续时间(毫秒)
 		int duration_ms;
 	};
 
 	// JSON:
-	// { "frames": [ { AnimationFrame }, { AnimationFrame}, ... ], "looping": true }
+	// { "frames": [ { AnimationFrame }, { AnimationFrame}, ... ], "texture_width": 16, "texture_height": 16, "looping": true }
 	class Animation final
 	{
 	public:
+		// 动画帧
 		std::vector<AnimationFrame> frames;
+
+		// 纹理大小
+		int texture_width;
+		int texture_height;
+		// 原点
+		// 如果未指定则为(width/2, height/2)
+		int origin_x;
+		int origin_y;
 
 		// 是否循环
 		bool looping;
@@ -56,6 +59,10 @@ namespace pd::config
 		using Set::Set;
 	};
 
+	// ===========================
+	// JSON
+	// ===========================
+
 	[[nodiscard]] auto load_animation_frame_from_json(AnimationFrame& frame, const ConfigReader::json_format& json) noexcept -> bool;
 	[[nodiscard]] auto load_animation_frame_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<AnimationFrame>;
 
@@ -64,4 +71,8 @@ namespace pd::config
 
 	[[nodiscard]] auto load_animation_set_from_json(AnimationSet& animation_set, const ConfigReader::json_format& json) noexcept -> bool;
 	[[nodiscard]] auto load_animation_set_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<AnimationSet>;
+
+	// ===========================
+	// 
+	// ===========================
 }

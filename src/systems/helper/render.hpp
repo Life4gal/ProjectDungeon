@@ -14,6 +14,7 @@
 namespace pd::config
 {
 	class AnimationFrame;
+	class Animation;
 }
 
 namespace pd::systems::helper
@@ -23,10 +24,11 @@ namespace pd::systems::helper
 	public:
 		// 为一个实体附加渲染组件
 		// 如果目标实体已经存在渲染组件则会进行覆盖
+		// 使用Animation的第一帧作为初始动画帧
 		static auto attach(
 			entt::registry& registry,
 			entt::entity entity,
-			const config::AnimationFrame& animation_frame,
+			const config::Animation& animation,
 			config::RenderLayer render_layer,
 			sf::Color color = sf::Color::White
 		) noexcept -> void;
@@ -40,8 +42,11 @@ namespace pd::systems::helper
 		// 使指定实体可见
 		static auto show(entt::registry& registry, entt::entity entity_with_render) noexcept -> void;
 
-		// 获取指定实体的动画帧
-		[[nodiscard]] static auto get_animation_frame(const entt::registry& registry, entt::entity entity_with_render) noexcept -> const config::AnimationFrame&;
+		// // 获取指定实体的动画帧
+		// [[nodiscard]] static auto get_animation_frame(const entt::registry& registry, entt::entity entity_with_render) noexcept -> const config::AnimationFrame&;
+
+		// 设定指定实体的动画帧
+		static auto set_animation_frame(entt::registry& registry, entt::entity entity_with_render, std::size_t frame_index) noexcept -> void;
 
 		// 获取指定实体的渲染层级
 		[[nodiscard]] static auto get_layer(const entt::registry& registry, entt::entity entity_with_render) noexcept -> config::RenderLayer;

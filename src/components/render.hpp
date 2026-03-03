@@ -14,6 +14,7 @@
 namespace pd::config
 {
 	class AnimationFrame;
+	class Animation;
 }
 
 namespace pd::components::render
@@ -29,6 +30,16 @@ namespace pd::components::render
 	// ==========================================
 	// 实体组件
 	// ==========================================
+
+	// 对config::Animation的引用
+	// 我们将纹理大小/原点等信息放在config::Animation中而不是config::AnimationFrame中
+	// 所以我们还需要额外引用该信息
+	// 与components::animation::Animation冗余,不过我们不像让其耦合
+	class Animation final
+	{
+	public:
+		std::reference_wrapper<const config::Animation> animation;
+	};
 
 	// 对config::AnimationFrame的引用
 	class AnimationFrame final

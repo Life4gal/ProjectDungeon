@@ -23,8 +23,6 @@ namespace pd::config
 
 		// 通常物理碰撞体大小与纹理大小一致
 		// 当然也支持碰撞区域小于(或者大于)纹理区域
-		// todo: 如果动画帧的纹理大小不完全相同,此时碰撞区域是否也要跟着变化?目前仅取第一帧的纹理大小作为默认值(如果未指定)
-		//  能否也是一个列表?
 		// "collision": { "width": 16, "height": 16, "enable_contact_event": true, "is_sensor": true }
 		class Collision
 		{
