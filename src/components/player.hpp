@@ -5,9 +5,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include <entt/entity/fwd.hpp>
 
 namespace pd::components::player
@@ -46,12 +43,5 @@ namespace pd::components::player
 
 		Type x;
 		Type y;
-	};
-
-	// 玩家当前拥有的钥匙列表
-	class Keys final
-	{
-	public:
-		std::vector<std::string> keys;
 	};
 }
