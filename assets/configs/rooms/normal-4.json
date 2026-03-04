@@ -1,5 +1,5 @@
 {
-	"name": "普通房间3",
+	"name": "普通房间4",
 	"type": "NORMAL",
 	"tile_size": 64,
 	"width": 9,
@@ -331,8 +331,8 @@
 	"decorations": {
 		"wall_stone": [
 			{
-				"x": 3,
-				"y": 3
+				"x": 4,
+				"y": 4
 			}
 		]
 	},
@@ -343,15 +343,13 @@
 
 	},
 	"doors": {
-		"door_stone": [
-			{
-				"x": 0,
-				"y": 4,
-				"direction": "LEFT",
-				"target_room": "room-id-0",
-				"key": ""
-			}
-		]
+		"UP": {
+			"id": "door_stone",
+			"x": 4,
+			"y": 0,
+			"target_room": "room-id-0",
+			"key": ""
+		}
 	},
 	"player_spawn_point": {
 		"x": 4,

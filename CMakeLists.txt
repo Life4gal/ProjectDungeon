@@ -141,23 +141,23 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/animation.cpp
 	# 地下城 -- 瓦片
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/tile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/tile.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/tile.cpp
 	# 地下城 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/room.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/room.cpp
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/level.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/level.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/level.cpp
 	# 地下城
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/dungeon.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/dungeon.cpp
 
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/player.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/player.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/player.cpp
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src/config/enemy.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/config/enemy.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/config/from_json/enemy.cpp
 
 	# ============================
 	# ASSET

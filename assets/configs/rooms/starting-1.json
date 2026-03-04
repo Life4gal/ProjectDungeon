@@ -1,6 +1,6 @@
 {
-	"name": "普通房间1",
-	"type": "NORMAL",
+	"name": "初始房间",
+	"type": "STARTING",
 	"tile_size": 64,
 	"width": 9,
 	"height": 9,
@@ -329,12 +329,7 @@
 		]
 	},
 	"decorations": {
-		"wall_stone": [
-			{
-				"x": 1,
-				"y": 1
-			}
-		]
+
 	},
 	"triggers": {
 
@@ -343,15 +338,34 @@
 
 	},
 	"doors": {
-		"door_stone": [
-			{
-				"x": 4,
-				"y": 8,
-				"direction": "DOWN",
-				"target_room": "room-id-0",
-				"key": ""
-			}
-		]
+		"UP": {
+			"id": "door_stone",
+			"x": 4,
+			"y": 0,
+			"target_room": "room-id-1",
+			"key": ""
+		},
+		"LEFT": {
+			"id": "door_stone",
+			"x": 0,
+			"y": 4,
+			"target_room": "room-id-2",
+			"key": ""
+		},
+		"RIGHT": {
+			"id": "door_stone",
+			"x": 8,
+			"y": 4,
+			"target_room": "room-id-3",
+			"key": ""
+		},
+		"DOWN": {
+			"id": "door_stone",
+			"x": 4,
+			"y": 8,
+			"target_room": "room-id-4",
+			"key": ""
+		}
 	},
 	"player_spawn_point": {
 		"x": 4,

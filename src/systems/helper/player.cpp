@@ -10,10 +10,7 @@
 #include <components/player.hpp>
 
 #include <config/collision_mask.hpp>
-// 快速测试用
-#include <config/level.hpp>
-#include <components/dungeon.hpp>
-#include <components/level.hpp>
+#include <config/dungeon.hpp>
 
 #include <systems/helper/physics_world.hpp>
 #include <systems/helper/transform.hpp>
@@ -34,6 +31,8 @@ namespace pd::systems::helper
 {
 	auto Player::spawn(
 		entt::registry& registry,
+		const config::Player& player_config,
+		const config::AnimationSet& animation_set,
 		const sf::Vector2f position,
 		const sf::Vector2f scale,
 		const sf::Angle rotation
@@ -43,18 +42,11 @@ namespace pd::systems::helper
 
 		PROMETHEUS_PLATFORM_ASSUME(not registry.ctx().contains<player::Player>());
 
-		// todo: 读取数据
-
-		// 快速测试用
-		const auto [level_entity] = registry.ctx().get<const dungeon::Level>();
-		const auto& level = registry.get<const level::Level>(level_entity).level.get();
-		const auto& animation_set = level.animation_set;
-
-		constexpr auto animation_id = std::string_view{"AntleredRascal"};
-		const auto animation_it = animation_set.find(animation_id);
+		const auto animation_it = animation_set.find(player_config.animation_id);
 		if (animation_it == animation_set.end())
 		{
-			// todo
+			SPDLOG_ERROR("玩家动画[{}]不存在!", player_config.animation_id);
+			// todo: 怎么办?有没有备用方案?
 			return entt::null;
 		}
 		const auto& animation = animation_it->second;
@@ -109,7 +101,7 @@ namespace pd::systems::helper
 			PhysicsBody::attach_shape(registry, entity, shape_def, box);
 		}
 		// actor
-		Actor::attach(registry, entity, 100, 20, 200);
+		Actor::attach(registry, entity, player_config.health, player_config.mana, player_config.speed);
 		// player
 		registry.emplace<player::Movement>(entity);
 

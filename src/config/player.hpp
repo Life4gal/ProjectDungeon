@@ -13,10 +13,6 @@ namespace pd::config
 	class Player final
 	{
 	public:
-		// 尺寸(比例)
-		float scale_x;
-		float scale_y;
-
 		// 动画ID
 		std::string animation_id;
 
@@ -28,11 +24,14 @@ namespace pd::config
 		float speed;
 
 		// 武器的名称列表
-		std::vector<std::string> weapon_ids;
+		std::vector<std::string> weapons;
 	};
 
 	// 玩家集
 	// 玩家ID -> 玩家配置
+	// JSON:
+	// { "players": "/path/to/players.json" }
+	// { "players": { "player-id-1": { Player }, "player-id-2": { Player }, ... } }
 	class PlayerSet final : public Set<Player>
 	{
 	public:

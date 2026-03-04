@@ -6,6 +6,9 @@
 #pragma once
 
 #include <string>
+#include <optional>
+
+#include <config/types.hpp>
 
 #include <entt/fwd.hpp>
 
@@ -69,7 +72,8 @@ namespace pd::systems::helper
 			entt::entity level_entity,
 			entt::entity this_room_entity,
 			entt::entity target_room_entity,
-			entt::entity player_entity
+			entt::entity player_entity,
+			std::optional<config::DoorDirection> entrance_direction
 		) noexcept -> void;
 	};
 }

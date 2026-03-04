@@ -5,8 +5,23 @@
 
 #pragma once
 
+// 动画集
 #include <config/animation.hpp>
+// // 字体集
+// #include <config/font.hpp>
+// // 音效集
+// #include <config/sound.hpp>
+// // 音乐集
+// #include <config/music.hpp>
+// 瓦片集
 #include <config/tile.hpp>
+
+// 玩家集
+#include <config/player.hpp>
+// 敌人集
+#include <config/enemy.hpp>
+
+// 房间集
 #include <config/room.hpp>
 
 namespace pd::config
@@ -26,6 +41,16 @@ namespace pd::config
 		// 瓦片集
 		// todo: 瓦片集是dungeon通用还是每个level单独加载?
 		TileSet tile_set;
+
+		// todo: 武器集
+
+		// 玩家配置
+		PlayerSet player_set;
+		// 本关使用的玩家ID
+		std::string player_id;
+
+		// 敌人配置(暂未使用,但需要提前加载验证)
+		EnemySet enemy_set;
 
 		// 关卡包含的房间集合
 		RoomSet room_set;

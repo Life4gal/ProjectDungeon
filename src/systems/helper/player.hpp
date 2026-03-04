@@ -14,6 +14,13 @@ namespace sf
 	class Event;
 }
 
+namespace pd::config
+{
+	class AnimationSet;
+
+	class Player;
+}
+
 namespace pd::systems::helper
 {
 	class Player final
@@ -22,6 +29,8 @@ namespace pd::systems::helper
 		// 在指定位置生成玩家
 		static auto spawn(
 			entt::registry& registry,
+			const config::Player& player_config,
+			const config::AnimationSet& animation_set,
 			sf::Vector2f position,
 			sf::Vector2f scale = sf::Vector2f{1, 1},
 			sf::Angle rotation = sf::degrees(0)

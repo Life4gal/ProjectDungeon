@@ -84,7 +84,7 @@ namespace pd::config
 			}
 			catch (const nlohmann::json::exception& e)
 			{
-				SPDLOG_ERROR("解析动画配置时发生错误: {}", e.what());
+				SPDLOG_ERROR("解析动画配置时发生错误: {}\n{}", e.what(), json.dump(4));
 				return false;
 			}
 		}

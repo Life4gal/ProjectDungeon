@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <array>
 #include <functional>
 #include <vector>
 
@@ -74,19 +75,22 @@ namespace pd::components
 		};
 
 		// 房间内钥匙实体
-		// 对应config::Room::key_tiles
-		class Keys final
+		// 如果没有钥匙则没有该组件
+		// 如果钥匙被收集了则没有该组件
+		// 对应config::Room::key_tile
+		class Key final
 		{
 		public:
-			std::vector<entt::entity> entities;
+			entt::entity entity;
 		};
 
 		// 房间内门瓦片实体
+		// 如果对应方向没有门则实体为entt::null
 		// 对应config::Room::door_tiles
 		class Doors final
 		{
 		public:
-			std::vector<entt::entity> entities;
+			std::array<entt::entity, 4> entities;
 		};
 
 		// 房间内敌人实体

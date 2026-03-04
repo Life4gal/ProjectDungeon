@@ -13,10 +13,6 @@ namespace pd::config
 	class Enemy final
 	{
 	public:
-		// 尺寸(比例)
-		float scale_x;
-		float scale_y;
-
 		// 动画ID
 		std::string animation_id;
 
@@ -35,11 +31,18 @@ namespace pd::config
 
 	// 敌人集
 	// 敌人ID -> 敌人配置
-	class EnemySet final : public Set<Enemy> {};
+	// JSON:
+	// { "enemies": "/path/to/enemies.json" }
+	// { "enemies": { "enemy-id-1": { Enemy }, "enemy-id-2": { Enemy }, ... } }
+	class EnemySet final : public Set<Enemy>
+	{
+	public:
+		using Set::Set;
+	};
 
-	[[nodiscard]] auto load_enemy_from_json(Enemy& player, const ConfigReader::json_format& json) noexcept -> bool;
+	[[nodiscard]] auto load_enemy_from_json(Enemy& enemy, const ConfigReader::json_format& json) noexcept -> bool;
 	[[nodiscard]] auto load_enemy_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<Enemy>;
 
-	[[nodiscard]] auto load_enemy_set_from_json(EnemySet& player_set, const ConfigReader::json_format& json) noexcept -> bool;
+	[[nodiscard]] auto load_enemy_set_from_json(EnemySet& enemy_set, const ConfigReader::json_format& json) noexcept -> bool;
 	[[nodiscard]] auto load_enemy_set_from_json(const ConfigReader::json_format& json) noexcept -> std::optional<EnemySet>;
 }

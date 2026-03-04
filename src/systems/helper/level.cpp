@@ -52,32 +52,6 @@ namespace pd::systems::helper
 			}
 		}
 
-		// 检查瓦片集
-		// todo: 理论上在 config/level.cpp --> from_xxx::load_level 时就应该检查了,这里不需要检查
-		{
-			const auto do_check_tiles = [&](const std::string_view type, const auto& tile_set) noexcept -> void
-			{
-				for (const auto& [tile_id, tile]: tile_set)
-				{
-					if (const auto animation_it = level.animation_set.find(tile.animation_id);
-						animation_it == level.animation_set.end())
-					{
-						SPDLOG_ERROR("{}瓦片纹理[{}]的动画[{}]不存在!", type, tile_id, tile.animation_id);
-						// todo: 如何处理?
-					}
-				}
-			};
-
-			// walls
-			do_check_tiles("墙壁", level.tile_set.wall_tiles);
-			// floors
-			do_check_tiles("地板", level.tile_set.floor_tiles);
-			// decorations
-			do_check_tiles("装饰物", level.tile_set.decoration_tiles);
-			// triggers
-			do_check_tiles("触发器", level.tile_set.trigger_tiles);
-		}
-
 		const auto entity = registry.create();
 
 		registry.emplace<level::Level>(entity, std::cref(level));
@@ -92,7 +66,7 @@ namespace pd::systems::helper
 		}
 
 		// 理论上应该由switch_room设置该组件
-		// 如果先设置改组件房间我们join :)
+		// 不过在这里设置该组件可以方便后续join :)
 		registry.emplace<level::Room>(entity, room_entity);
 
 		return entity;
@@ -153,7 +127,7 @@ namespace pd::systems::helper
 		const auto [room_entity] = registry.get<const level::Room>(level_entity);
 
 		// 切换到初始房间
-		switch_room(registry, level_entity, entt::null, room_entity, player_entity);
+		switch_room(registry, level_entity, entt::null, room_entity, player_entity, std::nullopt);
 		return true;
 	}
 
@@ -253,7 +227,10 @@ namespace pd::systems::helper
 		}
 
 		// 进入目标房间
-		switch_room(registry, level_entity, this_room_entity, target_room_entity, other_entity);
+		const auto [door_direction] = registry.get<const door::Direction>(door_entity);
+		 // 进入目标房间的入口方向应该与离开当前房间的出口方向相反
+		const auto entrance_direction = -door_direction;
+		switch_room(registry, level_entity, this_room_entity, target_room_entity, other_entity, entrance_direction);
 	}
 
 	auto Level::create_room(entt::registry& registry, const entt::entity level_entity, const std::string& room_id) noexcept -> entt::entity
@@ -315,7 +292,8 @@ namespace pd::systems::helper
 		const entt::entity level_entity,
 		const entt::entity this_room_entity,
 		const entt::entity target_room_entity,
-		const entt::entity player_entity
+		const entt::entity player_entity,
+		const std::optional<config::DoorDirection> entrance_direction
 	) noexcept -> void
 	{
 		using namespace components;
@@ -335,7 +313,7 @@ namespace pd::systems::helper
 		}
 
 		// 进入目标房间
-		Room::on_enter(registry, target_room_entity, player_entity, collected_keys);
+		Room::on_enter(registry, target_room_entity, player_entity, collected_keys, entrance_direction);
 
 		// 设置当前房间
 		registry.emplace_or_replace<level::Room>(level_entity, target_room_entity);

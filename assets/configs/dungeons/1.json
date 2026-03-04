@@ -1,0 +1,8 @@
+{
+	"name": "地下城1",
+	"levels": {
+		"level1": "assets/configs/levels/1.json",
+		"level2": "assets/configs/levels/2.json"
+	},
+	"level_order": [ "level1", "level2" ]
+}

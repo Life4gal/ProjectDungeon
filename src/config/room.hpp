@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <array>
 #include <optional>
 
 #include <config/config_reader.hpp>
@@ -86,8 +87,8 @@ namespace pd::config
 	//   "floors": { "floor-id-1": [ { "x": 0, "y": 0 }, ... ], ... }, 
 	//   "decorations": { "decoration-id-1": [ { "x": 0, "y": 0 }, ... ], ... }, 
 	//   "triggers": { "trigger-id-1": [ { "x": 0, "y": 0 }, ... ], ... }, 
-	//   "keys": { "key-id-1": [ { "x": 0, "y": 0, "name": "key-name" }, ... ], ... }, 
-	//   "doors": { "door-id-1": [ { "x": 0, "y": 0, "target_room": "room-id", "key": "key-name", "direction": "UP/DOWN/LEFT/RIGHT" }, ... ], ... }, 
+	//   "key": { "id": "key-id-1", "x": 0, "y": 0, "name": "key-name" }, 
+	//   "doors": { "UP": { "id": "door-id-1", "x": 0, "y": 0, "target_room": "room-id", "key": "key-name" }, "DOWN": { ... }, "LEFT": { ... }, "RIGHT": { ... } },
 	//   "player_spawn_point": { "tile_x": 0, "tile_y": 0 }, 
 	//   "enemy_spawn_points": [ { "x": 0, "y": 0 }, ... ], 
 	//   "npc_spawn_points": [ { "x": 0, "y": 0 }, ... ], 
@@ -108,10 +109,6 @@ namespace pd::config
 		// 房间高度
 		int height;
 
-		// 下面这些映射表的配置格式大致为(以json格式为例)
-		// "xxx": { "name": [ { "x": 0, "y": 0 }, ... ] }
-		// "doors": { "name": [ { "x": 0, "y": 0, "target_room": "room-id", "key": "key-name", "direction": "UP" }, ... ] }
-
 		// 墙壁位置与瓦片的映射表
 		std::unordered_map<Position, Wall> wall_tiles;
 		// 地板位置与瓦片的映射表
@@ -120,10 +117,13 @@ namespace pd::config
 		std::unordered_map<Position, Decoration> decoration_tiles;
 		// 触发器位置与瓦片的映射表
 		std::unordered_map<Position, Trigger> trigger_tiles;
+
 		// 钥匙位置与钥匙配置的映射表
-		std::unordered_map<Position, Key> key_tiles;
+		// 一个房间最多一把钥匙
+		std::optional<std::pair<Position, Key>> key_tile;
 		// 门位置与门配置的映射表
-		std::unordered_map<Position, Door> door_tiles;
+		// 一个房间最多四个门
+		std::array<std::optional<std::pair<Position, Door>>, 4> door_tiles;
 
 		// 玩家生成点(如果是初始房间)
 		Position player_spawn_point;

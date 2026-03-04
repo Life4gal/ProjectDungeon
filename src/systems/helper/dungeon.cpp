@@ -10,6 +10,8 @@
 
 #include <components/tags.hpp>
 #include <components/dungeon.hpp>
+#include <components/level.hpp>
+#include <components/room.hpp>
 
 #include <systems/helper/player.hpp>
 #include <systems/helper/level.hpp>
@@ -68,13 +70,24 @@ namespace pd::systems::helper
 		// 保存配置
 		registry.ctx().emplace<dungeon::Dungeon>(std::move(dungeon));
 
-		// 创建一个测试用实体
+		// 创建玩家实体
+		const auto player_it = level.player_set.find(level.player_id);
+		if (player_it == level.player_set.end())
+		{
+			SPDLOG_ERROR("关卡[{}]指定的玩家[{}]不存在!", level.name, level.player_id);
+			return false;
+		}
+		const auto& player = player_it->second;
+
+		// 实体的位置不重要,Room::on_enter会设置玩家位置
 		// 64 / 16 == 4
-		const auto player_entity = Player::spawn(registry, sf::Vector2f{500, 500}, sf::Vector2f{4, 4});
+		const auto player_entity = Player::spawn(registry, player, level.animation_set, sf::Vector2f{0, 0}, sf::Vector2f{4, 4});
 		if (player_entity == entt::null)
 		{
 			return false;
 		}
+
+		// 加入关卡
 		Level::join(registry, level_entity, player_entity);
 
 		return true;

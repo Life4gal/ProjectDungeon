@@ -23,5 +23,10 @@ namespace pd::utility
 		{
 			return std::hash<std::string_view>{}(string);
 		}
+
+		[[nodiscard]] static auto operator()(const char* string) noexcept -> std::size_t
+		{
+			return std::hash<std::string_view>{}(string);
+		}
 	};
 }

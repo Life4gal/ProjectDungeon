@@ -7,6 +7,9 @@
 
 #include <string>
 #include <span>
+#include <optional>
+
+#include <config/types.hpp>
 
 #include <entt/fwd.hpp>
 
@@ -58,8 +61,15 @@ namespace pd::systems::helper
 		// =====================================
 
 		// 进入房间
+		// 如果指定entrance_direction则玩家会出现在对应方向的门内侧,否则移动到房间中心
 		// todo: 我们不希望房间依赖关卡(房间访问属于关卡的组件),所以将玩家当前持有的钥匙传入
-		static auto on_enter(entt::registry& registry, entt::entity room_entity, entt::entity player_entity, std::span<const std::string> keys) noexcept -> void;
+		static auto on_enter(
+			entt::registry& registry,
+			entt::entity room_entity,
+			entt::entity player_entity,
+			std::span<const std::string> keys,
+			std::optional<config::DoorDirection> entrance_direction = std::nullopt
+		) noexcept -> void;
 
 		// 离开房间
 		static auto on_exit(entt::registry& registry, entt::entity room_entity, entt::entity player_entity) noexcept -> void;
@@ -203,7 +213,6 @@ namespace pd::systems::helper
 			entt::registry& registry,
 			const config::Door& door,
 			const config::DoorTile& door_tile,
-			// config::Dungeon::animation_set
 			const config::AnimationSet& animation_set,
 			sf::Vector2f position,
 			sf::Vector2f scale = sf::Vector2f{1, 1}

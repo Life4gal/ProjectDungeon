@@ -58,7 +58,50 @@ namespace pd::systems::helper
 			const auto room_tile_size = static_cast<float>(room.tile_size);
 			const auto room_half_tile_size = room_tile_size * 0.5f;
 
-			const auto do_create_tile = [&]<typename PositionToDataMapping, typename TileIdToTileMapping>(
+			const auto do_create_tile = [&]<typename Data, typename TileIdToTileMapping>(
+				const std::string_view type,
+				const config::Position tile_position,
+				const Data& tile_data,
+				// map: tile_id --> XxxTile
+				const TileIdToTileMapping& set,
+				// T + XxxTile + tile-position --> entity
+				auto tile_entity_maker
+			) noexcept -> entt::entity //
+						requires requires
+						{
+							{
+								tile_entity_maker(
+									tile_data,
+									typename TileIdToTileMapping::mapped_type{},
+									sf::Vector2f{}
+								)
+							} -> std::same_as<entt::entity>;
+						}
+			{
+				// config::Wall::tile_id
+				// config::Floor::tile_id
+				// config::Decoration::tile_id
+				// config::Trigger::tile_id
+				// config::Key::tile_id
+				// config::Door::tile_id
+				const auto& tile_id = tile_data.tile_id;
+				const auto tile_it = set.find(tile_id);
+				if (tile_it == set.end())
+				{
+					SPDLOG_WARN("房间[{}]引用了不存在的{}瓦片[{}]", room.name, type, tile_id);
+					return entt::null;
+				}
+
+				const auto& tile = tile_it->second;
+
+				const auto x = room_offset_x + static_cast<float>(tile_position.x) * room_tile_size + room_half_tile_size;
+				const auto y = room_offset_y + static_cast<float>(tile_position.y) * room_tile_size + room_half_tile_size;
+				const auto position = sf::Vector2f{x, y};
+
+				return tile_entity_maker(tile_data, tile, position);
+			};
+
+			const auto do_create_tiles = [&]<typename PositionToDataMapping, typename TileIdToTileMapping>(
 				const std::string_view type,
 				// map: position --> T
 				const PositionToDataMapping& tiles,
@@ -71,40 +114,26 @@ namespace pd::systems::helper
 			) noexcept -> void //
 						requires requires
 						{
-							{
-								tile_entity_maker(
-									typename PositionToDataMapping::mapped_type{},
-									typename TileIdToTileMapping::mapped_type{},
-									sf::Vector2f{}
-								)
-							} -> std::same_as<entt::entity>;
+							do_create_tile(
+								type,
+								typename PositionToDataMapping::key_type{},
+								typename PositionToDataMapping::mapped_type{},
+								set,
+								tile_entity_maker
+							);
 						}
 			{
 				entity_container.reserve(tiles.size());
 
 				for (const auto& [position, data]: tiles)
 				{
-					// config::Wall::tile_id
-					// config::Floor::tile_id
-					// config::Decoration::tile_id
-					// config::Trigger::tile_id
-					// config::Key::tile_id
-					// config::Door::tile_id
-					const auto& tile_id = data.tile_id;
-					const auto tile_it = set.find(tile_id);
-					if (tile_it == set.end())
+					const auto tile_entity = do_create_tile(type, position, data, set, tile_entity_maker);
+					if (tile_entity == entt::null)
 					{
-						SPDLOG_WARN("房间[{}]引用了不存在的{}瓦片[{}]", room.name, type, tile_id);
+						SPDLOG_WARN("房间[{}]的{}创建失败", room.name, type);
 						continue;
 					}
 
-					const auto& tile = tile_it->second;
-
-					const auto tile_x = room_offset_x + static_cast<float>(position.x) * room_tile_size + room_half_tile_size;
-					const auto tile_y = room_offset_y + static_cast<float>(position.y) * room_tile_size + room_half_tile_size;
-					const auto tile_position = sf::Vector2f{tile_x, tile_y};
-
-					const auto tile_entity = tile_entity_maker(data, tile, tile_position);
 					entity_container.emplace_back(tile_entity);
 				}
 			};
@@ -114,7 +143,7 @@ namespace pd::systems::helper
 				const auto& tiles = room.wall_tiles;
 				auto& [walls] = registry.emplace<room::Walls>(entity);
 
-				do_create_tile(
+				do_create_tiles(
 					"墙壁",
 					tiles,
 					tile_set.wall_tiles,
@@ -130,7 +159,7 @@ namespace pd::systems::helper
 				const auto& tiles = room.floor_tiles;
 				auto& [floors] = registry.emplace<room::Floors>(entity);
 
-				do_create_tile(
+				do_create_tiles(
 					"地板",
 					tiles,
 					tile_set.floor_tiles,
@@ -146,7 +175,7 @@ namespace pd::systems::helper
 				const auto& tiles = room.decoration_tiles;
 				auto& [decorations] = registry.emplace<room::Decorations>(entity);
 
-				do_create_tile(
+				do_create_tiles(
 					"装饰物",
 					tiles,
 					tile_set.decoration_tiles,
@@ -162,7 +191,7 @@ namespace pd::systems::helper
 				const auto& tiles = room.trigger_tiles;
 				auto& [triggers] = registry.emplace<room::Triggers>(entity);
 
-				do_create_tile(
+				do_create_tiles(
 					"触发器",
 					tiles,
 					tile_set.trigger_tiles,
@@ -173,42 +202,86 @@ namespace pd::systems::helper
 					triggers
 				);
 			}
-			// keys
+			// key
 			{
-				const auto& tiles = room.key_tiles;
-				auto& [keys] = registry.emplace<room::Keys>(entity);
+				if (const auto& tile_opt = room.key_tile;
+					tile_opt.has_value())
+				{
+					const auto& tile = *tile_opt;
 
-				do_create_tile(
-					"钥匙",
-					tiles,
-					tile_set.key_tiles,
-					[&](const config::Key& key, const config::KeyTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+					const auto key_entity = do_create_tile(
+						"钥匙",
+						tile.first,
+						tile.second,
+						tile_set.key_tiles,
+						[&](const config::Key& k, const config::KeyTile& kt, const sf::Vector2f position) noexcept -> entt::entity
+						{
+							return create_key(registry, k, kt, animation_set, position);
+						}
+					);
+
+					if (key_entity == entt::null)
 					{
-						return create_key(registry, key, tile, animation_set, position);
-					},
-					keys
-				);
+						SPDLOG_WARN("房间[{}]的钥匙[{}]创建失败", room.name, tile.second.name);
+					}
+					else
+					{
+						registry.emplace<room::Key>(entity, key_entity);
+					}
+				}
 			}
 			// doors
 			{
 				const auto& tiles = room.door_tiles;
 				auto& [doors] = registry.emplace<room::Doors>(entity);
 
-				do_create_tile(
-					"门",
-					tiles,
-					tile_set.door_tiles,
-					[&](const config::Door& door, const config::DoorTile& tile, const sf::Vector2f position) noexcept -> entt::entity
+				const auto do_create_door = [&](const config::DoorDirection direction) noexcept -> bool
+				{
+					const auto& tile_opt = tiles[config::index_of(direction)];
+					if (not tile_opt.has_value())
 					{
-						if (room.type == config::RoomType::STARTING)
-						{
-							return create_unlocked_door(registry, door, tile, animation_set, position);
-						}
+						doors[config::index_of(direction)] = entt::null;
+						return true;
+					}
 
-						return create_locked_door(registry, door, tile, animation_set, position);
-					},
-					doors
-				);
+					const auto& tile = *tile_opt;
+
+					const auto door_entity = do_create_tile(
+						"门",
+						tile.first,
+						tile.second,
+						tile_set.door_tiles,
+						[&](const config::Door& d, const config::DoorTile& dt, const sf::Vector2f position) noexcept -> entt::entity
+						{
+							if (room.type == config::RoomType::STARTING)
+							{
+								return create_unlocked_door(registry, d, dt, animation_set, position);
+							}
+
+							return create_locked_door(registry, d, dt, animation_set, position);
+						}
+					);
+
+					doors[config::index_of(direction)] = door_entity;
+					return door_entity != entt::null;
+				};
+
+				if (not do_create_door(config::DoorDirection::UP))
+				{
+					SPDLOG_WARN("房间[{}]的上方的门创建失败!", room.name);
+				}
+				if (not do_create_door(config::DoorDirection::DOWN))
+				{
+					SPDLOG_WARN("房间[{}]的下方的门创建失败!", room.name);
+				}
+				if (not do_create_door(config::DoorDirection::LEFT))
+				{
+					SPDLOG_WARN("房间[{}]的左方的门创建失败!", room.name);
+				}
+				if (not do_create_door(config::DoorDirection::RIGHT))
+				{
+					SPDLOG_WARN("房间[{}]的右方的门创建失败!", room.name);
+				}
 			}
 		}
 
@@ -263,7 +336,13 @@ namespace pd::systems::helper
 		registry.destroy(room_entity);
 	}
 
-	auto Room::on_enter(entt::registry& registry, const entt::entity room_entity, const entt::entity player_entity, const std::span<const std::string> keys) noexcept -> void
+	auto Room::on_enter(
+		entt::registry& registry,
+		const entt::entity room_entity,
+		const entt::entity player_entity,
+		const std::span<const std::string> keys,
+		const std::optional<config::DoorDirection> entrance_direction
+	) noexcept -> void
 	{
 		using namespace components;
 
@@ -276,10 +355,75 @@ namespace pd::systems::helper
 		show(registry, room_entity);
 
 		// 设置玩家位置
+		if (entrance_direction.has_value())
 		{
-			// todo: 一边的墙只有一个门吗?上个房间的门对应这个房间的哪个门?
+			// 传送到对应门内侧
 
-			PhysicsBody::set_position(registry, player_entity, {10, 10});
+			const auto& [doors] = registry.get<const room::Doors>(room_entity);
+			const auto door_entity = doors[config::index_of(*entrance_direction)];
+
+			PROMETHEUS_PLATFORM_ASSUME(door_entity != entt::null);
+
+			const auto door_position = Transform::get_position(registry, door_entity);
+			const auto door_width = static_cast<float>(Animation::get_texture_width(registry, door_entity));
+			const auto door_height = static_cast<float>(Animation::get_texture_height(registry, door_entity));
+
+			// 这个偏移防止在极限距离进入门时玩家和门重叠导致反复触发进入事件
+			constexpr auto spawn_offset = 5.f;
+
+			const auto position = [&] noexcept -> sf::Vector2f
+			{
+				switch (*entrance_direction)
+				{
+					case config::DoorDirection::UP:
+					{
+						return door_position + sf::Vector2f{0.f, door_height + spawn_offset};
+					}
+					case config::DoorDirection::DOWN:
+					{
+						return door_position + sf::Vector2f{0.f, -door_height - spawn_offset};
+					}
+					case config::DoorDirection::LEFT:
+					{
+						return door_position + sf::Vector2f{door_width + spawn_offset, 0.f};
+					}
+					case config::DoorDirection::RIGHT:
+					{
+						return door_position + sf::Vector2f{-door_width - spawn_offset, 0.f};
+					}
+					default: // NOLINT(clang-diagnostic-covered-switch-default)
+					{
+						std::unreachable();
+					}
+				}
+			}();
+
+			const auto physics_position = PhysicsWorld::physics_position_of(position);
+			PhysicsBody::set_position(registry, player_entity, physics_position);
+
+			// Transform::Position会在sync_transfrom中同步
+			// Transform::set_position(registry, player_entity, position);
+		}
+		else
+		{
+			// 房间中心
+
+			const auto& room = registry.get<const room::Room>(room_entity).room.get();
+
+			// todo: 仅允许初始房间出现在房间中心吗?
+			PROMETHEUS_PLATFORM_ASSUME(room.type == config::RoomType::STARTING);
+
+			const auto& [offset_x, offset_y] = registry.get<const room::CenteringOffset>(room_entity);
+			const auto tile_size = static_cast<float>(room.tile_size);
+			const auto room_center_x = offset_x + (static_cast<float>(room.width) * tile_size) * 0.5f;
+			const auto room_center_y = offset_y + (static_cast<float>(room.height) * tile_size) * 0.5f;
+			const auto center_position = sf::Vector2f{room_center_x, room_center_y};
+
+			const auto physics_center_position = PhysicsWorld::physics_position_of(center_position);
+			PhysicsBody::set_position(registry, player_entity, physics_center_position);
+
+			// Transform::Position会在sync_transfrom中同步
+			// Transform::set_position(registry, player_entity, center_position);
 		}
 
 		// 门需要根据玩家当前持有的钥匙进行解锁
@@ -310,23 +454,11 @@ namespace pd::systems::helper
 			if (const auto& room = registry.get<const room::Room>(room_entity).room.get();
 				room.type == config::RoomType::STARTING)
 			{
-				std::ranges::for_each(
-					door_entities,
-					[&registry](const entt::entity door_entity) noexcept -> void
-					{
-						unlock_door(registry, door_entity);
-					}
-				);
+				unlock_doors(registry, room_entity);
 			}
 			else
 			{
-				std::ranges::for_each(
-					door_entities,
-					[&registry](const entt::entity door_entity) noexcept -> void
-					{
-						lock_door(registry, door_entity);
-					}
-				);
+				lock_doors(registry, room_entity);
 			}
 		}
 	}
@@ -359,7 +491,6 @@ namespace pd::systems::helper
 		}
 
 		auto& [enemy_entities] = registry.get<room::Enemies>(room_entity);
-		auto& [key_entities] = registry.get<room::Keys>(room_entity);
 
 		// 检查是否还存在敌人实体
 		if (not enemy_entities.empty())
@@ -376,23 +507,8 @@ namespace pd::systems::helper
 			enemy_entities.erase(invalid_r.begin(), enemy_entities.end());
 		}
 
-		// 检查是否还存在钥匙实体
-		if (not key_entities.empty())
-		{
-			// 检查失效的钥匙实体并移除
-			const auto invalid_r = std::ranges::remove_if(
-				key_entities,
-				[&registry](const entt::entity e) noexcept -> bool
-				{
-					return not registry.valid(e);
-				}
-			);
-
-			key_entities.erase(invalid_r.begin(), key_entities.end());
-		}
-
 		// 如果既不存在敌人实体,又不存在钥匙实体,则认为房间已通过
-		if (enemy_entities.empty() and key_entities.empty())
+		if (enemy_entities.empty() and not registry.all_of<room::Key>(room_entity))
 		{
 			// 开启所有门
 			unlock_doors(registry, room_entity);
@@ -406,13 +522,14 @@ namespace pd::systems::helper
 		using namespace components;
 
 		// 钥匙实体应该属于当前房间
-		PROMETHEUS_PLATFORM_ASSUME(std::ranges::contains(registry.get<room::Keys>(room_entity).entities, key_entity));
+		PROMETHEUS_PLATFORM_ASSUME(registry.get<room::Key>(room_entity).entity == key_entity);
 
 		// 应用钥匙
 		apply_key(registry, room_entity, key_entity);
 		// 销毁钥匙实体
 		destroy_key(registry, key_entity);
-		// 无需修改room::Keys,on_update会检测
+		// 删除钥匙组件
+		registry.erase<room::Key>(room_entity);
 	}
 
 	auto Room::hide(entt::registry& registry, const entt::entity room_entity) noexcept -> void
@@ -494,6 +611,12 @@ namespace pd::systems::helper
 		const auto& [door_entities] = registry.get<room::Doors>(room_entity);
 		for (const entt::entity door_entity: door_entities)
 		{
+			// 注意过滤,因为门实体可能不存在(房间的某个方向可能没有门)
+			if (not registry.valid(door_entity))
+			{
+				return;
+			}
+
 			if (registry.all_of<door::Locked>(door_entity))
 			{
 				if (const auto* key = registry.try_get<const door::Key>(door_entity))
@@ -528,6 +651,12 @@ namespace pd::systems::helper
 			door_entities,
 			[&registry](const entt::entity door_entity) noexcept -> void
 			{
+				// 注意过滤,因为门实体可能不存在(房间的某个方向可能没有门)
+				if (not registry.valid(door_entity))
+				{
+					return;
+				}
+
 				if (not registry.all_of<door::Key>(door_entity))
 				{
 					unlock_door(registry, door_entity);
@@ -545,6 +674,12 @@ namespace pd::systems::helper
 			door_entities,
 			[&](const entt::entity door_entity) noexcept -> void
 			{
+				// 注意过滤,因为门实体可能不存在(房间的某个方向可能没有门)
+				if (not registry.valid(door_entity))
+				{
+					return;
+				}
+
 				lock_door(registry, door_entity);
 			}
 		);

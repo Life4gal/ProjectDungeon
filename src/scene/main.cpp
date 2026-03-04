@@ -52,7 +52,7 @@ namespace pd::scene
 		auto& registry = scene_registry_;
 
 		// 加载地下城
-		if (not helper::Dungeon::load(registry, "assets/configs/dungeons/dungeon-1.json"))
+		if (not helper::Dungeon::load(registry, "assets/configs/dungeons/1.json"))
 		{
 			std::println("[错误] 加载地下城失败");
 			return false;
