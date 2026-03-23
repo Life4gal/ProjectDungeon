@@ -393,3 +393,107 @@ add_custom_target(
 )
 
 add_dependencies(${PROJECT_NAME} copy_resources)
+
+add_executable(
+	${PROJECT_NAME}-alt
+		
+	# ============================
+	# EXTERNAL
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/external/imgui-SFML.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/external/imgui-SFML.cpp
+		
+	# ============================
+	# MANAGER
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager_type.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager.cpp
+	
+	# ============================
+	# COMPONENTS
+	# ============================
+	
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game_config.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/asset_manager.hpp
+	
+	# ============================
+	# EVENTS
+	# ============================
+	
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/game.hpp
+
+	# ============================
+	# SYSTEMS
+	# ============================
+	
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_config.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_config.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.cpp
+
+	# ============================
+	# SCENE
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/quit_game.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/quit_game.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.cpp
+	
+	# ============================
+	# GAME
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/asset.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/scene.hpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.cpp
+
+	# ============================
+	# MAIN
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/main.cpp
+)
+
+target_include_directories(
+		${PROJECT_NAME}-alt
+
+		PUBLIC
+		${CMAKE_CURRENT_SOURCE_DIR}/src-alt
+		${CMAKE_CURRENT_BINARY_DIR}
+)
+
+target_compile_options(
+		${PROJECT_NAME}-alt
+		PUBLIC
+
+		${PD_COMPILE_FLAGS}
+)
+
+target_compile_features(
+		${PROJECT_NAME}-alt
+		PRIVATE
+		cxx_std_23
+)
+
+target_link_libraries(
+		${PROJECT_NAME}-alt
+		PRIVATE
+
+		PrometheusCore
+		${PD_SFML_LIBRARIES}
+		imgui::imgui
+		EnTT::EnTT
+		box2d::box2d
+		spdlog::spdlog
+)
