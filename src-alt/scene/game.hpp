@@ -11,14 +11,12 @@
 
 namespace pd::scene
 {
-	class MainMenu final : public Scene
+	class Game final : public Scene
 	{
 	public:
-		enum class MenuOption : std::uint8_t
+		enum class PauseMenuOption : std::uint8_t
 		{
-			PLAYER_NAME = 0,
-			CONTINUE,
-			START,
+			RESUME = 0,
 			OPTIONS,
 			QUIT,
 
@@ -28,32 +26,29 @@ namespace pd::scene
 		using asset_id_type = manager::AssetId;
 
 	private:
-		// 主菜单字体
+		// 游戏字体
 		asset_id_type font_id_;
 		// 切换选项时音效
 		asset_id_type sound_id_switch_option_;
-		// 主菜单音乐
+		// 游戏音乐
 		asset_id_type music_id_;
 
-		// 玩家名
-		std::string player_name_label_;
 		// 选择的选项
-		std::underlying_type_t<MenuOption> selected_option_value_;
+		std::underlying_type_t<PauseMenuOption> selected_pause_option_value_;
 
-		// =======================
-		// HANDLE_EVENT
-		// =======================
+		auto handle_event_pause(const sf::Event& event) noexcept -> void;
 
-		auto handle_event_main(const sf::Event& event) noexcept -> void;
+		// 开始一场游戏
+		auto start_game() noexcept -> bool;
 
-		// =======================
-		// RENDER
-		// =======================
+		// 从存档加载游戏
+		auto load_game() noexcept -> bool;
 
-		auto render_main(sf::RenderWindow& window) noexcept -> void;
+		// 清理当前游戏并重新开始
+		auto restart_game() noexcept -> void;
 
 	public:
-		explicit MainMenu(Game& game) noexcept;
+		using Scene::Scene;
 
 		auto on_loaded() noexcept -> void override;
 

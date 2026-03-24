@@ -18,6 +18,8 @@ namespace pd::game
 	{
 		// 主菜单字体
 		MAIN_MENU = 0,
+		// 游戏字体
+		GAME,
 
 		COUNT,
 	};
@@ -26,7 +28,14 @@ namespace pd::game
 	{
 			// MAIN_MENU
 			R"(C:\Windows\Fonts\msyh.ttc)",
+			// GAME
+			R"(C:\Windows\Fonts\msyh.ttc)",
 	};
+
+	[[nodiscard]] constexpr auto map_font(const Fonts font) noexcept -> std::string_view
+	{
+		return fonts[std::to_underlying(font)];
+	}
 
 	// =========================================================
 	// TEXTURE
@@ -39,16 +48,21 @@ namespace pd::game
 	enum class Sounds : std::uint8_t
 	{
 		// 主菜单切换选项时音效
-		MAIN_MENU_SWITCH_OPTION = 0,
+		MENU_SWITCH_OPTION = 0,
 
 		COUNT,
 	};
 
 	constexpr std::array<std::string_view, std::to_underlying(Sounds::COUNT)> sounds
 	{
-			// MAIN_MENU_SWITCH_OPTION
-			"./media/sounds/main_menu_switch_option.ogg",
+			// MENU_SWITCH_OPTION
+			"./media/sounds/menu_switch_option.ogg",
 	};
+
+	[[nodiscard]] constexpr auto map_sound(const Sounds sound) noexcept -> std::string_view
+	{
+		return sounds[std::to_underlying(sound)];
+	}
 
 	// =========================================================
 	// MUSIC
@@ -58,9 +72,10 @@ namespace pd::game
 	{
 		// 启动游戏时音乐
 		LAUNCH_GAME = 0,
-
 		// 主菜单音乐
 		MAIN_MENU,
+		// 游戏音乐
+		GAME,
 
 		COUNT,
 	};
@@ -71,5 +86,12 @@ namespace pd::game
 			"./media/musics/launch_game.ogg",
 			// MAIN_MENU
 			"./media/musics/main_menu.ogg",
+			// GAME
+			"./media/musics/game.ogg",
 	};
+
+	[[nodiscard]] constexpr auto map_music(const Musics music) noexcept -> std::string_view
+	{
+		return musics[std::to_underlying(music)];
+	}
 }

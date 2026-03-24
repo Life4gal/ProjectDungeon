@@ -417,11 +417,17 @@ add_executable(
 	# COMPONENTS
 	# ============================
 	
+	# 游戏实体引用
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game.hpp
 
 	# 资源管理器
 	# 储存在场景registry的上下文中
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/asset_manager.hpp
+
+	# 游戏世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game_world.hpp
+	# 游戏物理世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game_physics_world.hpp
 	
 	# ============================
 	# EVENTS
@@ -448,6 +454,13 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.cpp
 
+	# 游戏世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_world.cpp
+	# 游戏物理世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_physics_world.cpp
+
 	# ============================
 	# SCENE
 	# ============================
@@ -460,10 +473,16 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.cpp
 	
+	# 游戏主场景
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/game.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/game.cpp
+
 	# ============================
 	# GAME
 	# ============================
 
+	# 菜单动作相关常量定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/menu_action.hpp
 	# 场景相关常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/scene.hpp
 	# 资源相关常量定义

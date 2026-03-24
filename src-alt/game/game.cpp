@@ -12,6 +12,9 @@
 #include <game/scene.hpp>
 
 #include <scene/main_menu.hpp>
+#include <scene/game.hpp>
+
+#include <prometheus/platform/os.hpp>
 
 #include <external/imgui-SFML.hpp>
 #include <imgui.h>
@@ -50,9 +53,14 @@ namespace pd
 		{
 			std::println("GAME...");
 
-			// todo
+			current_scene_ = std::make_unique<scene::Game>(*this);
+			current_scene_->on_loaded();
+			current_scene_->on_initialized();
+
 			return;
 		}
+
+		PROMETHEUS_PLATFORM_UNREACHABLE();
 	}
 
 	Game::Game(
@@ -165,16 +173,6 @@ namespace pd
 	auto Game::window_size() const noexcept -> sf::Vector2u
 	{
 		return window_.getSize();
-	}
-
-	auto Game::window_width() const noexcept -> unsigned
-	{
-		return window_size().x;
-	}
-
-	auto Game::window_height() const noexcept -> unsigned
-	{
-		return window_size().y;
 	}
 
 	auto Game::time() const noexcept -> sf::Time

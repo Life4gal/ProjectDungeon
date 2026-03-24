@@ -9,11 +9,26 @@
 
 #include <entt/fwd.hpp>
 
+#include <SFML/System/Vector2.hpp>
+#include <SFML/System/Time.hpp>
+
 namespace pd::systems
 {
 	class GameConfig final
 	{
 	public:
+		// ============================
+		// Game
+		// ============================
+
+		[[nodiscard]] static auto get_window_size(entt::registry& registry) noexcept -> sf::Vector2u;
+
+		[[nodiscard]] static auto get_absolute_time(entt::registry& registry) noexcept -> sf::Time;
+
+		// ============================
+		// GameConfig
+		// ============================
+
 		[[nodiscard]] static auto get_sound_volume(entt::registry& registry) noexcept -> float;
 
 		[[nodiscard]] static auto get_music_volume(entt::registry& registry) noexcept -> float;

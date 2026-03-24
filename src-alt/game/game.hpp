@@ -73,12 +73,6 @@ namespace pd
 		// 窗口大小
 		[[nodiscard]] auto window_size() const noexcept -> sf::Vector2u;
 
-		// 窗口宽度
-		[[nodiscard]] auto window_width() const noexcept -> unsigned;
-
-		// 窗口高度
-		[[nodiscard]] auto window_height() const noexcept -> unsigned;
-
 		// 游戏运行的绝对时间
 		[[nodiscard]] auto time() const noexcept -> sf::Time;
 	};

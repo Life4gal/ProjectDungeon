@@ -15,6 +15,26 @@
 
 namespace pd::systems
 {
+	auto GameConfig::get_window_size(entt::registry& registry) noexcept -> sf::Vector2u
+	{
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<components::Game>());
+
+		const auto& [game] = registry.ctx().get<const components::Game>();
+		const auto window_size = game.get().window_size();
+
+		return window_size;
+	}
+
+	auto GameConfig::get_absolute_time(entt::registry& registry) noexcept -> sf::Time
+	{
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<components::Game>());
+
+		const auto& [game] = registry.ctx().get<const components::Game>();
+		const auto absolute_time = game.get().time();
+
+		return absolute_time;
+	}
+
 	auto GameConfig::get_sound_volume(entt::registry& registry) noexcept -> float
 	{
 		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<components::Game>());
