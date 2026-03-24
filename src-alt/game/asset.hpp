@@ -24,18 +24,22 @@ namespace pd::game
 		COUNT,
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(Fonts::COUNT)> fonts
+	class Font final
 	{
-			// MAIN_MENU
-			R"(C:\Windows\Fonts\msyh.ttc)",
-			// GAME
-			R"(C:\Windows\Fonts\msyh.ttc)",
-	};
+	public:
+		constexpr static std::array<std::string_view, std::to_underlying(Fonts::COUNT)> fonts
+		{
+				// MAIN_MENU
+				R"(C:\Windows\Fonts\msyh.ttc)",
+				// GAME
+				R"(C:\Windows\Fonts\msyh.ttc)",
+		};
 
-	[[nodiscard]] constexpr auto map_font(const Fonts font) noexcept -> std::string_view
-	{
-		return fonts[std::to_underlying(font)];
-	}
+		[[nodiscard]] constexpr static auto get(const Fonts font) noexcept -> std::string_view
+		{
+			return fonts[std::to_underlying(font)];
+		}
+	};
 
 	// =========================================================
 	// TEXTURE
@@ -53,16 +57,20 @@ namespace pd::game
 		COUNT,
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(Sounds::COUNT)> sounds
+	class Sound final
 	{
-			// MENU_SWITCH_OPTION
-			"./media/sounds/menu_switch_option.ogg",
-	};
+	public:
+		constexpr static std::array<std::string_view, std::to_underlying(Sounds::COUNT)> sounds
+		{
+				// MENU_SWITCH_OPTION
+				"./media/sounds/menu_switch_option.ogg",
+		};
 
-	[[nodiscard]] constexpr auto map_sound(const Sounds sound) noexcept -> std::string_view
-	{
-		return sounds[std::to_underlying(sound)];
-	}
+		[[nodiscard]] constexpr static auto get(const Sounds sound) noexcept -> std::string_view
+		{
+			return sounds[std::to_underlying(sound)];
+		}
+	};
 
 	// =========================================================
 	// MUSIC
@@ -80,18 +88,22 @@ namespace pd::game
 		COUNT,
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(Musics::COUNT)> musics
+	class Music final
 	{
-			// LAUNCH_GAME
-			"./media/musics/launch_game.ogg",
-			// MAIN_MENU
-			"./media/musics/main_menu.ogg",
-			// GAME
-			"./media/musics/game.ogg",
-	};
+	public:
+		constexpr static std::array<std::string_view, std::to_underlying(Musics::COUNT)> musics
+		{
+				// LAUNCH_GAME
+				"./media/musics/launch_game.ogg",
+				// MAIN_MENU
+				"./media/musics/main_menu.ogg",
+				// GAME
+				"./media/musics/game.ogg",
+		};
 
-	[[nodiscard]] constexpr auto map_music(const Musics music) noexcept -> std::string_view
-	{
-		return musics[std::to_underlying(music)];
-	}
+		[[nodiscard]] constexpr static auto get(const Musics music) noexcept -> std::string_view
+		{
+			return musics[std::to_underlying(music)];
+		}
+	};
 }

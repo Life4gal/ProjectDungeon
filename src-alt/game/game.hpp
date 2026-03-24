@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <game/config.hpp>
+#include <game/game_config.hpp>
 #include <game/dispatcher.hpp>
 
 #include <events/game.hpp>

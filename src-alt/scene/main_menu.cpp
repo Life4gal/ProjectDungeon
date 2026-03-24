@@ -25,6 +25,7 @@ namespace pd::scene
 {
 	auto MainMenu::handle_event_main(const sf::Event& event) noexcept -> void
 	{
+		using namespace game;
 		using namespace systems;
 
 		const auto* kp = event.getIf<sf::Event::KeyPressed>();
@@ -34,23 +35,23 @@ namespace pd::scene
 			return;
 		}
 
-		const auto action = game::map_action(kp->code);
+		const auto action = MenuActionMap::get(kp->code);
 
 		if (
-			action != game::MenuAction::UP and
-			action != game::MenuAction::DOWN and
-			action != game::MenuAction::CONFIRM and
-			action != game::MenuAction::CANCEL
+			action != MenuAction::UP and
+			action != MenuAction::DOWN and
+			action != MenuAction::CONFIRM and
+			action != MenuAction::CANCEL
 		)
 		{
 			return;
 		}
 
-		if (action == game::MenuAction::UP or action == game::MenuAction::DOWN)
+		if (action == MenuAction::UP or action == MenuAction::DOWN)
 		{
 			AssetManager::play_sound(registry_, sound_id_switch_option_);
 
-			if (action == game::MenuAction::UP)
+			if (action == MenuAction::UP)
 			{
 				if (selected_option_value_ == 0)
 				{
@@ -73,17 +74,17 @@ namespace pd::scene
 				}
 			}
 		}
-		else if (action == game::MenuAction::CONFIRM)
+		else if (action == MenuAction::CONFIRM)
 		{
 			if (const auto selected_option = static_cast<MenuOption>(selected_option_value_);
 				selected_option == MenuOption::CONTINUE)
 			{
 				// todo
-				Dispatcher::scene_change(registry_, game::Scenes::GAME);
+				Dispatcher::scene_change(registry_, Scenes::GAME);
 			}
 			else if (selected_option == MenuOption::START)
 			{
-				Dispatcher::scene_change(registry_, game::Scenes::GAME);
+				Dispatcher::scene_change(registry_, Scenes::GAME);
 			}
 			else if (selected_option == MenuOption::OPTIONS)
 			{
@@ -91,12 +92,12 @@ namespace pd::scene
 			}
 			else if (selected_option == MenuOption::QUIT)
 			{
-				Dispatcher::scene_change(registry_, game::Scenes::QUIT);
+				Dispatcher::scene_change(registry_, Scenes::QUIT);
 			}
 		}
-		else if (action == game::MenuAction::CANCEL)
+		else if (action == MenuAction::CANCEL)
 		{
-			Dispatcher::scene_change(registry_, game::Scenes::QUIT);
+			Dispatcher::scene_change(registry_, Scenes::QUIT);
 		}
 		else
 		{
@@ -108,7 +109,7 @@ namespace pd::scene
 	{
 		using namespace systems;
 
-		const auto& font = systems::AssetManager::get_font(registry_, font_id_);
+		const auto& font = AssetManager::get_font(registry_, font_id_);
 
 		constexpr float menu_x = 290.f;
 		constexpr float menu_y_start = 300.f;
@@ -148,6 +149,7 @@ namespace pd::scene
 
 	auto MainMenu::on_loaded() noexcept -> void
 	{
+		using namespace game;
 		using namespace systems;
 
 		// AssetManager
@@ -163,9 +165,9 @@ namespace pd::scene
 			registry_.ctx().emplace<components::MusicChannel>(nullptr);
 		}
 
-		font_id_ = AssetManager::load_font(registry_, game::map_font(game::Fonts::MAIN_MENU));
-		sound_id_switch_option_ = AssetManager::load_sound(registry_, game::map_sound(game::Sounds::MENU_SWITCH_OPTION));
-		music_id_ = AssetManager::load_music(registry_, game::map_music(game::Musics::MAIN_MENU));
+		font_id_ = AssetManager::load_font(registry_, Font::get(Fonts::MAIN_MENU));
+		sound_id_switch_option_ = AssetManager::load_sound(registry_, Sound::get(Sounds::MENU_SWITCH_OPTION));
+		music_id_ = AssetManager::load_music(registry_, Music::get(Musics::MAIN_MENU));
 		player_name_label_ = std::string{"Player Name: "}.append(GameConfig::get_player_name(registry_));
 		{
 			// 如果存在存档则为continue,否则为start

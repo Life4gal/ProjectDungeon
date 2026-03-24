@@ -25,33 +25,36 @@ namespace pd::game
 		NONE,
 	};
 
-	// FIXME: 可配置?
-	constexpr std::array/*<sf::Keyboard::Key, std::to_underlying(MenuAction::COUNT)>*/ action_keys
+	class MenuActionMap final
 	{
-			// UP
-			sf::Keyboard::Key::Up,
-			// DOWN
-			sf::Keyboard::Key::Down,
-			// LEFT
-			sf::Keyboard::Key::Left,
-			// RIGHT
-			sf::Keyboard::Key::Right,
-			// CONFIRM
-			sf::Keyboard::Key::Enter,
-			// CANCEL
-			sf::Keyboard::Key::Escape,
-	};
-
-	[[nodiscard]] constexpr auto map_action(const sf::Keyboard::Key& key) noexcept -> MenuAction
-	{
-		for (std::size_t i = 0; i < std::to_underlying(MenuAction::COUNT); ++i)
+	public:
+		// FIXME: 可配置?
+		constexpr static std::array/*<sf::Keyboard::Key, std::to_underlying(MenuAction::COUNT)>*/ action_keys
 		{
-			if (key == action_keys[i])
-			{
-				return static_cast<MenuAction>(i);
-			}
-		}
+				// UP
+				sf::Keyboard::Key::Up,
+				// DOWN
+				sf::Keyboard::Key::Down,
+				// LEFT
+				sf::Keyboard::Key::Left,
+				// RIGHT
+				sf::Keyboard::Key::Right,
+				// CONFIRM
+				sf::Keyboard::Key::Enter,
+				// CANCEL
+				sf::Keyboard::Key::Escape,
+		};
 
-		return MenuAction::NONE;
-	}
+		[[nodiscard]] constexpr static auto get(const sf::Keyboard::Key& key) noexcept -> MenuAction
+		{
+			for (std::size_t i = 0; i < std::to_underlying(MenuAction::COUNT); ++i)
+			{
+				if (key == action_keys[i])
+				{
+					return static_cast<MenuAction>(i);
+				}
+			}
+			return MenuAction::NONE;
+		}
+	};
 }

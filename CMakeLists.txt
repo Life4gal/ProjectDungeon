@@ -487,9 +487,13 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/scene.hpp
 	# 资源相关常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/asset.hpp
+	# 地下城房间相关常量定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/room.hpp
+	# 所有常量定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/constants.hpp
 
 	# 游戏相关配置
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/config.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game_config.hpp
 
 	# 事件管理器/分发器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/dispatcher.hpp

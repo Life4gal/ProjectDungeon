@@ -26,6 +26,7 @@ namespace pd::scene
 {
 	auto Game::handle_event_pause(const sf::Event& event) noexcept -> void
 	{
+		using namespace game;
 		using namespace systems;
 
 		PROMETHEUS_PLATFORM_ASSUME(World::is_pause(registry_));
@@ -37,23 +38,23 @@ namespace pd::scene
 			return;
 		}
 
-		const auto action = game::map_action(kp->code);
+		const auto action = MenuActionMap::get(kp->code);
 
 		if (
-			action != game::MenuAction::UP and
-			action != game::MenuAction::DOWN and
-			action != game::MenuAction::CONFIRM and
-			action != game::MenuAction::CANCEL
+			action != MenuAction::UP and
+			action != MenuAction::DOWN and
+			action != MenuAction::CONFIRM and
+			action != MenuAction::CANCEL
 		)
 		{
 			return;
 		}
 
-		if (action == game::MenuAction::UP or action == game::MenuAction::DOWN)
+		if (action == MenuAction::UP or action == MenuAction::DOWN)
 		{
 			AssetManager::play_sound(registry_, sound_id_switch_option_);
 
-			if (action == game::MenuAction::UP)
+			if (action == MenuAction::UP)
 			{
 				if (selected_pause_option_value_ == 0)
 				{
@@ -76,7 +77,7 @@ namespace pd::scene
 				}
 			}
 		}
-		else if (action == game::MenuAction::CONFIRM)
+		else if (action == MenuAction::CONFIRM)
 		{
 			if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::RESUME))
 			{
@@ -89,10 +90,10 @@ namespace pd::scene
 			else if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::QUIT))
 			{
 				// 切换到主菜单
-				Dispatcher::scene_change(registry_, game::Scenes::MAIN_MENU);
+				Dispatcher::scene_change(registry_, Scenes::MAIN_MENU);
 			}
 		}
-		else if (action == game::MenuAction::CANCEL)
+		else if (action == MenuAction::CANCEL)
 		{
 			World::unpause(registry_);
 		}
@@ -119,6 +120,7 @@ namespace pd::scene
 
 	auto Game::on_loaded() noexcept -> void
 	{
+		using namespace game;
 		using namespace systems;
 
 		// AssetManager
@@ -134,9 +136,9 @@ namespace pd::scene
 			registry_.ctx().emplace<components::MusicChannel>(nullptr);
 		}
 
-		font_id_ = AssetManager::load_font(registry_, game::map_font(game::Fonts::GAME));
-		sound_id_switch_option_ = AssetManager::load_sound(registry_, game::map_sound(game::Sounds::MENU_SWITCH_OPTION));
-		music_id_ = AssetManager::load_music(registry_, game::map_music(game::Musics::GAME));
+		font_id_ = AssetManager::load_font(registry_, Font::get(Fonts::GAME));
+		sound_id_switch_option_ = AssetManager::load_sound(registry_, Sound::get(Sounds::MENU_SWITCH_OPTION));
+		music_id_ = AssetManager::load_music(registry_, Music::get(Musics::GAME));
 		selected_pause_option_value_ = std::to_underlying(PauseMenuOption::RESUME);
 
 		World::create(registry_);
