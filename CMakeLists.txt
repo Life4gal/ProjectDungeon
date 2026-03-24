@@ -408,6 +408,7 @@ add_executable(
 	# MANAGER
 	# ============================
 
+	# 资源管理器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager_type.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager.cpp
@@ -416,22 +417,34 @@ add_executable(
 	# COMPONENTS
 	# ============================
 	
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game_config.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game.hpp
+
+	# 资源管理器
+	# 储存在场景registry的上下文中
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/asset_manager.hpp
 	
 	# ============================
 	# EVENTS
 	# ============================
 	
+	# 游戏事件
+	# 主要是切换场景或是退出游戏之类的事件
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/game.hpp
 
 	# ============================
 	# SYSTEMS
 	# ============================
 	
+	# 游戏相关配置
+	# 直接访问Game实例
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_config.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_config.cpp
+	# 事件分发器
+	# 直接访问Game实例
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/dispatcher.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/dispatcher.cpp
 
+	# 资源管理器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.cpp
 
@@ -439,12 +452,11 @@ add_executable(
 	# SCENE
 	# ============================
 
+	# 游戏场景基类
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/quit_game.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/quit_game.cpp
-
+	# 游戏主菜单场景
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.cpp
 	
@@ -452,9 +464,18 @@ add_executable(
 	# GAME
 	# ============================
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/asset.hpp
+	# 场景相关常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/scene.hpp
+	# 资源相关常量定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/asset.hpp
 
+	# 游戏相关配置
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/config.hpp
+
+	# 事件管理器/分发器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/dispatcher.hpp
+
+	# 游戏类
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.cpp
 

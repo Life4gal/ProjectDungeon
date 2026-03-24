@@ -5,7 +5,11 @@
 
 #include <systems/game_config.hpp>
 
-#include <components/game_config.hpp>
+#include <components/game.hpp>
+
+#include <game/game.hpp>
+
+#include <prometheus/platform/os.hpp>
 
 #include <entt/entt.hpp>
 
@@ -13,28 +17,40 @@ namespace pd::systems
 {
 	auto GameConfig::get_sound_volume(entt::registry& registry) noexcept -> float
 	{
-		const auto& config = registry.ctx().get<const components::GameConfig>();
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<components::Game>());
+
+		const auto& [game] = registry.ctx().get<const components::Game>();
+		const auto& config = game.get().game_config();
 
 		return config.sound_volume;
 	}
 
 	auto GameConfig::get_music_volume(entt::registry& registry) noexcept -> float
 	{
-		const auto& config = registry.ctx().get<const components::GameConfig>();
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<components::Game>());
+
+		const auto& [game] = registry.ctx().get<const components::Game>();
+		const auto& config = game.get().game_config();
 
 		return config.music_volume;
 	}
 
 	auto GameConfig::get_max_sound_channels(entt::registry& registry) noexcept -> std::uint32_t
 	{
-		const auto& config = registry.ctx().get<const components::GameConfig>();
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<components::Game>());
+
+		const auto& [game] = registry.ctx().get<const components::Game>();
+		const auto& config = game.get().game_config();
 
 		return config.max_sound_channels;
 	}
 
 	auto GameConfig::get_player_name(entt::registry& registry) noexcept -> std::string_view
 	{
-		const auto& config = registry.ctx().get<const components::GameConfig>();
+		PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<components::Game>());
+
+		const auto& [game] = registry.ctx().get<const components::Game>();
+		const auto& config = game.get().game_config();
 
 		return config.player_name;
 	}

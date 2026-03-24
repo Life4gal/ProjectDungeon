@@ -5,10 +5,16 @@
 
 #include <scene/scene.hpp>
 
+#include <components/game.hpp>
+
 namespace pd::scene
 {
-	Scene::Scene(const std::reference_wrapper<entt::registry> global_registry) noexcept
-		: global_registry_{global_registry} {}
+	Scene::Scene(Game& game) noexcept
+	{
+		// 保存游戏实例引用
+		// 如果派生类会用到游戏实例,其必须保证调用点位于基类构造函数之后
+		registry_.ctx().emplace<components::Game>(std::ref(game));
+	}
 
 	Scene::~Scene() noexcept = default;
 }

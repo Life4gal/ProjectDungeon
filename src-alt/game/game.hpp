@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include <vector>
+#include <game/config.hpp>
+#include <game/dispatcher.hpp>
 
-#include <entt/entity/registry.hpp>
+#include <events/game.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -24,6 +25,9 @@ namespace pd
 		using scene_type = scene::Scene;
 
 	private:
+		GameConfig config_;
+		Dispatcher dispatcher_;
+
 		// 渲染窗口
 		sf::RenderWindow window_;
 		// 绝对时间时钟(不重启)
@@ -31,15 +35,14 @@ namespace pd
 		// 更新计时器(每帧重置)
 		sf::Clock clock_;
 
-		// 实体世界
-		entt::registry registry_;
-
-		// 游戏场景
-		std::vector<std::unique_ptr<scene_type>> scenes_;
-		// 游戏退出场景
-		scene_type* quit_game_scene_;
 		// 游戏当前场景
-		scene_type* current_scene_;
+		std::unique_ptr<scene_type> current_scene_;
+
+		// ==============================
+		// dispatcher绑定
+		// ==============================
+
+		auto on_request_scene_change(const events::RequestSceneChange& event) noexcept -> void;
 
 	public:
 		Game(
@@ -58,9 +61,14 @@ namespace pd
 
 		auto run() noexcept -> void;
 
-		// ====================================
-		// 一些可能变动,但是不应该(没必要)储存到实体世界的变量,可以直接通过接口获取
-		// ====================================
+		// 游戏配置
+		[[nodiscard]] auto game_config() noexcept -> GameConfig&;
+
+		// 游戏配置
+		[[nodiscard]] auto game_config() const noexcept -> const GameConfig&;
+
+		// 事件分发器
+		[[nodiscard]] auto dispatcher() noexcept -> Dispatcher&;
 
 		// 窗口大小
 		[[nodiscard]] auto window_size() const noexcept -> sf::Vector2u;

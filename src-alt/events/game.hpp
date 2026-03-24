@@ -5,7 +5,13 @@
 
 #pragma once
 
+#include <game/scene.hpp>
+
 namespace pd::events
 {
-	class QuitGame {};
+	class RequestSceneChange
+	{
+	public:
+		game::Scenes to;
+	};
 }

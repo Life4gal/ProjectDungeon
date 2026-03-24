@@ -7,13 +7,9 @@
 
 #include <string>
 
-namespace pd::components
+namespace pd
 {
-	// ==========================================
-	// 上下文组件
-	// ==========================================
-
-	class GameConfig final
+    class GameConfig final
 	{
 	public:
 		// 音效音量
@@ -27,8 +23,4 @@ namespace pd::components
 
 		std::string player_name{"Player"};
 	};
-
-	// ==========================================
-	// 实体组件
-	// ==========================================
 }

@@ -5,19 +5,20 @@
 
 #pragma once
 
-#include <cstdint>
+#include <functional>
+#include <string>
 
-namespace pd::game
+namespace pd
 {
-	enum class Scenes : std::uint8_t
-	{
-		// 主菜单
-		MAIN_MENU,
-		// 主游戏场景
-		GAME,
-		// 退出场景(需要吗?)
-		QUIT,
+	class Game;
 
-		COUNT
-	};
+	namespace components
+	{
+		// 游戏实例的引用
+		class Game final
+		{
+		public:
+			std::reference_wrapper<pd::Game> game;
+		};
+	} 
 }

@@ -5,19 +5,16 @@
 
 #pragma once
 
-#include <cstdint>
+#include <game/scene.hpp>
 
-namespace pd::game
+#include <entt/fwd.hpp>
+
+namespace pd::systems
 {
-	enum class Scenes : std::uint8_t
+	class Dispatcher final
 	{
-		// 主菜单
-		MAIN_MENU,
-		// 主游戏场景
-		GAME,
-		// 退出场景(需要吗?)
-		QUIT,
-
-		COUNT
+	public:
+		// 场景切换
+		static auto scene_change(entt::registry& registry, game::Scenes to) noexcept -> void;
 	};
 }

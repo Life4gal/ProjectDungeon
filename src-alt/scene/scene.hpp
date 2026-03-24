@@ -15,18 +15,21 @@ namespace sf
 	class RenderWindow;
 }
 
+namespace pd
+{
+	class Game;
+}
+
 namespace pd::scene
 {
 	class Scene
 	{
 	protected:
-		// 全局实体世界
-		std::reference_wrapper<entt::registry> global_registry_;
-		// 此场景实体世界
-		entt::registry scene_registry_;
+		// 实体世界
+		entt::registry registry_;
 
 	public:
-		explicit Scene(std::reference_wrapper<entt::registry> global_registry) noexcept;
+		explicit Scene(Game& game) noexcept;
 
 		Scene(const Scene&) noexcept = delete;
 		auto operator=(const Scene&) noexcept -> Scene& = delete;

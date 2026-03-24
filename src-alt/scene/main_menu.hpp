@@ -63,7 +63,7 @@ namespace pd::scene
 		auto render_main(sf::RenderWindow& window) noexcept -> void;
 
 	public:
-		explicit MainMenu(std::reference_wrapper<entt::registry> global_registry) noexcept;
+		explicit MainMenu(Game& game) noexcept;
 
 		auto on_loaded() noexcept -> void override;
 

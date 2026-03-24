@@ -5,9 +5,12 @@
 
 #include <game/game.hpp>
 
-#include <components/game_config.hpp>
+#include <print>
 
-#include <scene/quit_game.hpp>
+#include <events/game.hpp>
+
+#include <game/scene.hpp>
+
 #include <scene/main_menu.hpp>
 
 #include <external/imgui-SFML.hpp>
@@ -15,6 +18,43 @@
 
 namespace pd
 {
+	auto Game::on_request_scene_change(const events::RequestSceneChange& event) noexcept -> void
+	{
+		if (current_scene_)
+		{
+			current_scene_->on_unloaded();
+		}
+
+		// 切换到退出场景时直接关闭窗口
+		if (event.to == game::Scenes::QUIT)
+		{
+			std::println("QUIT...");
+
+			window_.close();
+
+			return;
+		}
+
+		if (event.to == game::Scenes::MAIN_MENU)
+		{
+			std::println("MAIN MAIN...");
+
+			current_scene_ = std::make_unique<scene::MainMenu>(*this);
+			current_scene_->on_loaded();
+			current_scene_->on_initialized();
+
+			return;
+		}
+
+		if (event.to == game::Scenes::GAME)
+		{
+			std::println("GAME...");
+
+			// todo
+			return;
+		}
+	}
+
 	Game::Game(
 		const unsigned window_width,
 		const unsigned window_height,
@@ -30,7 +70,7 @@ namespace pd
 		  },
 		  current_scene_{nullptr}
 	{
-		// IMGUI
+		// IMGUI初始化
 		{
 			// const auto init = ImGui::SFML::Init(window);
 			// assert(init);
@@ -49,30 +89,12 @@ namespace pd
 			const auto update = ImGui::SFML::UpdateFontTexture();
 			assert(update);
 		}
-		// 注册全局组件
-		{
-			// 游戏实例
-			// registry_.ctx().emplace<components::Game>(std::cref(*this));
+		// 订阅场景切换事件
+		dispatcher_.subscribe<events::RequestSceneChange, &Game::on_request_scene_change>(*this);
 
-			// 游戏配置
-			registry_.ctx().emplace<components::GameConfig>();
-		}
-		// 创建场景
-		{
-			// 退出场景(占位)
-			{
-				auto scene = std::make_unique<scene::QuitGame>(registry_);
-				quit_game_scene_ = scenes_.emplace_back(std::move(scene)).get();
-			}
-
-			// 主菜单
-			{
-				auto scene = std::make_unique<scene::MainMenu>(registry_);
-				current_scene_ = scenes_.emplace_back(std::move(scene)).get();
-				current_scene_->on_loaded();
-				current_scene_->on_initialized();
-			}
-		}
+		// 切换场景
+		// 注意是trigger,因为我们必须马上创建所需场景
+		dispatcher_.trigger(events::RequestSceneChange{.to = game::Scenes::MAIN_MENU});
 	}
 
 	Game::~Game() noexcept
@@ -95,13 +117,8 @@ namespace pd
 
 				if (event->is<sf::Event::Closed>())
 				{
-					// 卸载当前场景
-					current_scene_->on_unloaded();
-					// 切换到退出场景
-					current_scene_ = quit_game_scene_;
-
-					// 关闭窗口
-					window_.close();
+					// 在这里使用enqueue而不是trigger,我们保证退出前依然会处理完所有事件
+					dispatcher_.enqueue(events::RequestSceneChange{.to = game::Scenes::QUIT});
 				}
 				else
 				{
@@ -109,6 +126,9 @@ namespace pd
 					current_scene_->handle_event(e);
 				}
 			}
+
+			// 处理事件
+			dispatcher_.update();
 
 			const auto delta = clock_.restart();
 
@@ -125,6 +145,21 @@ namespace pd
 
 			window_.display();
 		}
+	}
+
+	auto Game::game_config() noexcept -> GameConfig&
+	{
+		return config_;
+	}
+
+	auto Game::game_config() const noexcept -> const GameConfig&
+	{
+		return config_;
+	}
+
+	auto Game::dispatcher() noexcept -> Dispatcher&
+	{
+		return dispatcher_;
 	}
 
 	auto Game::window_size() const noexcept -> sf::Vector2u
