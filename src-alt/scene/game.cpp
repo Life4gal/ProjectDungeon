@@ -13,8 +13,8 @@
 #include <systems/dispatcher.hpp>
 
 #include <systems/asset_manager.hpp>
-#include <systems/game_world.hpp>
-#include <systems/game_physics_world.hpp>
+#include <systems/world.hpp>
+#include <systems/physics_world.hpp>
 
 #include <prometheus/platform/os.hpp>
 
@@ -28,7 +28,7 @@ namespace pd::scene
 	{
 		using namespace systems;
 
-		PROMETHEUS_PLATFORM_ASSUME(GameWorld::is_pause(registry_));
+		PROMETHEUS_PLATFORM_ASSUME(World::is_pause(registry_));
 
 		const auto* kp = event.getIf<sf::Event::KeyPressed>();
 
@@ -80,7 +80,7 @@ namespace pd::scene
 		{
 			if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::RESUME))
 			{
-				GameWorld::unpause(registry_);
+				World::unpause(registry_);
 			}
 			else if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::OPTIONS))
 			{
@@ -94,7 +94,7 @@ namespace pd::scene
 		}
 		else if (action == game::MenuAction::CANCEL)
 		{
-			GameWorld::unpause(registry_);
+			World::unpause(registry_);
 		}
 		else
 		{
@@ -139,8 +139,8 @@ namespace pd::scene
 		music_id_ = AssetManager::load_music(registry_, game::map_music(game::Musics::GAME));
 		selected_pause_option_value_ = std::to_underlying(PauseMenuOption::RESUME);
 
-		GameWorld::create(registry_);
-		GamePhysicsWorld::create(registry_);
+		World::create(registry_);
+		PhysicsWorld::create(registry_);
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -157,8 +157,8 @@ namespace pd::scene
 	{
 		using namespace systems;
 
-		GamePhysicsWorld::destroy(registry_);
-		GameWorld::destroy(registry_);
+		PhysicsWorld::destroy(registry_);
+		World::destroy(registry_);
 
 		AssetManager::stop_music(registry_, music_id_);
 	}
@@ -173,7 +173,7 @@ namespace pd::scene
 			return;
 		}
 
-		if (GameWorld::is_pause(registry_))
+		if (World::is_pause(registry_))
 		{
 			return handle_event_pause(event);
 		}

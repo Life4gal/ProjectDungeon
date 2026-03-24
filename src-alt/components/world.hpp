@@ -7,7 +7,7 @@
 
 #include <SFML/System/Time.hpp>
 
-namespace pd::components::game_world
+namespace pd::components::world
 {
 	// 此帧历时
 	class FrameDelta final

@@ -7,7 +7,7 @@
 
 #include <box2d/id.h>
 
-namespace pd::components::game_physics_world
+namespace pd::components::physics_world
 {
 	class Id final
 	{

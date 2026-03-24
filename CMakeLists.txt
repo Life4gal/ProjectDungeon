@@ -425,9 +425,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/asset_manager.hpp
 
 	# 游戏世界
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/world.hpp
 	# 游戏物理世界
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game_physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/physics_world.hpp
 	
 	# ============================
 	# EVENTS
@@ -455,11 +455,11 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.cpp
 
 	# 游戏世界
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_world.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/world.cpp
 	# 游戏物理世界
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_physics_world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_physics_world.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/physics_world.cpp
 
 	# ============================
 	# SCENE

@@ -11,7 +11,7 @@
 
 namespace pd::systems
 {
-	class GameWorld final
+	class World final
 	{
 	public:
 		static auto create(entt::registry& registry) noexcept -> void;

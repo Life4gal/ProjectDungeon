@@ -15,7 +15,7 @@
 
 namespace pd::systems
 {
-	class GamePhysicsWorld final
+	class PhysicsWorld final
 	{
 	public:
 		static auto create(entt::registry& registry) noexcept -> void;
