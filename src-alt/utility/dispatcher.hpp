@@ -7,7 +7,7 @@
 
 #include <entt/signal/dispatcher.hpp>
 
-namespace pd
+namespace pd::utility
 {
 	namespace detail
 	{

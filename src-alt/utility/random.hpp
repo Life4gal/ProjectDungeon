@@ -8,7 +8,7 @@
 #include <concepts>
 #include <random>
 
-namespace pd::game
+namespace pd::utility
 {
 	class Random
 	{

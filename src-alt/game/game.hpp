@@ -5,8 +5,9 @@
 
 #pragma once
 
+#include <utility/dispatcher.hpp>
+
 #include <game/game_config.hpp>
-#include <game/dispatcher.hpp>
 
 #include <events/game.hpp>
 
@@ -26,7 +27,7 @@ namespace pd
 
 	private:
 		GameConfig config_;
-		Dispatcher dispatcher_;
+		utility::Dispatcher dispatcher_;
 
 		// 渲染窗口
 		sf::RenderWindow window_;
@@ -68,7 +69,7 @@ namespace pd
 		[[nodiscard]] auto game_config() const noexcept -> const GameConfig&;
 
 		// 事件分发器
-		[[nodiscard]] auto dispatcher() noexcept -> Dispatcher&;
+		[[nodiscard]] auto dispatcher() noexcept -> utility::Dispatcher&;
 
 		// 窗口大小
 		[[nodiscard]] auto window_size() const noexcept -> sf::Vector2u;

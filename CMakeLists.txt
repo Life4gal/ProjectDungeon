@@ -405,6 +405,19 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/external/imgui-SFML.cpp
 		
 	# ============================
+	# UTILITY
+	# ============================
+	
+	# 随机数生成器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/random.hpp
+	
+	# 事件管理器/分发器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/dispatcher.hpp
+
+	# 固定矩阵
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/fixed_matrix.hpp
+
+	# ============================
 	# MANAGER
 	# ============================
 
@@ -494,12 +507,6 @@ add_executable(
 
 	# 游戏相关配置
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game_config.hpp
-
-	# 事件管理器/分发器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/dispatcher.hpp
-
-	# 随机数生成器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/random.hpp
 
 	# 游戏类
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.hpp

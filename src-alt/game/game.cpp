@@ -165,7 +165,7 @@ namespace pd
 		return config_;
 	}
 
-	auto Game::dispatcher() noexcept -> Dispatcher&
+	auto Game::dispatcher() noexcept -> utility::Dispatcher&
 	{
 		return dispatcher_;
 	}
