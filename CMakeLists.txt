@@ -494,6 +494,9 @@ add_executable(
 	# 事件管理器/分发器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/dispatcher.hpp
 
+	# 随机数生成器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/random.hpp
+
 	# 游戏类
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.cpp
