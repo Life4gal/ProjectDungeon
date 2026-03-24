@@ -6,7 +6,6 @@
 #pragma once
 
 #include <functional>
-#include <string>
 
 namespace pd
 {
@@ -14,11 +13,21 @@ namespace pd
 
 	namespace components
 	{
+		// ==========================================
+		// 上下文组件
+		// ==========================================
+
 		// 游戏实例的引用
 		class Game final
 		{
 		public:
 			std::reference_wrapper<pd::Game> game;
 		};
-	} 
+
+		// ==========================================
+		// 实体组件
+		// ==========================================
+
+		//
+	}
 }

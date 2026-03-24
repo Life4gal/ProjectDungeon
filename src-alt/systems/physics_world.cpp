@@ -9,6 +9,8 @@
 
 #include <components/physics_world.hpp>
 
+#include <prometheus/platform/os.hpp>
+
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 
@@ -41,24 +43,24 @@ namespace pd::systems
 		def.gravity = b2Vec2_zero;
 		const auto id = b2CreateWorld(&def);
 
-		registry.ctx().emplace<physics_world::Id>(id);
+		registry.ctx().emplace<physics_world::WorldId>(id);
 	}
 
 	auto PhysicsWorld::destroy(entt::registry& registry) noexcept -> void
 	{
 		using namespace components;
 
-		const auto [id] = registry.ctx().get<physics_world::Id>();
+		const auto [id] = registry.ctx().get<physics_world::WorldId>();
 		b2DestroyWorld(id);
 
-		registry.ctx().erase<physics_world::Id>();
+		registry.ctx().erase<physics_world::WorldId>();
 	}
 
 	auto PhysicsWorld::id(entt::registry& registry) noexcept -> b2WorldId
 	{
 		using namespace components;
 
-		const auto [id] = registry.ctx().get<const physics_world::Id>();
+		const auto [id] = registry.ctx().get<const physics_world::WorldId>();
 
 		return id;
 	}
@@ -103,5 +105,143 @@ namespace pd::systems
 		const auto angle = b2Rot_GetAngle(physics_angle);
 
 		return sf::radians(angle);
+	}
+
+	auto PhysicsWorld::attach(entt::registry& registry, const entt::entity entity, const b2WorldId world_id, const b2BodyDef& body_def) noexcept -> void
+	{
+		using namespace components;
+
+		// 如果已有物理体则先销毁
+		if (registry.all_of<physics_world::BodyId>(entity))
+		{
+			deattach(registry, entity);
+		}
+
+		const auto body_id = b2CreateBody(world_id, &body_def);
+		registry.emplace_or_replace<physics_world::BodyId>(entity, body_id);
+	}
+
+	auto PhysicsWorld::deattach(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		b2DestroyBody(body_id);
+
+		registry.remove<physics_world::BodyId>(entity_with_physics_body);
+	}
+
+	auto PhysicsWorld::disable(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		b2Body_Disable(body_id);
+	}
+
+	auto PhysicsWorld::enable(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		b2Body_Enable(body_id);
+	}
+
+	auto PhysicsWorld::get_position(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> b2Vec2
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		return b2Body_GetPosition(body_id);
+	}
+
+	auto PhysicsWorld::set_position(entt::registry& registry, const entt::entity entity_with_physics_body, const b2Vec2 position) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		const auto rotation = b2Body_GetRotation(body_id);
+		b2Body_SetTransform(body_id, position, rotation);
+	}
+
+	auto PhysicsWorld::get_rotation(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> b2Rot
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		return b2Body_GetRotation(body_id);
+	}
+
+	auto PhysicsWorld::set_rotation(entt::registry& registry, const entt::entity entity_with_physics_body, const b2Rot rotation) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		const auto position = b2Body_GetPosition(body_id);
+		b2Body_SetTransform(body_id, position, rotation);
+	}
+
+	auto PhysicsWorld::get_transform(entt::registry& registry, const entt::entity entity_with_physics_body) noexcept -> b2Transform
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		return b2Body_GetTransform(body_id);
+	}
+
+	auto PhysicsWorld::set_transform(entt::registry& registry, const entt::entity entity_with_physics_body, const b2Transform transform) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		b2Body_SetTransform(body_id, transform.p, transform.q);
+	}
+
+	auto PhysicsWorld::attach_shape(entt::registry& registry, const entt::entity entity_with_physics_body, const b2ShapeDef& shape_def, const b2Circle& circle) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		b2CreateCircleShape(body_id, &shape_def, &circle);
+	}
+
+	auto PhysicsWorld::attach_shape(entt::registry& registry, const entt::entity entity_with_physics_body, const b2ShapeDef& shape_def, const b2Capsule& capsule) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		b2CreateCapsuleShape(body_id, &shape_def, &capsule);
+	}
+
+	auto PhysicsWorld::attach_shape(entt::registry& registry, const entt::entity entity_with_physics_body, const b2ShapeDef& shape_def, const b2Polygon& polygon) noexcept -> void
+	{
+		using namespace components;
+
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(entity_with_physics_body));
+
+		const auto [body_id] = registry.get<physics_world::BodyId>(entity_with_physics_body);
+		b2CreatePolygonShape(body_id, &shape_def, &polygon);
 	}
 }

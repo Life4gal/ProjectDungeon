@@ -5,27 +5,32 @@
 
 #pragma once
 
-#include <box2d/id.h>
-
-namespace pd::components::physics_world
+namespace pd::components::dungeon
 {
+	// 房间类型
+	enum class RoomType
+	{
+		// 标准房间
+		STANDARD,
+		// BOSS房间
+		BOSS,
+		// BOSS房间门钥匙房间
+		KEY,
+		// 商人房间
+		MERCHANT,
+		// 奖励房间
+		BONUS,
+		// 出口房间
+		EXIT,
+	};
+
 	// ==========================================
 	// 上下文组件
 	// ==========================================
-
-	class WorldId final
-	{
-	public:
-		b2WorldId id;
-	};
 
 	// ==========================================
 	// 实体组件
 	// ==========================================
 
-	class BodyId final
-	{
-	public:
-		b2BodyId id;
-	};
+	//
 }

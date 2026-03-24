@@ -11,13 +11,16 @@ namespace pd::game
 {
 	enum class DoorDirection : std::uint8_t
 	{
-		NORTH = 0,
-		SOUTH,
-		WEST,
-		EAST,
-
-		COUNT
+		NORTH = 0b00,
+		SOUTH = 0b01,
+		WEST = 0b10,
+		EAST = 0b11,
 	};
+
+	[[nodiscard]] constexpr auto operator-(const DoorDirection direction) noexcept -> DoorDirection
+	{
+		return static_cast<DoorDirection>(std::to_underlying(direction) ^ 0b01);
+	}
 
 	class Room final
 	{
@@ -33,8 +36,12 @@ namespace pd::game
 
 		constexpr static auto grid_width = 15;
 		constexpr static auto grid_height = 9;
-		constexpr static auto door_count = 4;
+		constexpr static auto tile_width = 64;
+		constexpr static auto tile_height = 64;
+		constexpr static auto room_width = grid_width * tile_width;
+		constexpr static auto room_height = grid_height * tile_height;
 
+		constexpr static auto door_count = 4;
 		constexpr static std::array<Position, door_count> door_positions
 		{{
 				// NORTH
