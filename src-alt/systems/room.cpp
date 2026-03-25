@@ -100,7 +100,7 @@ namespace pd::systems
 
 			PhysicsWorld::attach(registry, entity, world_id, body_def);
 
-			const auto [half_width, half_height] = PhysicsWorld::physics_size_of({game::Room::tile_width * 0.5f * scale.scale.x, game::Room::tile_height * 0.5f * scale.scale.y});
+			const auto [half_width, half_height] = PhysicsWorld::physics_size_of({game::room_tile_width * 0.5f * scale.scale.x, game::room_tile_height * 0.5f * scale.scale.y});
 			const auto box = b2MakeBox(half_width, half_height);
 
 			auto shape_def = b2DefaultShapeDef();
@@ -115,7 +115,7 @@ namespace pd::systems
 	{
 		using namespace components;
 
-		if (x >= game::Room::grid_width or y >= game::Room::grid_height)
+		if (x >= game::room_horizontal_grid or y >= game::room_vertical_grid)
 		{
 			return nullptr;
 		}

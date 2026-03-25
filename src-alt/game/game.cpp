@@ -7,12 +7,15 @@
 
 #include <print>
 
-#include <events/game.hpp>
-
-#include <game/scene.hpp>
+#include <game/constants_map.hpp>
 
 #include <scene/main_menu.hpp>
 #include <scene/game.hpp>
+
+#include <manager/random.hpp>
+#include <manager/asset.hpp>
+#include <manager/event.hpp>
+#include <manager/game_config.hpp>
 
 #include <prometheus/platform/os.hpp>
 
@@ -21,15 +24,29 @@
 
 namespace pd
 {
-	auto Game::on_request_scene_change(const events::RequestSceneChange& event) noexcept -> void
+	auto Game::on_window_resized(const events::WindowResized& event) noexcept -> void
 	{
+		using namespace manager;
+
+		std::ignore = this;
+
+		// 写入GameConfig
+		GameConfig::set_window_width(event.width);
+		GameConfig::set_window_height(event.height);
+	}
+
+	auto Game::on_scene_changed(const events::SceneChanged& event) noexcept -> void
+	{
+		using namespace game;
+		using namespace manager;
+
 		if (current_scene_)
 		{
 			current_scene_->on_unloaded();
 		}
 
 		// 切换到退出场景时直接关闭窗口
-		if (event.to == game::Scenes::QUIT)
+		if (event.to == Scene::QUIT)
 		{
 			std::println("QUIT...");
 
@@ -38,7 +55,7 @@ namespace pd
 			return;
 		}
 
-		if (event.to == game::Scenes::MAIN_MENU)
+		if (event.to == Scene::MAIN_MENU)
 		{
 			std::println("MAIN MAIN...");
 
@@ -49,7 +66,7 @@ namespace pd
 			return;
 		}
 
-		if (event.to == game::Scenes::GAME)
+		if (event.to == Scene::GAME)
 		{
 			std::println("GAME...");
 
@@ -77,7 +94,21 @@ namespace pd
 				  fullscreen ? sf::State::Fullscreen : sf::State::Windowed
 		  },
 		  current_scene_{nullptr}
+#if PROMETHEUS_COMPILER_DEBUG
+		  ,
+		  debug_random_{&manager::Random::instance()},
+		  debug_font_{&manager::Font::instance()},
+		  debug_texture_{&manager::Texture::instance()},
+		  debug_sound_{&manager::Sound::instance()},
+		  debug_music_{&manager::Music::instance()},
+		  debug_event_{&manager::Event::instance()},
+		  debug_game_config_{&manager::GameConfig::instance()}
+
+#endif
 	{
+		using namespace game;
+		using namespace manager;
+
 		// IMGUI初始化
 		{
 			// const auto init = ImGui::SFML::Init(window);
@@ -97,12 +128,17 @@ namespace pd
 			const auto update = ImGui::SFML::UpdateFontTexture();
 			assert(update);
 		}
+
+		// GameConfig
+		GameConfig::set_window_width(window_width);
+		GameConfig::set_window_height(window_height);
+
 		// 订阅场景切换事件
-		dispatcher_.subscribe<events::RequestSceneChange, &Game::on_request_scene_change>(*this);
+		Event::subscribe<events::SceneChanged, &Game::on_scene_changed>(*this);
 
 		// 切换场景
 		// 注意是trigger,因为我们必须马上创建所需场景
-		dispatcher_.trigger(events::RequestSceneChange{.to = game::Scenes::MAIN_MENU});
+		Event::trigger(events::SceneChanged{.to = Scene::MAIN_MENU});
 	}
 
 	Game::~Game() noexcept
@@ -112,8 +148,8 @@ namespace pd
 
 	auto Game::run() noexcept -> void
 	{
-		// 在这里重置绝对计时器,其计时从此刻开始
-		absolute_clock_.restart();
+		using namespace game;
+		using namespace manager;
 
 		while (window_.isOpen())
 		{
@@ -126,17 +162,20 @@ namespace pd
 				if (event->is<sf::Event::Closed>())
 				{
 					// 在这里使用enqueue而不是trigger,我们保证退出前依然会处理完所有事件
-					dispatcher_.enqueue(events::RequestSceneChange{.to = game::Scenes::QUIT});
+					Event::enqueue(events::SceneChanged{.to = Scene::QUIT});
+					continue;
 				}
-				else
-				{
-					// 当前场景处理事件
-					current_scene_->handle_event(e);
-				}
-			}
 
-			// 处理事件
-			dispatcher_.update();
+				if (const auto* r = event->getIf<sf::Event::Resized>())
+				{
+					// 对于窗口大小调整事件,我们不直接修改GameConfig,而是入列一个事件,这样其他地方也能处理该事件
+					Event::enqueue(events::WindowResized{.width = r->size.x, .height = r->size.y});
+					continue;
+				}
+
+				// 当前场景处理事件
+				current_scene_->handle_event(e);
+			}
 
 			const auto delta = clock_.restart();
 
@@ -152,31 +191,9 @@ namespace pd
 			ImGui::SFML::Render(window_);
 
 			window_.display();
+
+			// 我们将所有队列中的事件延后到该帧最后处理,以保证该帧能正常更新/渲染
+			Event::update();
 		}
-	}
-
-	auto Game::game_config() noexcept -> GameConfig&
-	{
-		return config_;
-	}
-
-	auto Game::game_config() const noexcept -> const GameConfig&
-	{
-		return config_;
-	}
-
-	auto Game::dispatcher() noexcept -> utility::Dispatcher&
-	{
-		return dispatcher_;
-	}
-
-	auto Game::window_size() const noexcept -> sf::Vector2u
-	{
-		return window_.getSize();
-	}
-
-	auto Game::time() const noexcept -> sf::Time
-	{
-		return absolute_clock_.getElapsedTime();
 	}
 }

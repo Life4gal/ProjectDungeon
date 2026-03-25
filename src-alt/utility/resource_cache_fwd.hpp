@@ -5,16 +5,11 @@
 
 #pragma once
 
-#include <game/scene.hpp>
+#include <entt/entity/entity.hpp>
 
-#include <entt/fwd.hpp>
-
-namespace pd::systems
+namespace pd::utility
 {
-	class Dispatcher final
-	{
-	public:
-		// 场景切换
-		static auto scene_change(entt::registry& registry, game::Scenes to) noexcept -> void;
-	};
+	enum class AssetId : entt::id_type {};
+
+	constexpr auto invalid_asset_id = AssetId{entt::null};
 }

@@ -5,19 +5,12 @@
 
 #pragma once
 
-#include <cstdint>
-
-namespace pd::game
+namespace pd::events
 {
-	enum class Scenes : std::uint8_t
+	class WindowResized
 	{
-		// 主菜单
-		MAIN_MENU,
-		// 主游戏场景
-		GAME,
-		// 退出场景(需要吗?)
-		QUIT,
-
-		COUNT
+	public:
+		unsigned width;
+		unsigned height;
 	};
 }

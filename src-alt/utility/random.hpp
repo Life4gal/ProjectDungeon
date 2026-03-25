@@ -19,49 +19,43 @@ namespace pd::utility
 	private:
 		engine_type engine_;
 
-		[[nodiscard]] static auto engine() noexcept -> engine_type&
-		{
-			static Random instance{};
-			return instance.engine_;
-		}
-
 	public:
 		Random() noexcept
 			: engine_{std::random_device{}()} {}
 
-		static auto seed(const seed_type seed) noexcept -> void
+		auto seed(const seed_type seed) noexcept -> void
 		{
-			engine().seed(seed);
+			engine_.seed(seed);
 		}
 
-		[[nodiscard]] static auto operator()() noexcept -> std::ptrdiff_t
+		[[nodiscard]] auto operator()() noexcept -> std::ptrdiff_t
 		{
-			return engine()();
+			return engine_();
 		}
 
 		// 生成闭区间随机整数 [min_value, max_value]
-		template<std::integral TInteger>
-		[[nodiscard]] static auto int_inclusive(TInteger min_value, TInteger max_value) -> TInteger
+		template<std::integral Integer>
+		[[nodiscard]] auto int_inclusive(const Integer min_value, const std::type_identity_t<Integer> max_value) noexcept -> Integer
 		{
-			return std::uniform_int_distribution<TInteger>{min_value, max_value}(engine());
+			return std::uniform_int_distribution<Integer>{min_value, max_value}(engine_);
 		}
 
 		// 生成闭区间随机浮点数 [min_value, max_value]
-		template<std::floating_point TFloat>
-		[[nodiscard]] static auto real_inclusive(TFloat min_value, TFloat max_value) -> TFloat
+		template<std::floating_point Float>
+		[[nodiscard]] auto real_inclusive(const Float min_value, const std::type_identity_t<Float> max_value) noexcept -> Float
 		{
-			return std::uniform_real_distribution<TFloat>{min_value, max_value}(engine());
+			return std::uniform_real_distribution<Float>{min_value, max_value}(engine_);
 		}
 
 		// 生成正态分布随机浮点数 N(mean, standard_deviation)
-		template<std::floating_point TFloat>
-		[[nodiscard]] static auto normal(TFloat mean, TFloat standard_deviation) -> TFloat
+		template<std::floating_point Float>
+		[[nodiscard]] auto normal(const Float mean, const std::type_identity_t<Float> standard_deviation) noexcept -> Float
 		{
-			return std::normal_distribution<TFloat>{mean, standard_deviation}(engine());
+			return std::normal_distribution<Float>{mean, standard_deviation}(engine_);
 		}
 
 		// 百分比判定: 例如 roll_percent(20) 表示 20% 成功率
-		[[nodiscard]] static auto roll_percent(const int percent) -> bool
+		[[nodiscard]] auto roll_percent(const int percent) noexcept -> bool
 		{
 			if (percent <= 0)
 			{
@@ -76,7 +70,7 @@ namespace pd::utility
 		}
 
 		// 概率判定: 概率范围 [0, 1]
-		[[nodiscard]] static auto chance(const float probability) -> bool
+		[[nodiscard]] auto chance(const float probability) noexcept -> bool
 		{
 			if (probability <= 0.f)
 			{
@@ -87,7 +81,7 @@ namespace pd::utility
 				return true;
 			}
 
-			return std::bernoulli_distribution{static_cast<double>(probability)}(engine());
+			return std::bernoulli_distribution{static_cast<double>(probability)}(engine_);
 		}
 	};
 }

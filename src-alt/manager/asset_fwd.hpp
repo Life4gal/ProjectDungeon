@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <entt/core/fwd.hpp>
-#include <entt/entity/entity.hpp>
+#include <utility/resource_cache_fwd.hpp>
+
 #include <entt/resource/resource.hpp>
 
 namespace sf
@@ -19,9 +19,8 @@ namespace sf
 
 namespace pd::manager
 {
-	enum class AssetId : entt::id_type {};
-
-	constexpr static auto invalid_asset_id = AssetId{entt::null};
+	using utility::AssetId;
+	using utility::invalid_asset_id;
 
 	using font_type = entt::resource<const sf::Font>;
 	using texture_type = entt::resource<const sf::Texture>;

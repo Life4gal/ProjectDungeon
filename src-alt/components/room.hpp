@@ -7,7 +7,7 @@
 
 #include <utility/fixed_matrix.hpp>
 
-#include <game/room.hpp>
+#include <game/constants.hpp>
 
 namespace pd::components::room
 {
@@ -120,8 +120,8 @@ namespace pd::components::room
 	class Room final
 	{
 	public:
-		using size_type = game::Room::size_type;
+		using size_type = std::uint32_t;
 
-		utility::FixedMatrix<Tile, game::Room::grid_width, game::Room::grid_height> grid;
+		utility::FixedMatrix<Tile, game::room_horizontal_grid, game::room_vertical_grid> grid;
 	};
 }

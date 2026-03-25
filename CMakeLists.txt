@@ -410,10 +410,11 @@ add_executable(
 	
 	# 随机数生成器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/random.hpp
-	
-	# 事件管理器/分发器
+	# 资源管理器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/resource_cache_fwd.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/resource_cache.hpp
+	# 事件分发器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/dispatcher.hpp
-
 	# 固定矩阵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/fixed_matrix.hpp
 
@@ -421,11 +422,20 @@ add_executable(
 	# MANAGER
 	# ============================
 
+	# 随机数生成器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/random.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/random.cpp
 	# 资源管理器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager_type.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_manager.cpp
-	
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_fwd.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.cpp
+	# 事件分发器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/event.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/event.cpp
+	# 游戏相关配置
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/game_config.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/game_config.cpp
+
 	# ============================
 	# COMPONENTS
 	# ============================
@@ -433,39 +443,33 @@ add_executable(
 	# 游戏实体引用
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/game.hpp
 
-	# 资源管理器
-	# 储存在场景registry的上下文中
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/asset_manager.hpp
-
 	# 游戏世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/world.hpp
 	# 游戏物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/physics_world.hpp
-	
+
+	# 实体标签
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/tags.hpp
+	# 实体变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/transform.hpp
+
+	# 地下城房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/room.hpp
+	# 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/dungeon.hpp
+
 	# ============================
 	# EVENTS
 	# ============================
 	
-	# 游戏事件
-	# 主要是切换场景或是退出游戏之类的事件
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/game.hpp
+	# 窗口相关事件
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/window.hpp
+	# 场景相关事件
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/scene.hpp
 
 	# ============================
 	# SYSTEMS
 	# ============================
-	
-	# 游戏相关配置
-	# 直接访问Game实例
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_config.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/game_config.cpp
-	# 事件分发器
-	# 直接访问Game实例
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/dispatcher.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/dispatcher.cpp
-
-	# 资源管理器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/asset_manager.cpp
 
 	# 游戏世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/world.hpp
@@ -473,6 +477,17 @@ add_executable(
 	# 游戏物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/physics_world.cpp
+
+	# 实体变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/transform.cpp
+
+	# 地下城房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/room.cpp
+	# 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/dungeon.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/dungeon.cpp
 
 	# ============================
 	# SCENE
@@ -494,19 +509,10 @@ add_executable(
 	# GAME
 	# ============================
 
-	# 菜单动作相关常量定义
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/menu_action.hpp
-	# 场景相关常量定义
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/scene.hpp
-	# 资源相关常量定义
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/asset.hpp
-	# 地下城房间相关常量定义
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/room.hpp
 	# 所有常量定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/constants.hpp
-
-	# 游戏相关配置
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game_config.hpp
+	# 常量定义相关映射
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/constants_map.hpp
 
 	# 游戏类
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.hpp

@@ -7,24 +7,16 @@
 
 #include <scene/scene.hpp>
 
-#include <manager/asset_manager_type.hpp>
+#include <game/constants.hpp>
+
+#include <manager/asset_fwd.hpp>
 
 namespace pd::scene
 {
 	class MainMenu final : public Scene
 	{
 	public:
-		enum class MenuOption : std::uint8_t
-		{
-			PLAYER_NAME = 0,
-			CONTINUE,
-			START,
-			OPTIONS,
-			QUIT,
-
-			COUNT
-		};
-
+		using option_type = game::MainMenuOption;
 		using asset_id_type = manager::AssetId;
 
 	private:
@@ -35,10 +27,8 @@ namespace pd::scene
 		// 主菜单音乐
 		asset_id_type music_id_;
 
-		// 玩家名
-		std::string player_name_label_;
 		// 选择的选项
-		std::underlying_type_t<MenuOption> selected_option_value_;
+		std::underlying_type_t<option_type> selected_option_value_;
 
 		// =======================
 		// HANDLE_EVENT
@@ -50,7 +40,7 @@ namespace pd::scene
 		// RENDER
 		// =======================
 
-		auto render_main(sf::RenderWindow& window) noexcept -> void;
+		auto render_main(sf::RenderWindow& window) const noexcept -> void;
 
 	public:
 		explicit MainMenu(Game& game) noexcept;

@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <game/scene.hpp>
+#include <game/constants.hpp>
 
 namespace pd::events
 {
-	class RequestSceneChange
+	class SceneChanged
 	{
 	public:
-		game::Scenes to;
+		game::Scene to;
 	};
 }

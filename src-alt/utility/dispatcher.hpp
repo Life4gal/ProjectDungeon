@@ -99,7 +99,6 @@ namespace pd::utility
 			dispatcher_.sink<Event>().clear();
 		}
 
-
 		auto clear() noexcept -> void
 		{
 			dispatcher_.clear();

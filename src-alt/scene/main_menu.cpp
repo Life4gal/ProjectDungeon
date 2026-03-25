@@ -7,26 +7,24 @@
 
 #include <ranges>
 
-#include <game/menu_action.hpp>
-#include <game/asset.hpp>
+#include <game/constants_map.hpp>
 
-#include <components/asset_manager.hpp>
+#include <events/scene.hpp>
 
-#include <systems/game_config.hpp>
-#include <systems/dispatcher.hpp>
-
-#include <systems/asset_manager.hpp>
+#include <manager/event.hpp>
+#include <manager/asset.hpp>
 
 #include <prometheus/platform/os.hpp>
 
 #include <SFML/Graphics.hpp>
+#include <imgui.h>
 
 namespace pd::scene
 {
 	auto MainMenu::handle_event_main(const sf::Event& event) noexcept -> void
 	{
 		using namespace game;
-		using namespace systems;
+		using namespace manager;
 
 		const auto* kp = event.getIf<sf::Event::KeyPressed>();
 
@@ -35,7 +33,7 @@ namespace pd::scene
 			return;
 		}
 
-		const auto action = MenuActionMap::get(kp->code);
+		const auto action = map(kp->code);
 
 		if (
 			action != MenuAction::UP and
@@ -49,13 +47,13 @@ namespace pd::scene
 
 		if (action == MenuAction::UP or action == MenuAction::DOWN)
 		{
-			AssetManager::play_sound(registry_, sound_id_switch_option_);
+			manager::Sound::play(sound_id_switch_option_);
 
 			if (action == MenuAction::UP)
 			{
 				if (selected_option_value_ == 0)
 				{
-					selected_option_value_ = std::to_underlying(MenuOption::COUNT) - 1;
+					selected_option_value_ = std::to_underlying(option_type::COUNT) - 1;
 				}
 				else
 				{
@@ -64,7 +62,7 @@ namespace pd::scene
 			}
 			else
 			{
-				if (selected_option_value_ == std::to_underlying(MenuOption::COUNT) - 1)
+				if (selected_option_value_ == std::to_underlying(option_type::COUNT) - 1)
 				{
 					selected_option_value_ = 0;
 				}
@@ -76,28 +74,28 @@ namespace pd::scene
 		}
 		else if (action == MenuAction::CONFIRM)
 		{
-			if (const auto selected_option = static_cast<MenuOption>(selected_option_value_);
-				selected_option == MenuOption::CONTINUE)
+			if (const auto selected_option = static_cast<option_type>(selected_option_value_);
+				selected_option == option_type::CONTINUE)
 			{
 				// todo
-				Dispatcher::scene_change(registry_, Scenes::GAME);
+				Event::enqueue(events::SceneChanged{.to = game::Scene::GAME});
 			}
-			else if (selected_option == MenuOption::START)
+			else if (selected_option == option_type::START)
 			{
-				Dispatcher::scene_change(registry_, Scenes::GAME);
+				Event::enqueue(events::SceneChanged{.to = game::Scene::GAME});
 			}
-			else if (selected_option == MenuOption::OPTIONS)
+			else if (selected_option == option_type::OPTIONS)
 			{
 				// todo
 			}
-			else if (selected_option == MenuOption::QUIT)
+			else if (selected_option == option_type::QUIT)
 			{
-				Dispatcher::scene_change(registry_, Scenes::QUIT);
+				Event::enqueue(events::SceneChanged{.to = game::Scene::QUIT});
 			}
 		}
 		else if (action == MenuAction::CANCEL)
 		{
-			Dispatcher::scene_change(registry_, Scenes::QUIT);
+			Event::enqueue(events::SceneChanged{.to = game::Scene::QUIT});
 		}
 		else
 		{
@@ -105,36 +103,24 @@ namespace pd::scene
 		}
 	}
 
-	auto MainMenu::render_main(sf::RenderWindow& window) noexcept -> void
+	auto MainMenu::render_main(sf::RenderWindow& window) const noexcept -> void
 	{
-		using namespace systems;
+		using namespace game;
+		using namespace manager;
 
-		const auto& font = AssetManager::get_font(registry_, font_id_);
+		const auto& font = manager::Font::get(font_id_);
 
-		constexpr float menu_x = 290.f;
-		constexpr float menu_y_start = 300.f;
-		constexpr float menu_y_step = 36.f;
-		constexpr auto menu_color_normal = sf::Color{120, 120, 120, 255};
-		constexpr auto menu_color_selected = sf::Color{255, 255, 255, 255};
-
-		const std::string menu_option_labels[]
+		for (const auto option_value: std::views::iota(static_cast<std::underlying_type_t<option_type>>(0), std::to_underlying(option_type::COUNT)))
 		{
-				player_name_label_,
-				"Continue",
-				"Star New Game",
-				"Options",
-				"Quit Game",
-		};
+			const auto option = static_cast<option_type>(option_value);
+			const auto name = map(option);
+			const auto color = std::cmp_equal(option_value, selected_option_value_) ? main_menu_option_color_selected : main_menu_option_color_normal;
 
-		for (const auto [index, label]: menu_option_labels | std::views::enumerate)
-		{
-			const auto color = std::cmp_equal(index, selected_option_value_) ? menu_color_selected : menu_color_normal;
-
-			sf::Text text{*font, label, 24};
+			sf::Text text{*font, sf::String::fromUtf8(name.begin(), name.end()), main_menu_font_size};
 			text.setFillColor(color);
 			text.setOutlineColor(sf::Color::Black);
 			text.setOutlineThickness(1);
-			text.setPosition({menu_x, menu_y_start + static_cast<float>(index) * menu_y_step});
+			text.setPosition({main_menu_begin_x, main_menu_begin_y + static_cast<float>(option_value) * main_menu_option_height});
 
 			window.draw(text);
 		}
@@ -145,68 +131,58 @@ namespace pd::scene
 		  font_id_{manager::invalid_asset_id},
 		  sound_id_switch_option_{manager::invalid_asset_id},
 		  music_id_{manager::invalid_asset_id},
-		  selected_option_value_{std::to_underlying(MenuOption::START)} {}
+		  selected_option_value_{std::to_underlying(option_type::START)} {}
 
 	auto MainMenu::on_loaded() noexcept -> void
 	{
-		using namespace game;
-		using namespace systems;
+		// using namespace game;
+		// using namespace manager;
 
-		// AssetManager
-		{
-			registry_.ctx().emplace<components::FontManager>();
-			registry_.ctx().emplace<components::TextureManager>();
-			registry_.ctx().emplace<components::SoundManager>();
-			registry_.ctx().emplace<components::MusicManager>();
-
-			// SoundChannels
-			registry_.ctx().emplace<components::SoundChannels>();
-			// MusicChannel
-			registry_.ctx().emplace<components::MusicChannel>(nullptr);
-		}
-
-		font_id_ = AssetManager::load_font(registry_, Font::get(Fonts::MAIN_MENU));
-		sound_id_switch_option_ = AssetManager::load_sound(registry_, Sound::get(Sounds::MENU_SWITCH_OPTION));
-		music_id_ = AssetManager::load_music(registry_, Music::get(Musics::MAIN_MENU));
-		player_name_label_ = std::string{"Player Name: "}.append(GameConfig::get_player_name(registry_));
+		font_id_ = manager::Font::load(map(game::Font::MAIN_MENU));
+		sound_id_switch_option_ = manager::Sound::load(map(game::Sound::MENU_SWITCH_OPTION));
+		music_id_ = manager::Music::load(map(game::Music::MAIN_MENU));
 		{
 			// 如果存在存档则为continue,否则为start
-			selected_option_value_ = std::to_underlying(MenuOption::START);
+			selected_option_value_ = std::to_underlying(option_type::START);
 		}
 	}
 
 	auto MainMenu::on_initialized() noexcept -> void
 	{
-		using namespace systems;
+		using namespace manager;
 
-		AssetManager::play_music(registry_, music_id_);
+		Music::play(music_id_);
 	}
 
 	auto MainMenu::on_unloaded() noexcept -> void
 	{
-		using namespace systems;
+		using namespace manager;
 
-		AssetManager::stop_music(registry_, music_id_);
+		Music::stop(music_id_);
+
+		Music::unload(music_id_);
+		Sound::unload(sound_id_switch_option_);
+		Font::unload(font_id_);
 	}
 
 	auto MainMenu::handle_event(const sf::Event& event) noexcept -> void
 	{
-		using namespace systems;
+		if (const auto& io = ImGui::GetIO();
+			io.WantCaptureKeyboard || io.WantCaptureMouse)
+		{
+			return;
+		}
 
 		handle_event_main(event);
 	}
 
 	auto MainMenu::update(const sf::Time delta) noexcept -> void
 	{
-		using namespace systems;
-
 		//
 	}
 
 	auto MainMenu::render(sf::RenderWindow& window) noexcept -> void
 	{
-		using namespace systems;
-
 		render_main(window);
 	}
 }

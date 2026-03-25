@@ -7,22 +7,16 @@
 
 #include <scene/scene.hpp>
 
-#include <manager/asset_manager_type.hpp>
+#include <game/constants.hpp>
+
+#include <manager/asset_fwd.hpp>
 
 namespace pd::scene
 {
 	class Game final : public Scene
 	{
 	public:
-		enum class PauseMenuOption : std::uint8_t
-		{
-			RESUME = 0,
-			OPTIONS,
-			QUIT,
-
-			COUNT
-		};
-
+		using option_type = game::GamePauseMenuOption;
 		using asset_id_type = manager::AssetId;
 
 	private:
@@ -34,7 +28,7 @@ namespace pd::scene
 		asset_id_type music_id_;
 
 		// 选择的选项
-		std::underlying_type_t<PauseMenuOption> selected_pause_option_value_;
+		std::underlying_type_t<option_type> selected_option_value_;
 
 		auto handle_event_pause(const sf::Event& event) noexcept -> void;
 

@@ -5,14 +5,13 @@
 
 #include <scene/game.hpp>
 
-#include <game/menu_action.hpp>
-#include <game/asset.hpp>
+#include <game/constants_map.hpp>
 
-#include <components/asset_manager.hpp>
+#include <events/scene.hpp>
 
-#include <systems/dispatcher.hpp>
+#include <manager/event.hpp>
+#include <manager/asset.hpp>
 
-#include <systems/asset_manager.hpp>
 #include <systems/world.hpp>
 #include <systems/physics_world.hpp>
 
@@ -27,6 +26,7 @@ namespace pd::scene
 	auto Game::handle_event_pause(const sf::Event& event) noexcept -> void
 	{
 		using namespace game;
+		using namespace manager;
 		using namespace systems;
 
 		PROMETHEUS_PLATFORM_ASSUME(World::is_pause(registry_));
@@ -38,7 +38,7 @@ namespace pd::scene
 			return;
 		}
 
-		const auto action = MenuActionMap::get(kp->code);
+		const auto action = map(kp->code);
 
 		if (
 			action != MenuAction::UP and
@@ -52,45 +52,45 @@ namespace pd::scene
 
 		if (action == MenuAction::UP or action == MenuAction::DOWN)
 		{
-			AssetManager::play_sound(registry_, sound_id_switch_option_);
+			manager::Sound::play(sound_id_switch_option_);
 
 			if (action == MenuAction::UP)
 			{
-				if (selected_pause_option_value_ == 0)
+				if (selected_option_value_ == 0)
 				{
-					selected_pause_option_value_ = std::to_underlying(PauseMenuOption::COUNT) - 1;
+					selected_option_value_ = std::to_underlying(option_type::COUNT) - 1;
 				}
 				else
 				{
-					selected_pause_option_value_ -= 1;
+					selected_option_value_ -= 1;
 				}
 			}
 			else
 			{
-				if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::COUNT) - 1)
+				if (selected_option_value_ == std::to_underlying(option_type::COUNT) - 1)
 				{
-					selected_pause_option_value_ = 0;
+					selected_option_value_ = 0;
 				}
 				else
 				{
-					selected_pause_option_value_ += 1;
+					selected_option_value_ += 1;
 				}
 			}
 		}
 		else if (action == MenuAction::CONFIRM)
 		{
-			if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::RESUME))
+			if (selected_option_value_ == std::to_underlying(option_type::RESUME))
 			{
 				World::unpause(registry_);
 			}
-			else if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::OPTIONS))
+			else if (selected_option_value_ == std::to_underlying(option_type::OPTIONS))
 			{
 				//
 			}
-			else if (selected_pause_option_value_ == std::to_underlying(PauseMenuOption::QUIT))
+			else if (selected_option_value_ == std::to_underlying(option_type::QUIT))
 			{
 				// 切换到主菜单
-				Dispatcher::scene_change(registry_, Scenes::MAIN_MENU);
+				Event::enqueue(events::SceneChanged{.to = game::Scene::MAIN_MENU});
 			}
 		}
 		else if (action == MenuAction::CANCEL)
@@ -120,26 +120,14 @@ namespace pd::scene
 
 	auto Game::on_loaded() noexcept -> void
 	{
-		using namespace game;
+		// using namespace game;
+		// using namespace manager;
 		using namespace systems;
 
-		// AssetManager
-		{
-			registry_.ctx().emplace<components::FontManager>();
-			registry_.ctx().emplace<components::TextureManager>();
-			registry_.ctx().emplace<components::SoundManager>();
-			registry_.ctx().emplace<components::MusicManager>();
-
-			// SoundChannels
-			registry_.ctx().emplace<components::SoundChannels>();
-			// MusicChannel
-			registry_.ctx().emplace<components::MusicChannel>(nullptr);
-		}
-
-		font_id_ = AssetManager::load_font(registry_, Font::get(Fonts::GAME));
-		sound_id_switch_option_ = AssetManager::load_sound(registry_, Sound::get(Sounds::MENU_SWITCH_OPTION));
-		music_id_ = AssetManager::load_music(registry_, Music::get(Musics::GAME));
-		selected_pause_option_value_ = std::to_underlying(PauseMenuOption::RESUME);
+		font_id_ = manager::Font::load(map(game::Font::GAME));
+		sound_id_switch_option_ = manager::Sound::load(map(game::Sound::MENU_SWITCH_OPTION));
+		music_id_ = manager::Music::load(map(game::Music::GAME));
+		selected_option_value_ = std::to_underlying(option_type::RESUME);
 
 		World::create(registry_);
 		PhysicsWorld::create(registry_);
@@ -147,9 +135,9 @@ namespace pd::scene
 
 	auto Game::on_initialized() noexcept -> void
 	{
-		using namespace systems;
+		using namespace manager;
 
-		AssetManager::play_music(registry_, music_id_);
+		Music::play(music_id_);
 
 		// 这里可以检查是否存在存档?
 		start_game();
@@ -157,12 +145,15 @@ namespace pd::scene
 
 	auto Game::on_unloaded() noexcept -> void
 	{
+		using namespace manager;
 		using namespace systems;
 
 		PhysicsWorld::destroy(registry_);
 		World::destroy(registry_);
 
-		AssetManager::stop_music(registry_, music_id_);
+		Music::stop(music_id_);
+		Sound::unload(sound_id_switch_option_);
+		Font::unload(font_id_);
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void

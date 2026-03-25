@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include <utility/dispatcher.hpp>
+#include <events/window.hpp>
+#include <events/scene.hpp>
 
-#include <game/game_config.hpp>
-
-#include <events/game.hpp>
+#include <prometheus/version-core.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -20,30 +19,49 @@ namespace pd
 		class Scene;
 	}
 
+	namespace manager
+	{
+		class Random;
+		class Font;
+		class Texture;
+		class Sound;
+		class Music;
+		class Event;
+		class GameConfig;
+	}
+
 	class Game final
 	{
 	public:
 		using scene_type = scene::Scene;
 
 	private:
-		GameConfig config_;
-		utility::Dispatcher dispatcher_;
-
 		// 渲染窗口
 		sf::RenderWindow window_;
-		// 绝对时间时钟(不重启)
-		sf::Clock absolute_clock_;
 		// 更新计时器(每帧重置)
 		sf::Clock clock_;
 
 		// 游戏当前场景
 		std::unique_ptr<scene_type> current_scene_;
 
-		// ==============================
-		// dispatcher绑定
-		// ==============================
+#if PROMETHEUS_COMPILER_DEBUG
 
-		auto on_request_scene_change(const events::RequestSceneChange& event) noexcept -> void;
+		// 下面这些变量不会使用,但是对调试有帮助
+
+		manager::Random* debug_random_;
+		manager::Font* debug_font_;
+		manager::Texture* debug_texture_;
+		manager::Sound* debug_sound_;
+		manager::Music* debug_music_;
+		manager::Event* debug_event_;
+		manager::GameConfig* debug_game_config_;
+
+#endif
+
+		// 游戏窗口大小变化
+		auto on_window_resized(const events::WindowResized& event) noexcept -> void;
+		// 游戏场景切换
+		auto on_scene_changed(const events::SceneChanged& event) noexcept -> void;
 
 	public:
 		Game(
@@ -61,20 +79,5 @@ namespace pd
 		~Game() noexcept;
 
 		auto run() noexcept -> void;
-
-		// 游戏配置
-		[[nodiscard]] auto game_config() noexcept -> GameConfig&;
-
-		// 游戏配置
-		[[nodiscard]] auto game_config() const noexcept -> const GameConfig&;
-
-		// 事件分发器
-		[[nodiscard]] auto dispatcher() noexcept -> utility::Dispatcher&;
-
-		// 窗口大小
-		[[nodiscard]] auto window_size() const noexcept -> sf::Vector2u;
-
-		// 游戏运行的绝对时间
-		[[nodiscard]] auto time() const noexcept -> sf::Time;
 	};
 }
