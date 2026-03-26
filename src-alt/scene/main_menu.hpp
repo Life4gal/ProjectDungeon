@@ -22,7 +22,7 @@ namespace pd::scene
 	private:
 		// 主菜单字体
 		asset_id_type font_id_;
-		// 切换选项时音效
+		// 主菜单音效-切换选项
 		asset_id_type sound_id_switch_option_;
 		// 主菜单音乐
 		asset_id_type music_id_;

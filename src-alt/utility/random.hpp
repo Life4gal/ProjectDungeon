@@ -14,7 +14,8 @@ namespace pd::utility
 	{
 	public:
 		using engine_type = std::mt19937;
-		using seed_type = engine_type::result_type;
+
+		using result_type = engine_type::result_type;
 
 	private:
 		engine_type engine_;
@@ -23,12 +24,22 @@ namespace pd::utility
 		Random() noexcept
 			: engine_{std::random_device{}()} {}
 
-		auto seed(const seed_type seed) noexcept -> void
+		[[nodiscard]] constexpr static auto min() noexcept -> result_type
+		{
+			return engine_type::min();
+		}
+
+		[[nodiscard]] constexpr static auto max() noexcept -> result_type
+		{
+			return engine_type::max();
+		}
+
+		auto seed(const result_type seed) noexcept -> void
 		{
 			engine_.seed(seed);
 		}
 
-		[[nodiscard]] auto operator()() noexcept -> std::ptrdiff_t
+		[[nodiscard]] auto operator()() noexcept -> result_type
 		{
 			return engine_();
 		}

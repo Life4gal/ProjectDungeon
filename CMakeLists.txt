@@ -453,7 +453,13 @@ add_executable(
 	# 实体变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/transform.hpp
 
-	# 地下城房间
+	# 地下城 -- 房间 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/tile.hpp
+	# 地下城 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/door.hpp
+	# 地下城 -- 房间 -- 宝箱
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/chest.hpp
+	# 地下城 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/room.hpp
 	# 地下城
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/dungeon.hpp
@@ -482,7 +488,13 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/transform.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/transform.cpp
 
-	# 地下城房间
+	# 地下城 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/door.cpp
+	# 地下城 -- 房间 -- 宝箱
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/chest.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/chest.cpp
+	# 地下城 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/systems/room.cpp
 	# 地下城

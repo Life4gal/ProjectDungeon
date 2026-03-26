@@ -5,123 +5,259 @@
 
 #pragma once
 
-#include <utility/fixed_matrix.hpp>
+#include <vector>
 
 #include <game/constants.hpp>
 
+#include <components/tile.hpp>
+#include <components/door.hpp>
+#include <components/chest.hpp>
+
+#include <utility/fixed_matrix.hpp>
+
 namespace pd::components::room
 {
-	enum class CollisionLogical : std::uint8_t
+	// ==========================================
+	// 非实体组件
+	// ==========================================
+
+	// 瓦片缓存
+	class CacheTile final
 	{
-		// 地板
-		FLOOR,
-		// 墙壁
-		WALL,
-		// 障碍物
-		OBSTACLE,
-		// 洞
-		HOLE,
-		// 可摧毁物
-		DESTROYABLE,
+	public:
+		tile::CollisionLogical collision_logical;
+		tile::Transform transform;
+		tile::Visual visual;
+		tile::Object object;
+
+		// 我们保存完整的Tile表,所以这里不再保存坐标
 	};
 
-	enum class Transform : std::uint8_t
+	class CacheTiles final
 	{
-		// 原始朝向
-		IDENTITY,
-		// 水平翻转
-		HORIZONTAL_FLIP,
-		// 垂直翻转
-		VERTICAL_FLIP,
-		// 顺时针旋转90度
-		CW_90,
-		// 逆时针旋转90度
-		CCW_90,
-		// 顺时针旋转180度
-		ROTATE_180,
-		// 转置
-		TRANSPOSE,
-		// 反转置
-		ANTI_TRANSPOSE
+	public:
+		utility::FixedMatrix<CacheTile, game::RoomHorizontalGrid, game::RoomVerticalGrid> tiles;
 	};
 
-	enum class DoorState : std::uint8_t
+	// 门缓存
+	class CacheDoor final
 	{
-		// 已关闭
-		CLOSED,
-		// 正在关闭
-		CLOSING,
-		// 已开启
-		OPENED,
-		// 正在开启
-		OPENING,
+	public:
+		door::Direction direction;
+		// 其要么开启,要么关闭,不存在开启中或是关闭中状态
+		bool opened;
+		door::Type type;
+		// 不需要缓存动画计时器,其必定已经播放完动画
+
+		// 理论上我们可以根据direction直接算出位置
+		// NORTH
+		// RoomHorizontalGrid / 2, 0
+		// SOUTH
+		// RoomHorizontalGrid / 2, RoomVerticalGrid - 1
+		// WEST
+		// 0, RoomVerticalGrid / 2
+		// EAST
+		// RoomHorizontalGrid - 1, RoomVerticalGrid / 2
+		// 不过保存这些位置也无伤大雅?
+		float x;
+		float y;
 	};
 
-	enum class DoorType : std::uint8_t
+	class CacheDoors final
 	{
-		// 标准门
+	public:
+		std::array<CacheDoor, std::to_underlying(door::Direction::COUNT)> doors;
+	};
+
+	// 宝箱缓存
+	class CacheChest final
+	{
+	public:
+		chest::Type type;
+		bool opened;
+		chest::TrapType trap_type;
+		// 不需要缓存动画计时器,其要么未触发,要么已触发
+
+		float x;
+		float y;
+	};
+
+	class CacheChests final
+	{
+	public:
+		std::vector<CacheChest> chests;
+	};
+
+	// 可破坏物缓存
+	class CacheDestroyableObject final
+	{
+	public:
+	};
+
+	class CacheDestroyableObjects final
+	{
+	public:
+		std::vector<CacheDestroyableObject> destroyable_objects;
+	};
+
+	// 物品缓存
+	class CacheItem final
+	{
+	public:
+	};
+
+	class CacheItems final
+	{
+	public:
+		std::vector<CacheItem> items;
+	};
+
+	// 尸体缓存
+	class CacheCorpse final
+	{
+	public:
+	};
+
+	class CacheCorpses final
+	{
+	public:
+		std::vector<CacheCorpse> corpses;
+	};
+
+	// 血迹缓存
+	class CacheBloodStain final
+	{
+	public:
+	};
+
+	class CacheBloodStains final
+	{
+	public:
+		std::vector<CacheBloodStain> blood_stains;
+	};
+
+	// 房间类型
+	enum class RoomType : std::uint8_t
+	{
+		// 该位置未生成房间
+		NONE,
+
+		// 起始房间
+		START,
+		// 标准房间
 		STANDARD,
-		// BOSS门
+		// BOSS房间
 		BOSS,
-		// 出口门
+		// BOSS房间门钥匙房间
+		KEY,
+		// 商人房间
+		MERCHANT,
+		// 奖励房间
+		BONUS,
+		// 出口房间
 		EXIT,
 	};
 
-	class Tile final
+	class RoomInfo final
 	{
 	public:
-		// todo: 精灵图索引?
-
-		CollisionLogical collision_logical;
-		Transform transform;
+		// 房间类型
+		RoomType type;
+		// 此房间是否已访问过
+		bool visited;
+		// 此房间是否已清理过
+		bool cleared;
+		// 此房间BOSS门是否打开(如果有BOSS门)
+		bool boss_door_opened;
 	};
 
 	// ==========================================
 	// 上下文组件
 	// ==========================================
 
-	class Room;
-
-	class CurrentRoom final
+	// 所有房间信息
+	class RoomInfos final
 	{
 	public:
-		std::reference_wrapper<Room> room;
+		using matrix_type = utility::FixedMatrix<RoomInfo, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type infos;
+	};
+
+	// 所有房间瓦片缓存
+	class RoomCacheTiles final
+	{
+	public:
+		using matrix_type = utility::FixedMatrix<CacheTiles, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type caches;
+	};
+
+	// 所有房间门缓存
+	class RoomCacheDoors final
+	{
+	public:
+		using matrix_type = utility::FixedMatrix<CacheDoors, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type caches;
+	};
+
+	// 所有房间宝箱缓存
+	class RoomCacheChests final
+	{
+	public:
+		using matrix_type = utility::FixedMatrix<CacheChests, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type caches;
+	};
+
+	// 所有房间可破坏物缓存
+	class RoomCacheDestroyableObjects final
+	{
+	public:
+		using matrix_type = utility::FixedMatrix<CacheDestroyableObjects, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type caches;
+	};
+
+	// 所有房间物品缓存
+	class RoomCacheItems final
+	{
+	public:
+		using matrix_type = utility::FixedMatrix<CacheItems, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type caches;
+	};
+
+	// 所有房间尸体缓存
+	class RoomCacheCorpses final
+	{
+	public:
+		using matrix_type = utility::FixedMatrix<CacheCorpses, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type caches;
+	};
+
+	// 所有房间血迹缓存
+	class RoomCacheBloodStains final
+	{
+	public:
+		using matrix_type = utility::FixedMatrix<CacheBloodStains, game::DungeonFloorWidth, game::DungeonFloorHeight>;
+
+		matrix_type caches;
+	};
+
+	// 当前所在房间坐标
+	class RoomCurrentPosition final
+	{
+	public:
+		std::uint32_t x;
+		std::uint32_t y;
 	};
 
 	// ==========================================
 	// 实体组件
 	// ==========================================
 
-	// FIXME: 当前房间的门通过registry.view<tags::door, ...>(entt::exclude<tags::disabled>)来访问,要不要直接放到上下文组件中?
-	class Door final
-	{
-	public:
-		// 方向
-		game::DoorDirection direction;
-
-		// 状态
-		DoorState state;
-		// 类型
-		DoorType type;
-		// 动画计时(毫秒)
-		std::uint8_t timer_ms;
-	};
-
-	// 含有该标签的门无法被systems::Room::open_doors打开
-	class LockedDoor {};
-
-	// 门感应器
-	class DoorSensor final
-	{
-	public:
-		// todo
-	};
-
-	class Room final
-	{
-	public:
-		using size_type = std::uint32_t;
-
-		utility::FixedMatrix<Tile, game::room_horizontal_grid, game::room_vertical_grid> grid;
-	};
+	// 房间似乎完全不需要实体?
 }

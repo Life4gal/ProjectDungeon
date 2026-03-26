@@ -9,11 +9,13 @@
 
 namespace pd::systems
 {
-	class Dungeon final
+	class Door
 	{
 	public:
-		static auto create(entt::registry& registry, std::uint32_t level) noexcept -> void;
+		// 开启所有门(除非其锁住了)
+		static auto open(entt::registry& registry) noexcept -> void;
 
-		static auto destroy(entt::registry& registry) noexcept -> void;
+		// 关闭所有门
+		static auto close(entt::registry& registry) noexcept -> void;
 	};
 }

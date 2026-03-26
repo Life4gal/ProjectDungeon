@@ -31,7 +31,7 @@ namespace pd::game
 	};
 
 	// FIXME: 可配置?
-	constexpr std::array /*<sf::Keyboard::Key, std::to_underlying(MenuAction::COUNT)>*/ menu_action_keys
+	constexpr std::array /*<sf::Keyboard::Key, std::to_underlying(MenuAction::COUNT)>*/ MenuActionKeys
 	{
 			// UP
 			sf::Keyboard::Key::Up,
@@ -85,7 +85,7 @@ namespace pd::game
 		COUNT
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(MainMenuOption::COUNT)> main_menu_option_names
+	constexpr std::array<std::string_view, std::to_underlying(MainMenuOption::COUNT)> MainMenuOptionNames
 	{
 			// RANDOM_SEED
 			// 不会使用
@@ -104,15 +104,15 @@ namespace pd::game
 	};
 
 	// 主菜单选项开始位置
-	constexpr float main_menu_begin_x = 290.f;
-	constexpr float main_menu_begin_y = 300.f;
+	constexpr float MainMenuBeginX = 290.f;
+	constexpr float MainMenuBeginY = 300.f;
 	// 主菜单选项字体大小
-	constexpr int main_menu_font_size = 24;
+	constexpr int MainMenuFontSize = 24;
 	// 主菜单选项高度
-	constexpr float main_menu_option_height = static_cast<float>(main_menu_font_size) * 1.5f;
+	constexpr float MainMenuOptionHeight = static_cast<float>(MainMenuFontSize) * 1.5f;
 	// 主菜单选项颜色
-	constexpr sf::Color main_menu_option_color_normal{120, 120, 120, 255};
-	constexpr sf::Color main_menu_option_color_selected{255, 255, 255, 255};
+	constexpr sf::Color MainMenuOptionColorNormal{120, 120, 120, 255};
+	constexpr sf::Color MainMenuOptionColorSelected{255, 255, 255, 255};
 
 	// =========================================
 	// 游戏暂停菜单
@@ -127,7 +127,7 @@ namespace pd::game
 		COUNT
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(GamePauseMenuOption::COUNT)> game_pause_menu_option_names
+	constexpr std::array<std::string_view, std::to_underlying(GamePauseMenuOption::COUNT)> GamePauseMenuOptionNames
 	{
 			// RESUME
 			"继续",
@@ -149,17 +149,21 @@ namespace pd::game
 	{
 		// 主菜单字体
 		MAIN_MENU = 0,
-		// 游戏字体
-		GAME,
+		// 游戏内HUD字体
+		GAME_HUD,
+		// 游戏暂停菜单字体
+		GAME_PAUSE_MENU,
 
 		COUNT,
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(Font::COUNT)> font_paths
+	constexpr std::array<std::string_view, std::to_underlying(Font::COUNT)> FontPaths
 	{
 			// MAIN_MENU
 			R"(C:\Windows\Fonts\msyh.ttc)",
-			// GAME
+			// GAME_HUD
+			R"(C:\Windows\Fonts\msyh.ttc)",
+			// GAME_PAUSE_MENU
 			R"(C:\Windows\Fonts\msyh.ttc)",
 	};
 
@@ -167,7 +171,40 @@ namespace pd::game
 	// 纹理资源
 	// ====================
 
+	enum class Texture : std::uint8_t
+	{
+		// 墙壁
+		WALL,
+		// 地板
+		FLOOR,
+
+		COUNT,
+	};
+
+	constexpr std::array<std::string_view, std::to_underlying(Texture::COUNT)> TexturePaths
+	{
+			// WALL
+			R"(.\media\textures\TILES-WALL.png)",
+			// FLOOR
+			R"(.\media\textures\TILES-FLOOR.png)",
+	};
+
+	// todo: 纹理信息如何配置?
+	// constexpr std::array<std::uint32_t, std::to_underlying(Texture::COUNT)> TextureWidths
+	// {
+	// 		// WALL
+	// 		64,
+	// 		// FLOOR
+	// 		64
+	// };
 	//
+	// constexpr std::array<std::uint32_t, std::to_underlying(Texture::COUNT)> TextureHeights
+	// {
+	// 		// WALL
+	// 		64,
+	// 		// FLOOR
+	// 		64,
+	// };
 
 	// ====================
 	// 音效资源
@@ -181,7 +218,7 @@ namespace pd::game
 		COUNT,
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(Sound::COUNT)> sound_paths
+	constexpr std::array<std::string_view, std::to_underlying(Sound::COUNT)> SoundPaths
 	{
 			// MENU_SWITCH_OPTION
 			R"(.\media\sounds\menu_switch_option.ogg)",
@@ -203,7 +240,7 @@ namespace pd::game
 		COUNT,
 	};
 
-	constexpr std::array<std::string_view, std::to_underlying(Music::COUNT)> music_paths
+	constexpr std::array<std::string_view, std::to_underlying(Music::COUNT)> MusicPaths
 	{
 			// LAUNCH_GAME
 			R"(.\media\musics\launch_game.wav)",
@@ -217,33 +254,41 @@ namespace pd::game
 	// 地下城 -- 房间
 	// =========================================
 
-	enum class DoorDirection : std::uint8_t
-	{
-		NORTH = 0b00,
-		SOUTH = 0b01,
-		WEST = 0b10,
-		EAST = 0b11,
-	};
+	// 房间水平方向的网格数量
+	constexpr std::uint32_t RoomHorizontalGrid = 15;
+	// 房间垂直方向的网格数量
+	constexpr std::uint32_t RoomVerticalGrid = 9;
 
-	constexpr std::uint32_t room_horizontal_grid = 15;
-	constexpr std::uint32_t room_vertical_grid = 9;
+	// 房间一个网格的宽度
+	constexpr std::uint32_t RoomTileWidth = 64;
+	// 房间一个网格的高度
+	constexpr std::uint32_t RoomTileHeight = 64;
 
-	constexpr std::uint32_t room_tile_width = 64;
-	constexpr std::uint32_t room_tile_height = 64;
+	// 房间的宽度
+	constexpr std::uint32_t RoomWidth = RoomHorizontalGrid * RoomTileWidth;
+	// 房间的高度
+	constexpr std::uint32_t RoomHeight = RoomVerticalGrid * RoomTileHeight;
 
-	constexpr std::uint32_t room_width = room_horizontal_grid * room_tile_width;
-	constexpr std::uint32_t room_height = room_vertical_grid * room_tile_height;
+	// =========================================
+	// 地下城
+	// =========================================
 
-	constexpr std::uint32_t room_door_count = 4;
-	constexpr std::array<std::pair<std::uint32_t, std::uint32_t>, room_door_count> room_door_position
-	{{
-			// NORTH
-			{room_horizontal_grid / 2, 0},
-			// SOUTH
-			{room_horizontal_grid / 2, room_vertical_grid - 1},
-			// WEST
-			{0, room_vertical_grid / 2},
-			// EAST
-			{room_horizontal_grid - 1, room_vertical_grid / 2}
-	}};
+	// 地下城一层的宽度(以房间数量表示)
+	constexpr std::uint32_t DungeonFloorWidth = 13;
+	// 地下城一层的高度(以房间数量表示)
+	constexpr std::uint32_t DungeonFloorHeight = 7;
+
+	// 地下城起始房间坐标X
+	constexpr std::uint32_t DungeonStartRoomX = DungeonFloorWidth / 2;
+	// 地下城起始房间坐标Y
+	constexpr std::uint32_t DungeonStartRoomY = DungeonFloorHeight / 2;
+
+	// 地下城房间数量基数
+	constexpr std::uint32_t DungeonRoomBaseCount = 10;
+	// 地下城房间数量增长系数(level * factor)
+	constexpr std::uint32_t DungeonRoomCountGrowthFactor = 4;
+	// 地下城房间数量最大值
+	constexpr std::uint32_t DungeonRoomMaxCount = DungeonRoomBaseCount + DungeonRoomCountGrowthFactor * 10;
+
+	static_assert(DungeonRoomMaxCount < DungeonFloorWidth * DungeonFloorHeight);
 }

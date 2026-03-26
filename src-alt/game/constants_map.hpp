@@ -17,7 +17,7 @@ namespace pd::game
 	{
 		for (std::size_t i = 0; i < std::to_underlying(MenuAction::COUNT); ++i)
 		{
-			if (key == menu_action_keys[i])
+			if (key == MenuActionKeys[i])
 			{
 				return static_cast<MenuAction>(i);
 			}
@@ -37,7 +37,7 @@ namespace pd::game
 
 	[[nodiscard]] constexpr auto map(const MainMenuOption option) noexcept -> std::string_view
 	{
-		return main_menu_option_names[std::to_underlying(option)];
+		return MainMenuOptionNames[std::to_underlying(option)];
 	}
 
 	// =========================================
@@ -46,7 +46,7 @@ namespace pd::game
 
 	[[nodiscard]] constexpr auto map(const GamePauseMenuOption option) noexcept -> std::string_view
 	{
-		return game_pause_menu_option_names[std::to_underlying(option)];
+		return GamePauseMenuOptionNames[std::to_underlying(option)];
 	}
 
 	// =========================================
@@ -59,14 +59,17 @@ namespace pd::game
 
 	[[nodiscard]] constexpr auto map(const Font font) noexcept -> std::string_view
 	{
-		return font_paths[std::to_underlying(font)];
+		return FontPaths[std::to_underlying(font)];
 	}
 
 	// ====================
 	// 纹理资源
 	// ====================
 
-	//
+	[[nodiscard]] constexpr auto map(const Texture texture) noexcept -> std::string_view
+	{
+		return TexturePaths[std::to_underlying(texture)];
+	}
 
 	// ====================
 	// 音效资源
@@ -74,7 +77,7 @@ namespace pd::game
 
 	[[nodiscard]] constexpr auto map(const Sound sound) noexcept -> std::string_view
 	{
-		return sound_paths[std::to_underlying(sound)];
+		return SoundPaths[std::to_underlying(sound)];
 	}
 
 	// ====================
@@ -83,20 +86,6 @@ namespace pd::game
 
 	[[nodiscard]] constexpr auto map(const Music music) noexcept -> std::string_view
 	{
-		return music_paths[std::to_underlying(music)];
-	}
-
-	// =========================================
-	// 地下城 -- 房间
-	// =========================================
-
-	[[nodiscard]] constexpr auto operator-(const DoorDirection direction) noexcept -> DoorDirection
-	{
-		return static_cast<DoorDirection>(std::to_underlying(direction) ^ 0b01);
-	}
-
-	[[nodiscard]] constexpr auto map(const DoorDirection direction) noexcept -> std::pair<int, int>
-	{
-		return room_door_position[std::to_underlying(direction)];
+		return MusicPaths[std::to_underlying(music)];
 	}
 }

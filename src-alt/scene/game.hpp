@@ -20,9 +20,15 @@ namespace pd::scene
 		using asset_id_type = manager::AssetId;
 
 	private:
-		// 游戏字体
-		asset_id_type font_id_;
-		// 切换选项时音效
+		// 游戏字体-HUD
+		asset_id_type font_id_hud_;
+		// 游戏字体-暂停菜单
+		asset_id_type font_id_pause_menu_;
+		// 游戏纹理-墙壁
+		asset_id_type texture_id_wall_;
+		// 游戏纹理-地板
+		asset_id_type texture_id_floor_;
+		// 游戏音效-切换选项
 		asset_id_type sound_id_switch_option_;
 		// 游戏音乐
 		asset_id_type music_id_;
@@ -42,7 +48,7 @@ namespace pd::scene
 		auto restart_game() noexcept -> void;
 
 	public:
-		using Scene::Scene;
+		explicit Game(pd::Game& game) noexcept;
 
 		auto on_loaded() noexcept -> void override;
 

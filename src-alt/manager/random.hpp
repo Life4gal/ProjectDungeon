@@ -15,13 +15,15 @@ namespace pd::manager
 
 	public:
 		using engine_type = random_type::engine_type;
-		using seed_type = random_type::seed_type;
+
+		using result_type = engine_type::result_type;
 
 	private:
 		random_type random_;
 
 	public:
 		// 这个接口公开仅为了Game::debug_random_
+		// 使用诸如std::ranges::shuffle这样的函数也会需要该接口
 		[[nodiscard]] static auto instance() noexcept -> Random&;
 
 	private:
@@ -31,12 +33,22 @@ namespace pd::manager
 		}
 
 	public:
-		static auto seed(const seed_type seed) noexcept -> void
+		[[nodiscard]] constexpr static auto min() noexcept -> result_type
+		{
+			return random_type::min();
+		}
+
+		[[nodiscard]] constexpr static auto max() noexcept -> result_type
+		{
+			return random_type::max();
+		}
+
+		static auto seed(const result_type seed) noexcept -> void
 		{
 			engine().seed(seed);
 		}
 
-		[[nodiscard]] static auto operator()() noexcept -> std::ptrdiff_t
+		[[nodiscard]] static auto operator()() noexcept -> result_type
 		{
 			return engine()();
 		}

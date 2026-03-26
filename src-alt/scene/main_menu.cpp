@@ -114,13 +114,13 @@ namespace pd::scene
 		{
 			const auto option = static_cast<option_type>(option_value);
 			const auto name = map(option);
-			const auto color = std::cmp_equal(option_value, selected_option_value_) ? main_menu_option_color_selected : main_menu_option_color_normal;
+			const auto color = std::cmp_equal(option_value, selected_option_value_) ? MainMenuOptionColorSelected : MainMenuOptionColorNormal;
 
-			sf::Text text{*font, sf::String::fromUtf8(name.begin(), name.end()), main_menu_font_size};
+			sf::Text text{*font, sf::String::fromUtf8(name.begin(), name.end()), MainMenuFontSize};
 			text.setFillColor(color);
 			text.setOutlineColor(sf::Color::Black);
 			text.setOutlineThickness(1);
-			text.setPosition({main_menu_begin_x, main_menu_begin_y + static_cast<float>(option_value) * main_menu_option_height});
+			text.setPosition({MainMenuBeginX, MainMenuBeginY + static_cast<float>(option_value) * MainMenuOptionHeight});
 
 			window.draw(text);
 		}
