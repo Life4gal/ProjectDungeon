@@ -74,8 +74,8 @@ namespace pd::components::room
 	{
 	public:
 		chest::Type type;
+		// 其要么开启,要么关闭,不存在开启中或是关闭中状态
 		bool opened;
-		chest::TrapType trap_type;
 		// 不需要缓存动画计时器,其要么未触发,要么已触发
 
 		float x;
@@ -85,6 +85,7 @@ namespace pd::components::room
 	class CacheChests final
 	{
 	public:
+		// 一个房间会有多个宝箱吗?
 		std::vector<CacheChest> chests;
 	};
 

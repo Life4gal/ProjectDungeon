@@ -7,7 +7,7 @@
 
 #include <components/room.hpp>
 
-#include <entt/fwd.hpp>
+#include <events/room.hpp>
 
 #include <SFML/System/Vector2.hpp>
 
@@ -29,64 +29,79 @@ namespace pd::systems
 		using room_type = components::room::RoomType;
 		using room_info = components::room::RoomInfo;
 
+		// =============================================
+		// 系统创建/销毁
+		// =============================================
+
 		static auto create(entt::registry& registry, room_position_type start_position, std::uint32_t count) noexcept -> void;
 
 		static auto destroy(entt::registry& registry) noexcept -> void;
 
+		// =============================================
+		// 事件响应
+		// =============================================
+
+		// 处理接触宝箱事件
+		static auto on_contact_chest(entt::registry& registry, const events::ChestContacted& event) noexcept -> void;
+
+		// =============================================
+		// 内容获取
+		// =============================================
+
 		// 获取目标房间信息
-		[[nodiscard]] static auto get_info(entt::registry& registry, room_position_type position) noexcept -> const room_info&;
+		[[nodiscard]] static auto get_info(entt::registry& registry, room_position_type position) noexcept -> room_info&;
 
 		// 获取当前房间信息
-		[[nodiscard]] static auto get_info(entt::registry& registry) noexcept -> const room_info&;
+		[[nodiscard]] static auto get_info(entt::registry& registry) noexcept -> room_info&;
 
 		// 获取目标房间瓦片缓存
-		[[nodiscard]] static auto get_cache_tiles(entt::registry& registry, room_position_type position) noexcept -> const cache_tiles&;
+		[[nodiscard]] static auto get_cache_tiles(entt::registry& registry, room_position_type position) noexcept -> cache_tiles&;
 
 		// 获取当前房间瓦片缓存
-		[[nodiscard]] static auto get_cache_tiles(entt::registry& registry) noexcept -> const cache_tiles&;
+		[[nodiscard]] static auto get_cache_tiles(entt::registry& registry) noexcept -> cache_tiles&;
 
 		// 获取目标房间门缓存
-		[[nodiscard]] static auto get_cache_doors(entt::registry& registry, room_position_type position) noexcept -> const cache_doors&;
+		[[nodiscard]] static auto get_cache_doors(entt::registry& registry, room_position_type position) noexcept -> cache_doors&;
 
 		// 获取当前房间门缓存
-		[[nodiscard]] static auto get_cache_doors(entt::registry& registry) noexcept -> const cache_doors&;
+		[[nodiscard]] static auto get_cache_doors(entt::registry& registry) noexcept -> cache_doors&;
 
 		// 获取目标房间宝箱缓存
-		[[nodiscard]] static auto get_cache_chests(entt::registry& registry, room_position_type position) noexcept -> const cache_chests&;
+		[[nodiscard]] static auto get_cache_chests(entt::registry& registry, room_position_type position) noexcept -> cache_chests&;
 
 		// 获取当前房间宝箱缓存
-		[[nodiscard]] static auto get_cache_chests(entt::registry& registry) noexcept -> const cache_chests&;
+		[[nodiscard]] static auto get_cache_chests(entt::registry& registry) noexcept -> cache_chests&;
 
 		// 获取目标房间可破坏物缓存
-		[[nodiscard]] static auto get_cache_destroyable_objects(entt::registry& registry, room_position_type position) noexcept -> const cache_destroyable_objects&;
+		[[nodiscard]] static auto get_cache_destroyable_objects(entt::registry& registry, room_position_type position) noexcept -> cache_destroyable_objects&;
 
 		// 获取当前房间可破坏物缓存
-		[[nodiscard]] static auto get_cache_destroyable_objects(entt::registry& registry) noexcept -> const cache_destroyable_objects&;
+		[[nodiscard]] static auto get_cache_destroyable_objects(entt::registry& registry) noexcept -> cache_destroyable_objects&;
 
 		// 获取目标房间物品缓存
-		[[nodiscard]] static auto get_cache_items(entt::registry& registry, room_position_type position) noexcept -> const cache_items&;
+		[[nodiscard]] static auto get_cache_items(entt::registry& registry, room_position_type position) noexcept -> cache_items&;
 
 		// 获取当前房间物品缓存
-		[[nodiscard]] static auto get_cache_items(entt::registry& registry) noexcept -> const cache_items&;
+		[[nodiscard]] static auto get_cache_items(entt::registry& registry) noexcept -> cache_items&;
 
 		// 获取目标房间尸体缓存
-		[[nodiscard]] static auto get_cache_corpses(entt::registry& registry, room_position_type position) noexcept -> const cache_corpses&;
+		[[nodiscard]] static auto get_cache_corpses(entt::registry& registry, room_position_type position) noexcept -> cache_corpses&;
 
 		// 获取当前房间尸体缓存
-		[[nodiscard]] static auto get_cache_corpses(entt::registry& registry) noexcept -> const cache_corpses&;
+		[[nodiscard]] static auto get_cache_corpses(entt::registry& registry) noexcept -> cache_corpses&;
 
 		// 获取目标房间血迹缓存
-		[[nodiscard]] static auto get_cache_blood_stains(entt::registry& registry, room_position_type position) noexcept -> const cache_blood_stains&;
+		[[nodiscard]] static auto get_cache_blood_stains(entt::registry& registry, room_position_type position) noexcept -> cache_blood_stains&;
 
 		// 获取当前房间血迹缓存
-		[[nodiscard]] static auto get_cache_blood_stains(entt::registry& registry) noexcept -> const cache_blood_stains&;
+		[[nodiscard]] static auto get_cache_blood_stains(entt::registry& registry) noexcept -> cache_blood_stains&;
 
 		// 获取当前房间坐标
 		[[nodiscard]] static auto get_position(entt::registry& registry) noexcept -> sf::Vector2u;
 
-		// ==============
+		// =============================================
 		// 下面这些接口实在没有啥更合适的地方放了,就放在Room里了
-		// ==============
+		// =============================================
 
 		using collision_logical = components::tile::CollisionLogical;
 

@@ -437,144 +437,157 @@ namespace pd::systems
 		registry.ctx().erase<room::RoomInfos>();
 	}
 
-	auto Room::get_info(entt::registry& registry, const room_position_type position) noexcept -> const room_info&
+	auto Room::on_contact_chest(entt::registry& registry, const events::ChestContacted& event) noexcept -> void
+	{
+		using namespace components;
+
+		// 获取缓存
+		auto& [caches] = get_cache_chests(registry);
+
+		PROMETHEUS_PLATFORM_ASSUME(event.chest_index < caches.size());
+
+		auto& cache = caches[event.chest_index];
+		cache.opened = true;
+	}
+
+	auto Room::get_info(entt::registry& registry, const room_position_type position) noexcept -> room_info&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [infos] = registry.ctx().get<room::RoomInfos>();
+		auto& [infos] = registry.ctx().get<room::RoomInfos>();
 
 		return infos[position.x, position.y];
 	}
 
-	auto Room::get_info(entt::registry& registry) noexcept -> const room_info&
+	auto Room::get_info(entt::registry& registry) noexcept -> room_info&
 	{
 		using namespace components;
 
 		return get_info(registry, get_position(registry));
 	}
 
-	auto Room::get_cache_tiles(entt::registry& registry, const room_position_type position) noexcept -> const cache_tiles&
+	auto Room::get_cache_tiles(entt::registry& registry, const room_position_type position) noexcept -> cache_tiles&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [caches] = registry.ctx().get<room::RoomCacheTiles>();
+		auto& [caches] = registry.ctx().get<room::RoomCacheTiles>();
 
 		return caches[position.x, position.y];
 	}
 
-	auto Room::get_cache_tiles(entt::registry& registry) noexcept -> const cache_tiles&
+	auto Room::get_cache_tiles(entt::registry& registry) noexcept -> cache_tiles&
 	{
 		using namespace components;
 
 		return get_cache_tiles(registry, get_position(registry));
 	}
 
-	auto Room::get_cache_doors(entt::registry& registry, const room_position_type position) noexcept -> const cache_doors&
+	auto Room::get_cache_doors(entt::registry& registry, const room_position_type position) noexcept -> cache_doors&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [caches] = registry.ctx().get<room::RoomCacheDoors>();
+		auto& [caches] = registry.ctx().get<room::RoomCacheDoors>();
 
 		return caches[position.x, position.y];
 	}
 
-	auto Room::get_cache_doors(entt::registry& registry) noexcept -> const cache_doors&
+	auto Room::get_cache_doors(entt::registry& registry) noexcept -> cache_doors&
 	{
 		using namespace components;
 
 		return get_cache_doors(registry, get_position(registry));
 	}
 
-	auto Room::get_cache_chests(entt::registry& registry, const room_position_type position) noexcept -> const cache_chests&
+	auto Room::get_cache_chests(entt::registry& registry, const room_position_type position) noexcept -> cache_chests&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [caches] = registry.ctx().get<room::RoomCacheChests>();
+		auto& [caches] = registry.ctx().get<room::RoomCacheChests>();
 
 		return caches[position.x, position.y];
 	}
 
-	auto Room::get_cache_chests(entt::registry& registry) noexcept -> const cache_chests&
+	auto Room::get_cache_chests(entt::registry& registry) noexcept -> cache_chests&
 	{
 		using namespace components;
 
 		return get_cache_chests(registry, get_position(registry));
 	}
 
-	auto Room::get_cache_destroyable_objects(entt::registry& registry, const room_position_type position) noexcept -> const cache_destroyable_objects&
+	auto Room::get_cache_destroyable_objects(entt::registry& registry, const room_position_type position) noexcept -> cache_destroyable_objects&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [caches] = registry.ctx().get<room::RoomCacheDestroyableObjects>();
+		auto& [caches] = registry.ctx().get<room::RoomCacheDestroyableObjects>();
 
 		return caches[position.x, position.y];
 	}
 
-	auto Room::get_cache_destroyable_objects(entt::registry& registry) noexcept -> const cache_destroyable_objects&
+	auto Room::get_cache_destroyable_objects(entt::registry& registry) noexcept -> cache_destroyable_objects&
 	{
 		using namespace components;
 
 		return get_cache_destroyable_objects(registry, get_position(registry));
 	}
 
-	auto Room::get_cache_items(entt::registry& registry, const room_position_type position) noexcept -> const cache_items&
+	auto Room::get_cache_items(entt::registry& registry, const room_position_type position) noexcept -> cache_items&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [caches] = registry.ctx().get<room::RoomCacheItems>();
+		auto& [caches] = registry.ctx().get<room::RoomCacheItems>();
 
 		return caches[position.x, position.y];
 	}
 
-	auto Room::get_cache_items(entt::registry& registry) noexcept -> const cache_items&
+	auto Room::get_cache_items(entt::registry& registry) noexcept -> cache_items&
 	{
 		using namespace components;
 
 		return get_cache_items(registry, get_position(registry));
 	}
 
-	auto Room::get_cache_corpses(entt::registry& registry, const room_position_type position) noexcept -> const cache_corpses&
+	auto Room::get_cache_corpses(entt::registry& registry, const room_position_type position) noexcept -> cache_corpses&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [caches] = registry.ctx().get<room::RoomCacheCorpses>();
+		auto& [caches] = registry.ctx().get<room::RoomCacheCorpses>();
 
 		return caches[position.x, position.y];
 	}
 
-	auto Room::get_cache_corpses(entt::registry& registry) noexcept -> const cache_corpses&
+	auto Room::get_cache_corpses(entt::registry& registry) noexcept -> cache_corpses&
 	{
 		using namespace components;
 
 		return get_cache_corpses(registry, get_position(registry));
 	}
 
-	auto Room::get_cache_blood_stains(entt::registry& registry, const room_position_type position) noexcept -> const cache_blood_stains&
+	auto Room::get_cache_blood_stains(entt::registry& registry, const room_position_type position) noexcept -> cache_blood_stains&
 	{
 		using namespace components;
 
 		PROMETHEUS_PLATFORM_ASSUME(position.x < game::DungeonFloorWidth and position.y < game::DungeonFloorHeight);
 
-		const auto& [caches] = registry.ctx().get<room::RoomCacheBloodStains>();
+		auto& [caches] = registry.ctx().get<room::RoomCacheBloodStains>();
 
 		return caches[position.x, position.y];
 	}
 
-	auto Room::get_cache_blood_stains(entt::registry& registry) noexcept -> const cache_blood_stains&
+	auto Room::get_cache_blood_stains(entt::registry& registry) noexcept -> cache_blood_stains&
 	{
 		using namespace components;
 

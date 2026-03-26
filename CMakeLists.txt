@@ -473,6 +473,9 @@ add_executable(
 	# 场景相关事件
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/scene.hpp
 
+	# 地下城 -- 房间相关事件
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/room.hpp
+
 	# ============================
 	# SYSTEMS
 	# ============================

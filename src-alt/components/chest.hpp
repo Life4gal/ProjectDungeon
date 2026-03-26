@@ -13,23 +13,7 @@ namespace pd::components::chest
 	// 非实体组件
 	// ==========================================
 
-	enum class Type : std::uint8_t
-	{
-		// 标准宝箱
-		STANDARD,
-		// 出口房间宝箱
-		EXIT,
-	};
-
-	enum class TrapType : std::uint8_t
-	{
-		NONE,
-
-		// 爆炸陷阱
-		EXPLOSION,
-		// 落石陷阱
-		ROCKFALL,
-	};
+	//
 
 	// ==========================================
 	// 上下文组件
@@ -41,14 +25,24 @@ namespace pd::components::chest
 	// 实体组件
 	// ==========================================
 
-	// 宝箱状态
-	enum class State : std::uint8_t
+	enum class Type : std::uint8_t
 	{
-		CLOSED,
-		OPENED,
+		// 钱币
+		COIN,
+		// 物品
+		ITEM,
+		// 装备
+		EQUIPMENT,
+		// 食物/药水
+		CONSUMABLE,
+
+		// 爆炸陷阱
+		EXPLOSION_TRAP,
+		// 落石陷阱
+		ROCKFALL_TRAP,
 	};
 
-	// 陷阱动画计时器
+	// 动画计时器
 	// 仅在播放动画时存在
 	class Timer final
 	{
