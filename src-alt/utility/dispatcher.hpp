@@ -71,14 +71,14 @@ namespace pd::utility
 			requires detail::invokable_with_bind_ref<Event, Functor, Bind>
 		auto unsubscribe(Bind& bind) noexcept -> void
 		{
-			dispatcher_.sink<Event>().template disconnect<Bind>(bind);
+			dispatcher_.sink<Event>().template disconnect<Functor, Bind>(bind);
 		}
 
 		template<typename Event, auto Functor, typename Bind>
 			requires detail::invokable_with_bind_ptr<Event, Functor, Bind>
 		auto unsubscribe(Bind* bind) noexcept -> void
 		{
-			dispatcher_.sink<Event>().template disconnect<Bind>(bind);
+			dispatcher_.sink<Event>().template disconnect<Functor, Bind>(bind);
 		}
 
 		template<typename Event>
