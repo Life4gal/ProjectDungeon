@@ -10,7 +10,7 @@
 namespace pd::utility
 {
 	template<typename T, std::size_t Rows, std::size_t Columns>
-	class FixedMatrix final
+	class FixedMatrix
 	{
 		using matrix_type = std::array<T, Rows * Columns>;
 

@@ -7,72 +7,86 @@
 
 #include <manager/event.hpp>
 
-#include <components/chest.hpp>
-#include <components/physics_world.hpp>
-
-#include <systems/physics_world.hpp>
-
-#include <prometheus/platform/os.hpp>
+#include <components/tags.hpp>
 
 #include <entt/entt.hpp>
 
 namespace pd::systems
 {
-	auto Chest::create(entt::registry& registry) noexcept -> void
+	auto Chest::subscribe_events(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
+		using namespace events;
 
-		Event::subscribe<events::ChestContacted, &on_contact>(registry);
+		Event::subscribe<room::PreDisableChest, &Chest::on_pre_disable>(registry);
+		Event::subscribe<room::PostDisableChest, &Chest::on_post_disable>(registry);
+		Event::subscribe<room::PreEnableChest, &Chest::on_pre_enable>(registry);
+		Event::subscribe<room::PostEnableChest, &Chest::on_post_enable>(registry);
+
+		Event::subscribe<chest::Contacted, &Chest::on_contact_chest>(registry);
 	}
 
-	auto Chest::destroy(entt::registry& registry) noexcept -> void
+	auto Chest::unsubscribe_events(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
+		using namespace events;
 
-		Event::unsubscribe<events::ChestContacted, &on_contact>(registry);
+		Event::unsubscribe<room::PreDisableChest, &Chest::on_pre_disable>(registry);
+		Event::unsubscribe<room::PostDisableChest, &Chest::on_post_disable>(registry);
+		Event::unsubscribe<room::PreEnableChest, &Chest::on_pre_enable>(registry);
+		Event::unsubscribe<room::PostEnableChest, &Chest::on_post_enable>(registry);
+
+		Event::unsubscribe<chest::Contacted, &Chest::on_contact_chest>(registry);
 	}
 
-	auto Chest::on_contact(entt::registry& registry, const events::ChestContacted& event) noexcept -> void
+	auto Chest::on_pre_disable(entt::registry& registry, const events::room::PreDisableChest& event) noexcept -> void
+	{
+		//
+	}
+
+	auto Chest::on_post_disable(entt::registry& registry, const events::room::PostDisableChest& event) noexcept -> void
+	{
+		//
+	}
+
+	auto Chest::on_pre_enable(entt::registry& registry, const events::room::PreEnableChest& event) noexcept -> void
+	{
+		//
+	}
+
+	auto Chest::on_post_enable(entt::registry& registry, const events::room::PostEnableChest& event) noexcept -> void
+	{
+		//
+	}
+
+	auto Chest::on_contact_chest(entt::registry& registry, const events::chest::Contacted& contacted) noexcept -> void
+	{
+		//
+	}
+
+	auto Chest::spawn(entt::registry& registry) noexcept -> entt::entity
 	{
 		using namespace components;
-		using namespace manager;
 
-		// 其必定存在物理碰撞体
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<physics_world::BodyId>(event.chest));
-		PhysicsWorld::deattach(registry, event.chest);
+		const auto entity = registry.create();
 
-		// 处理效果
-		switch (const auto type = registry.get<chest::Type>(event.chest);
-			type)
-		{
-			case chest::Type::COIN:
-			{
-				break;
-			}
-			case chest::Type::ITEM:
-			{
-				break;
-			}
-			case chest::Type::EQUIPMENT:
-			{
-				break;
-			}
-			case chest::Type::CONSUMABLE:
-			{
-				break;
-			}
-			case chest::Type::EXPLOSION_TRAP:
-			{
-				break;
-			}
-			case chest::Type::ROCKFALL_TRAP:
-			{
-				break;
-			}
-		}
+		// todo
 
-		// 房间缓存由房间处理事件时修改
-		// FIXME: 要不要销毁实体?
-		registry.destroy(event.chest);
+
+		registry.emplace<tags::chest>(entity);
+		return entity;
+	}
+
+	auto Chest::destroy(entt::registry& registry, const entt::entity entity) noexcept -> void
+	{
+		registry.destroy(entity);
+	}
+
+	auto Chest::destroy_all(entt::registry& registry) noexcept -> void
+	{
+		using namespace components;
+
+		const auto view = registry.view<tags::chest>();
+		registry.destroy(view.begin(), view.end());
 	}
 }

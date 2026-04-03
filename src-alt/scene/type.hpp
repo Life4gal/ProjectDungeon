@@ -5,13 +5,19 @@
 
 #pragma once
 
-#include <scene/type.hpp>
+#include <cstdint>
 
-namespace pd::events
+namespace pd::scene
 {
-	class SceneChanged
+	enum class Type : std::uint8_t
 	{
-	public:
-		scene::Type to;
+		// 主菜单
+		MAIN_MENU,
+		// 主游戏场景
+		GAME,
+		// 退出场景(需要吗?)
+		QUIT,
+
+		COUNT
 	};
 }

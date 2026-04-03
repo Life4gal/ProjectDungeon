@@ -18,11 +18,7 @@ namespace pd
 		// ==========================================
 
 		// 游戏实例的引用
-		class Game final
-		{
-		public:
-			std::reference_wrapper<pd::Game> game;
-		};
+		class Game final : public std::reference_wrapper<pd::Game> {};
 
 		// ==========================================
 		// 实体组件

@@ -48,22 +48,6 @@ namespace pd::game
 	};
 
 	// =========================================
-	// 场景类型
-	// =========================================
-
-	enum class Scene : std::uint8_t
-	{
-		// 主菜单
-		MAIN_MENU,
-		// 主游戏场景
-		GAME,
-		// 退出场景(需要吗?)
-		QUIT,
-
-		COUNT
-	};
-
-	// =========================================
 	// 主菜单
 	// =========================================
 
@@ -189,22 +173,19 @@ namespace pd::game
 			R"(.\media\textures\TILES-FLOOR.png)",
 	};
 
-	// todo: 纹理信息如何配置?
-	// constexpr std::array<std::uint32_t, std::to_underlying(Texture::COUNT)> TextureWidths
-	// {
-	// 		// WALL
-	// 		64,
-	// 		// FLOOR
-	// 		64
-	// };
-	//
-	// constexpr std::array<std::uint32_t, std::to_underlying(Texture::COUNT)> TextureHeights
-	// {
-	// 		// WALL
-	// 		64,
-	// 		// FLOOR
-	// 		64,
-	// };
+	// ========
+	// 墙壁
+
+	// 墙类型(总共八行)
+	constexpr std::uint32_t TextureTileWallCategory = 8;
+	// 一行10列
+	constexpr std::uint32_t TextureTileWallCountPerRow = 10;
+	// 墙角
+	constexpr std::uint32_t TextureTileWallCornerOffset = 0;
+	constexpr std::uint32_t TextureTileWallInnerCornerOffset = 1;
+	// 非墙角
+	constexpr std::uint32_t TextureTileWallOffset = 2;
+	constexpr std::uint32_t TextureTileWallCount = 8;
 
 	// ====================
 	// 音效资源
@@ -251,6 +232,17 @@ namespace pd::game
 	};
 
 	// =========================================
+	// 地下城 -- 房间 -- 门
+	// =========================================
+
+	// 门物理体占整个瓦片的比例
+	constexpr float DoorBodyRatio = 0.6667f;
+	// 门感应区占整个瓦片的比例
+	constexpr float DoorSensorRatio = 0.3f;
+	// 门阻挡占整个瓦片的比例(防止玩家走到地图外部)
+	constexpr float DoorBlockerRatio = 1 - DoorBodyRatio - DoorSensorRatio;
+
+	// =========================================
 	// 地下城 -- 房间
 	// =========================================
 
@@ -270,25 +262,31 @@ namespace pd::game
 	constexpr std::uint32_t RoomHeight = RoomVerticalGrid * RoomTileHeight;
 
 	// =========================================
-	// 地下城
+	// 地下城 -- 楼层
 	// =========================================
 
 	// 地下城一层的宽度(以房间数量表示)
-	constexpr std::uint32_t DungeonFloorWidth = 13;
+	constexpr std::uint32_t FloorHorizontalRoom = 13;
 	// 地下城一层的高度(以房间数量表示)
-	constexpr std::uint32_t DungeonFloorHeight = 7;
+	constexpr std::uint32_t FloorVerticalRoom = 7;
 
-	// 地下城起始房间坐标X
-	constexpr std::uint32_t DungeonStartRoomX = DungeonFloorWidth / 2;
-	// 地下城起始房间坐标Y
-	constexpr std::uint32_t DungeonStartRoomY = DungeonFloorHeight / 2;
+	// 地下城一层的起始房间坐标X
+	constexpr std::uint32_t FloorStartRoomX = FloorHorizontalRoom / 2;
+	// 地下城一层的起始房间坐标Y
+	constexpr std::uint32_t FloorStartRoomY = FloorVerticalRoom / 2;
 
-	// 地下城房间数量基数
-	constexpr std::uint32_t DungeonRoomBaseCount = 10;
-	// 地下城房间数量增长系数(level * factor)
-	constexpr std::uint32_t DungeonRoomCountGrowthFactor = 4;
-	// 地下城房间数量最大值
-	constexpr std::uint32_t DungeonRoomMaxCount = DungeonRoomBaseCount + DungeonRoomCountGrowthFactor * 10;
+	// 地下城一层的房间数量基数
+	constexpr std::uint32_t FloorRoomBaseCount = 10;
+	// 地下城一层的房间数量增长系数(level * factor)
+	constexpr std::uint32_t FloorRoomCountGrowthFactor = 4;
+	// 地下城一层的房间数量最大值
+	constexpr std::uint32_t FloorRoomMaxCount = FloorRoomBaseCount + FloorRoomCountGrowthFactor * 10;
 
-	static_assert(DungeonRoomMaxCount < DungeonFloorWidth * DungeonFloorHeight);
+	static_assert(FloorRoomMaxCount < FloorHorizontalRoom * FloorVerticalRoom);
+
+	// =========================================
+	// 地下城
+	// =========================================
+
+	// 
 }

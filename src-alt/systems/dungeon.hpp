@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <events/dungeon.hpp>
+
 #include <entt/fwd.hpp>
 
 namespace pd::systems
@@ -12,7 +14,26 @@ namespace pd::systems
 	class Dungeon final
 	{
 	public:
-		static auto create(entt::registry& registry, std::uint32_t level) noexcept -> void;
+		// =============================================
+		// 事件响应
+		// =============================================
+
+		// 订阅事件
+		static auto subscribe_events(entt::registry& registry) noexcept -> void;
+
+		// 取消订阅事件
+		static auto unsubscribe_events(entt::registry& registry) noexcept -> void;
+
+	private:
+		// 进入地下城
+		static auto on_go(entt::registry& registry, const events::dungeon::Go& event) noexcept -> void;
+
+	public:
+		// =============================================
+		// 创建/销毁上下文
+		// =============================================
+
+		static auto create(entt::registry& registry) noexcept -> void;
 
 		static auto destroy(entt::registry& registry) noexcept -> void;
 	};

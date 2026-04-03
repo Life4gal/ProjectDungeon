@@ -5,13 +5,14 @@
 
 #pragma once
 
-#include <scene/type.hpp>
+#include <entt/entity/fwd.hpp>
 
-namespace pd::events
+namespace pd::events::chest
 {
-	class SceneChanged
+	class Contacted final
 	{
 	public:
-		scene::Type to;
+		entt::entity chest;
+		entt::entity entity;
 	};
 }

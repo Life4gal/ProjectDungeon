@@ -5,87 +5,133 @@
 
 #pragma once
 
+#include <span>
+#include <functional>
+
 #include <entt/entity/fwd.hpp>
 
-namespace pd::events
+namespace pd::components::floor
 {
-	// ===============
-	// 门
-	// ===============
+	class RoomInfo;
+	class RoomEntity;
+}
 
-	// 与门实体接触时触发
-	class ClosedDoorContacted final
+namespace pd::events::room
+{
+	// 激活(进入)房间
+	class Active final
 	{
 	public:
-		entt::entity door;
-		entt::entity player;
+		std::reference_wrapper<const components::floor::RoomInfo> info;
+		std::reference_wrapper<const components::floor::RoomEntity> entity;
 	};
 
-	// 与门感应器接触时触发
-	class OpenedDoorContacted final
+	// 清理房间
+	class Cleared final
 	{
 	public:
-		entt::entity door;
-		entt::entity player;
+		std::reference_wrapper<const components::floor::RoomInfo> info;
+		std::reference_wrapper<const components::floor::RoomEntity> entity;
 	};
 
-	// ===============
-	// 宝箱
-	// ===============
-
-	// 仅与未开启宝箱接触时触发
-	class ChestContacted final
+	// 禁用(离开)房间
+	class Inactive final
 	{
 	public:
-		entt::entity chest;
-		entt::entity player;
-
-		// 宝箱在CacheChests中的索引
-		// 有这个索引,我们不再需要获取宝箱实体的位置信息,也不用限制一个房间只有一个宝箱
-		std::uint32_t chest_index;
+		std::reference_wrapper<const components::floor::RoomInfo> info;
+		std::reference_wrapper<const components::floor::RoomEntity> entity;
 	};
 
-	// ===============
-	// 可破坏物
-	// ===============
-
-	// 与可破坏物接触时触发
-	// 在事件级别就区分与其解除的实体类型,还是由订阅者自行判断?
-	class DestroyableObjectContacted final
+	namespace detail
 	{
-	public:
-		entt::entity destroyable_object;
-		entt::entity contactor;
-	};
+		class Entities
+		{
+		public:
+			std::span<const entt::entity> entities;
+		};
+	}
 
-	// ===============
-	// 物品
-	// ===============
+	// 禁用当前房间瓦片实体前*立刻*触发
+	class PreDisableTile final : public detail::Entities {};
 
-	// 与物品接触时触发
-	class ItemContacted final
-	{
-	public:
-		entt::entity item;
-		entt::entity player;
-	};
+	// 禁用当前房间瓦片实体后*立刻*触发
+	class PostDisableTile final : public detail::Entities {};
 
-	// ===============
-	// 尸体
-	// ===============
+	// 启用当前房间瓦片实体前*立刻*触发
+	class PreEnableTile final : public detail::Entities {};
 
-	// 生成尸体时触发
-	class CorpseCreated final
-	{
-	public:
-		entt::entity corpse;
-	};
+	// 启用当前房间瓦片实体后*立刻*触发
+	class PostEnableTile final : public detail::Entities {};
 
-	// 与尸体接触时触发
-	class CorpseContacted final
-	{
-	public:
-		entt::entity corpse;
-		entt::entity contactor;
-	};
+	// 禁用当前房间门实体前*立刻*触发
+	class PreDisableDoor final : public detail::Entities {};
+
+	// 禁用当前房间门实体后*立刻*触发
+	class PostDisableDoor final : public detail::Entities {};
+
+	// 启用当前房间门实体前*立刻*触发
+	class PreEnableDoor final : public detail::Entities {};
+
+	// 启用当前房间门实体后*立刻*触发
+	class PostEnableDoor final : public detail::Entities {};
+
+	// 禁用当前房间宝箱实体前*立刻*触发
+	class PreDisableChest final : public detail::Entities {};
+
+	// 禁用当前房间宝箱实体后*立刻*触发
+	class PostDisableChest final : public detail::Entities {};
+
+	// 启用当前房间宝箱实体前*立刻*触发
+	class PreEnableChest final : public detail::Entities {};
+
+	// 启用当前房间宝箱实体后*立刻*触发
+	class PostEnableChest final : public detail::Entities {};
+
+	// 禁用当前房间可破坏物实体前*立刻*触发
+	class PreDisableDestroyableObject final : public detail::Entities {};
+
+	// 禁用当前房间可破坏物实体后*立刻*触发
+	class PostDisableDestroyableObject final : public detail::Entities {};
+
+	// 启用当前房间可破坏物实体前*立刻*触发
+	class PreEnableDestroyableObject final : public detail::Entities {};
+
+	// 启用当前房间可破坏物实体后*立刻*触发
+	class PostEnableDestroyableObject final : public detail::Entities {};
+
+	// 禁用当前房间物品实体前*立刻*触发
+	class PreDisableItem final : public detail::Entities {};
+
+	// 禁用当前房间物品实体后*立刻*触发
+	class PostDisableItem final : public detail::Entities {};
+
+	// 启用当前房间物品实体前*立刻*触发
+	class PreEnableItem final : public detail::Entities {};
+
+	// 启用当前房间物品实体后*立刻*触发
+	class PostEnableItem final : public detail::Entities {};
+
+	// 禁用当前房间尸体实体前*立刻*触发
+	class PreDisableCorpse final : public detail::Entities {};
+
+	// 禁用当前房间尸体实体后*立刻*触发
+	class PostDisableCorpse final : public detail::Entities {};
+
+	// 启用当前房间尸体实体前*立刻*触发
+	class PreEnableCorpse final : public detail::Entities {};
+
+	// 启用当前房间尸体实体后*立刻*触发
+	class PostEnableCorpse final : public detail::Entities {};
+
+	// 禁用当前房间血迹实体前*立刻*触发
+	class PreDisableBloodStain final : public detail::Entities {};
+
+	// 禁用当前房间血迹实体后*立刻*触发
+	class PostDisableBloodStain final : public detail::Entities {};
+
+	// 启用当前房间血迹实体前*立刻*触发
+	class PreEnableBloodStain final : public detail::Entities {};
+
+	// 启用当前房间血迹实体后*立刻*触发
+	class PostEnableBloodStain final : public detail::Entities {};
 }

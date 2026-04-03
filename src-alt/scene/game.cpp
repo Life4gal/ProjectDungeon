@@ -8,6 +8,7 @@
 #include <game/constants_map.hpp>
 
 #include <events/scene.hpp>
+#include <events/dungeon.hpp>
 
 #include <manager/event.hpp>
 #include <manager/asset.hpp>
@@ -16,9 +17,12 @@
 #include <systems/physics_world.hpp>
 
 #include <systems/dungeon.hpp>
+#include <systems/floor.hpp>
+#include <systems/room.hpp>
+#include <systems/door.hpp>
+#include <systems/chest.hpp>
 
 #include <prometheus/platform/os.hpp>
-
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
 #include <imgui.h>
@@ -92,7 +96,7 @@ namespace pd::scene
 			else if (selected_option_value_ == std::to_underlying(option_type::QUIT))
 			{
 				// 切换到主菜单
-				Event::enqueue(events::SceneChanged{.to = game::Scene::MAIN_MENU});
+				Event::enqueue(events::SceneChanged{.to = Type::MAIN_MENU});
 			}
 		}
 		else if (action == MenuAction::CANCEL)
@@ -107,10 +111,11 @@ namespace pd::scene
 
 	auto Game::start_game() noexcept -> bool
 	{
-		using namespace systems;
+		using namespace manager;
+		using namespace events;
 
-		// 生成地牢
-		Dungeon::create(registry_, 1);
+		// 进入地下城
+		Event::trigger(dungeon::Go{.level = 1, .x = game::FloorStartRoomX, .y = game::FloorStartRoomY});
 
 		return true;
 	}
@@ -153,6 +158,17 @@ namespace pd::scene
 		// 创建系统
 		World::create(registry_);
 		PhysicsWorld::create(registry_);
+
+		Dungeon::create(registry_);
+		Floor::create(registry_);
+		Room::create(registry_);
+
+		// 订阅事件
+		Dungeon::subscribe_events(registry_);
+		Floor::subscribe_events(registry_);
+		Room::subscribe_events(registry_);
+		Door::subscribe_events(registry_);
+		Chest::subscribe_events(registry_);
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -172,10 +188,18 @@ namespace pd::scene
 
 		Music::stop(music_id_);
 
-		// todo: 合适的销毁地牢的时机
-		Dungeon::destroy(registry_);
+		// 退订事件
+		Chest::unsubscribe_events(registry_);
+		Door::unsubscribe_events(registry_);
+		Room::unsubscribe_events(registry_);
+		Floor::unsubscribe_events(registry_);
+		Dungeon::unsubscribe_events(registry_);
 
 		// 销毁系统
+		Room::destroy(registry_);
+		Floor::destroy(registry_);
+		Dungeon::destroy(registry_);
+
 		PhysicsWorld::destroy(registry_);
 		World::destroy(registry_);
 

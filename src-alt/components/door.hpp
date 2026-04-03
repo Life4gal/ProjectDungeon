@@ -7,10 +7,18 @@
 
 #include <SFML/System/Time.hpp>
 
+#include <box2d/id.h>
+
 namespace pd::components::door
 {
 	// ==========================================
-	// 非实体组件
+	// 上下文组件
+	// ==========================================
+
+	//
+
+	// ==========================================
+	// 实体组件
 	// ==========================================
 
 	enum class Direction : std::uint8_t
@@ -20,7 +28,7 @@ namespace pd::components::door
 		WEST = 0b10,
 		EAST = 0b11,
 
-		COUNT
+		COUNT = 4
 	};
 
 	// [[nodiscard]] constexpr auto operator-(const Direction direction) noexcept -> Direction
@@ -37,18 +45,6 @@ namespace pd::components::door
 		// 出口门
 		EXIT,
 	};
-
-	// ==========================================
-	// 上下文组件
-	// ==========================================
-
-	//
-
-	// ==========================================
-	// 实体组件
-	// ==========================================
-
-	// 上面的组件我们不附加在实体上,而是保存在房间的组件中
 
 	class Locked {};
 
@@ -70,5 +66,18 @@ namespace pd::components::door
 	{
 	public:
 		sf::Time timer;
+	};
+
+	// 物理体
+	// 仅在激活时存在
+	class Physics final
+	{
+	public:
+		// 门
+		b2ShapeId door;
+		// 感应区
+		b2ShapeId sensor;
+		// 阻挡(防止玩家走到地图外部)
+		b2ShapeId blocker;
 	};
 }

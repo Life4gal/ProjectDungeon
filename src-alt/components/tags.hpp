@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <entt/core/type_traits.hpp>
 #include <entt/core/hashed_string.hpp>
 
 namespace pd::components::tags
@@ -18,19 +19,31 @@ namespace pd::components::tags
 	// =================
 	// 房间
 
-	using floor = entt::tag<"Floor"_hs>;
-	using wall = entt::tag<"Wall"_hs>;
-	using obstacle = entt::tag<"Obstacle"_hs>;
-	using hole = entt::tag<"Hole"_hs>;
+	// 瓦片
+	using tile = entt::tag<"Tile"_hs>;
+	// 门
 	using door = entt::tag<"Door"_hs>;
-	using door_sensor = entt::tag<"DoorSensor"_hs>;
+	// 宝箱
+	using chest = entt::tag<"Chest"_hs>;
+	// 可破坏物
+	using destroyable_object = entt::tag<"DestroyableObject"_hs>;
+	// 物品
+	using item = entt::tag<"Item"_hs>;
+	// 尸体
+	using corpse = entt::tag<"Corpse"_hs>;
+	// 血迹
+	using blood_stain = entt::tag<"BloodStain"_hs>;
 
 	// =================================================
 	// 状态标识
 	// =================================================
 
+	// 禁用
+	// FIXME(OPT): 这个标签目前威力太大了,是否需要根据具体功能拆分?
 	using disabled = entt::tag<"Disabled"_hs>;
 
+	// 濒死
 	using dying = entt::tag<"Dying"_hs>;
+	// 死亡
 	using dead = entt::tag<"Dead"_hs>;
 }

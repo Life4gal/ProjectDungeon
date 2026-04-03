@@ -46,7 +46,7 @@ namespace pd
 		}
 
 		// 切换到退出场景时直接关闭窗口
-		if (event.to == Scene::QUIT)
+		if (event.to == scene::Type::QUIT)
 		{
 			std::println("QUIT...");
 
@@ -55,7 +55,7 @@ namespace pd
 			return;
 		}
 
-		if (event.to == Scene::MAIN_MENU)
+		if (event.to == scene::Type::MAIN_MENU)
 		{
 			std::println("MAIN MAIN...");
 
@@ -66,7 +66,7 @@ namespace pd
 			return;
 		}
 
-		if (event.to == Scene::GAME)
+		if (event.to == scene::Type::GAME)
 		{
 			std::println("GAME...");
 
@@ -138,7 +138,7 @@ namespace pd
 
 		// 切换场景
 		// 注意是trigger,因为我们必须马上创建所需场景
-		Event::trigger(events::SceneChanged{.to = Scene::MAIN_MENU});
+		Event::trigger(events::SceneChanged{.to = scene::Type::MAIN_MENU});
 	}
 
 	Game::~Game() noexcept
@@ -162,7 +162,7 @@ namespace pd
 				if (event->is<sf::Event::Closed>())
 				{
 					// 在这里使用enqueue而不是trigger,我们保证退出前依然会处理完所有事件
-					Event::enqueue(events::SceneChanged{.to = Scene::QUIT});
+					Event::enqueue(events::SceneChanged{.to = scene::Type::QUIT});
 					continue;
 				}
 

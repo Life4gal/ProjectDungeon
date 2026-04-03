@@ -5,13 +5,19 @@
 
 #pragma once
 
-#include <scene/type.hpp>
+#include <cstdint>
 
-namespace pd::events
+namespace pd::events::dungeon
 {
-	class SceneChanged
+	// 进入指定楼层的指定房间
+	class Go final
 	{
 	public:
-		scene::Type to;
+		// 层级
+		std::uint32_t level;
+		// 指定房间X
+		std::uint32_t x;
+		// 指定房间Y
+		std::uint32_t y;
 	};
 }

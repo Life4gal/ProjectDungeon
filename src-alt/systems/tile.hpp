@@ -5,20 +5,20 @@
 
 #pragma once
 
-#include <events/chest.hpp>
-#include <events/room.hpp>
+#include <components/tile.hpp>
 
 #include <entt/fwd.hpp>
 
 namespace pd::systems
 {
-	class Chest final
+	class Tile final
 	{
 	public:
+		using collision_logical = components::tile::CollisionLogical;
+
 		// =============================================
 		// 事件响应
 		// =============================================
-
 		// 订阅事件
 		static auto subscribe_events(entt::registry& registry) noexcept -> void;
 
@@ -26,29 +26,38 @@ namespace pd::systems
 		static auto unsubscribe_events(entt::registry& registry) noexcept -> void;
 
 	private:
-		static auto on_pre_disable(entt::registry& registry, const events::room::PreDisableChest& event) noexcept -> void;
-
-		static auto on_post_disable(entt::registry& registry, const events::room::PostDisableChest& event) noexcept -> void;
-
-		static auto on_pre_enable(entt::registry& registry, const events::room::PreEnableChest& event) noexcept -> void;
-
-		static auto on_post_enable(entt::registry& registry, const events::room::PostEnableChest& event) noexcept -> void;
-
-		static auto on_contact_chest(entt::registry& registry, const events::chest::Contacted& contacted) noexcept -> void;
+		//
 
 	public:
 		// =============================================
 		// 创建/销毁实体
 		// =============================================
 
-		// 创建宝箱
+		// 创建瓦片
 		// todo: 参数?
-		static auto spawn(entt::registry& registry) noexcept -> entt::entity;
+		static auto create(entt::registry& registry) noexcept -> entt::entity;
 
-		// 销毁宝箱
+		// 销毁瓦片
 		static auto destroy(entt::registry& registry, entt::entity entity) noexcept -> void;
 
-		// 销毁所有宝箱
+		// 销毁所有瓦片
 		static auto destroy_all(entt::registry& registry) noexcept -> void;
+
+		// =============================================
+		// 辅助接口(也许不需要公开?)
+		// =============================================
+
+		// 是否可以行走
+		// 一般单指地板类型
+		[[nodiscard]] static auto is_walkable(collision_logical collision_logical) noexcept -> bool;
+
+		// 是否可以飞越
+		// 一般单指非墙壁类型
+		[[nodiscard]] static auto is_flyable(collision_logical collision_logical) noexcept -> bool;
+
+		// 是否可以穿越
+		// 一般指非墙壁类型和非障碍物类型
+		// 其比飞行更低,例如飞弹
+		[[nodiscard]] static auto is_passable(collision_logical collision_logical) noexcept -> bool;
 	};
 }

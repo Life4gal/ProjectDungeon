@@ -78,11 +78,11 @@ namespace pd::scene
 				selected_option == option_type::CONTINUE)
 			{
 				// todo
-				Event::enqueue(events::SceneChanged{.to = game::Scene::GAME});
+				Event::enqueue(events::SceneChanged{.to = Type::GAME});
 			}
 			else if (selected_option == option_type::START)
 			{
-				Event::enqueue(events::SceneChanged{.to = game::Scene::GAME});
+				Event::enqueue(events::SceneChanged{.to = Type::GAME});
 			}
 			else if (selected_option == option_type::OPTIONS)
 			{
@@ -90,12 +90,12 @@ namespace pd::scene
 			}
 			else if (selected_option == option_type::QUIT)
 			{
-				Event::enqueue(events::SceneChanged{.to = game::Scene::QUIT});
+				Event::enqueue(events::SceneChanged{.to = Type::QUIT});
 			}
 		}
 		else if (action == MenuAction::CANCEL)
 		{
-			Event::enqueue(events::SceneChanged{.to = game::Scene::QUIT});
+			Event::enqueue(events::SceneChanged{.to = Type::QUIT});
 		}
 		else
 		{
