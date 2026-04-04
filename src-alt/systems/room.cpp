@@ -21,7 +21,6 @@ namespace pd::systems
 		Event::subscribe<room::Active, &on_active_room>(registry);
 		Event::subscribe<room::Cleared, &on_clear_room>(registry);
 		Event::subscribe<room::Inactive, &on_inactive_room>(registry);
-
 		Event::subscribe<door::Contacted, &on_contact_door>(registry);
 		Event::subscribe<door::SensorContacted, &on_contact_door_sensor>(registry);
 	}
@@ -34,7 +33,6 @@ namespace pd::systems
 		Event::unsubscribe<room::Active, &on_active_room>(registry);
 		Event::unsubscribe<room::Cleared, &on_clear_room>(registry);
 		Event::unsubscribe<room::Inactive, &on_inactive_room>(registry);
-
 		Event::unsubscribe<door::Contacted, &on_contact_door>(registry);
 		Event::unsubscribe<door::SensorContacted, &on_contact_door_sensor>(registry);
 	}
@@ -49,23 +47,13 @@ namespace pd::systems
 			const auto& entities = event.entity.get();
 			const auto& [tiles, doors, chests, destroyable_objects, items, corpses, blood_stains] = entities;
 
-			Event::trigger(room::PreEnableTile{tiles});
-			Event::trigger(room::PreEnableDoor{doors});
-			Event::trigger(room::PreEnableChest{chests});
-			Event::trigger(room::PreEnableDestroyableObject{destroyable_objects});
-			Event::trigger(room::PreEnableItem{items});
-			Event::trigger(room::PreEnableCorpse{corpses});
-			Event::trigger(room::PreEnableBloodStain{blood_stains});
-
-			//
-
-			Event::trigger(room::PostEnableTile{tiles});
-			Event::trigger(room::PostEnableDoor{doors});
-			Event::trigger(room::PostEnableChest{chests});
-			Event::trigger(room::PostEnableDestroyableObject{chests});
-			Event::trigger(room::PostEnableItem{items});
-			Event::trigger(room::PostEnableCorpse{corpses});
-			Event::trigger(room::PostEnableBloodStain{blood_stains});
+			Event::enqueue(room::EnableTile{tiles});
+			Event::enqueue(room::EnableDoor{doors});
+			Event::enqueue(room::EnableChest{chests});
+			// Event::enqueue(room::EnableDestroyableObject{destroyable_objects});
+			// Event::enqueue(room::EnableItem{items});
+			// Event::enqueue(room::EnableCorpse{corpses});
+			// Event::enqueue(room::EnableBloodStain{blood_stains});
 		}
 
 		// 如果房间未清除
@@ -96,23 +84,13 @@ namespace pd::systems
 			const auto& entities = event.entity.get();
 			const auto& [tiles, doors, chests, destroyable_objects, items, corpses, blood_stains] = entities;
 
-			Event::trigger(room::PreDisableTile{tiles});
-			Event::trigger(room::PreDisableDoor{doors});
-			Event::trigger(room::PreDisableChest{chests});
-			Event::trigger(room::PreDisableDestroyableObject{destroyable_objects});
-			Event::trigger(room::PreDisableItem{items});
-			Event::trigger(room::PreDisableCorpse{corpses});
-			Event::trigger(room::PreDisableBloodStain{blood_stains});
-
-			//
-
-			Event::trigger(room::PostDisableTile{tiles});
-			Event::trigger(room::PostDisableDoor{doors});
-			Event::trigger(room::PostDisableChest{chests});
-			Event::trigger(room::PostDisableDestroyableObject{chests});
-			Event::trigger(room::PostDisableItem{items});
-			Event::trigger(room::PostDisableCorpse{corpses});
-			Event::trigger(room::PostDisableBloodStain{blood_stains});
+			Event::enqueue(room::DisableTile{tiles});
+			Event::enqueue(room::DisableDoor{doors});
+			Event::enqueue(room::DisableChest{chests});
+			// Event::enqueue(room::DisableDestroyableObject{destroyable_objects});
+			// Event::enqueue(room::DisableItem{items});
+			// Event::enqueue(room::DisableCorpse{corpses});
+			// Event::enqueue(room::DisableBloodStain{blood_stains});
 		}
 
 		if (const auto& info = event.info.get();

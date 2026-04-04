@@ -7,86 +7,136 @@
 
 #include <manager/asset_fwd.hpp>
 
-#include <utility/resource_cache.hpp>
+#include <entt/core/hashed_string.hpp>
+#include <entt/resource/cache.hpp>
 
 namespace pd::manager
 {
 	namespace detail
 	{
-		template<typename Derived, typename Loader>
+		[[nodiscard]] constexpr auto to_id(const AssetId id) noexcept -> entt::id_type
+		{
+			return std::to_underlying(id);
+		}
+
+		[[nodiscard]] constexpr auto from_id(const entt::id_type id) noexcept -> AssetId
+		{
+			return static_cast<AssetId>(id);
+		}
+
+		[[nodiscard]] constexpr auto make_id(const std::string_view path) noexcept -> entt::id_type
+		{
+			return entt::hashed_string{path.data(), path.size()};
+		}
+
+		template<typename Loader>
 		class Asset
 		{
 			using loader_type = Loader;
-			using cache_type = utility::ResourceCache<loader_type>;
+			using element_type = Loader::result_type::element_type;
+			using cache_type = entt::resource_cache<element_type, loader_type>;
 
 		public:
-			using reference = cache_type::reference;
-			using const_reference = cache_type::const_reference;
+			using reference = entt::resource<element_type>;
+			using const_reference = entt::resource<const element_type>;
 
 			using size_type = cache_type::size_type;
 
 		private:
-			cache_type cache_;
-
-			[[nodiscard]] static auto cache() noexcept -> cache_type&
-			{
-				return Derived::instance().cache_;
-			}
+			inline static cache_type cache_;
 
 		public:
+			// [[nodiscard]] static auto instance() noexcept -> cache_type&
+			// {
+			// 	return cache_;
+			// }
+
 			[[nodiscard]] static auto load(const std::string_view path) noexcept -> AssetId
 			{
-				return cache().load(path);
+				const auto id = make_id(path);
+				[[maybe_unused]] const auto [it, loaded] = cache_.load(id, path);
+
+				return from_id(id);
 			}
 
 			[[nodiscard]] static auto force_load(const std::string_view path) -> AssetId
 			{
-				return cache().force_load(path);
+				const auto id = make_id(path);
+				[[maybe_unused]] const auto [it, loaded] = cache_.force_load(id, path);
+
+				return from_id(id);
 			}
 
+		private:
+			[[nodiscard]] static auto get(const entt::id_type id) noexcept -> reference
+			{
+				return cache_[id];
+			}
+
+		public:
 			[[nodiscard]] static auto get(const AssetId id) noexcept -> reference
 			{
-				return cache().get(id);
+				return get(to_id(id));
 			}
 
 			[[nodiscard]] static auto get(const std::string_view path) noexcept -> reference
 			{
-				return cache().get(path);
+				const auto id = make_id(path);
+
+				return get(id);
 			}
 
 			[[nodiscard]] static auto empty() noexcept -> bool
 			{
-				return cache().empty();
+				return cache_.empty();
 			}
 
 			[[nodiscard]] static auto size() noexcept -> size_type
 			{
-				return cache().size();
+				return cache_.size();
 			}
 
+		private:
+			[[nodiscard]] static auto contains(const entt::id_type id) noexcept -> bool
+			{
+				return cache_.contains(id);
+			}
+
+		public:
 			[[nodiscard]] static auto contains(const AssetId id) noexcept -> bool
 			{
-				return cache().contains(id);
+				return contains(to_id(id));
 			}
 
 			[[nodiscard]] static auto contains(const std::string_view path) noexcept -> bool
 			{
-				return cache().contains(path);
+				const auto id = make_id(path);
+
+				return contains(id);
 			}
 
+		private:
+			static auto erase(const entt::id_type id) noexcept -> bool
+			{
+				return cache_.erase(id) != 0;
+			}
+
+		public:
 			static auto unload(const AssetId id) noexcept -> bool
 			{
-				return cache().erase(id);
+				return erase(to_id(id));
 			}
 
 			static auto unload(const std::string_view path) noexcept -> bool
 			{
-				return cache().erase(path);
+				const auto id = make_id(path);
+
+				return erase(id);
 			}
 
 			static auto clear() noexcept -> void
 			{
-				cache().clear();
+				cache_.clear();
 			}
 		};
 
@@ -123,26 +173,13 @@ namespace pd::manager
 		};
 	}
 
-	class Font final : public detail::Asset<Font, detail::FontLoader>
+	class Font final : public detail::Asset<detail::FontLoader> {};
+
+	class Texture final : public detail::Asset<detail::TextureLoader> {};
+
+	class Sound final : public detail::Asset<detail::SoundLoader>
 	{
 	public:
-		// 这个接口公开仅为了Game::debug_font_
-		[[nodiscard]] static auto instance() noexcept -> Font&;
-	};
-
-	class Texture final : public detail::Asset<Texture, detail::TextureLoader>
-	{
-	public:
-		// 这个接口公开仅为了Game::debug_texture_
-		[[nodiscard]] static auto instance() noexcept -> Texture&;
-	};
-
-	class Sound final : public detail::Asset<Sound, detail::SoundLoader>
-	{
-	public:
-		// 这个接口公开仅为了Game::debug_sound_
-		[[nodiscard]] static auto instance() noexcept -> Sound&;
-
 		// 播放一个音效
 		// false:
 		//  -指定的音效未加载
@@ -170,12 +207,9 @@ namespace pd::manager
 		static auto play_unique(std::string_view path) noexcept -> bool;
 	};
 
-	class Music final : public detail::Asset<Music, detail::MusicLoader>
+	class Music final : public detail::Asset<detail::MusicLoader>
 	{
 	public:
-		// 这个接口公开仅为了Game::debug_music_
-		[[nodiscard]] static auto instance() noexcept -> Music&;
-
 		// 播放一个音乐,如果音乐正在播放则跳过
 		// false:
 		//  -指定的音乐未加载

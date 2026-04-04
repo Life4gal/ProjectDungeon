@@ -168,11 +168,8 @@ namespace pd::systems
 		using namespace manager;
 		using namespace events;
 
-		Event::subscribe<room::PreDisableDoor, &Door::on_pre_disable>(registry);
-		Event::subscribe<room::PostDisableDoor, &Door::on_post_disable>(registry);
-		Event::subscribe<room::PreEnableDoor, &Door::on_pre_enable>(registry);
-		Event::subscribe<room::PostEnableDoor, &Door::on_post_enable>(registry);
-
+		Event::subscribe<room::DisableDoor, &Door::on_disable>(registry);
+		Event::subscribe<room::EnableDoor, &Door::on_enable>(registry);
 		Event::subscribe<door::OpenRequest, &Door::on_open_request>(registry);
 		Event::subscribe<door::CloseRequest, &Door::on_close_request>(registry);
 		Event::subscribe<door::Contacted, &Door::on_contact_door>(registry);
@@ -184,21 +181,22 @@ namespace pd::systems
 		using namespace manager;
 		using namespace events;
 
-		Event::unsubscribe<room::PreDisableDoor, &Door::on_pre_disable>(registry);
-		Event::unsubscribe<room::PostDisableDoor, &Door::on_post_disable>(registry);
-		Event::unsubscribe<room::PreEnableDoor, &Door::on_pre_enable>(registry);
-		Event::unsubscribe<room::PostEnableDoor, &Door::on_post_enable>(registry);
-
+		Event::unsubscribe<room::DisableDoor, &Door::on_disable>(registry);
+		Event::unsubscribe<room::EnableDoor, &Door::on_enable>(registry);
 		Event::unsubscribe<door::OpenRequest, &Door::on_open_request>(registry);
 		Event::unsubscribe<door::CloseRequest, &Door::on_close_request>(registry);
 		Event::unsubscribe<door::Contacted, &Door::on_contact_door>(registry);
 		Event::unsubscribe<door::SensorContacted, &Door::on_contact_door_sensor>(registry);
 	}
 
-	auto Door::on_pre_disable(entt::registry& registry, const events::room::PreDisableDoor& event) noexcept -> void
+	auto Door::on_disable(entt::registry& registry, const events::room::DisableDoor& event) noexcept -> void
 	{
+		using namespace components;
+
 		for (const auto entity: event.entities)
 		{
+			registry.emplace_or_replace<tags::disabled>(entity);
+
 			// 禁用时销毁物理体
 			// FIXME(OPT): 禁用物理体?
 
@@ -206,15 +204,14 @@ namespace pd::systems
 		}
 	}
 
-	auto Door::on_post_disable([[maybe_unused]] entt::registry& registry, [[maybe_unused]] const events::room::PostDisableDoor& event) noexcept -> void
+	auto Door::on_enable(entt::registry& registry, const events::room::EnableDoor& event) noexcept -> void
 	{
-		//
-	}
+		using namespace components;
 
-	auto Door::on_pre_enable(entt::registry& registry, const events::room::PreEnableDoor& event) noexcept -> void
-	{
 		for (const auto entity: event.entities)
 		{
+			registry.remove<tags::disabled>(entity);
+
 			// 启用时创建物理体
 			// FIXME(OPT): 重新启用物理体?
 
@@ -232,11 +229,6 @@ namespace pd::systems
 
 			create_door_body(registry, entity, position->position, *direction);
 		}
-	}
-
-	auto Door::on_post_enable([[maybe_unused]] entt::registry& registry, [[maybe_unused]] const events::room::PostEnableDoor& event) noexcept -> void
-	{
-		//
 	}
 
 	auto Door::on_open_request(entt::registry& registry, const events::door::OpenRequest& event) noexcept -> void

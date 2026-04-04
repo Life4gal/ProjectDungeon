@@ -408,13 +408,6 @@ add_executable(
 	# UTILITY
 	# ============================
 	
-	# 随机数生成器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/random.hpp
-	# 资源管理器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/resource_cache_fwd.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/resource_cache.hpp
-	# 事件分发器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/dispatcher.hpp
 	# 固定矩阵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/fixed_matrix.hpp
 
@@ -424,17 +417,14 @@ add_executable(
 
 	# 随机数生成器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/random.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/random.cpp
 	# 资源管理器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_fwd.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.cpp
 	# 事件分发器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/event.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/event.cpp
 	# 游戏相关配置
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/game_config.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/game_config.cpp
 
 	# ============================
 	# COMPONENTS

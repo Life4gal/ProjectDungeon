@@ -17,8 +17,6 @@
 #include <manager/event.hpp>
 #include <manager/game_config.hpp>
 
-#include <prometheus/platform/os.hpp>
-
 #include <external/imgui-SFML.hpp>
 #include <imgui.h>
 
@@ -59,9 +57,10 @@ namespace pd
 		{
 			std::println("MAIN MAIN...");
 
-			current_scene_ = std::make_unique<scene::MainMenu>(*this);
-			current_scene_->on_loaded();
-			current_scene_->on_initialized();
+			// current_scene_ = std::make_unique<scene::MainMenu>(*this);
+			// current_scene_->on_loaded();
+			// current_scene_->on_initialized();
+			pending_scene_ = scene::Type::MAIN_MENU;
 
 			return;
 		}
@@ -70,14 +69,13 @@ namespace pd
 		{
 			std::println("GAME...");
 
-			current_scene_ = std::make_unique<scene::Game>(*this);
-			current_scene_->on_loaded();
-			current_scene_->on_initialized();
+			// current_scene_ = std::make_unique<scene::Game>(*this);
+			// current_scene_->on_loaded();
+			// current_scene_->on_initialized();
+			pending_scene_ = scene::Type::GAME;
 
 			return;
 		}
-
-		PROMETHEUS_PLATFORM_UNREACHABLE();
 	}
 
 	Game::Game(
@@ -94,17 +92,6 @@ namespace pd
 				  fullscreen ? sf::State::Fullscreen : sf::State::Windowed
 		  },
 		  current_scene_{nullptr}
-#if PROMETHEUS_COMPILER_DEBUG
-		  ,
-		  debug_random_{&manager::Random::instance()},
-		  debug_font_{&manager::Font::instance()},
-		  debug_texture_{&manager::Texture::instance()},
-		  debug_sound_{&manager::Sound::instance()},
-		  debug_music_{&manager::Music::instance()},
-		  debug_event_{&manager::Event::instance()},
-		  debug_game_config_{&manager::GameConfig::instance()}
-
-#endif
 	{
 		using namespace game;
 		using namespace manager;
@@ -136,9 +123,14 @@ namespace pd
 		// 订阅场景切换事件
 		Event::subscribe<events::SceneChanged, &Game::on_scene_changed>(*this);
 
+		Event::instance().sink<events::dungeon::Go>().connect<[](const events::dungeon::Go& go) {}>();
+
 		// 切换场景
 		// 注意是trigger,因为我们必须马上创建所需场景
-		Event::trigger(events::SceneChanged{.to = scene::Type::MAIN_MENU});
+		// Event::trigger(events::SceneChanged{.to = scene::Type::MAIN_MENU});
+		current_scene_ = std::make_unique<scene::MainMenu>(*this);
+		current_scene_->on_loaded();
+		current_scene_->on_initialized();
 	}
 
 	Game::~Game() noexcept
@@ -194,6 +186,25 @@ namespace pd
 
 			// 我们将所有队列中的事件延后到该帧最后处理,以保证该帧能正常更新/渲染
 			Event::update();
+
+			// 创建场景实例(如果需要)
+			if (pending_scene_)
+			{
+				if (const auto type = *pending_scene_;
+					type == scene::Type::MAIN_MENU)
+				{
+					current_scene_ = std::make_unique<scene::MainMenu>(*this);
+				}
+				else if (type == scene::Type::GAME)
+				{
+					current_scene_ = std::make_unique<scene::Game>(*this);
+				}
+
+				current_scene_->on_loaded();
+				current_scene_->on_initialized();
+
+				pending_scene_.reset();
+			}
 		}
 	}
 }

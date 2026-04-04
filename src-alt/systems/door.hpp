@@ -33,13 +33,9 @@ namespace pd::systems
 		static auto unsubscribe_events(entt::registry& registry) noexcept -> void;
 
 	private:
-		static auto on_pre_disable(entt::registry& registry, const events::room::PreDisableDoor& event) noexcept -> void;
+		static auto on_disable(entt::registry& registry, const events::room::DisableDoor& event) noexcept -> void;
 
-		static auto on_post_disable(entt::registry& registry, const events::room::PostDisableDoor& event) noexcept -> void;
-
-		static auto on_pre_enable(entt::registry& registry, const events::room::PreEnableDoor& event) noexcept -> void;
-
-		static auto on_post_enable(entt::registry& registry, const events::room::PostEnableDoor& event) noexcept -> void;
+		static auto on_enable(entt::registry& registry, const events::room::EnableDoor& event) noexcept -> void;
 
 		static auto on_open_request(entt::registry& registry, const events::door::OpenRequest& event) noexcept -> void;
 

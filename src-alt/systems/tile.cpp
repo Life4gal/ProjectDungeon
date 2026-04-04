@@ -16,13 +16,39 @@ namespace pd::systems
 	auto Tile::subscribe_events(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
-		// using namespace events;
+		using namespace events;
+
+		Event::subscribe<room::DisableTile, &on_disable>(registry);
+		Event::subscribe<room::EnableTile, &on_enable>(registry);
 	}
 
 	auto Tile::unsubscribe_events(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
-		// using namespace events;
+		using namespace events;
+
+		Event::unsubscribe<room::DisableTile, &on_disable>(registry);
+		Event::unsubscribe<room::EnableTile, &on_enable>(registry);
+	}
+
+	auto Tile::on_disable(entt::registry& registry, const events::room::DisableTile& event) noexcept -> void
+	{
+		using namespace components;
+
+		for (const auto entity: event.entities)
+		{
+			registry.emplace_or_replace<tags::disabled>(entity);
+		}
+	}
+
+	auto Tile::on_enable(entt::registry& registry, const events::room::EnableTile& event) noexcept -> void
+	{
+		using namespace components;
+
+		for (const auto entity: event.entities)
+		{
+			registry.remove<tags::disabled>(entity);
+		}
 	}
 
 	auto Tile::create(entt::registry& registry) noexcept -> entt::entity

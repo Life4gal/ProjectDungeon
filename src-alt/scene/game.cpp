@@ -21,6 +21,7 @@
 #include <systems/room.hpp>
 #include <systems/door.hpp>
 #include <systems/chest.hpp>
+#include <systems/tile.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
@@ -115,7 +116,7 @@ namespace pd::scene
 		using namespace events;
 
 		// 进入地下城
-		Event::trigger(dungeon::Go{.level = 1, .x = game::FloorStartRoomX, .y = game::FloorStartRoomY});
+		Event::enqueue(dungeon::Go{.level = 1, .x = game::FloorStartRoomX, .y = game::FloorStartRoomY});
 
 		return true;
 	}
@@ -132,12 +133,12 @@ namespace pd::scene
 
 	Game::Game(pd::Game& game) noexcept
 		: Scene{game},
-		  font_id_hud_{manager::invalid_asset_id},
-		  font_id_pause_menu_{manager::invalid_asset_id},
-		  texture_id_wall_{manager::invalid_asset_id},
-		  texture_id_floor_{manager::invalid_asset_id},
-		  sound_id_switch_option_{manager::invalid_asset_id},
-		  music_id_{manager::invalid_asset_id},
+		  font_id_hud_{manager::InvalidAssetId},
+		  font_id_pause_menu_{manager::InvalidAssetId},
+		  texture_id_wall_{manager::InvalidAssetId},
+		  texture_id_floor_{manager::InvalidAssetId},
+		  sound_id_switch_option_{manager::InvalidAssetId},
+		  music_id_{manager::InvalidAssetId},
 		  selected_option_value_{std::to_underlying(option_type::RESUME)} {}
 
 	auto Game::on_loaded() noexcept -> void
@@ -169,6 +170,7 @@ namespace pd::scene
 		Room::subscribe_events(registry_);
 		Door::subscribe_events(registry_);
 		Chest::subscribe_events(registry_);
+		Tile::subscribe_events(registry_);
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -189,6 +191,7 @@ namespace pd::scene
 		Music::stop(music_id_);
 
 		// 退订事件
+		Tile::unsubscribe_events(registry_);
 		Chest::unsubscribe_events(registry_);
 		Door::unsubscribe_events(registry_);
 		Room::unsubscribe_events(registry_);

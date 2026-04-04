@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <utility/resource_cache_fwd.hpp>
-
+#include <entt/core/fwd.hpp>
+#include <entt/entity/entity.hpp>
 #include <entt/resource/resource.hpp>
 
 namespace sf
@@ -19,12 +19,13 @@ namespace sf
 
 namespace pd::manager
 {
-	using utility::AssetId;
-	using utility::invalid_asset_id;
+	enum class AssetId : entt::id_type {};
+
+	constexpr auto InvalidAssetId = AssetId{entt::null};
 
 	using font_type = entt::resource<const sf::Font>;
 	using texture_type = entt::resource<const sf::Texture>;
 	using sound_type = entt::resource<const sf::SoundBuffer>;
-	// music需要暂停,所有不是const
+	// music需要暂停,所以不是const
 	using music_type = entt::resource<sf::Music>;
 }

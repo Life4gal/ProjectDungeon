@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <events/room.hpp>
+
 #include <components/tile.hpp>
 
 #include <entt/fwd.hpp>
@@ -26,7 +28,9 @@ namespace pd::systems
 		static auto unsubscribe_events(entt::registry& registry) noexcept -> void;
 
 	private:
-		//
+		static auto on_disable(entt::registry& registry, const events::room::DisableTile& event) noexcept -> void;
+
+		static auto on_enable(entt::registry& registry, const events::room::EnableTile& event) noexcept -> void;
 
 	public:
 		// =============================================

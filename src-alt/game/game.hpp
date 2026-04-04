@@ -5,10 +5,10 @@
 
 #pragma once
 
+#include <optional>
+
 #include <events/window.hpp>
 #include <events/scene.hpp>
-
-#include <prometheus/version-core.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -43,20 +43,10 @@ namespace pd
 
 		// 游戏当前场景
 		std::unique_ptr<scene_type> current_scene_;
-
-#if PROMETHEUS_COMPILER_DEBUG
-
-		// 下面这些变量不会使用,但是对调试有帮助
-
-		manager::Random* debug_random_;
-		manager::Font* debug_font_;
-		manager::Texture* debug_texture_;
-		manager::Sound* debug_sound_;
-		manager::Music* debug_music_;
-		manager::Event* debug_event_;
-		manager::GameConfig* debug_game_config_;
-
-#endif
+		// 待切换的场景
+		// 我们不在响应事件时创建场景实例,而是在Event::update之后再创建实例
+		// 避免实例订阅事件影响Event::update
+		std::optional<scene::Type> pending_scene_;
 
 		// 游戏窗口大小变化
 		auto on_window_resized(const events::WindowResized& event) noexcept -> void;

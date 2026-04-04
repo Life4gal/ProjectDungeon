@@ -51,87 +51,45 @@ namespace pd::events::room
 		};
 	}
 
-	// 禁用当前房间瓦片实体前*立刻*触发
-	class PreDisableTile final : public detail::Entities {};
+	// 禁用当前房间瓦片实体
+	class DisableTile final : public detail::Entities {};
 
-	// 禁用当前房间瓦片实体后*立刻*触发
-	class PostDisableTile final : public detail::Entities {};
+	// 启用当前房间瓦片实体
+	class EnableTile final : public detail::Entities {};
 
-	// 启用当前房间瓦片实体前*立刻*触发
-	class PreEnableTile final : public detail::Entities {};
+	// 禁用当前房间门实体
+	class DisableDoor final : public detail::Entities {};
 
-	// 启用当前房间瓦片实体后*立刻*触发
-	class PostEnableTile final : public detail::Entities {};
+	// 启用当前房间门实体
+	class EnableDoor final : public detail::Entities {};
 
-	// 禁用当前房间门实体前*立刻*触发
-	class PreDisableDoor final : public detail::Entities {};
+	// 禁用当前房间宝箱实体
+	class DisableChest final : public detail::Entities {};
 
-	// 禁用当前房间门实体后*立刻*触发
-	class PostDisableDoor final : public detail::Entities {};
+	// 启用当前房间宝箱实体
+	class EnableChest final : public detail::Entities {};
 
-	// 启用当前房间门实体前*立刻*触发
-	class PreEnableDoor final : public detail::Entities {};
+	// 禁用当前房间可破坏物实体
+	class DisableDestroyableObject final : public detail::Entities {};
 
-	// 启用当前房间门实体后*立刻*触发
-	class PostEnableDoor final : public detail::Entities {};
+	// 启用当前房间可破坏物实体
+	class EnableDestroyableObject final : public detail::Entities {};
 
-	// 禁用当前房间宝箱实体前*立刻*触发
-	class PreDisableChest final : public detail::Entities {};
+	// 禁用当前房间物品实体
+	class DisableItem final : public detail::Entities {};
 
-	// 禁用当前房间宝箱实体后*立刻*触发
-	class PostDisableChest final : public detail::Entities {};
+	// 启用当前房间物品实体
+	class EnableItem final : public detail::Entities {};
 
-	// 启用当前房间宝箱实体前*立刻*触发
-	class PreEnableChest final : public detail::Entities {};
+	// 禁用当前房间尸体实体
+	class DisableCorpse final : public detail::Entities {};
 
-	// 启用当前房间宝箱实体后*立刻*触发
-	class PostEnableChest final : public detail::Entities {};
+	// 启用当前房间尸体实体
+	class EnableCorpse final : public detail::Entities {};
 
-	// 禁用当前房间可破坏物实体前*立刻*触发
-	class PreDisableDestroyableObject final : public detail::Entities {};
+	// 禁用当前房间血迹实体
+	class DisableBloodStain final : public detail::Entities {};
 
-	// 禁用当前房间可破坏物实体后*立刻*触发
-	class PostDisableDestroyableObject final : public detail::Entities {};
-
-	// 启用当前房间可破坏物实体前*立刻*触发
-	class PreEnableDestroyableObject final : public detail::Entities {};
-
-	// 启用当前房间可破坏物实体后*立刻*触发
-	class PostEnableDestroyableObject final : public detail::Entities {};
-
-	// 禁用当前房间物品实体前*立刻*触发
-	class PreDisableItem final : public detail::Entities {};
-
-	// 禁用当前房间物品实体后*立刻*触发
-	class PostDisableItem final : public detail::Entities {};
-
-	// 启用当前房间物品实体前*立刻*触发
-	class PreEnableItem final : public detail::Entities {};
-
-	// 启用当前房间物品实体后*立刻*触发
-	class PostEnableItem final : public detail::Entities {};
-
-	// 禁用当前房间尸体实体前*立刻*触发
-	class PreDisableCorpse final : public detail::Entities {};
-
-	// 禁用当前房间尸体实体后*立刻*触发
-	class PostDisableCorpse final : public detail::Entities {};
-
-	// 启用当前房间尸体实体前*立刻*触发
-	class PreEnableCorpse final : public detail::Entities {};
-
-	// 启用当前房间尸体实体后*立刻*触发
-	class PostEnableCorpse final : public detail::Entities {};
-
-	// 禁用当前房间血迹实体前*立刻*触发
-	class PreDisableBloodStain final : public detail::Entities {};
-
-	// 禁用当前房间血迹实体后*立刻*触发
-	class PostDisableBloodStain final : public detail::Entities {};
-
-	// 启用当前房间血迹实体前*立刻*触发
-	class PreEnableBloodStain final : public detail::Entities {};
-
-	// 启用当前房间血迹实体后*立刻*触发
-	class PostEnableBloodStain final : public detail::Entities {};
+	// 启用当前房间血迹实体
+	class EnableBloodStain final : public detail::Entities {};
 }

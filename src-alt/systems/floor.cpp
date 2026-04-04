@@ -335,7 +335,7 @@ namespace pd::systems
 						continue;
 					}
 
-					std::ranges::shuffle(standards, manager::Random::instance());
+					std::ranges::shuffle(standards, manager::Random::engine());
 
 					// KEY
 					{
@@ -468,6 +468,7 @@ namespace pd::systems
 		const auto infos = generate_floor({event.start_x, event.start_y}, event.count);
 
 		registry.ctx().insert_or_assign<floor::RoomInfos>(floor::RoomInfos{infos});
+		registry.ctx().insert_or_assign<floor::RoomEntities>({});
 		registry.ctx().insert_or_assign<floor::RoomCount>(floor::RoomCount{.count = event.count});
 		registry.ctx().insert_or_assign<floor::CurrentRoom>(floor::CurrentRoom{.x = event.start_x, .y = event.start_y});
 	}
@@ -514,7 +515,7 @@ namespace pd::systems
 		Event::enqueue(events::room::Inactive{.info = std::cref(info), .entity = std::cref(entity)});
 	}
 
-	auto Floor::create(entt::registry& registry) noexcept -> void
+	auto Floor::create([[maybe_unused]] entt::registry& registry) noexcept -> void
 	{
 		// 需不需要一开始创建这些组件?
 

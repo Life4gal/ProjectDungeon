@@ -141,24 +141,6 @@ namespace pd::manager
 		}
 	}
 
-	auto Font::instance() noexcept -> Font&
-	{
-		static Font instance{};
-		return instance;
-	}
-
-	auto Texture::instance() noexcept -> Texture&
-	{
-		static Texture instance{};
-		return instance;
-	}
-
-	auto Sound::instance() noexcept -> Sound&
-	{
-		static Sound instance{};
-		return instance;
-	}
-
 	namespace
 	{
 		// 音效播放通道
@@ -251,12 +233,6 @@ namespace pd::manager
 		}
 
 		return do_play_sound(sound, true);
-	}
-
-	auto Music::instance() noexcept -> Music&
-	{
-		static Music instance{};
-		return instance;
 	}
 
 	namespace

@@ -11,88 +11,105 @@ namespace pd::manager
 {
 	class GameConfig final
 	{
-		// 游戏窗口的宽度
-		// 仅在窗口大小更新时修改
-		unsigned window_width_;
-		// 游戏窗口的高度
-		// 仅在窗口大小更新时修改
-		unsigned window_height_;
+	public:
+		class Vars final
+		{
+		public:
+			// 游戏窗口的宽度
+			// 仅在窗口大小更新时修改
+			unsigned window_width;
+			// 游戏窗口的高度
+			// 仅在窗口大小更新时修改
+			unsigned window_height;
 
-		// 音效音量
-		float sound_volume_;
-		// 音乐音量
-		float music_volume_;
+			// 音效音量
+			float sound_volume;
+			// 音乐音量
+			float music_volume;
 
-		// 这决定我们最多能创建多少个sf::Sound实例
-		// 这部分资源基本不会释放 :(
-		std::uint32_t max_sound_channels_;
+			// 这决定我们最多能创建多少个sf::Sound实例
+			// 这部分资源基本不会释放 :(
+			std::uint32_t max_sound_channels;
 
-		std::string player_name_;
+			// 玩家名称
+			std::string player_name;
+		};
 
-		GameConfig() noexcept;
+	private:
+		inline static Vars vars_
+		{
+				.window_width = 1280,
+				.window_height = 720,
+				.sound_volume = 100,
+				.music_volume = 100,
+				.max_sound_channels = 16,
+				.player_name = "Unnamed",
+		};
 
 	public:
-		// 这个接口公开仅为了Game::debug_game_config_
-		[[nodiscard]] static auto instance() noexcept -> GameConfig&;
+		// [[nodiscard]] static auto instance() noexcept -> Vars&
+		// {
+		// 	return vars_;
+		// }
 
 		[[nodiscard]] static auto get_window_width() noexcept -> unsigned
 		{
-			return instance().window_width_;
+			return vars_.window_width;
 		}
 
 		static auto set_window_width(const unsigned width) noexcept -> void
 		{
-			instance().window_width_ = width;
+			vars_.window_width = width;
 		}
 
 		[[nodiscard]] static auto get_window_height() noexcept -> unsigned
 		{
-			return instance().window_height_;
+			return vars_.window_height;
 		}
 
 		static auto set_window_height(const unsigned height) noexcept -> void
 		{
-			instance().window_height_ = height;
+			vars_.window_height = height;
 		}
 
 		[[nodiscard]] static auto get_sound_volume() noexcept -> float
 		{
-			return instance().sound_volume_;
+			return vars_.sound_volume;
 		}
 
 		static auto set_sound_volume(const float volume) noexcept -> void
 		{
-			instance().sound_volume_ = volume;
+			vars_.sound_volume = volume;
 		}
 
 		[[nodiscard]] static auto get_music_volume() noexcept -> float
 		{
-			return instance().music_volume_;
+			return vars_.music_volume;
 		}
 
 		static auto set_music_volume(const float volume) noexcept -> void
 		{
-			instance().music_volume_ = volume;
+			vars_.music_volume = volume;
 		}
 
 		[[nodiscard]] static auto get_max_sound_channels() noexcept -> std::uint32_t
 		{
-			return instance().max_sound_channels_;
+			return vars_.max_sound_channels;
 		}
 
 		static auto set_max_sound_channels(const std::uint32_t channels) noexcept -> void
 		{
-			instance().max_sound_channels_ = channels;
+			vars_.max_sound_channels = channels;
 		}
 
 		[[nodiscard]] static auto get_player_name() noexcept -> std::string_view
 		{
-			return instance().player_name_;
+			return vars_.player_name;
 		}
 
 		static auto set_player_name(const std::string_view name) noexcept -> void
 		{
-			instance().player_name_ = name;
+			vars_.player_name = name;
 		}
 	};
 }

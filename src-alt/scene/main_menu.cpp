@@ -128,9 +128,9 @@ namespace pd::scene
 
 	MainMenu::MainMenu(Game& game) noexcept
 		: Scene{game},
-		  font_id_{manager::invalid_asset_id},
-		  sound_id_switch_option_{manager::invalid_asset_id},
-		  music_id_{manager::invalid_asset_id},
+		  font_id_{manager::InvalidAssetId},
+		  sound_id_switch_option_{manager::InvalidAssetId},
+		  music_id_{manager::InvalidAssetId},
 		  selected_option_value_{std::to_underlying(option_type::START)} {}
 
 	auto MainMenu::on_loaded() noexcept -> void

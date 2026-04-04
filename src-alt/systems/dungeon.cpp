@@ -41,14 +41,13 @@ namespace pd::systems
 		using namespace components;
 		using namespace systems;
 
-		const auto count = game::FloorRoomBaseCount + event.level * game::FloorRoomCountGrowthFactor;
-
-		// 创建指定层级的地牢布局
-		Event::trigger(events::floor::GenerateRequest{.count = count, .start_x = event.x, .start_y = event.y});
-
 		// 保存信息
 		registry.ctx().insert_or_assign<dungeon::Info>(dungeon::Info{.level = event.level});
-
+		
+		const auto count = game::FloorRoomBaseCount + event.level * game::FloorRoomCountGrowthFactor;
+		
+		// 创建指定层级的地牢布局
+		Event::enqueue(events::floor::GenerateRequest{.count = count, .start_x = event.x, .start_y = event.y});
 		// 进入房间
 		Event::enqueue(events::floor::Entered{.x = event.x, .y = event.y});
 	}

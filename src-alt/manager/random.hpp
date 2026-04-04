@@ -5,85 +5,101 @@
 
 #pragma once
 
-#include <utility/random.hpp>
+#include <concepts>
+#include <random>
 
 namespace pd::manager
 {
 	class Random final
 	{
-		using random_type = utility::Random;
-
 	public:
-		using engine_type = random_type::engine_type;
+		using engine_type = std::mt19937;
 
 		using result_type = engine_type::result_type;
 
 	private:
-		random_type random_;
+		inline static engine_type engine_;
 
 	public:
-		// 这个接口公开仅为了Game::debug_random_
-		// 使用诸如std::ranges::shuffle这样的函数也会需要该接口
-		[[nodiscard]] static auto instance() noexcept -> Random&;
+		// [[nodiscard]] static auto instance() noexcept -> engine_type&
+		// {
+		// 	return engine_;
+		// }
 
-	private:
-		[[nodiscard]] static auto engine() noexcept -> random_type&
-		{
-			return instance().random_;
-		}
-
-	public:
 		[[nodiscard]] constexpr static auto min() noexcept -> result_type
 		{
-			return random_type::min();
+			return engine_type::min();
 		}
 
 		[[nodiscard]] constexpr static auto max() noexcept -> result_type
 		{
-			return random_type::max();
+			return engine_type::max();
 		}
 
 		static auto seed(const result_type seed) noexcept -> void
 		{
-			engine().seed(seed);
+			engine_.seed(seed);
 		}
 
-		[[nodiscard]] static auto operator()() noexcept -> result_type
+		// std::ranges::shuffle(range, manager::Random::engine());
+		// [[nodiscard]] static auto operator()() noexcept -> result_type
+		// {
+		// 	return engine_();
+		// }
+		[[nodiscard]] static auto engine() noexcept -> engine_type&
 		{
-			return engine()();
+			return engine_;
 		}
 
 		// 生成闭区间随机整数 [min_value, max_value]
 		template<std::integral Integer>
 		[[nodiscard]] static auto int_inclusive(const Integer min_value, const std::type_identity_t<Integer> max_value) noexcept -> Integer
 		{
-			return engine().int_inclusive(min_value, max_value);
+			return std::uniform_int_distribution<Integer>{min_value, max_value}(engine_);
 		}
 
 		// 生成闭区间随机浮点数 [min_value, max_value]
 		template<std::floating_point Float>
 		[[nodiscard]] static auto real_inclusive(const Float min_value, const std::type_identity_t<Float> max_value) noexcept -> Float
 		{
-			return engine().real_inclusive(min_value, max_value);
+			return std::uniform_real_distribution<Float>{min_value, max_value}(engine_);
 		}
 
 		// 生成正态分布随机浮点数 N(mean, standard_deviation)
 		template<std::floating_point Float>
 		[[nodiscard]] static auto normal(const Float mean, const std::type_identity_t<Float> standard_deviation) noexcept -> Float
 		{
-			return engine().normal(mean, standard_deviation);
+			return std::normal_distribution<Float>{mean, standard_deviation}(engine_);
 		}
 
 		// 百分比判定: 例如 roll_percent(20) 表示 20% 成功率
 		[[nodiscard]] static auto roll_percent(const int percent) noexcept -> bool
 		{
-			return engine().roll_percent(percent);
+			if (percent <= 0)
+			{
+				return false;
+			}
+			if (percent >= 100)
+			{
+				return true;
+			}
+
+			return int_inclusive(0, 99) < percent;
 		}
 
 		// 概率判定: 概率范围 [0, 1]
 		[[nodiscard]] static auto chance(const float probability) noexcept -> bool
 		{
-			return engine().chance(probability);
+			if (probability <= 0.f)
+			{
+				return false;
+			}
+			if (probability >= 1.f)
+			{
+				return true;
+			}
+
+			return std::bernoulli_distribution{static_cast<double>(probability)}(engine_);
 		}
 	};
 }

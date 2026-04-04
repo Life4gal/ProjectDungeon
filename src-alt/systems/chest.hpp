@@ -26,13 +26,9 @@ namespace pd::systems
 		static auto unsubscribe_events(entt::registry& registry) noexcept -> void;
 
 	private:
-		static auto on_pre_disable(entt::registry& registry, const events::room::PreDisableChest& event) noexcept -> void;
+		static auto on_disable(entt::registry& registry, const events::room::DisableChest& event) noexcept -> void;
 
-		static auto on_post_disable(entt::registry& registry, const events::room::PostDisableChest& event) noexcept -> void;
-
-		static auto on_pre_enable(entt::registry& registry, const events::room::PreEnableChest& event) noexcept -> void;
-
-		static auto on_post_enable(entt::registry& registry, const events::room::PostEnableChest& event) noexcept -> void;
+		static auto on_enable(entt::registry& registry, const events::room::EnableChest& event) noexcept -> void;
 
 		static auto on_contact_chest(entt::registry& registry, const events::chest::Contacted& contacted) noexcept -> void;
 

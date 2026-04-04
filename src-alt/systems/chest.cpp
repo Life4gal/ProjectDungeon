@@ -18,11 +18,8 @@ namespace pd::systems
 		using namespace manager;
 		using namespace events;
 
-		Event::subscribe<room::PreDisableChest, &Chest::on_pre_disable>(registry);
-		Event::subscribe<room::PostDisableChest, &Chest::on_post_disable>(registry);
-		Event::subscribe<room::PreEnableChest, &Chest::on_pre_enable>(registry);
-		Event::subscribe<room::PostEnableChest, &Chest::on_post_enable>(registry);
-
+		Event::subscribe<room::DisableChest, &Chest::on_disable>(registry);
+		Event::subscribe<room::EnableChest, &Chest::on_enable>(registry);
 		Event::subscribe<chest::Contacted, &Chest::on_contact_chest>(registry);
 	}
 
@@ -31,32 +28,29 @@ namespace pd::systems
 		using namespace manager;
 		using namespace events;
 
-		Event::unsubscribe<room::PreDisableChest, &Chest::on_pre_disable>(registry);
-		Event::unsubscribe<room::PostDisableChest, &Chest::on_post_disable>(registry);
-		Event::unsubscribe<room::PreEnableChest, &Chest::on_pre_enable>(registry);
-		Event::unsubscribe<room::PostEnableChest, &Chest::on_post_enable>(registry);
-
+		Event::unsubscribe<room::DisableChest, &Chest::on_disable>(registry);
+		Event::unsubscribe<room::EnableChest, &Chest::on_enable>(registry);
 		Event::unsubscribe<chest::Contacted, &Chest::on_contact_chest>(registry);
 	}
 
-	auto Chest::on_pre_disable(entt::registry& registry, const events::room::PreDisableChest& event) noexcept -> void
+	auto Chest::on_disable(entt::registry& registry, const events::room::DisableChest& event) noexcept -> void
 	{
-		//
+		using namespace components;
+
+		for (const auto entity: event.entities)
+		{
+			registry.emplace_or_replace<tags::disabled>(entity);
+		}
 	}
 
-	auto Chest::on_post_disable(entt::registry& registry, const events::room::PostDisableChest& event) noexcept -> void
+	auto Chest::on_enable(entt::registry& registry, const events::room::EnableChest& event) noexcept -> void
 	{
-		//
-	}
+		using namespace components;
 
-	auto Chest::on_pre_enable(entt::registry& registry, const events::room::PreEnableChest& event) noexcept -> void
-	{
-		//
-	}
-
-	auto Chest::on_post_enable(entt::registry& registry, const events::room::PostEnableChest& event) noexcept -> void
-	{
-		//
+		for (const auto entity: event.entities)
+		{
+			registry.remove<tags::disabled>(entity);
+		}
 	}
 
 	auto Chest::on_contact_chest(entt::registry& registry, const events::chest::Contacted& contacted) noexcept -> void
