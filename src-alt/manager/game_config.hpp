@@ -47,11 +47,6 @@ namespace pd::manager
 		};
 
 	public:
-		// [[nodiscard]] static auto instance() noexcept -> Vars&
-		// {
-		// 	return vars_;
-		// }
-
 		[[nodiscard]] static auto get_window_width() noexcept -> unsigned
 		{
 			return vars_.window_width;

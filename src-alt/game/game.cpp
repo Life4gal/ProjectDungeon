@@ -123,8 +123,6 @@ namespace pd
 		// 订阅场景切换事件
 		Event::subscribe<events::SceneChanged, &Game::on_scene_changed>(*this);
 
-		Event::instance().sink<events::dungeon::Go>().connect<[](const events::dungeon::Go& go) {}>();
-
 		// 切换场景
 		// 注意是trigger,因为我们必须马上创建所需场景
 		// Event::trigger(events::SceneChanged{.to = scene::Type::MAIN_MENU});

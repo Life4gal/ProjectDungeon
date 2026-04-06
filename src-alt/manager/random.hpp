@@ -21,11 +21,6 @@ namespace pd::manager
 		inline static engine_type engine_;
 
 	public:
-		// [[nodiscard]] static auto instance() noexcept -> engine_type&
-		// {
-		// 	return engine_;
-		// }
-
 		[[nodiscard]] constexpr static auto min() noexcept -> result_type
 		{
 			return engine_type::min();

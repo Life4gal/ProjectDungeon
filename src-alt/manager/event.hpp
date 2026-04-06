@@ -32,11 +32,6 @@ namespace pd::manager
 		inline static dispatcher_type dispatcher_{};
 
 	public:
-		[[nodiscard]] static auto instance() noexcept -> dispatcher_type&
-		{
-			return dispatcher_;
-		}
-
 		template<typename Event, auto Functor>
 		static auto subscribe() noexcept -> void //
 			requires requires { dispatcher_.sink<Event>().template connect<Functor>(); }

@@ -46,11 +46,6 @@ namespace pd::manager
 			inline static cache_type cache_;
 
 		public:
-			// [[nodiscard]] static auto instance() noexcept -> cache_type&
-			// {
-			// 	return cache_;
-			// }
-
 			[[nodiscard]] static auto load(const std::string_view path) noexcept -> AssetId
 			{
 				const auto id = make_id(path);
