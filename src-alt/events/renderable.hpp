@@ -3,11 +3,21 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <scene/scene.hpp>
+#pragma once
 
-namespace pd::scene
+#include <entt/entity/fwd.hpp>
+
+namespace pd::events::renderable
 {
-	Scene::Scene() noexcept = default;
+	class Hide final
+	{
+	public:
+		entt::entity entity;
+	};
 
-	Scene::~Scene() noexcept = default;
+	class Show final
+	{
+	public:
+		entt::entity entity;
+	};
 }

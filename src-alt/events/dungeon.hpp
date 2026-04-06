@@ -20,4 +20,7 @@ namespace pd::events::dungeon
 		// 指定房间Y
 		std::uint32_t y;
 	};
+
+	// 离开地下城
+	class Exit final {};
 }

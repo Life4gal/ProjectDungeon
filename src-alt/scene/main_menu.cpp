@@ -126,12 +126,12 @@ namespace pd::scene
 		}
 	}
 
-	MainMenu::MainMenu(Game& game) noexcept
-		: Scene{game},
-		  font_id_{manager::InvalidAssetId},
-		  sound_id_switch_option_{manager::InvalidAssetId},
-		  music_id_{manager::InvalidAssetId},
-		  selected_option_value_{std::to_underlying(option_type::START)} {}
+	MainMenu::MainMenu() noexcept
+		:
+		font_id_{manager::InvalidAssetId},
+		sound_id_switch_option_{manager::InvalidAssetId},
+		music_id_{manager::InvalidAssetId},
+		selected_option_value_{std::to_underlying(option_type::START)} {}
 
 	auto MainMenu::on_loaded() noexcept -> void
 	{

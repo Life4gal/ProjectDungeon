@@ -5,29 +5,21 @@
 
 #pragma once
 
-#include <components/room.hpp>
-
 #include <events/room.hpp>
 #include <events/door.hpp>
 
-#include <SFML/System/Vector2.hpp>
+#include <entt/fwd.hpp>
 
-namespace pd::systems
+namespace pd::listener
 {
 	class Room final
 	{
 	public:
-		using position_type = sf::Vector2u;
-
-		// =============================================
-		// 事件响应
-		// =============================================
-
 		// 订阅事件
-		static auto subscribe_events(entt::registry& registry) noexcept -> void;
+		static auto subscribe(entt::registry& registry) noexcept -> void;
 
 		// 取消订阅事件
-		static auto unsubscribe_events(entt::registry& registry) noexcept -> void;
+		static auto unsubscribe(entt::registry& registry) noexcept -> void;
 
 	private:
 		// 激活(进入)房间
@@ -44,14 +36,5 @@ namespace pd::systems
 
 		// 处理接触门感应器事件
 		static auto on_contact_door_sensor(entt::registry& registry, const events::door::SensorContacted& event) noexcept -> void;
-
-	public:
-		// =============================================
-		// 创建/销毁上下文
-		// =============================================
-
-		static auto create(entt::registry& registry) noexcept -> void;
-
-		static auto destroy(entt::registry& registry) noexcept -> void;
 	};
 }

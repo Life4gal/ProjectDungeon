@@ -126,7 +126,7 @@ namespace pd
 		// 切换场景
 		// 注意是trigger,因为我们必须马上创建所需场景
 		// Event::trigger(events::SceneChanged{.to = scene::Type::MAIN_MENU});
-		current_scene_ = std::make_unique<scene::MainMenu>(*this);
+		current_scene_ = std::make_unique<scene::MainMenu>();
 		current_scene_->on_loaded();
 		current_scene_->on_initialized();
 	}
@@ -191,11 +191,11 @@ namespace pd
 				if (const auto type = *pending_scene_;
 					type == scene::Type::MAIN_MENU)
 				{
-					current_scene_ = std::make_unique<scene::MainMenu>(*this);
+					current_scene_ = std::make_unique<scene::MainMenu>();
 				}
 				else if (type == scene::Type::GAME)
 				{
-					current_scene_ = std::make_unique<scene::Game>(*this);
+					current_scene_ = std::make_unique<scene::Game>();
 				}
 
 				current_scene_->on_loaded();

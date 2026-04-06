@@ -11,6 +11,9 @@
 
 #include <manager/asset_fwd.hpp>
 
+#include <SFML/System/Time.hpp>
+#include <box2d/id.h>
+
 namespace pd::scene
 {
 	class Game final : public Scene
@@ -18,6 +21,12 @@ namespace pd::scene
 	public:
 		using option_type = game::GamePauseMenuOption;
 		using asset_id_type = manager::AssetId;
+
+		// 物理世界
+		// 由于我们将其大部分功能移动到了*attacher/physics_body* 中
+		// 剩余部分如若还作为一个系统就显得有些鸡肋了
+		// 我们将其设置为游戏场景的静态成员
+		static b2WorldId physics_world_id;
 
 	private:
 		// 游戏字体-HUD
@@ -36,6 +45,19 @@ namespace pd::scene
 		// 选择的选项
 		std::underlying_type_t<option_type> selected_option_value_;
 
+		// ==================
+		// 下面这几个变量原本属于world组件,为了它们编写一个相关的系统似乎有些鸡肋?暂时先将它们放在这里
+		// ==================
+
+		// 此帧历时
+		sf::Time frame_delta_;
+		// 从游戏开始到现在总历时
+		sf::Time total_elapsed_;
+		// 从游戏开始到现在游玩历时(暂停时停止计时)
+		sf::Time play_elapsed_;
+		// 当前游戏是否暂停
+		bool is_paused_;
+
 		auto handle_event_pause(const sf::Event& event) noexcept -> void;
 
 		// 开始一场游戏
@@ -48,7 +70,7 @@ namespace pd::scene
 		auto restart_game() noexcept -> void;
 
 	public:
-		explicit Game(pd::Game& game) noexcept;
+		explicit Game() noexcept;
 
 		auto on_loaded() noexcept -> void override;
 

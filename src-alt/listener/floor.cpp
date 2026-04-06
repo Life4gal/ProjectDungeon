@@ -3,29 +3,28 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <systems/floor.hpp>
+#include <listener/floor.hpp>
 
-#include <manager/random.hpp>
 #include <manager/event.hpp>
+#include <manager/random.hpp>
 
 #include <components/floor.hpp>
 
-#include <events/room.hpp>
-
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
+#include <SFML/System/Vector2.hpp>
 
 #if PROMETHEUS_COMPILER_DEBUG
 #include <print>
 #endif
 
-namespace pd::systems
+namespace pd::listener
 {
 	namespace
 	{
 		using namespace components;
 
-		using position_type = Floor::position_type;
+		using position_type = sf::Vector2u;
 		using room_type = floor::RoomType;
 		using infos_type = floor::RoomInfos;
 
@@ -441,23 +440,25 @@ namespace pd::systems
 		}
 	}
 
-	auto Floor::subscribe_events(entt::registry& registry) noexcept -> void
+	auto Floor::subscribe(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
 		using namespace events;
 
 		Event::subscribe<floor::GenerateRequest, &Floor::on_generate_request>(registry);
+		Event::subscribe<floor::DestroyRequest, &Floor::on_destroy_request>(registry);
 		Event::subscribe<floor::Entered, &Floor::on_enter_room>(registry);
 		Event::subscribe<floor::Cleared, &Floor::on_clear_room>(registry);
 		Event::subscribe<floor::Left, &Floor::on_leave_room>(registry);
 	}
 
-	auto Floor::unsubscribe_events(entt::registry& registry) noexcept -> void
+	auto Floor::unsubscribe(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
 		using namespace events;
 
 		Event::unsubscribe<floor::GenerateRequest, &Floor::on_generate_request>(registry);
+		Event::unsubscribe<floor::DestroyRequest, &Floor::on_destroy_request>(registry);
 		Event::unsubscribe<floor::Entered, &Floor::on_enter_room>(registry);
 		Event::unsubscribe<floor::Cleared, &Floor::on_clear_room>(registry);
 		Event::unsubscribe<floor::Left, &Floor::on_leave_room>(registry);
@@ -471,6 +472,14 @@ namespace pd::systems
 		registry.ctx().insert_or_assign<floor::RoomEntities>({});
 		registry.ctx().insert_or_assign<floor::RoomCount>(floor::RoomCount{.count = event.count});
 		registry.ctx().insert_or_assign<floor::CurrentRoom>(floor::CurrentRoom{.x = event.start_x, .y = event.start_y});
+	}
+
+	auto Floor::on_destroy_request(entt::registry& registry, [[maybe_unused]] const events::floor::DestroyRequest& event) noexcept -> void
+	{
+		registry.ctx().erase<floor::CurrentRoom>();
+		registry.ctx().erase<floor::RoomCount>();
+		registry.ctx().erase<floor::RoomEntities>();
+		registry.ctx().erase<floor::RoomInfos>();
 	}
 
 	auto Floor::on_enter_room(entt::registry& registry, const events::floor::Entered& event) noexcept -> void
@@ -514,126 +523,4 @@ namespace pd::systems
 
 		Event::enqueue(events::room::Inactive{.info = std::cref(info), .entity = std::cref(entity)});
 	}
-
-	auto Floor::create([[maybe_unused]] entt::registry& registry) noexcept -> void
-	{
-		// 需不需要一开始创建这些组件?
-
-		// // 当前层级所有房间信息
-		// registry.ctx().emplace<floor::RoomInfos>();
-		// // 当前层级所有房间的实体
-		// registry.ctx().emplace<floor::RoomEntities>();
-		// // 当前生成房间数量
-		// registry.ctx().emplace<floor::RoomCount>(0);
-		// // 当前所在房间坐标
-		// registry.ctx().emplace<floor::CurrentRoom>(0, 0);
-	}
-
-	auto Floor::destroy(entt::registry& registry) noexcept -> void
-	{
-		registry.ctx().erase<floor::CurrentRoom>();
-		registry.ctx().erase<floor::RoomCount>();
-		registry.ctx().erase<floor::RoomEntities>();
-		registry.ctx().erase<floor::RoomInfos>();
-	}
-
-	// auto Floor::get_room_count(entt::registry& registry) noexcept -> std::uint32_t
-	// {
-	// 	PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<floor::RoomCount>());
-	//
-	// 	const auto [count] = registry.ctx().get<const floor::RoomCount>();
-	// 	return count;
-	// }
-	//
-	// auto Floor::get_current_position(entt::registry& registry) noexcept -> position_type
-	// {
-	// 	PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<floor::CurrentRoom>());
-	//
-	// 	const auto [x, y] = registry.ctx().get<const floor::CurrentRoom>();
-	// 	return {x, y};
-	// }
-	//
-	// auto Floor::get_room_info(entt::registry& registry, const position_type position) noexcept -> info_type*
-	// {
-	// 	PROMETHEUS_PLATFORM_ASSUME(is_within_bounds(position));
-	// 	PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<floor::RoomInfos>());
-	//
-	// 	auto& infos = registry.ctx().get<floor::RoomInfos>();
-	// 	auto& info = infos[position.x, position.y];
-	//
-	// 	if (info.type == floor::RoomType::NONE)
-	// 	{
-	// 		return nullptr;
-	// 	}
-	//
-	// 	return &info;
-	// }
-	//
-	// auto Floor::has_room(entt::registry& registry, const position_type position) noexcept -> bool
-	// {
-	// 	return get_room_info(registry, position) != nullptr;
-	// }
-	//
-	// auto Floor::count_placed_neighbors(entt::registry& registry, const position_type position) noexcept -> std::uint32_t
-	// {
-	// 	PROMETHEUS_PLATFORM_ASSUME(has_room(registry,position));
-	// 	PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<floor::RoomInfos>());
-	//
-	// 	const auto& infos = registry.ctx().get<const floor::RoomInfos>();
-	// 	return systems::count_placed_neighbors(infos, position);
-	// }
-	//
-	// auto Floor::get_placed_neighbors(entt::registry& registry, const position_type position) noexcept -> std::vector<position_type>
-	// {
-	// 	PROMETHEUS_PLATFORM_ASSUME(has_room(registry, position));
-	// 	PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<floor::RoomInfos>());
-	//
-	// 	const auto& infos = registry.ctx().get<const floor::RoomInfos>();
-	// 	return systems::get_placed_neighbors(infos, position);
-	// }
-	//
-	// auto Floor::get_unplaced_neighbors(entt::registry& registry, const position_type position) noexcept -> std::vector<position_type>
-	// {
-	// 	PROMETHEUS_PLATFORM_ASSUME(has_room(registry, position));
-	// 	PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<floor::RoomInfos>());
-	//
-	// 	const auto& infos = registry.ctx().get<const floor::RoomInfos>();
-	// 	return systems::get_unplaced_neighbors(infos, position);
-	// }
-	//
-	// // auto Floor::get_frontier(entt::registry& registry, const std::span<const position_type> placed) noexcept -> std::vector<position_type>
-	// // {
-	// // 	PROMETHEUS_PLATFORM_ASSUME(registry.ctx().contains<floor::RoomInfos>());
-	// //
-	// // 	const auto& infos = registry.ctx().get<const floor::RoomInfos>();
-	// // 	return systems::get_frontier(infos, placed);
-	// // }
-	//
-	// auto Floor::get_current_room_info(entt::registry& registry) noexcept -> info_type*
-	// {
-	// 	const auto position = get_current_position(registry);
-	//
-	// 	return get_room_info(registry, position);
-	// }
-	//
-	// auto Floor::count_current_placed_neighbors(entt::registry& registry) noexcept -> std::uint32_t
-	// {
-	// 	const auto position = get_current_position(registry);
-	//
-	// 	return count_placed_neighbors(registry, position);
-	// }
-	//
-	// auto Floor::get_current_placed_neighbors(entt::registry& registry) noexcept -> std::vector<position_type>
-	// {
-	// 	const auto position = get_current_position(registry);
-	//
-	// 	return get_placed_neighbors(registry, position);
-	// }
-	//
-	// auto Floor::get_current_unplaced_neighbors(entt::registry& registry) noexcept -> std::vector<position_type>
-	// {
-	// 	const auto position = get_current_position(registry);
-	//
-	// 	return get_unplaced_neighbors(registry, position);
-	// }
 }

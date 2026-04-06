@@ -3,11 +3,16 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <scene/scene.hpp>
+#pragma once
 
-namespace pd::scene
+#include <entt/fwd.hpp>
+
+namespace sf
 {
-	Scene::Scene() noexcept = default;
+	class RenderWindow;
+}
 
-	Scene::~Scene() noexcept = default;
+namespace pd::render
+{
+	auto renderable(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
 }

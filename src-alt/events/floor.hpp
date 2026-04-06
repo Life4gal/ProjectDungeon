@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <entt/entity/fwd.hpp>
+#include <cstdint>
 
 namespace pd::events::floor
 {
@@ -20,6 +20,9 @@ namespace pd::events::floor
 		// 起始房间坐标Y
 		std::uint32_t start_y;
 	};
+
+	// 销毁楼层
+	class DestroyRequest final {};
 
 	// 进入房间
 	class Entered final

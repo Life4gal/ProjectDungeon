@@ -15,11 +15,6 @@ namespace sf
 	class RenderWindow;
 }
 
-namespace pd
-{
-	class Game;
-}
-
 namespace pd::scene
 {
 	class Scene
@@ -29,7 +24,7 @@ namespace pd::scene
 		entt::registry registry_;
 
 	public:
-		explicit Scene(Game& game) noexcept;
+		explicit Scene() noexcept;
 
 		Scene(const Scene&) noexcept = delete;
 		auto operator=(const Scene&) noexcept -> Scene& = delete;

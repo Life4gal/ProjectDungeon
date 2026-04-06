@@ -3,17 +3,20 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <systems/room.hpp>
+#include <listener/room.hpp>
 
 #include <manager/event.hpp>
+
+#include <events/door.hpp>
+#include <events/chest.hpp>
 
 #include <components/floor.hpp>
 
 #include <entt/entt.hpp>
 
-namespace pd::systems
+namespace pd::listener
 {
-	auto Room::subscribe_events(entt::registry& registry) noexcept -> void
+	auto Room::subscribe(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
 		using namespace events;
@@ -25,7 +28,7 @@ namespace pd::systems
 		Event::subscribe<door::SensorContacted, &on_contact_door_sensor>(registry);
 	}
 
-	auto Room::unsubscribe_events(entt::registry& registry) noexcept -> void
+	auto Room::unsubscribe(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
 		using namespace events;
@@ -47,13 +50,12 @@ namespace pd::systems
 			const auto& entities = event.entity.get();
 			const auto& [tiles, doors, chests, destroyable_objects, items, corpses, blood_stains] = entities;
 
-			Event::enqueue(room::EnableTile{tiles});
-			Event::enqueue(room::EnableDoor{doors});
-			Event::enqueue(room::EnableChest{chests});
-			// Event::enqueue(room::EnableDestroyableObject{destroyable_objects});
-			// Event::enqueue(room::EnableItem{items});
-			// Event::enqueue(room::EnableCorpse{corpses});
-			// Event::enqueue(room::EnableBloodStain{blood_stains});
+			Event::enqueue(door::EnableAll{doors});
+			Event::enqueue(chest::EnableAll{chests});
+			// Event::enqueue(destroyable_object::EnableAll{destroyable_objects});
+			// Event::enqueue(item::EnableAll{items});
+			// Event::enqueue(corpse::EnableAll{corpses});
+			// Event::enqueue(blood_stain::EnableAll{blood_stains});
 		}
 
 		// 如果房间未清除
@@ -84,13 +86,12 @@ namespace pd::systems
 			const auto& entities = event.entity.get();
 			const auto& [tiles, doors, chests, destroyable_objects, items, corpses, blood_stains] = entities;
 
-			Event::enqueue(room::DisableTile{tiles});
-			Event::enqueue(room::DisableDoor{doors});
-			Event::enqueue(room::DisableChest{chests});
-			// Event::enqueue(room::DisableDestroyableObject{destroyable_objects});
-			// Event::enqueue(room::DisableItem{items});
-			// Event::enqueue(room::DisableCorpse{corpses});
-			// Event::enqueue(room::DisableBloodStain{blood_stains});
+			Event::enqueue(door::DisableAll{doors});
+			Event::enqueue(chest::DisableAll{chests});
+			// Event::enqueue(destroyable_object::DisableAll{destroyable_objects});
+			// Event::enqueue(item::DisableAll{items});
+			// Event::enqueue(corpse::DisableAll{corpses});
+			// Event::enqueue(blood_stain::DisableAll{blood_stains});
 		}
 
 		if (const auto& info = event.info.get();
@@ -110,15 +111,5 @@ namespace pd::systems
 	{
 		// 房间本身应该是不在乎这个事件的
 		// 或者说接触事件不在这里处理
-	}
-
-	auto Room::create(entt::registry& registry) noexcept -> void
-	{
-		using namespace components;
-	}
-
-	auto Room::destroy(entt::registry& registry) noexcept -> void
-	{
-		using namespace components;
 	}
 }

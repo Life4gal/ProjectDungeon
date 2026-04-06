@@ -3,11 +3,17 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <scene/scene.hpp>
+#pragma once
 
-namespace pd::scene
+#include <box2d/id.h>
+
+namespace pd::components::physics_body
 {
-	Scene::Scene() noexcept = default;
+	class BodyId final
+	{
+	public:
+		b2BodyId id;
+	};
 
-	Scene::~Scene() noexcept = default;
+	// 这里不管理Shape相关内容,由使用它们的组件自己管理
 }

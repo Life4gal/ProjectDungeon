@@ -7,36 +7,49 @@
 
 #include <game/constants_map.hpp>
 
-#include <events/scene.hpp>
-#include <events/dungeon.hpp>
-
+// =========
+// 管理器
 #include <manager/event.hpp>
 #include <manager/asset.hpp>
 
-#include <systems/world.hpp>
-#include <systems/physics_world.hpp>
+// =========
+// 事件
+#include <events/scene.hpp>
+#include <events/dungeon.hpp>
 
-#include <systems/dungeon.hpp>
-#include <systems/floor.hpp>
-#include <systems/room.hpp>
-#include <systems/door.hpp>
-#include <systems/chest.hpp>
-#include <systems/tile.hpp>
+// =========
+// 监听器
+#include <listener/door.hpp>
+#include <listener/chest.hpp>
+#include <listener/room.hpp>
+#include <listener/floor.hpp>
+#include <listener/dungeon.hpp>
 
+// =========
+// 更新
+
+// =========
+// 渲染
+#include <render/renderable.hpp>
+
+// =========
+// 依赖
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
+#include <box2d/box2d.h>
 #include <imgui.h>
 
 namespace pd::scene
 {
+	b2WorldId Game::physics_world_id = b2_nullWorldId;
+
 	auto Game::handle_event_pause(const sf::Event& event) noexcept -> void
 	{
 		using namespace game;
 		using namespace manager;
-		using namespace systems;
 
-		PROMETHEUS_PLATFORM_ASSUME(World::is_pause(registry_));
+		PROMETHEUS_PLATFORM_ASSUME(is_paused_);
 
 		const auto* kp = event.getIf<sf::Event::KeyPressed>();
 
@@ -88,7 +101,7 @@ namespace pd::scene
 		{
 			if (selected_option_value_ == std::to_underlying(option_type::RESUME))
 			{
-				World::unpause(registry_);
+				is_paused_ = false;
 			}
 			else if (selected_option_value_ == std::to_underlying(option_type::OPTIONS))
 			{
@@ -102,7 +115,7 @@ namespace pd::scene
 		}
 		else if (action == MenuAction::CANCEL)
 		{
-			World::unpause(registry_);
+			is_paused_ = false;
 		}
 		else
 		{
@@ -131,22 +144,22 @@ namespace pd::scene
 		//
 	}
 
-	Game::Game(pd::Game& game) noexcept
-		: Scene{game},
-		  font_id_hud_{manager::InvalidAssetId},
-		  font_id_pause_menu_{manager::InvalidAssetId},
-		  texture_id_wall_{manager::InvalidAssetId},
-		  texture_id_floor_{manager::InvalidAssetId},
-		  sound_id_switch_option_{manager::InvalidAssetId},
-		  music_id_{manager::InvalidAssetId},
-		  selected_option_value_{std::to_underlying(option_type::RESUME)} {}
+	Game::Game() noexcept
+		:
+		font_id_hud_{manager::InvalidAssetId},
+		font_id_pause_menu_{manager::InvalidAssetId},
+		texture_id_wall_{manager::InvalidAssetId},
+		texture_id_floor_{manager::InvalidAssetId},
+		sound_id_switch_option_{manager::InvalidAssetId},
+		music_id_{manager::InvalidAssetId},
+		selected_option_value_{std::to_underlying(option_type::RESUME)},
+		frame_delta_{sf::seconds(1)},
+		total_elapsed_{sf::Time::Zero},
+		play_elapsed_{sf::Time::Zero},
+		is_paused_{false} {}
 
 	auto Game::on_loaded() noexcept -> void
 	{
-		// using namespace game;
-		// using namespace manager;
-		using namespace systems;
-
 		// 加载资源
 		font_id_hud_ = manager::Font::load(map(game::Font::GAME_HUD));
 		font_id_pause_menu_ = manager::Font::load(map(game::Font::GAME_PAUSE_MENU));
@@ -156,21 +169,22 @@ namespace pd::scene
 		music_id_ = manager::Music::load(map(game::Music::GAME));
 		selected_option_value_ = std::to_underlying(option_type::RESUME);
 
-		// 创建系统
-		World::create(registry_);
-		PhysicsWorld::create(registry_);
+		// 创建物理世界
+		{
+			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NULL(physics_world_id));
 
-		Dungeon::create(registry_);
-		Floor::create(registry_);
-		Room::create(registry_);
+			auto def = b2DefaultWorldDef();
+			// 无重力世界(俯视角)
+			def.gravity = b2Vec2_zero;
+			physics_world_id = b2CreateWorld(&def);
+		}
 
 		// 订阅事件
-		Dungeon::subscribe_events(registry_);
-		Floor::subscribe_events(registry_);
-		Room::subscribe_events(registry_);
-		Door::subscribe_events(registry_);
-		Chest::subscribe_events(registry_);
-		Tile::subscribe_events(registry_);
+		listener::Door::subscribe(registry_);
+		listener::Chest::subscribe(registry_);
+		listener::Room::subscribe(registry_);
+		listener::Floor::subscribe(registry_);
+		listener::Dungeon::subscribe(registry_);
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -185,46 +199,40 @@ namespace pd::scene
 
 	auto Game::on_unloaded() noexcept -> void
 	{
-		using namespace manager;
-		using namespace systems;
-
-		Music::stop(music_id_);
+		manager::Music::stop(music_id_);
 
 		// 退订事件
-		Tile::unsubscribe_events(registry_);
-		Chest::unsubscribe_events(registry_);
-		Door::unsubscribe_events(registry_);
-		Room::unsubscribe_events(registry_);
-		Floor::unsubscribe_events(registry_);
-		Dungeon::unsubscribe_events(registry_);
+		listener::Door::subscribe(registry_);
+		listener::Chest::subscribe(registry_);
+		listener::Room::subscribe(registry_);
+		listener::Floor::subscribe(registry_);
+		listener::Dungeon::subscribe(registry_);
 
-		// 销毁系统
-		Room::destroy(registry_);
-		Floor::destroy(registry_);
-		Dungeon::destroy(registry_);
+		// 销毁物理世界
+		{
+			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NON_NULL(physics_world_id));
 
-		PhysicsWorld::destroy(registry_);
-		World::destroy(registry_);
+			b2DestroyWorld(physics_world_id);
+			physics_world_id = b2_nullWorldId;
+		}
 
 		// 卸载资源
-		Sound::unload(sound_id_switch_option_);
-		Texture::unload(texture_id_floor_);
-		Texture::unload(texture_id_wall_);
-		Font::unload(font_id_pause_menu_);
-		Font::unload(font_id_hud_);
+		manager::Sound::unload(sound_id_switch_option_);
+		manager::Texture::unload(texture_id_floor_);
+		manager::Texture::unload(texture_id_wall_);
+		manager::Font::unload(font_id_pause_menu_);
+		manager::Font::unload(font_id_hud_);
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void
 	{
-		using namespace systems;
-
 		if (const auto& io = ImGui::GetIO();
 			io.WantCaptureKeyboard || io.WantCaptureMouse)
 		{
 			return;
 		}
 
-		if (World::is_pause(registry_))
+		if (is_paused_)
 		{
 			return handle_event_pause(event);
 		}
@@ -232,15 +240,18 @@ namespace pd::scene
 
 	auto Game::update(const sf::Time delta) noexcept -> void
 	{
-		using namespace systems;
+		frame_delta_ = delta;
+		total_elapsed_ += delta;
+		if (not is_paused_)
+		{
+			play_elapsed_ += delta;
+		}
 
-		//
+		// todo
 	}
 
 	auto Game::render(sf::RenderWindow& window) noexcept -> void
 	{
-		using namespace systems;
-
-		//
+		render::renderable(registry_, window);
 	}
 }
