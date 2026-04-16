@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <components/chest.hpp>
-
 #include <entt/fwd.hpp>
 
 namespace pd::factory

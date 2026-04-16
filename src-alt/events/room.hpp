@@ -8,35 +8,244 @@
 #include <span>
 #include <functional>
 
-namespace pd::components::floor
-{
-	class RoomInfo;
-	class RoomEntity;
-}
+#include <entt/entity/fwd.hpp>
 
 namespace pd::events::room
 {
-	// 激活(进入)房间
-	class Active final
+	namespace door
+	{
+		// 禁用指定门实体
+		class Disable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 启用指定门实体
+		class Enable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 禁用所有指定门实体
+		class DisableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+
+		// 启用所有指定门实体
+		class EnableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+
+		// 请求开启所有门(如果可以开启)
+		class OpenRequest final {};
+
+		// 请求关闭所有门(如果可以关闭)
+		class CloseRequest final {};
+
+		// 任意实体与门实体接触
+		class Contacted final
+		{
+		public:
+			entt::entity door;
+			entt::entity entity;
+		};
+
+		// 任意实体与门传感器接触
+		class SensorContacted final
+		{
+		public:
+			entt::entity door;
+			entt::entity entity;
+		};
+	}
+
+	namespace item
+	{
+		// 禁用指定物品实体
+		class Disable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 启用指定物品实体
+		class Enable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 禁用所有指定物品实体
+		class DisableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+
+		// 启用所有指定物品实体
+		class EnableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+	}
+
+	namespace chest
+	{
+		// 禁用指定宝箱实体
+		class Disable final
+		{
+		public:
+			entt::entity chest;
+		};
+
+		// 启用指定宝箱实体
+		class Enable final
+		{
+		public:
+			entt::entity chest;
+		};
+
+		// 禁用所有指定宝箱实体
+		class DisableAll final
+		{
+		public:
+			std::span<const entt::entity> chests;
+		};
+
+		// 启用所有指定宝箱实体
+		class EnableAll final
+		{
+		public:
+			std::span<const entt::entity> chests;
+		};
+
+		// 任意实体与宝箱实体接触
+		class Contacted final
+		{
+		public:
+			entt::entity chest;
+			entt::entity entity;
+		};
+	}
+
+	namespace blood_stain
+	{
+		// 禁用指定血迹实体
+		class Disable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 启用指定血迹实体
+		class Enable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 禁用所有指定血迹实体
+		class DisableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+
+		// 启用所有指定血迹实体
+		class EnableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+	}
+
+	namespace corpse
+	{
+		// 禁用指定尸体实体
+		class Disable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 启用指定尸体实体
+		class Enable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 禁用所有指定尸体实体
+		class DisableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+
+		// 启用所有指定尸体实体
+		class EnableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+	}
+
+	namespace destroyable
+	{
+		// 禁用指定可破坏物实体
+		class Disable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 启用指定可破坏物实体
+		class Enable final
+		{
+		public:
+			entt::entity door;
+		};
+
+		// 禁用所有指定可破坏物实体
+		class DisableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+
+		// 启用所有指定可破坏物实体
+		class EnableAll final
+		{
+		public:
+			std::span<const entt::entity> doors;
+		};
+	}
+
+	// 进入指定房间
+	class Entered final
 	{
 	public:
-		std::reference_wrapper<const components::floor::RoomInfo> info;
-		std::reference_wrapper<const components::floor::RoomEntity> entity;
+		entt::entity room;
 	};
 
-	// 房间被清理
+	// 指定房间已清理
 	class Cleared final
 	{
 	public:
-		std::reference_wrapper<const components::floor::RoomInfo> info;
-		std::reference_wrapper<const components::floor::RoomEntity> entity;
+		entt::entity room;
 	};
 
-	// 禁用(离开)房间
-	class Inactive final
+	// 离开指定房间
+	class Left final
 	{
 	public:
-		std::reference_wrapper<const components::floor::RoomInfo> info;
-		std::reference_wrapper<const components::floor::RoomEntity> entity;
+		entt::entity room;
 	};
 }

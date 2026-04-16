@@ -7,13 +7,12 @@
 
 #include <entt/fwd.hpp>
 
-namespace pd::listener
+namespace sf
 {
-	class Floor final
-	{
-	public:
-		static auto subscribe(entt::registry& registry) noexcept -> void;
+	class RenderWindow;
+}
 
-		static auto unsubscribe(entt::registry& registry) noexcept -> void;
-	};
+namespace pd::render
+{
+	auto room(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
 }

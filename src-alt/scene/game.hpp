@@ -12,7 +12,6 @@
 #include <manager/asset_fwd.hpp>
 
 #include <SFML/System/Time.hpp>
-#include <box2d/id.h>
 
 namespace pd::scene
 {
@@ -21,12 +20,6 @@ namespace pd::scene
 	public:
 		using option_type = game::GamePauseMenuOption;
 		using asset_id_type = manager::AssetId;
-
-		// 物理世界
-		// 由于我们将其大部分功能移动到了*attacher/physics_body* 中
-		// 剩余部分如若还作为一个系统就显得有些鸡肋了
-		// 我们将其设置为游戏场景的静态成员
-		static b2WorldId physics_world_id;
 
 	private:
 		// 游戏字体-HUD

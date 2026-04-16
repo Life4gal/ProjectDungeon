@@ -9,23 +9,26 @@
 
 #include <entt/fwd.hpp>
 
-#include <SFML/System/Vector2.hpp>
-
 namespace pd::factory
 {
-	class Door final
+	class Room final
 	{
 	public:
-		using direction_type = blueprint::DoorDirection;
-		using type_type = blueprint::DoorType;
+		using type_type = blueprint::RoomType;
 
-		// 创建门
-		static auto spawn(entt::registry& registry, sf::Vector2f position, direction_type direction, type_type type) noexcept -> entt::entity;
+		struct position_type
+		{
+			std::uint32_t x;
+			std::uint32_t y;
+		};
 
-		// 销毁门
+		// 创建房间
+		static auto spawn(entt::registry& registry, type_type type, position_type position) noexcept -> entt::entity;
+
+		// 销毁房间
 		static auto destroy(entt::registry& registry, entt::entity entity) noexcept -> void;
 
-		// 销毁所有门
+		// 销毁所有房间
 		static auto destroy_all(entt::registry& registry) noexcept -> void;
 	};
 }

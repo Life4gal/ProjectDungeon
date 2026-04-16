@@ -427,9 +427,22 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/event.hpp
 	# 游戏相关配置
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/game_config.hpp
+	
+	# ============================
+	# BLUEPRINT(蓝图)
+	# ============================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/def.hpp
+
+	# 地下城 -- 楼层 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/room.cpp
+	# 地下城 -- 楼层
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/floor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/floor.cpp
 
 	# ============================
-	# COMPONENTS
+	# COMPONENTS(组件)
 	# ============================
 
 	# 标签
@@ -437,40 +450,26 @@ add_executable(
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/transform.hpp
 	# 渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/renderable.hpp
-	# 物理刚体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/physics_body.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/sprite.hpp
+	# 物理
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/physics.hpp
 
 	# 地下城 -- 楼层 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/tile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/chest.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/destroyable_object.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/item.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/corpse.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/blood_stain.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/room.hpp
 	# 地下城 -- 楼层
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/floor.hpp
 	# 地下城
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/dungeon.hpp
-
+	
 	# ============================
-	# EVENTS
+	# EVENTS(事件)
 	# ============================
 	
-	# 窗口相关事件
+	# 窗口
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/window.hpp
-	# 场景相关事件
+	# 场景
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/scene.hpp
-	
-	# 实体渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/renderable.hpp
 
-	# 地下城 -- 楼层 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/door.hpp
-	# 地下城 -- 楼层 -- 房间 -- 宝箱
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/chest.hpp
 	# 地下城 -- 楼层 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/room.hpp
 	# 地下城 -- 楼层
@@ -479,15 +478,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/dungeon.hpp
 		
 	# ============================
-	# LISTENER(监听器)
+	# LISTENER(处理事件)
 	# ============================
 	
-	# 地下城 -- 楼层 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/door.cpp
-	# 地下城 -- 楼层 -- 房间 -- 宝箱
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/chest.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/chest.cpp
 	# 地下城 -- 楼层 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/room.cpp
@@ -497,23 +490,23 @@ add_executable(
 	# 地下城
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/dungeon.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/dungeon.cpp
-
+	
 	# ============================
-	# ATTACHER(附加器,为实体附加组件,以及提供一些组件操控接口)
+	# ACCESSOR(创建/访问组件)
 	# ============================
-		
+	
 	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/attacher/transform.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/attacher/transform.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/transform.cpp
 	# 渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/attacher/renderable.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/attacher/renderable.cpp
-	# 物理刚体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/attacher/physics_body.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/attacher/physics_body.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/sprite.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/sprite.cpp
+	# 物理
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/physics.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/physics.cpp
 
 	# ============================
-	# FACTORY(实体工厂,负责创建/销毁实体)
+	# FACTORY(创建/销毁实体)
 	# ============================
 
 	# 地下城 -- 房间 -- 门
@@ -522,6 +515,9 @@ add_executable(
 	# 地下城 -- 房间 -- 宝箱
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/chest.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/chest.cpp
+	# 地下城 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/room.cpp
 	
 	# ============================
 	# UPDATE(更新)
@@ -531,8 +527,8 @@ add_executable(
 	# RENDER(渲染)
 	# ============================
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/renderable.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/renderable.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/room.cpp
 
 	# ============================
 	# SCENE

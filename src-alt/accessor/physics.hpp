@@ -5,14 +5,13 @@
 
 #pragma once
 
-#include <components/physics_body.hpp>
-
 #include <entt/fwd.hpp>
-
-#include <box2d/math_functions.h>
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Angle.hpp>
+
+#include <box2d/id.h>
+#include <box2d/math_functions.h>
 
 struct b2BodyDef;
 struct b2ShapeDef;
@@ -21,14 +20,14 @@ struct b2Circle;
 struct b2Capsule;
 struct b2Polygon;
 
-namespace pd::attacher
+namespace pd::accessor
 {
-	class PhysicsBody final
+	class Physics final
 	{
 	public:
 		class ShapeAttacher final
 		{
-			friend PhysicsBody;
+			friend Physics;
 
 			b2BodyId body_id_;
 
@@ -37,20 +36,36 @@ namespace pd::attacher
 
 		public:
 			// 为指定刚体附加一个圆形碰撞体
-			auto attach(const b2ShapeDef& shape_def, const b2Circle& circle) const noexcept -> b2ShapeId;
+			auto attach(const b2ShapeDef& shape_def, const b2Circle& circle) noexcept -> b2ShapeId;
 
 			// 为指定刚体附加一个胶囊形碰撞体
-			auto attach(const b2ShapeDef& shape_def, const b2Capsule& capsule) const noexcept -> b2ShapeId;
+			auto attach(const b2ShapeDef& shape_def, const b2Capsule& capsule) noexcept -> b2ShapeId;
 
 			// 为指定刚体附加一个多边形碰撞体
-			auto attach(const b2ShapeDef& shape_def, const b2Polygon& polygon) const noexcept -> b2ShapeId;
+			auto attach(const b2ShapeDef& shape_def, const b2Polygon& polygon) noexcept -> b2ShapeId;
 		};
 
-		// 为一个实体附加一个物理刚体,如果该实体已经有物理刚体则先销毁原有的物理刚体然后覆盖
-		static auto attach(entt::registry& registry, entt::entity entity, b2WorldId world_id, const b2BodyDef& body_def) noexcept -> ShapeAttacher;
+		// ===================================================
+
+		// 初始化系统
+		static auto initialize_system(entt::registry& registry) noexcept -> void;
+
+		// 销毁系统
+		static auto destroy_system(entt::registry& registry) noexcept -> void;
+
+		// ===================================================
+
+		// 为一个实体附加物理刚体,如果其已有物理刚体则什么也不做(用于追加形状)
+		static auto attach(entt::registry& registry, entt::entity entity, const b2BodyDef& body_def) noexcept -> ShapeAttacher;
+
+		// 为一个实体附加物理刚体,如果其已有物理刚体则先销毁原有的物理刚体
+		static auto attach_force(entt::registry& registry, entt::entity entity, const b2BodyDef& body_def) noexcept -> ShapeAttacher;
 
 		// 为一个实体移除物理刚体组件,如果目标实体没有物理刚体组件则什么也不做
+		// 如果是为了销毁实体则无需调用此函数,因为实体销毁时会自动销毁其所有组件
 		static auto deattach(entt::registry& registry, entt::entity entity) noexcept -> void;
+
+		// ===================================================
 
 		// 禁用一个实体的物理刚体,如果目标实体没有物理刚体组件则什么也不做
 		static auto disable(entt::registry& registry, entt::entity entity) noexcept -> void;
@@ -79,9 +94,10 @@ namespace pd::attacher
 		// 设置一个实体的物理刚体的变换,如果目标实体没有物理刚体组件则什么也不做
 		static auto set_transform(entt::registry& registry, entt::entity entity, b2Transform new_transform) noexcept -> void;
 
-		// ============================
-		// 提供一些数值转换接口用于将像素单位转为物理单位(反正亦然)
-		// ============================
+		// FIXME: 缩放如何实现?
+
+		// ===================================================
+		// 辅助构建b2BodyDef/b2ShapeDef
 
 		[[nodiscard]] static auto to_user_data(entt::entity entity) noexcept -> void*;
 

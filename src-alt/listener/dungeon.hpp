@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <events/dungeon.hpp>
-
 #include <entt/fwd.hpp>
 
 namespace pd::listener
@@ -14,17 +12,8 @@ namespace pd::listener
 	class Dungeon final
 	{
 	public:
-		// 订阅事件
 		static auto subscribe(entt::registry& registry) noexcept -> void;
 
-		// 取消订阅事件
 		static auto unsubscribe(entt::registry& registry) noexcept -> void;
-
-	private:
-		// 进入地下城
-		static auto on_go(entt::registry& registry, const events::dungeon::Go& event) noexcept -> void;
-
-		// 离开地下城
-		static auto on_exit(entt::registry& registry, const events::dungeon::Exit& event) noexcept -> void;
 	};
 }

@@ -9,41 +9,47 @@
 
 // =========
 // 管理器
+
 #include <manager/event.hpp>
 #include <manager/asset.hpp>
 
 // =========
 // 事件
+
 #include <events/scene.hpp>
 #include <events/dungeon.hpp>
 
 // =========
 // 监听器
-#include <listener/door.hpp>
-#include <listener/chest.hpp>
+
 #include <listener/room.hpp>
 #include <listener/floor.hpp>
 #include <listener/dungeon.hpp>
+
+// =========
+// 访问
+
+#include <accessor/transform.hpp>
+#include <accessor/sprite.hpp>
+#include <accessor/physics.hpp>
 
 // =========
 // 更新
 
 // =========
 // 渲染
-#include <render/renderable.hpp>
+
+#include <render/room.hpp>
 
 // =========
 // 依赖
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
-#include <box2d/box2d.h>
 #include <imgui.h>
 
 namespace pd::scene
 {
-	b2WorldId Game::physics_world_id = b2_nullWorldId;
-
 	auto Game::handle_event_pause(const sf::Event& event) noexcept -> void
 	{
 		using namespace game;
@@ -169,22 +175,15 @@ namespace pd::scene
 		music_id_ = manager::Music::load(map(game::Music::GAME));
 		selected_option_value_ = std::to_underlying(option_type::RESUME);
 
-		// 创建物理世界
-		{
-			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NULL(physics_world_id));
-
-			auto def = b2DefaultWorldDef();
-			// 无重力世界(俯视角)
-			def.gravity = b2Vec2_zero;
-			physics_world_id = b2CreateWorld(&def);
-		}
-
 		// 订阅事件
-		listener::Door::subscribe(registry_);
-		listener::Chest::subscribe(registry_);
 		listener::Room::subscribe(registry_);
 		listener::Floor::subscribe(registry_);
 		listener::Dungeon::subscribe(registry_);
+
+		// 访问器初始化
+		accessor::Transform::initialize_system(registry_);
+		accessor::Sprite::initialize_system(registry_);
+		accessor::Physics::initialize_system(registry_);
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -201,20 +200,15 @@ namespace pd::scene
 	{
 		manager::Music::stop(music_id_);
 
+		// 销毁访问器
+		accessor::Transform::destroy_system(registry_);
+		accessor::Sprite::destroy_system(registry_);
+		accessor::Physics::destroy_system(registry_);
+
 		// 退订事件
-		listener::Door::subscribe(registry_);
-		listener::Chest::subscribe(registry_);
 		listener::Room::subscribe(registry_);
 		listener::Floor::subscribe(registry_);
 		listener::Dungeon::subscribe(registry_);
-
-		// 销毁物理世界
-		{
-			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NON_NULL(physics_world_id));
-
-			b2DestroyWorld(physics_world_id);
-			physics_world_id = b2_nullWorldId;
-		}
 
 		// 卸载资源
 		manager::Sound::unload(sound_id_switch_option_);
@@ -252,6 +246,6 @@ namespace pd::scene
 
 	auto Game::render(sf::RenderWindow& window) noexcept -> void
 	{
-		render::renderable(registry_, window);
+		render::room(registry_, window);
 	}
 }

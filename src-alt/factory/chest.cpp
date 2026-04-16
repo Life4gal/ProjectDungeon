@@ -6,6 +6,7 @@
 #include <factory/chest.hpp>
 
 #include <components/tags.hpp>
+#include <components/room.hpp>
 
 #include <entt/entt.hpp>
 

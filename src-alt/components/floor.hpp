@@ -5,70 +5,22 @@
 
 #pragma once
 
-#include <vector>
-
-#include <game/constants.hpp>
-
-#include <utility/fixed_matrix.hpp>
+#include <blueprint/floor.hpp>
 
 namespace pd::components::floor
 {
-	// 房间类型
-	enum class RoomType : std::uint8_t
-	{
-		// 该位置未生成房间
-		NONE,
-
-		// 起始房间
-		START,
-		// 标准房间
-		STANDARD,
-		// BOSS房间
-		BOSS,
-		// BOSS房间门钥匙房间
-		KEY,
-		// 商人房间
-		MERCHANT,
-		// 奖励房间
-		BONUS,
-		// 出口房间
-		EXIT,
-	};
-
-	// 房间信息
-	class RoomInfo final
-	{
-	public:
-		// 房间类型
-		RoomType type;
-		// 此房间是否已访问过
-		bool visited;
-		// 此房间是否已清理过
-		bool cleared;
-	};
-
-	// 房间实体(用于控制实体禁用/激活)
-	class RoomEntity
-	{
-	public:
-		std::vector<entt::entity> tiles;
-		std::vector<entt::entity> doors;
-		std::vector<entt::entity> chests;
-		std::vector<entt::entity> destroyable_objects;
-		std::vector<entt::entity> items;
-		std::vector<entt::entity> corpses;
-		std::vector<entt::entity> blood_stains;
-	};
-
 	// ==========================================
 	// 上下文组件
 	// ==========================================
 
-	// 当前层级所有房间信息
-	class RoomInfos final : public utility::FixedMatrix<RoomInfo, game::FloorHorizontalRoom, game::FloorVerticalRoom> {};
+	// 楼层布局
+	class Layout final
+	{
+	public:
+		using layout_type = blueprint::Floor::layout_type;
 
-	// 当前层级所有房间的实体
-	class RoomEntities final : public utility::FixedMatrix<RoomEntity, game::FloorHorizontalRoom, game::FloorVerticalRoom> {};
+		layout_type layout;
+	};
 
 	// 当前生成房间数量
 	class RoomCount final

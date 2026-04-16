@@ -24,7 +24,7 @@ namespace pd::events::floor
 	// 销毁楼层
 	class DestroyRequest final {};
 
-	// 进入房间
+	// 进入指定房间
 	class Entered final
 	{
 	public:
@@ -32,7 +32,7 @@ namespace pd::events::floor
 		std::uint32_t y;
 	};
 
-	// 清理房间
+	// 指定房间已清理
 	class Cleared final
 	{
 	public:
@@ -40,7 +40,7 @@ namespace pd::events::floor
 		std::uint32_t y;
 	};
 
-	// 离开房间
+	// 离开指定房间
 	class Left final
 	{
 	public:

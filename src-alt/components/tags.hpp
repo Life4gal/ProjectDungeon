@@ -19,20 +19,24 @@ namespace pd::components::tags
 	// =================
 	// 房间
 
-	// 瓦片
-	using tile = entt::tag<"Tile"_hs>;
 	// 门
 	using door = entt::tag<"Door"_hs>;
-	// 宝箱
-	using chest = entt::tag<"Chest"_hs>;
-	// 可破坏物
-	using destroyable_object = entt::tag<"DestroyableObject"_hs>;
 	// 物品
 	using item = entt::tag<"Item"_hs>;
-	// 尸体
-	using corpse = entt::tag<"Corpse"_hs>;
+	// 宝箱
+	using chest = entt::tag<"Chest"_hs>;
 	// 血迹
 	using blood_stain = entt::tag<"BloodStain"_hs>;
+	// 尸体
+	using corpse = entt::tag<"Corpse"_hs>;
+	// 可破坏物
+	using destroyable = entt::tag<"Destroyable"_hs>;
+
+	// 房间
+	using room = entt::tag<"Room"_hs>;
+
+	// =================
+	// 
 
 	// =================================================
 	// 状态标识

@@ -5,19 +5,13 @@
 
 #pragma once
 
-#include <entt/entity/fwd.hpp>
+#include <box2d/id.h>
 
-namespace pd::events::renderable
+namespace pd::components::physics
 {
-	class Hide final
+	class BodyId final
 	{
 	public:
-		entt::entity entity;
-	};
-
-	class Show final
-	{
-	public:
-		entt::entity entity;
+		b2BodyId id;
 	};
 }

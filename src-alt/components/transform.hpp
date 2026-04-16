@@ -10,18 +10,23 @@
 
 namespace pd::components::transform
 {
+	// 像素位置
+	// 如果实体存在物理刚体组件则该组件的位置会随物理刚体的位置自动更新,否则该组件的位置由Transform::set_position接口设置
 	class Position
 	{
 	public:
 		sf::Vector2f position;
 	};
 
+	// 缩放
 	class Scale
 	{
 	public:
 		sf::Vector2f scale;
 	};
 
+	// 旋转
+	// 如果实体存在物理刚体组件则该组件的旋转会随物理刚体的旋转自动更新,否则该组件的旋转由Transform::set_rotation接口设置
 	class Rotation
 	{
 	public:

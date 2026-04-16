@@ -5,9 +5,12 @@
 
 #include <listener/dungeon.hpp>
 
+#include <game/constants.hpp>
+
 #include <manager/event.hpp>
 
-#include <game/constants.hpp>
+#include <events/dungeon.hpp>
+#include <events/floor.hpp>
 
 #include <components/dungeon.hpp>
 
@@ -15,50 +18,50 @@
 
 namespace pd::listener
 {
+	namespace
+	{
+		namespace ed = events::dungeon;
+		namespace cd = components::dungeon;
+
+		auto on_go(entt::registry& registry, const ed::Go& event) noexcept -> void
+		{
+			using namespace manager;
+
+			// 保存信息
+			registry.ctx().insert_or_assign(cd::Info{.level = event.level});
+
+			// 创建指定层级的地牢布局
+			const auto count = game::FloorRoomBaseCount + event.level * game::FloorRoomCountGrowthFactor;
+			Event::enqueue(events::floor::GenerateRequest{.count = count, .start_x = event.x, .start_y = event.y});
+			// 进入房间
+			Event::enqueue(events::floor::Entered{.x = event.x, .y = event.y});
+		}
+
+		auto on_exit(entt::registry& registry, [[maybe_unused]] const ed::Exit& event) noexcept -> void
+		{
+			using namespace manager;
+
+			// 销毁信息
+			registry.ctx().erase<cd::Info>();
+
+			// 销毁楼层
+			Event::enqueue(events::floor::DestroyRequest{});
+		}
+	}
+
 	auto Dungeon::subscribe(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
-		using namespace events;
 
-		Event::subscribe<dungeon::Go, &on_go>(registry);
-		Event::subscribe<dungeon::Exit, &Dungeon::on_exit>(registry);
+		Event::subscribe<ed::Go, &on_go>(registry);
+		Event::subscribe<ed::Exit, &on_exit>(registry);
 	}
 
 	auto Dungeon::unsubscribe(entt::registry& registry) noexcept -> void
 	{
 		using namespace manager;
-		using namespace events;
 
-		Event::unsubscribe<dungeon::Go, &on_go>(registry);
-		Event::unsubscribe<dungeon::Exit, &Dungeon::on_exit>(registry);
-	}
-
-	auto Dungeon::on_go(entt::registry& registry, const events::dungeon::Go& event) noexcept -> void
-	{
-		using namespace manager;
-		// using namespace events;
-		using namespace components;
-
-		// 保存信息
-		registry.ctx().insert_or_assign<dungeon::Info>(dungeon::Info{.level = event.level});
-
-		// 创建指定层级的地牢布局
-		const auto count = game::FloorRoomBaseCount + event.level * game::FloorRoomCountGrowthFactor;
-		Event::enqueue(events::floor::GenerateRequest{.count = count, .start_x = event.x, .start_y = event.y});
-		// 进入房间
-		Event::enqueue(events::floor::Entered{.x = event.x, .y = event.y});
-	}
-
-	auto Dungeon::on_exit(entt::registry& registry, [[maybe_unused]] const events::dungeon::Exit& event) noexcept -> void
-	{
-		using namespace manager;
-		// using namespace events;
-		using namespace components;
-
-		// 销毁信息
-		registry.ctx().erase<dungeon::Info>();
-
-		// 销毁楼层
-		Event::enqueue(events::floor::DestroyRequest{});
+		Event::unsubscribe<ed::Go, &on_go>(registry);
+		Event::unsubscribe<ed::Exit, &on_exit>(registry);
 	}
 }
