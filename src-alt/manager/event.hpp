@@ -5,14 +5,6 @@
 
 #pragma once
 
-#include <events/chest.hpp>
-#include <events/door.hpp>
-#include <events/dungeon.hpp>
-#include <events/floor.hpp>
-#include <events/room.hpp>
-#include <events/scene.hpp>
-#include <events/window.hpp>
-
 #include <entt/signal/dispatcher.hpp>
 
 #define PD_EVENT_DEBUG 1
@@ -149,44 +141,6 @@ namespace pd::manager
 			if constexpr (std::is_same_v<Event, void>)
 			{
 				dispatcher_.update();
-
-				// using namespace events;
-				//
-				// dispatcher_.update<SceneChanged>();
-				// dispatcher_.update<WindowResized>();
-				//
-				// dispatcher_.update<dungeon::Go>();
-				//
-				// dispatcher_.update<floor::GenerateRequest>();
-				// dispatcher_.update<floor::Entered>();
-				// dispatcher_.update<floor::Cleared>();
-				// dispatcher_.update<floor::Left>();
-				//
-				// dispatcher_.update<room::Active>();
-				// dispatcher_.update<room::Cleared>();
-				// dispatcher_.update<room::Inactive>();
-				//
-				// dispatcher_.update<room::DisableTile>();
-				// dispatcher_.update<room::EnableTile>();
-				// dispatcher_.update<room::DisableDoor>();
-				// dispatcher_.update<room::EnableDoor>();
-				// dispatcher_.update<room::DisableChest>();
-				// dispatcher_.update<room::EnableChest>();
-				// dispatcher_.update<room::DisableDestroyableObject>();
-				// dispatcher_.update<room::EnableDestroyableObject>();
-				// dispatcher_.update<room::DisableItem>();
-				// dispatcher_.update<room::EnableItem>();
-				// dispatcher_.update<room::DisableCorpse>();
-				// dispatcher_.update<room::EnableCorpse>();
-				// dispatcher_.update<room::DisableBloodStain>();
-				// dispatcher_.update<room::EnableBloodStain>();
-				//
-				// dispatcher_.update<door::OpenRequest>();
-				// dispatcher_.update<door::CloseRequest>();
-				// dispatcher_.update<door::Contacted>();
-				// dispatcher_.update<door::SensorContacted>();
-				//
-				// dispatcher_.update<chest::Contacted>();
 			}
 			else
 			{
