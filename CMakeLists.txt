@@ -394,204 +394,304 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #
 #add_dependencies(${PROJECT_NAME} copy_resources)
 
+#add_executable(
+#	${PROJECT_NAME}-alt
+#		
+#	# ============================
+#	# EXTERNAL
+#	# ============================
+#
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/external/imgui-SFML.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/external/imgui-SFML.cpp
+#		
+#	# ============================
+#	# UTILITY
+#	# ============================
+#	
+#	# 字符串哈希(支持异构)
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/string_hash.hpp
+#	# 固定矩阵
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/fixed_matrix.hpp
+#
+#	# ============================
+#	# MANAGER
+#	# ============================
+#
+#	# 随机数生成器
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/random.hpp
+#	# 资源管理器
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_fwd.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.cpp
+#	# 事件分发器
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/event.hpp
+#	# 游戏相关配置
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/game_config.hpp
+#	
+#	# ============================
+#	# BLUEPRINT(蓝图)
+#	# ============================
+#
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/def.hpp
+#
+#	# 地下城 -- 楼层 -- 房间
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/room.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/room.cpp
+#	# 地下城 -- 楼层
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/floor.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/floor.cpp
+#
+#	# ============================
+#	# COMPONENTS(组件)
+#	# ============================
+#
+#	# 标签
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/tags.hpp
+#	# 变换
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/transform.hpp
+#	# 渲染
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/sprite.hpp
+#	# 物理
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/physics.hpp
+#
+#	# 地下城 -- 楼层 -- 房间
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/room.hpp
+#	# 地下城 -- 楼层
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/floor.hpp
+#	# 地下城
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/dungeon.hpp
+#	
+#	# ============================
+#	# EVENTS(事件)
+#	# ============================
+#	
+#	# 窗口
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/window.hpp
+#	# 场景
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/scene.hpp
+#
+#	# 地下城 -- 楼层 -- 房间
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/room.hpp
+#	# 地下城 -- 楼层
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/floor.hpp
+#	# 地下城
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/dungeon.hpp
+#		
+#	# ============================
+#	# LISTENER(处理事件)
+#	# ============================
+#	
+#	# 地下城 -- 楼层 -- 房间
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/room.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/room.cpp
+#	# 地下城 -- 楼层
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/floor.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/floor.cpp
+#	# 地下城
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/dungeon.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/dungeon.cpp
+#	
+#	# ============================
+#	# ACCESSOR(创建/访问组件)
+#	# ============================
+#	
+#	# 变换
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/transform.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/transform.cpp
+#	# 渲染
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/sprite.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/sprite.cpp
+#	# 物理
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/physics.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/physics.cpp
+#
+#	# ============================
+#	# FACTORY(创建/销毁实体)
+#	# ============================
+#
+#	# 地下城 -- 房间 -- 门
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/door.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/door.cpp
+#	# 地下城 -- 房间 -- 宝箱
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/chest.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/chest.cpp
+#	# 地下城 -- 房间
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/room.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/room.cpp
+#	
+#	# ============================
+#	# UPDATE(更新)
+#	# ============================
+#	
+#	# ============================
+#	# RENDER(渲染)
+#	# ============================
+#
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/room.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/room.cpp
+#
+#	# ============================
+#	# SCENE
+#	# ============================
+#
+#	# 场景类型
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/type.hpp
+#
+#	# 游戏场景基类
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.cpp
+#
+#	# 游戏主菜单场景
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.cpp
+#	
+#	# 游戏主场景
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/game.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/game.cpp
+#
+#	# ============================
+#	# GAME
+#	# ============================
+#
+#	# 所有常量定义
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/constants.hpp
+#	# 常量定义相关映射
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/constants_map.hpp
+#
+#	# 游戏类
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.hpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.cpp
+#
+#	# ============================
+#	# MAIN
+#	# ============================
+#
+#	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/main.cpp
+#)
+
 add_executable(
-	${PROJECT_NAME}-alt
+	${PROJECT_NAME}-new
 		
 	# ============================
 	# EXTERNAL
 	# ============================
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/external/imgui-SFML.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/external/imgui-SFML.cpp
-		
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/external/imgui-SFML.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/external/imgui-SFML.cpp
+
 	# ============================
 	# UTILITY
 	# ============================
 	
 	# 字符串哈希(支持异构)
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/string_hash.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/utility/string_hash.hpp
 	# 固定矩阵
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/utility/fixed_matrix.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/utility/fixed_matrix.hpp
 
 	# ============================
 	# MANAGER
 	# ============================
 
 	# 随机数生成器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/random.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/random.hpp
 	# 资源管理器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset_fwd.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/asset.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/asset_fwd.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/asset.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/asset.cpp
 	# 事件分发器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/event.hpp
-	# 游戏相关配置
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/manager/game_config.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/event.hpp
+	# 
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/i18n.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/i18n.cpp
 	
 	# ============================
-	# BLUEPRINT(蓝图)
+	# VAR
 	# ============================
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/def.hpp
-
-	# 地下城 -- 楼层 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/room.cpp
-	# 地下城 -- 楼层
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/floor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/blueprint/floor.cpp
+	# 窗口
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/var/window.hpp
+	# 音频
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/var/audio.hpp
+	# 按键动作映射
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/var/key_action_mapper.hpp
 
 	# ============================
-	# COMPONENTS(组件)
-	# ============================
-
-	# 标签
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/tags.hpp
-	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/transform.hpp
-	# 渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/sprite.hpp
-	# 物理
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/physics.hpp
-
-	# 地下城 -- 楼层 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/room.hpp
-	# 地下城 -- 楼层
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/floor.hpp
-	# 地下城
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/components/dungeon.hpp
-	
-	# ============================
-	# EVENTS(事件)
+	# EVENT
 	# ============================
 	
 	# 窗口
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/window.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/window.hpp
 	# 场景
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/scene.hpp
-
-	# 地下城 -- 楼层 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/room.hpp
-	# 地下城 -- 楼层
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/floor.hpp
-	# 地下城
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/events/dungeon.hpp
-		
-	# ============================
-	# LISTENER(处理事件)
-	# ============================
-	
-	# 地下城 -- 楼层 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/room.cpp
-	# 地下城 -- 楼层
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/floor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/floor.cpp
-	# 地下城
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/dungeon.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/listener/dungeon.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/scene.hpp
 	
 	# ============================
-	# ACCESSOR(创建/访问组件)
-	# ============================
-	
-	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/transform.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/transform.cpp
-	# 渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/sprite.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/sprite.cpp
-	# 物理
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/physics.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/accessor/physics.cpp
-
-	# ============================
-	# FACTORY(创建/销毁实体)
+	# MENU
 	# ============================
 
-	# 地下城 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/door.cpp
-	# 地下城 -- 房间 -- 宝箱
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/chest.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/chest.cpp
-	# 地下城 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/factory/room.cpp
-	
-	# ============================
-	# UPDATE(更新)
-	# ============================
-	
-	# ============================
-	# RENDER(渲染)
-	# ============================
+	# 菜单基类(其实这个基类没啥必要)
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/menu/menu.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/menu/menu.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/render/room.cpp
+	# 主菜单
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/menu/main.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/menu/main.cpp
+
+	# 游戏内暂停菜单
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/menu/pause.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/menu/pause.cpp
 
 	# ============================
 	# SCENE
 	# ============================
 
 	# 场景类型
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/type.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/scene/category.hpp
 
 	# 游戏场景基类
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/scene.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/scene/scene.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/scene/scene.cpp
 
 	# 游戏主菜单场景
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/main_menu.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/scene/main_menu.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/scene/main_menu.cpp
 	
 	# 游戏主场景
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/game.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/scene/game.cpp
-
-	# ============================
-	# GAME
-	# ============================
-
-	# 所有常量定义
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/constants.hpp
-	# 常量定义相关映射
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/constants_map.hpp
-
-	# 游戏类
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/game/game.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/scene/game.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/scene/game.cpp
 
 	# ============================
 	# MAIN
 	# ============================
 
-	${CMAKE_CURRENT_SOURCE_DIR}/src-alt/main.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/game.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/game.cpp
+	
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/main.cpp
 )
 
 target_include_directories(
-		${PROJECT_NAME}-alt
+		${PROJECT_NAME}-new
 
 		PUBLIC
-		${CMAKE_CURRENT_SOURCE_DIR}/src-alt
+		${CMAKE_CURRENT_SOURCE_DIR}/src-new
 		${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_compile_options(
-		${PROJECT_NAME}-alt
+		${PROJECT_NAME}-new
 		PUBLIC
 
 		${PD_COMPILE_FLAGS}
 )
 
 target_compile_features(
-		${PROJECT_NAME}-alt
+		${PROJECT_NAME}-new
 		PRIVATE
 		cxx_std_23
 )
 
 target_link_libraries(
-		${PROJECT_NAME}-alt
+		${PROJECT_NAME}-new
 		PRIVATE
 
 		PrometheusCore
