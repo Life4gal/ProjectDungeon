@@ -15,13 +15,10 @@
 #include <manager/event.hpp>
 
 // =========
-// 事件
+// 测试用
 
-// =========
-// 监听器
+#include <factory/floor.hpp>
 
-// =========
-// 访问
 
 // =========
 // 更新
@@ -29,6 +26,7 @@
 // =========
 // 渲染
 
+#include <render/floor.hpp>
 
 // =========
 // 依赖
@@ -45,12 +43,27 @@ namespace pd::scene
 		// TODO: 多个音乐
 		// TODO: 暂停菜单是否需要切换音乐?
 		constexpr std::string_view GameMusic = R"(.\media\musics\game.wav)";
+
+		// 测试用
+		std::vector<blueprint::Floor> g_test_floors
+		{
+				// clang-format off
+				{.transform = {.x = 100, .y = 100, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
+				{.transform = {.x = 200, .y = 100, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
+				{.transform = {.x = 100, .y = 200, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
+				{.transform = {.x = 200, .y = 200, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
+				// clang-format on
+		};
 	}
 
 	auto Game::start_game() noexcept -> bool
 	{
 		// 进入地下城
 
+		for (const auto& floor: g_test_floors)
+		{
+			factory::Floor::spawn(registry_, floor);
+		}
 
 		return true;
 	}
@@ -85,18 +98,12 @@ namespace pd::scene
 
 		music_ = manager::Music::load(GameMusic);
 
-		// 加载资源
-
-		// 订阅事件
-
-		// 访问器初始化
+		// 
 	}
 
 	auto Game::on_initialized() noexcept -> void
 	{
-		using manager::AudioPlayer;
-
-		AudioPlayer::play(music_);
+		manager::AudioPlayer::play(music_);
 
 		// 这里可以检查是否存在存档?
 		start_game();
@@ -104,20 +111,12 @@ namespace pd::scene
 
 	auto Game::on_unloaded() noexcept -> void
 	{
-		using manager::Font;
-		using manager::Texture;
-		using manager::Sound;
-		using manager::Music;
-		using manager::AudioPlayer;
-
-		AudioPlayer::stop(music_);
+		manager::AudioPlayer::stop(music_);
 		music_ = manager::InvalidHandler;
 
-		// 销毁访问器
+		// 销毁所有实体(如果有)
 
-		// 退订事件
-
-		// 卸载资源
+		factory::Floor::destroy_all(registry_);
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void
@@ -165,7 +164,7 @@ namespace pd::scene
 
 	auto Game::render(sf::RenderWindow& window) noexcept -> void
 	{
-		// 
+		render::floor(registry_, window);
 
 		if (is_paused_)
 		{

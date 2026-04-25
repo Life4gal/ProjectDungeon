@@ -626,7 +626,54 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/window.hpp
 	# 场景
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/scene.hpp
+		
+	# ============================
+	# BLUEPRINT
+	# ============================
 	
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
+	# 渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite.hpp
+
+	# 地板
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/floor.hpp
+
+	# ============================
+	# COMPONENT
+	# ============================
+	
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
+	# 渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite.hpp
+
+	# 相机(可视区域)
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp
+
+	# 地板
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/floor.hpp
+		
+	# ============================
+	# SYSTEM -- FACTORY
+	# ============================
+
+	# 地板
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.cpp
+
+	# ============================
+	# SYSTEM -- UPDATE
+	# ============================
+	
+	# ============================
+	# SYSTEM -- RENDER
+	# ============================
+
+	# 地板
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.cpp
+
 	# ============================
 	# MENU
 	# ============================
