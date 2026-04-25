@@ -5,7 +5,8 @@
 
 #include <scene/main_menu.hpp>
 
-#include <manager/asset.hpp>
+#include <manager/resource.hpp>
+#include <manager/audio_player.hpp>
 
 #include <menu/main.hpp>
 
@@ -20,7 +21,7 @@ namespace pd::scene
 	}
 
 	MainMenu::MainMenu() noexcept
-		: music_id_{manager::InvalidAssetId} {}
+		: music_{manager::InvalidHandler} {}
 
 	MainMenu::MainMenu(MainMenu&&) noexcept = default;
 
@@ -32,22 +33,22 @@ namespace pd::scene
 	{
 		main_ = std::make_unique<menu::Main>();
 
-		music_id_ = manager::Music::load(MainMenuMusic);
+		music_ = manager::Music::load(MainMenuMusic);
 	}
 
 	auto MainMenu::on_initialized() noexcept -> void
 	{
-		using manager::Music;
+		using manager::AudioPlayer;
 
-		Music::play(music_id_);
+		AudioPlayer::play(music_);
 	}
 
 	auto MainMenu::on_unloaded() noexcept -> void
 	{
-		using manager::Music;
+		using manager::AudioPlayer;
 
-		Music::stop(music_id_);
-		Music::unload(music_id_);
+		AudioPlayer::stop(music_);
+		music_ = manager::InvalidHandler;
 
 		main_.reset();
 	}

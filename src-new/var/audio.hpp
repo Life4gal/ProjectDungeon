@@ -15,6 +15,10 @@ namespace pd::var
 	inline float music_volume;
 
 	// 这决定我们最多能创建多少个sf::Sound实例
-	// 这部分资源基本不会释放 :(
+	// 这部分资源*不会*自动释放 :(
 	inline std::uint32_t max_sound_channels;
+
+	// 这决定我们最多创建多少个sf::Music实例
+	// 这部分资源*不会*自动释放 :(
+	inline std::uint32_t max_music_channels;
 }

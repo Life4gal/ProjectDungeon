@@ -7,7 +7,8 @@
 
 #include <ranges>
 
-#include <manager/asset.hpp>
+#include <manager/resource.hpp>
+#include <manager/audio_player.hpp>
 #include <manager/event.hpp>
 #include <manager/i18n.hpp>
 
@@ -62,13 +63,13 @@ namespace pd::menu
 
 	auto Main::on_action(const Action action) noexcept -> void
 	{
-		using manager::Sound;
+		using manager::AudioPlayer;
 		using manager::Event;
 		using event::scene::Switched;
 
 		if (action == Action::UP or action == Action::DOWN)
 		{
-			Sound::play(sound_id_switch_option_);
+			AudioPlayer::play(sound_switch_option_);
 
 			if (action == Action::UP)
 			{
@@ -137,14 +138,12 @@ namespace pd::menu
 		using manager::Font;
 		using manager::Internationalization;
 
-		const auto& font = Font::get(font_id_);
-
 		for (const auto option_value: std::views::iota(static_cast<std::underlying_type_t<Option>>(0), static_cast<std::underlying_type_t<Option>>(Option::COUNT)))
 		{
 			const auto& name = Internationalization::map(MainMenuOptionI18NKeys[option_value]);
 			const auto color = std::cmp_equal(option_value, selected_option_value_) ? MainMenuOptionColorSelected : MainMenuOptionColorNormal;
 
-			sf::Text text{*font, sf::String::fromUtf8(name.begin(), name.end()), MainMenuFontSize};
+			sf::Text text{*font_, sf::String::fromUtf8(name.begin(), name.end()), MainMenuFontSize};
 			text.setFillColor(color);
 			text.setOutlineColor(sf::Color::Black);
 			text.setOutlineThickness(1);
@@ -155,20 +154,13 @@ namespace pd::menu
 	}
 
 	Main::Main() noexcept
-		: font_id_{manager::Font::load(MainMenuFont)},
-		  sound_id_switch_option_{manager::Sound::load(MainMenuSoundSwitchOption)},
+		: font_{manager::Font::load(MainMenuFont)},
+		  sound_switch_option_{manager::Sound::load(MainMenuSoundSwitchOption)},
 		  // 如果存在存档则为continue,否则为start
 		  selected_option_value_{std::to_underlying(Option::START)}
 	{
 		//
 	}
 
-	Main::~Main() noexcept
-	{
-		using manager::Font;
-		using manager::Sound;
-
-		Sound::unload(sound_id_switch_option_);
-		Font::unload(font_id_);
-	}
+	// Main::~Main() noexcept = default;
 }

@@ -7,14 +7,15 @@
 
 #include <menu/menu.hpp>
 
-#include <manager/asset_fwd.hpp>
+#include <manager/resource_fwd.hpp>
 
 namespace pd::menu
 {
 	class Main final : public Menu
 	{
 	public:
-		using asset_id_type = manager::AssetId;
+		using font_handler = manager::font_handler;
+		using sound_handler = manager::sound_handler;
 
 		enum class Option : std::uint8_t
 		{
@@ -36,9 +37,9 @@ namespace pd::menu
 
 	private:
 		// 主菜单字体
-		asset_id_type font_id_;
+		font_handler font_;
 		// 主菜单音效-切换选项
-		asset_id_type sound_id_switch_option_;
+		sound_handler sound_switch_option_;
 
 		// 选择的选项
 		std::underlying_type_t<Option> selected_option_value_;
@@ -52,12 +53,12 @@ namespace pd::menu
 	public:
 		explicit Main() noexcept;
 
-		Main(const Main&) noexcept = delete;
-		auto operator=(const Main&) noexcept -> Main& = delete;
-
-		Main(Main&&) noexcept = default;
-		auto operator=(Main&&) noexcept -> Main& = default;
-
-		~Main() noexcept override;
+		// Main(const Main&) noexcept = delete;
+		// auto operator=(const Main&) noexcept -> Main& = delete;
+		//
+		// Main(Main&&) noexcept = default;
+		// auto operator=(Main&&) noexcept -> Main& = default;
+		//
+		// ~Main() noexcept override;
 	};
 }

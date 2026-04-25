@@ -9,7 +9,7 @@
 
 #include <scene/scene.hpp>
 
-#include <manager/asset_fwd.hpp>
+#include <manager/resource_fwd.hpp>
 
 namespace pd::menu
 {
@@ -21,13 +21,13 @@ namespace pd::scene
 	class MainMenu final : public Scene
 	{
 	public:
-		using asset_id_type = manager::AssetId;
+		using music_handler = manager::music_handler;
 
 	private:
 		std::unique_ptr<menu::Main> main_;
 
 		// 主菜单音乐
-		asset_id_type music_id_;
+		music_handler music_;
 
 	public:
 		explicit MainMenu() noexcept;

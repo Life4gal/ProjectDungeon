@@ -9,7 +9,7 @@
 
 #include <scene/scene.hpp>
 
-#include <manager/asset_fwd.hpp>
+#include <manager/resource_fwd.hpp>
 
 namespace pd::menu
 {
@@ -21,13 +21,13 @@ namespace pd::scene
 	class Game final : public Scene
 	{
 	public:
-		using asset_id_type = manager::AssetId;
+		using music_handler = manager::music_handler;
 
 	private:
 		std::unique_ptr<menu::Pause> pause_;
 
 		// 游戏音乐
-		asset_id_type music_id_;
+		music_handler music_;
 
 		// ==================
 		// 下面这几个变量原本属于world组件,为了它们编写一个相关的系统似乎有些鸡肋?暂时先将它们放在这里

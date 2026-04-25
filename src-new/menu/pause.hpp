@@ -9,14 +9,15 @@
 
 #include <menu/menu.hpp>
 
-#include <manager/asset_fwd.hpp>
+#include <manager/resource_fwd.hpp>
 
 namespace pd::menu
 {
 	class Pause final : public Menu
 	{
 	public:
-		using asset_id_type = manager::AssetId;
+		using font_handler = manager::font_handler;
+		using sound_handler = manager::sound_handler;
 
 		enum class Option : std::uint8_t
 		{
@@ -34,9 +35,9 @@ namespace pd::menu
 
 	private:
 		// 暂停菜单字体
-		asset_id_type font_id_;
+		font_handler font_;
 		// 暂停菜单音效-切换选项
-		asset_id_type sound_id_switch_option_;
+		sound_handler sound_switch_option_;
 
 		// 选择的选项
 		std::underlying_type_t<Option> selected_option_value_;
@@ -53,12 +54,12 @@ namespace pd::menu
 	public:
 		explicit Pause(bool& pause) noexcept;
 
-		Pause(const Pause&) noexcept = delete;
-		auto operator=(const Pause&) noexcept -> Pause& = delete;
-
-		Pause(Pause&&) noexcept = default;
-		auto operator=(Pause&&) noexcept -> Pause& = default;
-
-		~Pause() noexcept override;
+		// Pause(const Pause&) noexcept = delete;
+		// auto operator=(const Pause&) noexcept -> Pause& = delete;
+		//
+		// Pause(Pause&&) noexcept = default;
+		// auto operator=(Pause&&) noexcept -> Pause& = default;
+		//
+		// ~Pause() noexcept override;
 	};
 }

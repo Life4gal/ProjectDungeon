@@ -595,9 +595,12 @@ add_executable(
 	# 随机数生成器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/random.hpp
 	# 资源管理器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/asset_fwd.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/asset.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/asset.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/resource_fwd.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/resource.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/resource.cpp
+	# 音频播放器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/audio_player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/audio_player.cpp
 	# 事件分发器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/event.hpp
 	# 

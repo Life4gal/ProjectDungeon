@@ -10,7 +10,8 @@
 // =========
 // 管理器
 
-#include <manager/asset.hpp>
+#include <manager/resource.hpp>
+#include <manager/audio_player.hpp>
 #include <manager/event.hpp>
 
 // =========
@@ -65,7 +66,7 @@ namespace pd::scene
 	}
 
 	Game::Game() noexcept
-		: music_id_{manager::InvalidAssetId},
+		: music_{manager::InvalidHandler},
 		  frame_delta_{sf::seconds(1)},
 		  total_elapsed_{sf::Time::Zero},
 		  play_elapsed_{sf::Time::Zero},
@@ -82,8 +83,9 @@ namespace pd::scene
 		// 也许菜单创建可以延迟到第一次打开菜单时?不过目前先在这里创建好了
 		pause_ = std::make_unique<menu::Pause>(is_paused_);
 
+		music_ = manager::Music::load(GameMusic);
+
 		// 加载资源
-		music_id_ = manager::Music::load(GameMusic);
 
 		// 订阅事件
 
@@ -92,9 +94,9 @@ namespace pd::scene
 
 	auto Game::on_initialized() noexcept -> void
 	{
-		using namespace manager;
+		using manager::AudioPlayer;
 
-		Music::play(music_id_);
+		AudioPlayer::play(music_);
 
 		// 这里可以检查是否存在存档?
 		start_game();
@@ -106,17 +108,16 @@ namespace pd::scene
 		using manager::Texture;
 		using manager::Sound;
 		using manager::Music;
+		using manager::AudioPlayer;
 
-		Music::stop(music_id_);
+		AudioPlayer::stop(music_);
+		music_ = manager::InvalidHandler;
 
 		// 销毁访问器
 
-
 		// 退订事件
 
-
 		// 卸载资源
-		Music::unload(music_id_);
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void
