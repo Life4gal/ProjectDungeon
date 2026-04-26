@@ -77,20 +77,17 @@ namespace pd::render
 			g_shared_states.texture = sprite_texture.texture.operator->();
 			g_shared_states.transform = [&] noexcept -> sf::Transform
 			{
-				const auto origin_x = static_cast<float>(sprite_origin.origin.x);
-				const auto origin_y = static_cast<float>(sprite_origin.origin.y);
 				// 缩放叠加
 				const auto scale_x = sprite_scale.scale.x * transform_scale.scale.x;
 				const auto scale_y = sprite_scale.scale.y * transform_scale.scale.y;
+				const auto origin_x = static_cast<float>(sprite_origin.origin.x) * scale_x;
+				const auto origin_y = static_cast<float>(sprite_origin.origin.y) * scale_y;
 
-				sf::Transform transform{};
-				transform.translate(transform_position.position);
-				transform.rotate(transform_rotation.rotation);
-				transform.scale({scale_x, scale_y});
-
-				transform.translate({-origin_x, -origin_y});
-
-				return transform;
+				return sf::Transform{}
+				       .translate(transform_position.position)
+				       .rotate(transform_rotation.rotation)
+				       .scale({scale_x, scale_y})
+				       .translate({-origin_x, -origin_y});
 			}();
 
 			window.draw(vertices.data(), vertices.size(), sf::PrimitiveType::TriangleStrip, g_shared_states);
