@@ -25,20 +25,6 @@ namespace pd::utility
 
 		inline static b2WorldId world_id = b2_nullWorldId;
 
-	private:
-		[[nodiscard]] static auto from_physics(const b2Vec2 value) noexcept -> sf::Vector2f
-		{
-			const auto [x, y] = pixels_per_meter * value;
-			return {x, y};
-		}
-
-		[[nodiscard]] static auto to_physics(const sf::Vector2f value) noexcept -> b2Vec2
-		{
-			const auto [x, y] = meters_per_pixel * value;
-			return {.x = x, .y = y};
-		}
-
-	public:
 		[[nodiscard]] static auto to_user_data(const entt::entity entity) noexcept -> void*
 		{
 			return std::bit_cast<void*>(static_cast<std::uintptr_t>(entt::to_integral(entity)));
@@ -49,32 +35,34 @@ namespace pd::utility
 			return entt::entity{static_cast<std::underlying_type_t<entt::entity>>(std::bit_cast<std::uintptr_t>(user_data))};
 		}
 
-		[[nodiscard]] static auto to_physics_position(const sf::Vector2f position) noexcept -> b2Vec2
+		[[nodiscard]] static auto from_physics(const float value) noexcept -> float
 		{
-			return to_physics(position);
+			return pixels_per_meter * value;
 		}
 
-		[[nodiscard]] static auto from_physics_position(const b2Vec2 position) noexcept -> sf::Vector2f
+		[[nodiscard]] static auto from_physics(const b2Vec2 value) noexcept -> sf::Vector2f
 		{
-			return from_physics(position);
+			const auto [x, y] = pixels_per_meter * value;
+			return {x, y};
 		}
 
-		[[nodiscard]] static auto to_physics_size(const sf::Vector2f size) noexcept -> b2Vec2
+		[[nodiscard]] static auto to_physics(const float value) noexcept -> float
 		{
-			return to_physics(size);
+			return meters_per_pixel * value;
 		}
 
-		[[nodiscard]] static auto from_physics_size(const b2Vec2 size) noexcept -> sf::Vector2f
+		[[nodiscard]] static auto to_physics(const sf::Vector2f value) noexcept -> b2Vec2
 		{
-			return from_physics(size);
+			const auto [x, y] = meters_per_pixel * value;
+			return {.x = x, .y = y};
 		}
 
-		[[nodiscard]] static auto to_physics_rotation(const sf::Angle angle) noexcept -> b2Rot
+		[[nodiscard]] static auto to_physics(const sf::Angle angle) noexcept -> b2Rot
 		{
 			return b2MakeRot(angle.asRadians());
 		}
 
-		[[nodiscard]] static auto from_physics_rotation(const b2Rot rotation) noexcept -> sf::Angle
+		[[nodiscard]] static auto from_physics(const b2Rot rotation) noexcept -> sf::Angle
 		{
 			return sf::radians(b2Rot_GetAngle(rotation));
 		}

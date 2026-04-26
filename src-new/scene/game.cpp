@@ -28,6 +28,8 @@
 // =========
 // 更新
 
+#include <update/physics_world.hpp>
+
 // =========
 // 渲染
 
@@ -85,6 +87,157 @@ namespace pd::scene
 			b2DestroyWorld(world_id);
 			world_id = b2_nullWorldId;
 		}
+
+		// 绘制物理世界
+		constexpr auto rgb_to_rgba = [](const b2HexColor color) noexcept -> sf::Color
+		{
+			return sf::Color{(static_cast<std::uint32_t>(color) << 8) | 0xff};
+		};
+		auto g_physics_world_draw = [] noexcept -> b2DebugDraw
+		{
+			using utility::Physics;
+
+			auto draw = b2DefaultDebugDraw();
+
+			draw.DrawPolygonFcn = [](const b2Vec2* vertices, const int vertex_count, const b2HexColor color, void* context) noexcept -> void
+			{
+				auto* window = static_cast<sf::RenderWindow*>(context);
+
+				sf::ConvexShape polygon{};
+
+				polygon.setPointCount(vertex_count);
+				for (int i = 0; i < vertex_count; ++i)
+				{
+					const auto& vertex = vertices[i];
+
+					const auto point = Physics::from_physics(vertex);
+					polygon.setPoint(i, point);
+				}
+
+				polygon.setFillColor(sf::Color::Transparent);
+				polygon.setOutlineColor(rgb_to_rgba(color));
+				polygon.setOutlineThickness(2);
+
+				window->draw(polygon);
+			};
+			draw.DrawSolidPolygonFcn = [](
+				const b2Transform transform,
+				const b2Vec2* vertices,
+				const int vertex_count,
+				[[maybe_unused]] const float radius,
+				const b2HexColor color,
+				void* context
+			) noexcept -> void
+					{
+						auto* window = static_cast<sf::RenderWindow*>(context);
+
+						sf::ConvexShape polygon{};
+
+						const b2Vec2 origin = transform.p;
+						polygon.setPointCount(vertex_count);
+						for (int i = 0; i < vertex_count; ++i)
+						{
+							const auto& vertex = vertices[i];
+							const auto rotated = b2RotateVector(transform.q, vertex);
+							const auto position = origin + rotated;
+
+							const auto point = Physics::from_physics(position);
+							polygon.setPoint(i, point);
+						}
+
+						const auto sf_color = rgb_to_rgba(color);
+						const auto sf_color_half_transparent = sf::Color{sf_color.r, sf_color.g, sf_color.b, 128};
+						polygon.setFillColor(sf_color_half_transparent);
+						polygon.setOutlineColor(sf_color);
+						polygon.setOutlineThickness(1);
+
+						window->draw(polygon);
+					};
+			draw.DrawCircleFcn = [](const b2Vec2 center, const float radius, const b2HexColor color, void* context) noexcept -> void
+			{
+				auto* window = static_cast<sf::RenderWindow*>(context);
+
+				sf::CircleShape circle{Physics::from_physics(radius)};
+				circle.setPosition(Physics::from_physics(center));
+
+				const auto sf_color = rgb_to_rgba(color);
+				circle.setFillColor(sf::Color::Transparent);
+				circle.setOutlineColor(sf_color);
+				circle.setOutlineThickness(2);
+
+				window->draw(circle);
+			};
+			draw.DrawSolidCircleFcn = [](const b2Transform transform, const float radius, const b2HexColor color, void* context) noexcept -> void
+			{
+				auto* window = static_cast<sf::RenderWindow*>(context);
+
+				sf::CircleShape circle{Physics::from_physics(radius)};
+				circle.setPosition(Physics::from_physics(transform.p));
+
+				const auto sf_color = rgb_to_rgba(color);
+				const auto sf_color_half_transparent = sf::Color{sf_color.r, sf_color.g, sf_color.b, 128};
+				circle.setFillColor(sf_color_half_transparent);
+				circle.setOutlineColor(sf_color);
+				circle.setOutlineThickness(1);
+
+				window->draw(circle);
+			};
+			draw.DrawSolidCapsuleFcn = [](const b2Vec2 p1, const b2Vec2 p2, const float radius, const b2HexColor color, void* context) noexcept -> void
+			{
+				auto* window = static_cast<sf::RenderWindow*>(context);
+
+				const auto direction = p2 - p1;
+				const auto length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+				const auto angle = std::atan2(direction.y, direction.x);
+
+				sf::RectangleShape rect{{Physics::from_physics(length), Physics::from_physics(radius * 2)}};
+				rect.setOrigin({0, Physics::from_physics(radius)});
+				rect.setPosition(Physics::from_physics(p1));
+				rect.setRotation(sf::radians(angle));
+
+				sf::CircleShape end1{Physics::from_physics(radius)};
+				end1.setOrigin({Physics::from_physics(radius), Physics::from_physics(radius)});
+				end1.setPosition(Physics::from_physics(p1));
+
+				sf::CircleShape end2{Physics::from_physics(radius)};
+				end2.setOrigin({Physics::from_physics(radius), Physics::from_physics(radius)});
+				end2.setPosition(Physics::from_physics(p2));
+
+				const auto sf_color = rgb_to_rgba(color);
+				const auto sf_color_half_transparent = sf::Color{sf_color.r, sf_color.g, sf_color.b, 128};
+				rect.setFillColor(sf_color_half_transparent);
+				end1.setFillColor(sf_color_half_transparent);
+				end2.setFillColor(sf_color_half_transparent);
+
+				window->draw(rect);
+				window->draw(end1);
+				window->draw(end2);
+			};
+			draw.DrawSegmentFcn = [](const b2Vec2 p1, const b2Vec2 p2, const b2HexColor color, void* context) noexcept -> void
+			{
+				auto* window = static_cast<sf::RenderWindow*>(context);
+
+				const std::array<sf::Vertex, 2> line
+				{{
+						{.position = Physics::from_physics(p1), .color = rgb_to_rgba(color), .texCoords = {}},
+						{.position = Physics::from_physics(p2), .color = rgb_to_rgba(color), .texCoords = {}},
+				}};
+
+				window->draw(line.data(), line.size(), sf::PrimitiveType::Lines);
+			};
+			// draw.DrawTransformFcn = nullptr;
+			// draw.DrawPointFcn = nullptr;
+			// draw.DrawStringFcn = nullptr;
+
+			draw.drawShapes = true;
+			draw.drawJoints = true;
+			draw.drawBounds = true;
+			draw.drawMass = true;
+			draw.drawContacts = true;
+			draw.drawContactNormals = true;
+
+			return draw;
+		}();
 
 		// 测试用
 		blueprint::Room g_test_room
@@ -326,7 +479,7 @@ namespace pd::scene
 		}
 		else
 		{
-			//
+			update::physics_world(registry_, delta);
 		}
 	}
 
@@ -334,6 +487,9 @@ namespace pd::scene
 	{
 		render::floor(registry_, window);
 		render::wall(registry_, window);
+
+		g_physics_world_draw.context = &window;
+		b2World_Draw(utility::Physics::world_id, &g_physics_world_draw);
 
 		if (is_paused_)
 		{

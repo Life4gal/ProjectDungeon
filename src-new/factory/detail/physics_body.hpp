@@ -30,8 +30,8 @@ namespace pd::factory::detail
 
 		auto def = b2DefaultBodyDef();
 		def.type = static_cast<b2BodyType>(physics_body.type);
-		def.position = utility::Physics::to_physics_position(position);
-		def.rotation = utility::Physics::to_physics_rotation(rotation);
+		def.position = utility::Physics::to_physics(position);
+		def.rotation = utility::Physics::to_physics(rotation);
 		def.userData = utility::Physics::to_user_data(entity);
 
 		auto body_id = b2CreateBody(utility::Physics::world_id, &def);

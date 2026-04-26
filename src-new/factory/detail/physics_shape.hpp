@@ -36,8 +36,10 @@ namespace pd::factory::detail
 		const blueprint::PhysicsShapeCircle& circle
 	) noexcept -> b2ShapeId
 	{
+		using utility::Physics;
+
 		const auto def = make_shape_def(circle.def);
-		const b2Circle shape{.center = {0, 0}, .radius = circle.radius};
+		const b2Circle shape{.center = {0, 0}, .radius = Physics::to_physics(circle.radius)};
 
 		return b2CreateCircleShape(body_id, &def, &shape);
 	}
@@ -47,12 +49,14 @@ namespace pd::factory::detail
 		const blueprint::PhysicsShapeCapsule& capsule
 	) noexcept -> b2ShapeId
 	{
+		using utility::Physics;
+
 		const auto def = make_shape_def(capsule.def);
 		const b2Capsule shape
 		{
-				.center1 = {capsule.center1_offset_x, capsule.center1_offset_y},
-				.center2 = {capsule.center2_offset_x, capsule.center2_offset_y},
-				.radius = capsule.radius
+				.center1 = Physics::to_physics({capsule.center1_offset_x, capsule.center1_offset_y}),
+				.center2 = Physics::to_physics({capsule.center2_offset_x, capsule.center2_offset_y}),
+				.radius = Physics::to_physics(capsule.radius)
 		};
 
 		return b2CreateCapsuleShape(body_id, &def, &shape);
@@ -63,8 +67,10 @@ namespace pd::factory::detail
 		const blueprint::PhysicsShapeBox& box
 	) noexcept -> b2ShapeId
 	{
+		using utility::Physics;
+
 		const auto def = make_shape_def(box.def);
-		const auto shape = b2MakeBox(box.width / 2, box.height / 2);
+		const auto shape = b2MakeBox(Physics::to_physics(box.width / 2), Physics::to_physics(box.height / 2));
 
 		return b2CreatePolygonShape(body_id, &def, &shape);
 	}
@@ -74,12 +80,14 @@ namespace pd::factory::detail
 		const blueprint::PhysicsShapeOffsetBox& offset_box
 	) noexcept -> b2ShapeId
 	{
+		using utility::Physics;
+
 		const auto def = make_shape_def(offset_box.def);
 		const auto shape = b2MakeOffsetBox(
-			offset_box.width / 2,
-			offset_box.height / 2,
-			{offset_box.offset_x, offset_box.offset_y},
-			utility::Physics::to_physics_rotation(sf::degrees(offset_box.rotation))
+			Physics::to_physics(offset_box.width / 2),
+			Physics::to_physics(offset_box.height / 2),
+			Physics::to_physics({offset_box.offset_x, offset_box.offset_y}),
+			Physics::to_physics(sf::degrees(offset_box.rotation))
 		);
 
 		return b2CreatePolygonShape(body_id, &def, &shape);

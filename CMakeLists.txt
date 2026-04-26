@@ -695,6 +695,10 @@ add_executable(
 	# SYSTEM -- UPDATE
 	# ============================
 	
+	# 物理世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
+
 	# ============================
 	# SYSTEM -- RENDER
 	# ============================
