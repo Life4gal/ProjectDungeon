@@ -3,11 +3,11 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <render/floor.hpp>
+#include <render/wall.hpp>
 
 #include <manager/resource.hpp>
 
-#include <component/floor.hpp>
+#include <component/wall.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -22,11 +22,11 @@ namespace pd::render
 		sf::RenderStates g_shared_states{};
 	}
 
-	auto floor(entt::registry& registry, sf::RenderWindow& window) noexcept -> void
+	auto wall(entt::registry& registry, sf::RenderWindow& window) noexcept -> void
 	{
 		const auto view = registry
 				.view<
-					floor::Floor,
+					wall::Wall,
 					sprite::Texture,
 					sprite::Position,
 					sprite::Size,
@@ -43,7 +43,7 @@ namespace pd::render
 			if (sprite_texture.texture == manager::InvalidHandler)
 			{
 				SPDLOG_WARN(
-					"无法渲染位于({:.1f}:{:.1f})的地板[0x{:08x}],无效的纹理资源句柄[{}]!",
+					"无法渲染位于({:.1f}:{:.1f})的墙壁[0x{:08x}],无效的纹理资源句柄[{}]!",
 					transform_position.position.x,
 					transform_position.position.y,
 					static_cast<std::uint32_t>(entity),

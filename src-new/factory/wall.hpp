@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include <blueprint/floor.hpp>
+#include <blueprint/wall.hpp>
 
 #include <entt/entity/fwd.hpp>
 
 namespace pd::factory
 {
-	class Floor final
+	class Wall final
 	{
 	public:
-		static auto spawn(entt::registry& registry, const blueprint::Floor& floor) noexcept -> entt::entity;
+		static auto spawn(entt::registry& registry, const blueprint::Wall& wall) noexcept -> entt::entity;
 
 		static auto destroy(entt::registry& registry, entt::entity entity) noexcept -> void;
 

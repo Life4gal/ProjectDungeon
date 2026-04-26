@@ -15,10 +15,15 @@
 #include <manager/event.hpp>
 
 // =========
+// 物理世界特别处理
+#include <utility/physics.hpp>
+#include <component/physics_body.hpp>
+#include <box2d/box2d.h>
+
+// =========
 // 测试用
 
-#include <factory/floor.hpp>
-
+#include <factory/room.hpp>
 
 // =========
 // 更新
@@ -27,6 +32,7 @@
 // 渲染
 
 #include <render/floor.hpp>
+#include <render/wall.hpp>
 
 // =========
 // 依赖
@@ -44,15 +50,176 @@ namespace pd::scene
 		// TODO: 暂停菜单是否需要切换音乐?
 		constexpr std::string_view GameMusic = R"(.\media\musics\game.wav)";
 
-		// 测试用
-		std::vector<blueprint::Floor> g_test_floors
+		auto on_destroy_physics_body(entt::registry& registry, const entt::entity entity) noexcept -> void
 		{
-				// clang-format off
-				{.transform = {.x = 100, .y = 100, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
-				{.transform = {.x = 200, .y = 100, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
-				{.transform = {.x = 100, .y = 200, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
-				{.transform = {.x = 200, .y = 200, .scale_x = 1, .scale_y = 1, .rotation = 0}, .sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32}},
-				// clang-format on
+			const auto [body_id] = registry.get<const component::physics_body::Id>(entity);
+			b2DestroyBody(body_id);
+		}
+
+		// 创建物理世界
+		auto create_physics_world(entt::registry& registry) noexcept -> void
+		{
+			auto& world_id = utility::Physics::world_id;
+
+			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NULL(world_id), "重复创建物理世界");
+
+			auto def = b2DefaultWorldDef();
+			// 无重力世界(俯视角)
+			def.gravity = b2Vec2_zero;
+			world_id = b2CreateWorld(&def);
+
+			// 订阅组件销毁事件,以便在组件销毁时销毁物理刚体
+			// 如此便不需要在销毁实体前手动调用deattach函数销毁物理刚体组件
+			registry.on_destroy<component::physics_body::Id>().connect<&on_destroy_physics_body>();
+		}
+
+		// 销毁物理世界
+		auto destroy_physics_world(entt::registry& registry) noexcept -> void
+		{
+			auto& world_id = utility::Physics::world_id;
+
+			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NON_NULL(world_id), "物理世界未创建");
+
+			registry.on_destroy<component::physics_body::Id>().disconnect<&on_destroy_physics_body>();
+
+			b2DestroyWorld(world_id);
+			world_id = b2_nullWorldId;
+		}
+
+		// 测试用
+		blueprint::Room g_test_room
+		{
+				.floors =
+				{
+						// 第一行
+						{
+								.transform = {.x = 100 + 64 * 0, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 1, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 2, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 3, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 4, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 5, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 6, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 7, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 8, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 9, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						// 第二行
+						{
+								.transform = {.x = 100 + 64 * 0, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 1, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 2, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 3, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 4, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 5, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 6, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 7, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 8, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						{
+								.transform = {.x = 100 + 64 * 9, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						// 第三行
+						// 第四行
+						// 第五行
+						// 第六行
+						// 第七行
+						// 第八行
+						// 第九行
+				},
+				.walls =
+				{
+						// 左上
+						{
+								.transform = {.x = 100 - 64, .y = 100 - 64, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
+								// clang-format off
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								// clang-format on
+						},
+						// 右上
+						{
+								.transform = {.x = 100 + 64 * 9 + 64, .y = 100 - 64, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
+								// clang-format off
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								// clang-format on
+						},
+						// 左下
+						{
+								.transform = {.x = 100 - 64, .y = 100 + 64 * 9, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
+								// clang-format off
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								// clang-format on
+						},
+						// 右下
+						{
+								.transform = {.x = 100 + 64 * 9 + 64, .y = 100 + 64 * 9, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
+								// clang-format off
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								// clang-format on
+						},
+				},
 		};
 	}
 
@@ -60,10 +227,7 @@ namespace pd::scene
 	{
 		// 进入地下城
 
-		for (const auto& floor: g_test_floors)
-		{
-			factory::Floor::spawn(registry_, floor);
-		}
+		factory::Room::create(registry_, g_test_room);
 
 		return true;
 	}
@@ -98,6 +262,8 @@ namespace pd::scene
 
 		music_ = manager::Music::load(GameMusic);
 
+		create_physics_world(registry_);
+
 		// 
 	}
 
@@ -114,9 +280,11 @@ namespace pd::scene
 		manager::AudioPlayer::stop(music_);
 		music_ = manager::InvalidHandler;
 
+		destroy_physics_world(registry_);
+
 		// 销毁所有实体(如果有)
 
-		factory::Floor::destroy_all(registry_);
+		factory::Room::destroy(registry_);
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void
@@ -165,6 +333,7 @@ namespace pd::scene
 	auto Game::render(sf::RenderWindow& window) noexcept -> void
 	{
 		render::floor(registry_, window);
+		render::wall(registry_, window);
 
 		if (is_paused_)
 		{

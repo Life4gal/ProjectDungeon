@@ -587,6 +587,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/utility/string_hash.hpp
 	# 固定矩阵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/utility/fixed_matrix.hpp
+	# 物理定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/utility/physics.hpp
 
 	# ============================
 	# MANAGER
@@ -635,9 +637,17 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite.hpp
+	# 物理刚体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_body.hpp
+	# 物理形状
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_shape.hpp
 
-	# 地板
+	# 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/floor.hpp
+	# 房间 -- 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/wall.hpp
+	# 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
 
 	# ============================
 	# COMPONENT
@@ -647,20 +657,39 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite.hpp
+	# 物理刚体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/physics_body.hpp
 
 	# 相机(可视区域)
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp
 
-	# 地板
+	# 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/floor.hpp
+	# 房间 -- 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/wall.hpp
 		
 	# ============================
 	# SYSTEM -- FACTORY
 	# ============================
 
-	# 地板
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.hpp
+	# 渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.hpp
+	# 物理刚体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_body.hpp
+	# 物理形状
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_shape.hpp
+
+	# 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.cpp
+	# 房间 -- 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.cpp
+	# 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.cpp
 
 	# ============================
 	# SYSTEM -- UPDATE
@@ -670,9 +699,12 @@ add_executable(
 	# SYSTEM -- RENDER
 	# ============================
 
-	# 地板
+	# 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.cpp
+	# 房间 -- 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.cpp
 
 	# ============================
 	# MENU
@@ -751,3 +783,12 @@ target_link_libraries(
 		box2d::box2d
 		spdlog::spdlog
 )
+
+# 复制 assets 文件夹到输出目录
+add_custom_target(
+    copy_resources 
+    ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+)
+
+add_dependencies(${PROJECT_NAME}-new copy_resources)
