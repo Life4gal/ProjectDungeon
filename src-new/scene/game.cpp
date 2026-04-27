@@ -433,11 +433,13 @@ namespace pd::scene
 		manager::AudioPlayer::stop(music_);
 		music_ = manager::InvalidHandler;
 
-		destroy_physics_world(registry_);
+		pause_.reset();
 
 		// 销毁所有实体(如果有)
-
 		factory::Room::destroy(registry_);
+
+		// 最后销毁物理世界
+		destroy_physics_world(registry_);
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void
