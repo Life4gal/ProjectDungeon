@@ -28,15 +28,9 @@ namespace pd::factory
 		detail::attach(registry, entity, wall.sprite);
 		// physics_body & physics_shape
 		{
-			const auto body_id = detail::create_attach(
-				registry,
-				entity,
-				{wall.transform.x, wall.transform.y},
-				sf::degrees(wall.transform.rotation),
-				wall.physics_body
-			);
-			const auto shape_id = detail::create(body_id, wall.physics_shape);
+			const auto body_id = detail::create_attach(registry, entity, wall.transform, wall.physics_body);
 
+			const auto shape_id = detail::create(body_id, wall.transform, wall.physics_shape);
 			registry.emplace<wall::PhysicsShape>(entity, shape_id);
 		}
 

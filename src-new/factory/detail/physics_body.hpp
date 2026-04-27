@@ -21,8 +21,7 @@ namespace pd::factory::detail
 	[[nodiscard]] inline auto create_attach(
 		entt::registry& registry,
 		const entt::entity entity,
-		const sf::Vector2f position,
-		const sf::Angle rotation,
+		const blueprint::Transform& transform,
 		const blueprint::PhysicsBody& physics_body
 	) noexcept -> b2BodyId
 	{
@@ -30,8 +29,8 @@ namespace pd::factory::detail
 
 		auto def = b2DefaultBodyDef();
 		def.type = static_cast<b2BodyType>(physics_body.type);
-		def.position = utility::Physics::to_physics(position);
-		def.rotation = utility::Physics::to_physics(rotation);
+		def.position = utility::Physics::to_physics({transform.x, transform.y});
+		def.rotation = utility::Physics::to_physics(sf::degrees(transform.rotation));
 		def.userData = utility::Physics::to_user_data(entity);
 
 		auto body_id = b2CreateBody(utility::Physics::world_id, &def);

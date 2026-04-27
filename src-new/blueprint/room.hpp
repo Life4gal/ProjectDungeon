@@ -15,6 +15,11 @@ namespace pd::blueprint
 	class Room final
 	{
 	public:
+		// 房间偏移
+		// entity-position = room-offset + position
+		float offset_x;
+		float offset_y;
+
 		// 房间 -- 地板
 		std::vector<Floor> floors;
 		// 房间 -- 墙壁

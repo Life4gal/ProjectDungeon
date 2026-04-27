@@ -240,136 +240,422 @@ namespace pd::scene
 		}();
 
 		// 测试用
+		constexpr int TileWidth = 64;
+		constexpr int TileHeight = 64;
+		constexpr int TileOriginX = TileWidth / 2;
+		constexpr int TileOriginY = TileHeight / 2;
 		blueprint::Room g_test_room
 		{
+				.offset_x = 0,
+				.offset_y = 0,
 				.floors =
 				{
 						// 第一行
 						{
-								.transform = {.x = 100 + 64 * 0, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 1, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 2, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 3, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 4, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 5, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 6, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 7, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 8, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 9, .y = 100 + 64 * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						// 第二行
 						{
-								.transform = {.x = 100 + 64 * 0, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 1, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 2, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 3, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 4, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 5, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 6, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 7, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 8, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						{
-								.transform = {.x = 100 + 64 * 9, .y = 100 + 64 * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 1, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 						},
 						// 第三行
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 2, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
 						// 第四行
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 3, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
 						// 第五行
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 4, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
 						// 第六行
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 5, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
 						// 第七行
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 6, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
 						// 第八行
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 7, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
 						// 第九行
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 0, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 1, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 2, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 3, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 4, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 5, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 6, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 7, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 8, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
+						{
+								.transform = {.x = TileWidth + TileOriginX + TileWidth * 9, .y = TileHeight + TileOriginY + TileHeight * 8, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
+						},
 				},
 				.walls =
 				{
 						// 左上
 						{
-								.transform = {.x = 100 - 64, .y = 100 - 64, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileOriginX, .y = TileOriginY, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
 								// clang-format off
-								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = TileWidth, .height =TileHeight},
 								// clang-format on
 						},
 						// 右上
 						{
-								.transform = {.x = 100 + 64 * 9 + 64, .y = 100 - 64, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileOriginX + TileWidth * (9 + 2), .y = TileOriginY, .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
 								// clang-format off
-								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = TileWidth, .height = TileHeight},
 								// clang-format on
 						},
 						// 左下
 						{
-								.transform = {.x = 100 - 64, .y = 100 + 64 * 9, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileOriginX, .y = TileOriginY + TileHeight * (8 + 2), .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
 								// clang-format off
-								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = TileWidth, .height = TileHeight},
 								// clang-format on
 						},
 						// 右下
 						{
-								.transform = {.x = 100 + 64 * 9 + 64, .y = 100 + 64 * 9, .scale_x = 1, .scale_y = 1, .rotation = 0},
-								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								.transform = {.x = TileOriginX + TileWidth * (9 + 2), .y = TileOriginY + TileHeight * (8 + 2), .scale_x = 1, .scale_y = 1, .rotation = 0},
+								.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = TileWidth, .height = TileHeight, .origin_x = TileOriginX, .origin_y = TileOriginY},
 								.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
 								// clang-format off
-								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = 64, .height = 64},
+								.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = TileWidth, .height = TileHeight},
 								// clang-format on
 						},
 				},

@@ -12,12 +12,18 @@ namespace pd::factory
 {
 	auto Room::create(entt::registry& registry, const blueprint::Room& room) noexcept -> void
 	{
-		for (const auto& floor: room.floors)
+		for (auto floor: room.floors)
 		{
+			floor.transform.x += room.offset_x;
+			floor.transform.y += room.offset_y;
+
 			Floor::spawn(registry, floor);
 		}
-		for (const auto& wall: room.walls)
+		for (auto wall: room.walls)
 		{
+			wall.transform.x += room.offset_x;
+			wall.transform.y += room.offset_y;
+
 			Wall::spawn(registry, wall);
 		}
 	}

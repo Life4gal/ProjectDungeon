@@ -33,62 +33,70 @@ namespace pd::factory::detail
 
 	[[nodiscard]] inline auto create(
 		const b2BodyId body_id,
+		const blueprint::Transform& transform,
 		const blueprint::PhysicsShapeCircle& circle
 	) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
+		const auto radius = Physics::to_physics(circle.radius * std::ranges::max(transform.scale_x, transform.scale_y));
+
 		const auto def = make_shape_def(circle.def);
-		const b2Circle shape{.center = {0, 0}, .radius = Physics::to_physics(circle.radius)};
+		const b2Circle shape{.center = {0, 0}, .radius = radius};
 
 		return b2CreateCircleShape(body_id, &def, &shape);
 	}
 
 	[[nodiscard]] inline auto create(
 		const b2BodyId body_id,
+		const blueprint::Transform& transform,
 		const blueprint::PhysicsShapeCapsule& capsule
 	) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
+		const auto center1 = Physics::to_physics({capsule.center1_offset_x * transform.scale_x, capsule.center1_offset_y * transform.scale_y});
+		const auto center2 = Physics::to_physics({capsule.center2_offset_x * transform.scale_x, capsule.center2_offset_y * transform.scale_y});
+		const auto radius = Physics::to_physics(capsule.radius * std::ranges::max(transform.scale_x, transform.scale_y));
+
 		const auto def = make_shape_def(capsule.def);
-		const b2Capsule shape
-		{
-				.center1 = Physics::to_physics({capsule.center1_offset_x, capsule.center1_offset_y}),
-				.center2 = Physics::to_physics({capsule.center2_offset_x, capsule.center2_offset_y}),
-				.radius = Physics::to_physics(capsule.radius)
-		};
+		const b2Capsule shape{.center1 = center1, .center2 = center2, .radius = radius};
 
 		return b2CreateCapsuleShape(body_id, &def, &shape);
 	}
 
 	[[nodiscard]] inline auto create(
 		const b2BodyId body_id,
+		const blueprint::Transform& transform,
 		const blueprint::PhysicsShapeBox& box
 	) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
+		const auto width = Physics::to_physics(box.width * transform.scale_x);
+		const auto height = Physics::to_physics(box.height * transform.scale_y);
+
 		const auto def = make_shape_def(box.def);
-		const auto shape = b2MakeBox(Physics::to_physics(box.width / 2), Physics::to_physics(box.height / 2));
+		const auto shape = b2MakeBox(width / 2, height / 2);
 
 		return b2CreatePolygonShape(body_id, &def, &shape);
 	}
 
 	[[nodiscard]] inline auto create(
 		const b2BodyId body_id,
+		const blueprint::Transform& transform,
 		const blueprint::PhysicsShapeOffsetBox& offset_box
 	) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
+		const auto width = Physics::to_physics(offset_box.width * transform.scale_x);
+		const auto height = Physics::to_physics(offset_box.height * transform.scale_y);
+		const auto center = Physics::to_physics({offset_box.offset_x * transform.scale_x, offset_box.offset_y * transform.scale_y});
+		const auto rotation = Physics::to_physics(sf::degrees(transform.rotation));
+
 		const auto def = make_shape_def(offset_box.def);
-		const auto shape = b2MakeOffsetBox(
-			Physics::to_physics(offset_box.width / 2),
-			Physics::to_physics(offset_box.height / 2),
-			Physics::to_physics({offset_box.offset_x, offset_box.offset_y}),
-			Physics::to_physics(sf::degrees(offset_box.rotation))
-		);
+		const auto shape = b2MakeOffsetBox(width / 2, height / 2, center, rotation);
 
 		return b2CreatePolygonShape(body_id, &def, &shape);
 	}

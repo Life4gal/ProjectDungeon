@@ -73,8 +73,5 @@ namespace pd::blueprint
 
 		float offset_x;
 		float offset_y;
-
-		// degree
-		float rotation;
 	};
 }
