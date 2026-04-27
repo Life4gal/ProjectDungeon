@@ -23,12 +23,16 @@
 // =========
 // 测试用
 
+#include <event/camera.hpp>
+#include <listener/camera.hpp>
+
 #include <factory/room.hpp>
 
 // =========
 // 更新
 
 #include <update/physics_world.hpp>
+#include <update/camera.hpp>
 #include <update/sprite_animation.hpp>
 
 // =========
@@ -241,7 +245,7 @@ namespace pd::scene
 			return draw;
 		}();
 
-		// 测试用
+		// 测试用房间数据
 		constexpr int TileWidth = 64;
 		constexpr int TileHeight = 64;
 		constexpr int TileOriginX = TileWidth / 2;
@@ -668,6 +672,11 @@ namespace pd::scene
 	{
 		// 进入地下城
 
+		// 相机
+		manager::Event::enqueue(event::camera::Move{.x = 0, .y = 0});
+		manager::Event::enqueue(event::camera::Resize{.width = 1080, .height = 720});
+
+		// 房间
 		factory::Room::create(registry_, g_test_room);
 
 		return true;
@@ -703,7 +712,12 @@ namespace pd::scene
 
 		music_ = manager::Music::load(GameMusic);
 
+		// 物理世界
 		create_physics_world(registry_);
+
+		// 相机
+		manager::Event::subscribe<event::camera::Move, &listener::camera::on_move>(registry_);
+		manager::Event::subscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
 
 		// 
 	}
@@ -726,6 +740,10 @@ namespace pd::scene
 		// 销毁所有实体(如果有)
 		factory::Room::destroy(registry_);
 
+		// 相机
+		manager::Event::unsubscribe<event::camera::Move, &listener::camera::on_move>(registry_);
+		manager::Event::unsubscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
+
 		// 最后销毁物理世界
 		destroy_physics_world(registry_);
 	}
@@ -746,9 +764,26 @@ namespace pd::scene
 		{
 			if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
 			{
-				if (kp->code == sf::Keyboard::Key::Escape)
+				using sf::Keyboard::Key;
+
+				if (kp->code == Key::Escape)
 				{
 					is_paused_ = true;
+				}
+				else if (kp->code == Key::Z)
+				{
+					manager::Event::enqueue(event::camera::Move{.x = 0, .y = 0});
+					manager::Event::enqueue(event::camera::Resize{.width = 1080, .height = 720});
+				}
+				else if (kp->code == Key::X)
+				{
+					manager::Event::enqueue(event::camera::Move{.x = 0, .y = 0});
+					manager::Event::enqueue(event::camera::Resize{.width = 540, .height = 360});
+				}
+				else if (kp->code == Key::C)
+				{
+					manager::Event::enqueue(event::camera::Move{.x = 540, .y = 360});
+					manager::Event::enqueue(event::camera::Resize{.width = 540, .height = 360});
 				}
 			}
 		}
@@ -770,6 +805,9 @@ namespace pd::scene
 		else
 		{
 			update::physics_world(registry_, delta);
+
+			update::camera(registry_, delta);
+
 			update::sprite_animation(registry_, delta);
 		}
 	}
@@ -778,6 +816,7 @@ namespace pd::scene
 	{
 		render::floor(registry_, window);
 		render::wall(registry_, window);
+
 		render::player(registry_, window);
 
 		g_physics_world_draw.context = &window;

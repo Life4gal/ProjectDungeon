@@ -8,6 +8,7 @@
 #include <manager/resource.hpp>
 
 #include <component/wall.hpp>
+#include <component/state.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -26,6 +27,7 @@ namespace pd::render
 	{
 		const auto view = registry
 				.view<
+					state::InCameraArea,
 					wall::Wall,
 					sprite::Texture,
 					sprite::Position,

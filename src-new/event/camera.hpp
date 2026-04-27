@@ -5,22 +5,19 @@
 
 #pragma once
 
-#include <SFML/System/Vector2.hpp>
-
-namespace pd::component::camera
+namespace pd::event::camera
 {
-	// 相机位置/大小有变化,需要更新视野内实体
-	class Dirty final {};
-
-	class Position final
+	class Move final
 	{
 	public:
-		sf::Vector2f position;
+		float x;
+		float y;
 	};
 
-	class Size final
+	class Resize final
 	{
 	public:
-		sf::Vector2f size;
+		float width;
+		float height;
 	};
 }

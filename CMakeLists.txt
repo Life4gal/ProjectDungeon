@@ -628,6 +628,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/window.hpp
 	# 场景
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/scene.hpp
+
+	# 相机
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/camera.hpp
 		
 	# ============================
 	# BLUEPRINT
@@ -658,6 +661,8 @@ add_executable(
 	# COMPONENT
 	# ============================
 	
+	# 状态
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/state.hpp
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
 	# 精灵
@@ -669,6 +674,8 @@ add_executable(
 
 	# 相机(可视区域)
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp
+	# 屏幕
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/screen.hpp
 
 	# 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/floor.hpp
@@ -714,6 +721,14 @@ add_executable(
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.cpp
+	
+	# ============================
+	# SYSTEM -- LISTENER
+	# ============================
+
+	# 相机
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.cpp
 
 	# ============================
 	# SYSTEM -- UPDATE
@@ -722,6 +737,10 @@ add_executable(
 	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
+	
+	# 相机
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.cpp
 
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.hpp
