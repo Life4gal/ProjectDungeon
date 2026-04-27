@@ -635,8 +635,10 @@ add_executable(
 	
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
-	# 渲染
+	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite.hpp
+	# 精灵动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite_animation.hpp
 	# 物理刚体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_body.hpp
 	# 物理形状
@@ -649,14 +651,19 @@ add_executable(
 	# 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
 
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
+
 	# ============================
 	# COMPONENT
 	# ============================
 	
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
-	# 渲染
+	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite.hpp
+	# 精灵动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_animation.hpp
 	# 物理刚体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/physics_body.hpp
 
@@ -668,14 +675,19 @@ add_executable(
 	# 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/wall.hpp
 		
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
+
 	# ============================
 	# SYSTEM -- FACTORY
 	# ============================
 
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.hpp
-	# 渲染
+	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.hpp
+	# 精灵动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite_animation.hpp
 	# 物理刚体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_body.hpp
 	# 物理形状
@@ -691,6 +703,18 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.cpp
 
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.cpp
+	
+	# ============================
+	# SYSTEM -- HELPER
+	# ============================
+	
+	# 精灵动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.cpp
+
 	# ============================
 	# SYSTEM -- UPDATE
 	# ============================
@@ -698,6 +722,10 @@ add_executable(
 	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
+
+	# 精灵动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.cpp
 
 	# ============================
 	# SYSTEM -- RENDER
@@ -709,6 +737,10 @@ add_executable(
 	# 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.cpp
+
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.cpp
 
 	# ============================
 	# MENU

@@ -29,12 +29,14 @@
 // 更新
 
 #include <update/physics_world.hpp>
+#include <update/sprite_animation.hpp>
 
 // =========
 // 渲染
 
 #include <render/floor.hpp>
 #include <render/wall.hpp>
+#include <render/player.hpp>
 
 // =========
 // 依赖
@@ -768,6 +770,7 @@ namespace pd::scene
 		else
 		{
 			update::physics_world(registry_, delta);
+			update::sprite_animation(registry_, delta);
 		}
 	}
 
@@ -775,6 +778,7 @@ namespace pd::scene
 	{
 		render::floor(registry_, window);
 		render::wall(registry_, window);
+		render::player(registry_, window);
 
 		g_physics_world_draw.context = &window;
 		b2World_Draw(utility::Physics::world_id, &g_physics_world_draw);

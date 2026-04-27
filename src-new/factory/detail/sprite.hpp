@@ -23,6 +23,7 @@ namespace pd::factory::detail
 		registry.emplace<sprite::Position>(entity, sf::Vector2i{sprite.x, sprite.y});
 		registry.emplace<sprite::Size>(entity, sf::Vector2i{sprite.width, sprite.height});
 		registry.emplace<sprite::Origin>(entity, sf::Vector2i{sprite.origin_x, sprite.origin_y});
+
 		registry.emplace<sprite::Color>(entity, sf::Color::White);
 		registry.emplace<sprite::Scale>(entity, sf::Vector2f{1, 1});
 	}
