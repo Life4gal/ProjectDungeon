@@ -156,19 +156,27 @@ namespace pd
 			// 创建场景实例(如果需要)
 			if (pending_scene_)
 			{
-				if (const auto category = *pending_scene_; category == scene::Category::MAIN_MENU)
-				{
-					current_scene_ = std::make_unique<scene::MainMenu>();
-				}
-				else if (category == scene::Category::GAME or category == scene::Category::GAME_CONTINUE)
-				{
-					current_scene_ = std::make_unique<scene::Game>();
-				}
-
-				current_scene_->on_loaded();
-				current_scene_->on_initialized();
-
+				const auto category = *pending_scene_;
 				pending_scene_.reset();
+
+				if (category != scene::Category::QUIT)
+				{
+					if (category == scene::Category::MAIN_MENU)
+					{
+						current_scene_ = std::make_unique<scene::MainMenu>();
+					}
+					else if (category == scene::Category::GAME or category == scene::Category::GAME_CONTINUE)
+					{
+						current_scene_ = std::make_unique<scene::Game>();
+					}
+					else
+					{
+						PROMETHEUS_PLATFORM_UNREACHABLE();
+					}
+
+					current_scene_->on_loaded();
+					current_scene_->on_initialized();
+				}
 			}
 		}
 	}

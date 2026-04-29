@@ -647,15 +647,32 @@ add_executable(
 	# 物理形状
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_shape.hpp
 
-	# 房间 -- 地板
+	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/floor.hpp
-	# 房间 -- 墙壁
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/wall.hpp
-	# 房间
+	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/level.hpp
 
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
+			
+	# ============================
+	# DESIGNER
+	# ============================
+	
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.cpp
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.cpp
+
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.cpp
 
 	# ============================
 	# COMPONENT
@@ -702,15 +719,18 @@ add_executable(
 	# 物理形状
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_shape.hpp
 
-	# 房间 -- 地板
+	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.cpp
-	# 房间 -- 墙壁
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.cpp
-	# 房间
+	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.cpp
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.cpp
 
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.hpp
@@ -740,10 +760,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.cpp
 	
-	# 相机
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.cpp
-
 	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
@@ -758,6 +774,10 @@ add_executable(
 	# ============================
 	# SYSTEM -- RENDER
 	# ============================
+	
+	# 相机
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.cpp
 
 	# 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.hpp

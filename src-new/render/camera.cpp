@@ -3,20 +3,20 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <update/camera.hpp>
+#include <render/camera.hpp>
 
 #include <component/camera.hpp>
 #include <component/state.hpp>
 #include <component/transform.hpp>
 
 #include <entt/entt.hpp>
-#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics.hpp>
 
-namespace pd::update
+namespace pd::render
 {
 	using namespace component;
 
-	auto camera(entt::registry& registry, [[maybe_unused]] const sf::Time delta) noexcept -> void
+	auto camera(entt::registry& registry, sf::RenderWindow& window) noexcept -> void
 	{
 		if (not registry.ctx().contains<camera::Dirty>())
 		{
@@ -27,6 +27,10 @@ namespace pd::update
 		const auto& [camera_size] = registry.ctx().get<const camera::Size>();
 		const auto camera_area = sf::Rect{camera_position, camera_size};
 
+		// 设置窗口视图
+		window.setView(sf::View{camera_area});
+
+		// 更新可视实体
 		for (const auto view = registry.view<transform::Position>();
 		     const auto [entity, position]: view.each())
 		{

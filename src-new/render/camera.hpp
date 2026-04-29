@@ -5,11 +5,14 @@
 
 #pragma once
 
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
-#include <SFML/System/Time.hpp>
-
-namespace pd::update
+namespace sf
 {
-	auto camera(entt::registry& registry, sf::Time delta) noexcept -> void;
+	class RenderWindow;
+}
+
+namespace pd::render
+{
+	auto camera(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
 }
