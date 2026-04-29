@@ -673,8 +673,7 @@ namespace pd::scene
 		// 进入地下城
 
 		// 相机
-		manager::Event::enqueue(event::camera::Move{.x = 0, .y = 0});
-		manager::Event::enqueue(event::camera::Resize{.width = 1080, .height = 720});
+		manager::Event::enqueue(event::camera::Set{.x = 0, .y = 0, .width = 1080, .height = 720});
 
 		// 房间
 		factory::Room::create(registry_, g_test_room);
@@ -716,6 +715,7 @@ namespace pd::scene
 		create_physics_world(registry_);
 
 		// 相机
+		manager::Event::subscribe<event::camera::Set, &listener::camera::on_set>(registry_);
 		manager::Event::subscribe<event::camera::Move, &listener::camera::on_move>(registry_);
 		manager::Event::subscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
 
@@ -741,6 +741,7 @@ namespace pd::scene
 		factory::Room::destroy(registry_);
 
 		// 相机
+		manager::Event::unsubscribe<event::camera::Set, &listener::camera::on_set>(registry_);
 		manager::Event::unsubscribe<event::camera::Move, &listener::camera::on_move>(registry_);
 		manager::Event::unsubscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
 
@@ -772,18 +773,15 @@ namespace pd::scene
 				}
 				else if (kp->code == Key::Z)
 				{
-					manager::Event::enqueue(event::camera::Move{.x = 0, .y = 0});
-					manager::Event::enqueue(event::camera::Resize{.width = 1080, .height = 720});
+					manager::Event::enqueue(event::camera::Set{.x = 0, .y = 0, .width = 1080, .height = 720});
 				}
 				else if (kp->code == Key::X)
 				{
-					manager::Event::enqueue(event::camera::Move{.x = 0, .y = 0});
-					manager::Event::enqueue(event::camera::Resize{.width = 540, .height = 360});
+					manager::Event::enqueue(event::camera::Set{.x = 0, .y = 0, .width = 540, .height = 360});
 				}
 				else if (kp->code == Key::C)
 				{
-					manager::Event::enqueue(event::camera::Move{.x = 540, .y = 360});
-					manager::Event::enqueue(event::camera::Resize{.width = 540, .height = 360});
+					manager::Event::enqueue(event::camera::Set{.x = 540, .y = 360, .width = 540, .height = 360});
 				}
 			}
 		}

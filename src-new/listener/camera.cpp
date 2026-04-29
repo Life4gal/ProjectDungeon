@@ -14,6 +14,14 @@ namespace pd::listener::camera
 	namespace cc = component::camera;
 	namespace ec = event::camera;
 
+	auto on_set(entt::registry& registry, const ec::Set& set) noexcept -> void
+	{
+		registry.ctx().emplace<cc::Dirty>();
+
+		registry.ctx().insert_or_assign(cc::Position{.position = {set.x, set.y}});
+		registry.ctx().insert_or_assign(cc::Size{.size = {set.width, set.height}});
+	}
+
 	auto on_move(entt::registry& registry, const ec::Move& move) noexcept -> void
 	{
 		registry.ctx().emplace<cc::Dirty>();

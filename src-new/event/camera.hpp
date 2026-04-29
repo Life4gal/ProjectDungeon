@@ -7,6 +7,15 @@
 
 namespace pd::event::camera
 {
+	class Set final
+	{
+	public:
+		float x;
+		float y;
+		float width;
+		float height;
+	};
+
 	class Move final
 	{
 	public:
