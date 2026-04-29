@@ -684,6 +684,8 @@ add_executable(
 		
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
+	# 玩家控制器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player_controller.hpp
 
 	# ============================
 	# SYSTEM -- FACTORY
@@ -738,6 +740,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
 	
+	# 玩家控制器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.cpp
+
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.cpp

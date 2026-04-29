@@ -23,15 +23,19 @@
 // =========
 // 测试用
 
+#include <component/player_controller.hpp>
+
 #include <event/camera.hpp>
 #include <listener/camera.hpp>
 
 #include <factory/room.hpp>
+#include <factory/player.hpp>
 
 // =========
 // 更新
 
 #include <update/physics_world.hpp>
+#include <update/player_controller.hpp>
 #include <update/camera.hpp>
 #include <update/sprite_animation.hpp>
 
@@ -107,6 +111,7 @@ namespace pd::scene
 
 			draw.DrawPolygonFcn = [](const b2Vec2* vertices, const int vertex_count, const b2HexColor color, void* context) noexcept -> void
 			{
+				const auto sf_color = rgb_to_rgba(color);
 				auto* window = static_cast<sf::RenderWindow*>(context);
 
 				sf::ConvexShape polygon{};
@@ -116,12 +121,12 @@ namespace pd::scene
 				{
 					const auto& vertex = vertices[i];
 
-					const auto point = Physics::from_physics(vertex);
-					polygon.setPoint(i, point);
+					const auto pixels_position = Physics::from_physics(vertex);
+					polygon.setPoint(i, pixels_position);
 				}
 
 				polygon.setFillColor(sf::Color::Transparent);
-				polygon.setOutlineColor(rgb_to_rgba(color));
+				polygon.setOutlineColor(sf_color);
 				polygon.setOutlineThickness(2);
 
 				window->draw(polygon);
@@ -135,6 +140,8 @@ namespace pd::scene
 				void* context
 			) noexcept -> void
 					{
+						const auto sf_color = rgb_to_rgba(color);
+						const auto sf_color_half_transparent = sf::Color{sf_color.r, sf_color.g, sf_color.b, 128};
 						auto* window = static_cast<sf::RenderWindow*>(context);
 
 						sf::ConvexShape polygon{};
@@ -147,12 +154,10 @@ namespace pd::scene
 							const auto rotated = b2RotateVector(transform.q, vertex);
 							const auto position = origin + rotated;
 
-							const auto point = Physics::from_physics(position);
-							polygon.setPoint(i, point);
+							const auto pixels_position = Physics::from_physics(position);
+							polygon.setPoint(i, pixels_position);
 						}
 
-						const auto sf_color = rgb_to_rgba(color);
-						const auto sf_color_half_transparent = sf::Color{sf_color.r, sf_color.g, sf_color.b, 128};
 						polygon.setFillColor(sf_color_half_transparent);
 						polygon.setOutlineColor(sf_color);
 						polygon.setOutlineThickness(1);
@@ -161,12 +166,17 @@ namespace pd::scene
 					};
 			draw.DrawCircleFcn = [](const b2Vec2 center, const float radius, const b2HexColor color, void* context) noexcept -> void
 			{
+				const auto pixels_radius = Physics::from_physics(radius);
+				const auto pixels_center = Physics::from_physics(center);
+				const auto sf_color = rgb_to_rgba(color);
 				auto* window = static_cast<sf::RenderWindow*>(context);
 
-				sf::CircleShape circle{Physics::from_physics(radius)};
-				circle.setPosition(Physics::from_physics(center));
+				sf::CircleShape circle{};
 
-				const auto sf_color = rgb_to_rgba(color);
+				circle.setRadius(pixels_radius);
+				circle.setOrigin({pixels_radius, pixels_radius});
+				circle.setPosition(pixels_center);
+
 				circle.setFillColor(sf::Color::Transparent);
 				circle.setOutlineColor(sf_color);
 				circle.setOutlineThickness(2);
@@ -175,13 +185,18 @@ namespace pd::scene
 			};
 			draw.DrawSolidCircleFcn = [](const b2Transform transform, const float radius, const b2HexColor color, void* context) noexcept -> void
 			{
-				auto* window = static_cast<sf::RenderWindow*>(context);
-
-				sf::CircleShape circle{Physics::from_physics(radius)};
-				circle.setPosition(Physics::from_physics(transform.p));
-
+				const auto pixels_radius = Physics::from_physics(radius);
+				const auto pixels_center = Physics::from_physics(transform.p);
 				const auto sf_color = rgb_to_rgba(color);
 				const auto sf_color_half_transparent = sf::Color{sf_color.r, sf_color.g, sf_color.b, 128};
+				auto* window = static_cast<sf::RenderWindow*>(context);
+
+				sf::CircleShape circle{};
+
+				circle.setRadius(pixels_radius);
+				circle.setOrigin({pixels_radius, pixels_radius});
+				circle.setPosition(pixels_center);
+
 				circle.setFillColor(sf_color_half_transparent);
 				circle.setOutlineColor(sf_color);
 				circle.setOutlineThickness(1);
@@ -190,27 +205,33 @@ namespace pd::scene
 			};
 			draw.DrawSolidCapsuleFcn = [](const b2Vec2 p1, const b2Vec2 p2, const float radius, const b2HexColor color, void* context) noexcept -> void
 			{
-				auto* window = static_cast<sf::RenderWindow*>(context);
-
-				const auto direction = p2 - p1;
-				const auto length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-				const auto angle = std::atan2(direction.y, direction.x);
-
-				sf::RectangleShape rect{{Physics::from_physics(length), Physics::from_physics(radius * 2)}};
-				rect.setOrigin({0, Physics::from_physics(radius)});
-				rect.setPosition(Physics::from_physics(p1));
-				rect.setRotation(sf::radians(angle));
-
-				sf::CircleShape end1{Physics::from_physics(radius)};
-				end1.setOrigin({Physics::from_physics(radius), Physics::from_physics(radius)});
-				end1.setPosition(Physics::from_physics(p1));
-
-				sf::CircleShape end2{Physics::from_physics(radius)};
-				end2.setOrigin({Physics::from_physics(radius), Physics::from_physics(radius)});
-				end2.setPosition(Physics::from_physics(p2));
-
+				const auto pixels_p1 = Physics::from_physics(p1);
+				const auto pixels_p2 = Physics::from_physics(p2);
+				const auto pixels_radius = Physics::from_physics(radius);
 				const auto sf_color = rgb_to_rgba(color);
 				const auto sf_color_half_transparent = sf::Color{sf_color.r, sf_color.g, sf_color.b, 128};
+				auto* window = static_cast<sf::RenderWindow*>(context);
+
+				const auto direction = pixels_p2 - pixels_p1;
+				const auto length = direction.length();
+				const auto angle = std::atan2(direction.y, direction.x);
+
+				sf::RectangleShape rect{};
+				rect.setSize({length, pixels_radius * 2});
+				rect.setOrigin({0, pixels_radius});
+				rect.setPosition(pixels_p1);
+				rect.setRotation(sf::radians(angle));
+
+				sf::CircleShape end1{};
+				end1.setRadius(pixels_radius);
+				end1.setOrigin({pixels_radius, pixels_radius});
+				end1.setPosition(pixels_p1);
+
+				sf::CircleShape end2{};
+				end2.setRadius(pixels_radius);
+				end2.setOrigin({pixels_radius, pixels_radius});
+				end2.setPosition(pixels_p2);
+
 				rect.setFillColor(sf_color_half_transparent);
 				end1.setFillColor(sf_color_half_transparent);
 				end2.setFillColor(sf_color_half_transparent);
@@ -221,12 +242,15 @@ namespace pd::scene
 			};
 			draw.DrawSegmentFcn = [](const b2Vec2 p1, const b2Vec2 p2, const b2HexColor color, void* context) noexcept -> void
 			{
+				const auto pixels_p1 = Physics::from_physics(p1);
+				const auto pixels_p2 = Physics::from_physics(p2);
+				const auto sf_color = rgb_to_rgba(color);
 				auto* window = static_cast<sf::RenderWindow*>(context);
 
 				const std::array<sf::Vertex, 2> line
 				{{
-						{.position = Physics::from_physics(p1), .color = rgb_to_rgba(color), .texCoords = {}},
-						{.position = Physics::from_physics(p2), .color = rgb_to_rgba(color), .texCoords = {}},
+						{.position = pixels_p1, .color = sf_color, .texCoords = {}},
+						{.position = pixels_p2, .color = sf_color, .texCoords = {}},
 				}};
 
 				window->draw(line.data(), line.size(), sf::PrimitiveType::Lines);
@@ -666,6 +690,33 @@ namespace pd::scene
 						},
 				},
 		};
+
+		// 测试用玩家数据
+		blueprint::Player g_test_player
+		{
+				.transform = {.x = g_test_room.offset_x + 200, .y = g_test_room.offset_y + 200, .scale_x = 1, .scale_y = 1, .rotation = 0},
+				.animation =
+				{
+						.frames =
+						{
+								// 第一帧
+								{.texture = "./assets/tileset/player.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								// 第二帧
+								{.texture = "./assets/tileset/player.png", .x = 64, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								// 第三帧
+								{.texture = "./assets/tileset/player.png", .x = 128, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+								// 第四帧
+								{.texture = "./assets/tileset/player.png", .x = 192, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						},
+						.durations_ms = {250, 250, 250, 250},
+						.looping = true,
+						.reversed = false,
+				},
+				.physics_body = {.type = blueprint::PhysicsBodyType::DYNAMIC, .is_bullet = false},
+				// clang-format off
+				.physics_shape = {.def = {.material = {.friction = 0.5f, .restitution = 0.1f}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = true}, .radius = 32},
+				// clang-format on
+		};
 	}
 
 	auto Game::start_game() noexcept -> bool
@@ -677,6 +728,9 @@ namespace pd::scene
 
 		// 房间
 		factory::Room::create(registry_, g_test_room);
+		// 玩家
+		const auto player = factory::Player::spawn(registry_, g_test_player);
+		registry_.ctx().emplace<component::player_controller::Target>(player);
 
 		return true;
 	}
@@ -766,11 +820,34 @@ namespace pd::scene
 			if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
 			{
 				using sf::Keyboard::Key;
+				namespace cpc = component::player_controller;
 
 				if (kp->code == Key::Escape)
 				{
 					is_paused_ = true;
 				}
+				// =====================
+				// PLAYER_CONTROLLER
+				// =====================
+				else if (kp->code == Key::A)
+				{
+					registry_.ctx().emplace<cpc::HorizontalMovement>(cpc::MovementType::BACKWARD);
+				}
+				else if (kp->code == Key::D)
+				{
+					registry_.ctx().emplace<cpc::HorizontalMovement>(cpc::MovementType::FORWARD);
+				}
+				else if (kp->code == Key::W)
+				{
+					registry_.ctx().emplace<cpc::VerticalMovement>(cpc::MovementType::BACKWARD);
+				}
+				else if (kp->code == Key::S)
+				{
+					registry_.ctx().emplace<cpc::VerticalMovement>(cpc::MovementType::FORWARD);
+				}
+				// =====================
+				// CAMERA
+				// =====================
 				else if (kp->code == Key::Z)
 				{
 					manager::Event::enqueue(event::camera::Set{.x = 0, .y = 0, .width = 1080, .height = 720});
@@ -782,6 +859,23 @@ namespace pd::scene
 				else if (kp->code == Key::C)
 				{
 					manager::Event::enqueue(event::camera::Set{.x = 540, .y = 360, .width = 540, .height = 360});
+				}
+			}
+			else if (const auto* kr = event.getIf<sf::Event::KeyReleased>())
+			{
+				using sf::Keyboard::Key;
+				namespace cpc = component::player_controller;
+
+				// =====================
+				// PLAYER_CONTROLLER
+				// =====================
+				if (kr->code == Key::A or kr->code == Key::D)
+				{
+					registry_.ctx().erase<cpc::HorizontalMovement>();
+				}
+				else if (kr->code == Key::W or kr->code == Key::S)
+				{
+					registry_.ctx().erase<cpc::VerticalMovement>();
 				}
 			}
 		}
@@ -803,6 +897,8 @@ namespace pd::scene
 		else
 		{
 			update::physics_world(registry_, delta);
+
+			update::player_controller(registry_, delta);
 
 			update::camera(registry_, delta);
 

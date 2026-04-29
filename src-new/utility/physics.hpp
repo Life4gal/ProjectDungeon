@@ -25,17 +25,17 @@ namespace pd::utility
 
 		inline static b2WorldId world_id = b2_nullWorldId;
 
-		[[nodiscard]] static auto to_user_data(const entt::entity entity) noexcept -> void*
+		[[nodiscard]] constexpr static auto to_user_data(const entt::entity entity) noexcept -> void*
 		{
 			return std::bit_cast<void*>(static_cast<std::uintptr_t>(entt::to_integral(entity)));
 		}
 
-		[[nodiscard]] static auto to_entity(const void* user_data) noexcept -> entt::entity
+		[[nodiscard]] constexpr static auto to_entity(const void* user_data) noexcept -> entt::entity
 		{
 			return entt::entity{static_cast<std::underlying_type_t<entt::entity>>(std::bit_cast<std::uintptr_t>(user_data))};
 		}
 
-		[[nodiscard]] static auto from_physics(const float value) noexcept -> float
+		[[nodiscard]] constexpr static auto from_physics(const float value) noexcept -> float
 		{
 			return pixels_per_meter * value;
 		}
@@ -46,7 +46,7 @@ namespace pd::utility
 			return {x, y};
 		}
 
-		[[nodiscard]] static auto to_physics(const float value) noexcept -> float
+		[[nodiscard]] constexpr static auto to_physics(const float value) noexcept -> float
 		{
 			return meters_per_pixel * value;
 		}
