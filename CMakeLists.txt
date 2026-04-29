@@ -736,18 +736,21 @@ add_executable(
 	# SYSTEM -- UPDATE
 	# ============================
 	
-	# 物理世界
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
-	
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.cpp
-
+	
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/camera.cpp
 
+	# 物理世界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
+	# 同步物理世界更新的变换信息
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sync_physics_transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sync_physics_transform.cpp
+	
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.cpp

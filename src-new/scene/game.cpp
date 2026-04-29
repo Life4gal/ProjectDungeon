@@ -34,9 +34,10 @@
 // =========
 // 更新
 
-#include <update/physics_world.hpp>
 #include <update/player_controller.hpp>
 #include <update/camera.hpp>
+#include <update/physics_world.hpp>
+#include <update/sync_physics_transform.hpp>
 #include <update/sprite_animation.hpp>
 
 // =========
@@ -793,6 +794,7 @@ namespace pd::scene
 
 		// 销毁所有实体(如果有)
 		factory::Room::destroy(registry_);
+		factory::Player::destroy_all(registry_);
 
 		// 相机
 		manager::Event::unsubscribe<event::camera::Set, &listener::camera::on_set>(registry_);
@@ -896,11 +898,12 @@ namespace pd::scene
 		}
 		else
 		{
-			update::physics_world(registry_, delta);
-
 			update::player_controller(registry_, delta);
 
 			update::camera(registry_, delta);
+
+			update::physics_world(registry_, delta);
+			update::sync_physics_transform(registry_, delta);
 
 			update::sprite_animation(registry_, delta);
 		}
