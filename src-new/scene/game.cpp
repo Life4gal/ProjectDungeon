@@ -413,15 +413,15 @@ namespace pd::scene
 				// =====================
 				else if (kp->code == Key::Z)
 				{
-					manager::Event::enqueue(event::camera::Set{.x = 0, .y = 0, .width = 1080, .height = 720});
+					manager::Event::enqueue(event::camera::Resize{.width = 1080, .height = 720});
 				}
 				else if (kp->code == Key::X)
 				{
-					manager::Event::enqueue(event::camera::Set{.x = 0, .y = 0, .width = 540, .height = 360});
+					manager::Event::enqueue(event::camera::Resize{.width = 540, .height = 360});
 				}
 				else if (kp->code == Key::C)
 				{
-					manager::Event::enqueue(event::camera::Set{.x = 540, .y = 360, .width = 540, .height = 360});
+					manager::Event::enqueue(event::camera::Resize{.width = 270, .height = 180});
 				}
 			}
 			else if (const auto* kr = event.getIf<sf::Event::KeyReleased>())

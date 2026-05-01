@@ -34,6 +34,8 @@ namespace pd::render
 		for (const auto view = registry.view<transform::Position>();
 		     const auto [entity, position]: view.each())
 		{
+			// TODO: 不能简单地用position筛选处于相机范围内的实体,还需要考虑实体的size,当且仅当实体的bounding box完全不与相机范围相交时才认为实体不在相机范围内
+
 			if (camera_area.contains(position.position))
 			{
 				registry.emplace_or_replace<state::InCameraArea>(entity);
