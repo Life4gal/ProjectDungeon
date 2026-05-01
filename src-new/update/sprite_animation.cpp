@@ -23,6 +23,8 @@ namespace pd::update
 					const sprite_animation::Total,
 					sprite_animation::Timer,
 					sprite_animation::Index,
+					const sprite_animation::Mode,
+					const sprite_animation::Direction,
 					// FIXME: 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture/Position/Size/Origin其实会比较浪费性能,可以考虑在动画帧切换时才获取&更新这些组件
 					sprite::Texture,
 					sprite::Position,
@@ -35,7 +37,7 @@ namespace pd::update
 					sprite_animation::Ended
 				>);
 
-		for (const auto [entity, sprites, total, timer, index, texture, position, size, origin]: view.each())
+		for (const auto [entity, sprites, total, timer, index, mode, direction, texture, position, size, origin]: view.each())
 		{
 			timer.elapsed += delta;
 			// 如果此帧未结束,无需更新
@@ -49,11 +51,8 @@ namespace pd::update
 
 			using helper::SpriteAnimation;
 
-			const auto reversed = SpriteAnimation::is_reversed(registry, entity);
-			const auto looping = SpriteAnimation::is_looping(registry, entity);
-
 			// 跳转到下一帧
-			if (const auto next_frame_index = SpriteAnimation::jump_to_next_frame(total, index, reversed, looping);
+			if (const auto next_frame_index = SpriteAnimation::jump_to_next_frame(total, index, mode, direction);
 				next_frame_index == SpriteAnimation::animation_ended)
 			{
 				// 如果动画已结束则标记为已结束

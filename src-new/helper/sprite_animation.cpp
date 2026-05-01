@@ -12,38 +12,38 @@ namespace pd::helper
 {
 	using namespace component::sprite_animation;
 
-	auto SpriteAnimation::get_next_frame_index(const Total& total, const Index& index, const bool reversed, const bool looping) noexcept -> index_type
+	auto SpriteAnimation::get_next_frame_index(const Total& total, const Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
 	{
 		const auto last_index = total.total - 1;
 		const auto current = index.index;
 
 		// 如果到了最后一帧(或第一帧)且不是循环动画则返回animation_ended
-		if (const auto end_frame_index = reversed ? 0 : last_index;
-			current == end_frame_index and not looping)
+		if (const auto end_frame_index = direction == Direction::BACKWARD ? 0 : last_index;
+			current == end_frame_index and mode == Mode::ONE_SHOT)
 		{
 			return animation_ended;
 		}
 
-		const auto next_frame_index = reversed ? (current == 0 ? last_index : current - 1) : (current + 1) % total.total;
+		const auto next_frame_index = direction == Direction::BACKWARD ? (current == 0 ? last_index : current - 1) : (current + 1) % total.total;
 		return next_frame_index;
 	}
 
 	auto SpriteAnimation::get_next_frame_index(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Sprites,Index>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Sprites,Index,Mode, Direction>(entity_with_animation)));
 
 		const auto& total = registry.get<const Total>(entity_with_animation);
 		const auto& index = registry.get<const Index>(entity_with_animation);
-		const auto reversed = registry.all_of<Reversed>(entity_with_animation);
-		const auto looping = registry.all_of<Looping>(entity_with_animation);
+		const auto& mode = registry.get<const Mode>(entity_with_animation);
+		const auto& direction = registry.get<const Direction>(entity_with_animation);
 
-		return get_next_frame_index(total, index, reversed, looping);
+		return get_next_frame_index(total, index, mode, direction);
 	}
 
-	auto SpriteAnimation::set_next_frame(const Sprites& sprites, const Total& total, Timer& timer, Index& index, const bool reversed, const bool looping) noexcept -> index_type
+	auto SpriteAnimation::set_next_frame(const Sprites& sprites, const Total& total, Timer& timer, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
 	{
 		// 获取下一帧索引
-		const auto next_frame_index = get_next_frame_index(total, index, reversed, looping);
+		const auto next_frame_index = get_next_frame_index(total, index, mode, direction);
 
 		// 如果动画已结束则什么也不做
 		if (next_frame_index == animation_ended)
@@ -62,10 +62,10 @@ namespace pd::helper
 		const auto& total = registry.get<const Total>(entity_with_animation);
 		auto& timer = registry.get<Timer>(entity_with_animation);
 		auto& index = registry.get<Index>(entity_with_animation);
-		const auto reversed = registry.all_of<Reversed>(entity_with_animation);
-		const auto looping = registry.all_of<Looping>(entity_with_animation);
+		const auto& mode = registry.get<const Mode>(entity_with_animation);
+		const auto& direction = registry.get<const Direction>(entity_with_animation);
 
-		const auto next_frame_index = set_next_frame(sprites, total, timer, index, reversed, looping);
+		const auto next_frame_index = set_next_frame(sprites, total, timer, index, mode, direction);
 
 		// 标记为已结束
 		if (next_frame_index == animation_ended)
@@ -76,10 +76,10 @@ namespace pd::helper
 		return next_frame_index;
 	}
 
-	auto SpriteAnimation::jump_to_next_frame(const Total& total, Index& index, const bool reversed, const bool looping) noexcept -> index_type
+	auto SpriteAnimation::jump_to_next_frame(const Total& total, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
 	{
 		// 获取下一帧索引
-		const auto next_frame_index = get_next_frame_index(total, index, reversed, looping);
+		const auto next_frame_index = get_next_frame_index(total, index, mode, direction);
 
 		// 如果动画已结束则什么也不做
 		if (next_frame_index == animation_ended)
@@ -95,10 +95,10 @@ namespace pd::helper
 	{
 		const auto& total = registry.get<const Total>(entity_with_animation);
 		auto& index = registry.get<Index>(entity_with_animation);
-		const auto reversed = registry.all_of<Reversed>(entity_with_animation);
-		const auto looping = registry.all_of<Looping>(entity_with_animation);
+		const auto& mode = registry.get<const Mode>(entity_with_animation);
+		const auto& direction = registry.get<const Direction>(entity_with_animation);
 
-		const auto next_frame_index = jump_to_next_frame(total, index, reversed, looping);
+		const auto next_frame_index = jump_to_next_frame(total, index, mode, direction);
 
 		// 标记为已结束
 		if (next_frame_index == animation_ended)
@@ -156,7 +156,7 @@ namespace pd::helper
 
 	auto SpriteAnimation::looping(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		registry.emplace_or_replace<Looping>(entity_with_animation);
+		registry.emplace_or_replace<Mode>(entity_with_animation, Mode::LOOP);
 
 		// 如果非循环动画之前已经播放完毕,则需要移除已结束的标记
 		registry.remove<Ended>(entity_with_animation);
@@ -164,22 +164,30 @@ namespace pd::helper
 
 	auto SpriteAnimation::unlooping(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		registry.remove<Looping>(entity_with_animation);
+		registry.emplace_or_replace<Mode>(entity_with_animation, Mode::ONE_SHOT);
 	}
 
 	auto SpriteAnimation::is_looping(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
 	{
-		return registry.all_of<Looping>(entity_with_animation);
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Mode>(entity_with_animation)));
+
+		const auto& mode = registry.get<const Mode>(entity_with_animation);
+
+		return mode == Mode::ONE_SHOT;
 	}
 
 	auto SpriteAnimation::reverse(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		registry.emplace_or_replace<Reversed>(entity_with_animation);
+		registry.emplace_or_replace<Direction>(entity_with_animation, Direction::BACKWARD);
 	}
 
 	auto SpriteAnimation::is_reversed(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
 	{
-		return registry.all_of<Reversed>(entity_with_animation);
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Direction>(entity_with_animation)));
+
+		const auto& direction = registry.get<const Direction>(entity_with_animation);
+
+		return direction == Direction::BACKWARD;
 	}
 
 	auto SpriteAnimation::pause(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void

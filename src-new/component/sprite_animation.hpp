@@ -63,13 +63,23 @@ namespace pd::component::sprite_animation
 		std::size_t index;
 	};
 
-	// 标记当前动画是否循环
-	// 如果不循环则不存在该数据
-	class Looping final {};
+	// 当前动画播放模式
+	enum class Mode : std::uint8_t
+	{
+		// 单次播放
+		ONE_SHOT,
+		// 循环播放
+		LOOP,
+	};
 
-	// 标记当前动画是否反向播放
-	// 如果不反向播放则不存在该数据
-	class Reversed final {};
+	// 当前动画播放方向
+	enum class Direction : std::int8_t
+	{
+		// 正向播放
+		FORWARD = -1,
+		// 方向播放
+		BACKWARD = 1,
+	};
 
 	// 标记当前动画是否暂停
 	// 如果不暂停则不存在该数据

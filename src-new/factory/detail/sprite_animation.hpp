@@ -43,16 +43,10 @@ namespace pd::factory::detail
 		registry.emplace<sprite_animation::Timer>(entity, sprite_animation::Timer{.duration = sf::milliseconds(sprite_animation.durations_ms[begin_frame_index]), .elapsed = sf::Time::Zero});
 		// index
 		registry.emplace<sprite_animation::Index>(entity, begin_frame_index);
-		// looping
-		if (sprite_animation.looping)
-		{
-			registry.emplace<sprite_animation::Looping>(entity);
-		}
-		// reversed
-		if (sprite_animation.reversed)
-		{
-			registry.emplace<sprite_animation::Reversed>(entity);
-		}
+		// mode
+		registry.emplace<sprite_animation::Mode>(entity, sprite_animation.looping ? sprite_animation::Mode::LOOP : sprite_animation::Mode::ONE_SHOT);
+		// direction
+		registry.emplace<sprite_animation::Direction>(entity, sprite_animation.reversed ? sprite_animation::Direction::BACKWARD : sprite_animation::Direction::FORWARD);
 
 		// sprite
 		attach(registry, entity, sprite_animation.frames[begin_frame_index]);

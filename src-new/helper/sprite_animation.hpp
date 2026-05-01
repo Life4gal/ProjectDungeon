@@ -25,8 +25,8 @@ namespace pd::helper
 		[[nodiscard]] static auto get_next_frame_index(
 			const component::sprite_animation::Total& total,
 			const component::sprite_animation::Index& index,
-			bool reversed,
-			bool looping
+			const component::sprite_animation::Mode& mode,
+			const component::sprite_animation::Direction& direction
 		) noexcept -> index_type;
 
 		// 获取实体的下一帧动画索引
@@ -43,8 +43,8 @@ namespace pd::helper
 			const component::sprite_animation::Total& total,
 			component::sprite_animation::Timer& timer,
 			component::sprite_animation::Index& index,
-			bool reversed,
-			bool looping
+			const component::sprite_animation::Mode& mode,
+			const component::sprite_animation::Direction& direction
 		) noexcept -> index_type;
 
 		// 使实体的动画播放到下一帧(返回下一帧动画的索引)
@@ -60,8 +60,8 @@ namespace pd::helper
 		static auto jump_to_next_frame(
 			const component::sprite_animation::Total& total,
 			component::sprite_animation::Index& index,
-			bool reversed,
-			bool looping
+			const component::sprite_animation::Mode& mode,
+			const component::sprite_animation::Direction& direction
 		) noexcept -> index_type;
 
 		// 使实体的动画播放到下一帧(返回下一帧动画的索引)
