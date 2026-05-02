@@ -8,6 +8,8 @@
 // std::bit_cast
 #include <bit>
 
+#include <blueprint/detail/physics_shape.hpp>
+
 #include <entt/entity/entity.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Angle.hpp>
@@ -25,6 +27,10 @@ namespace pd::utility
 
 		inline static b2WorldId world_id = b2_nullWorldId;
 
+		// ========================
+		// ENTITY <-> USER DATA
+		// ========================
+
 		[[nodiscard]] constexpr static auto to_user_data(const entt::entity entity) noexcept -> void*
 		{
 			return std::bit_cast<void*>(static_cast<std::uintptr_t>(entt::to_integral(entity)));
@@ -34,6 +40,24 @@ namespace pd::utility
 		{
 			return entt::entity{static_cast<std::underlying_type_t<entt::entity>>(std::bit_cast<std::uintptr_t>(user_data))};
 		}
+
+		// ========================
+		// PhysicsShapeType <-> USER DATA
+		// ========================
+
+		[[nodiscard]] constexpr static auto to_user_data(const blueprint::PhysicsShapeType type) noexcept -> void*
+		{
+			return std::bit_cast<void*>(static_cast<std::uintptr_t>(type));
+		}
+
+		[[nodiscard]] constexpr static auto to_shape_type(const void* user_data) noexcept -> blueprint::PhysicsShapeType
+		{
+			return static_cast<blueprint::PhysicsShapeType>(std::bit_cast<std::uintptr_t>(user_data));
+		}
+
+		// ========================
+		// sf::Vector2f <-> b2Vec2
+		// ========================
 
 		[[nodiscard]] constexpr static auto from_physics(const float value) noexcept -> float
 		{
@@ -56,6 +80,10 @@ namespace pd::utility
 			const auto [x, y] = meters_per_pixel * value;
 			return {.x = x, .y = y};
 		}
+
+		// ========================
+		// sf::Angle <-> b2Rot
+		// ========================
 
 		[[nodiscard]] static auto to_physics(const sf::Angle angle) noexcept -> b2Rot
 		{

@@ -631,7 +631,12 @@ add_executable(
 
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/camera.hpp
-		
+
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/wall.hpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/door.hpp
+
 	# ============================
 	# BLUEPRINT
 	# ============================
@@ -758,6 +763,12 @@ add_executable(
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.cpp
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/wall.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/wall.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.cpp
 
 	# ============================
 	# SYSTEM -- UPDATE

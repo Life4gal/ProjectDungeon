@@ -17,6 +17,7 @@
 
 // =========
 // 物理世界特别处理
+
 #include <utility/physics.hpp>
 #include <component/physics_body.hpp>
 #include <box2d/box2d.h>
@@ -26,13 +27,24 @@
 
 #include <component/player_controller.hpp>
 
-#include <event/camera.hpp>
-#include <listener/camera.hpp>
-
 #include <designer/level.hpp>
 #include <designer/player.hpp>
 #include <factory/level.hpp>
 #include <factory/player.hpp>
+
+// =========
+// 事件
+
+#include <event/camera.hpp>
+#include <event/wall.hpp>
+#include <event/door.hpp>
+
+// =========
+// 监听
+
+#include <listener/camera.hpp>
+#include <listener/wall.hpp>
+#include <listener/door.hpp>
 
 // =========
 // 更新
@@ -54,6 +66,7 @@
 
 // =========
 // 依赖
+
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
@@ -336,6 +349,14 @@ namespace pd::scene
 		manager::Event::subscribe<event::camera::Set, &listener::camera::on_set>(registry_);
 		manager::Event::subscribe<event::camera::Move, &listener::camera::on_move>(registry_);
 		manager::Event::subscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
+		// 地下城-- 关卡-- 房间-- 墙壁
+		manager::Event::subscribe<event::wall::ContactBegin, &listener::wall::on_contact_begin>(registry_);
+		manager::Event::subscribe<event::wall::ContactEnd, &listener::wall::on_contact_end>(registry_);
+		// 地下城-- 关卡-- 房间-- 门
+		manager::Event::subscribe<event::door::ContactBegin, &listener::door::on_contact_begin>(registry_);
+		manager::Event::subscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
+		manager::Event::subscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
+		manager::Event::subscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
 
 		// 
 	}
@@ -363,6 +384,14 @@ namespace pd::scene
 		manager::Event::unsubscribe<event::camera::Set, &listener::camera::on_set>(registry_);
 		manager::Event::unsubscribe<event::camera::Move, &listener::camera::on_move>(registry_);
 		manager::Event::unsubscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
+		// 地下城-- 关卡-- 房间-- 墙壁
+		manager::Event::unsubscribe<event::wall::ContactBegin, &listener::wall::on_contact_begin>(registry_);
+		manager::Event::unsubscribe<event::wall::ContactEnd, &listener::wall::on_contact_end>(registry_);
+		// 地下城-- 关卡-- 房间-- 门
+		manager::Event::unsubscribe<event::door::ContactBegin, &listener::door::on_contact_begin>(registry_);
+		manager::Event::unsubscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
+		manager::Event::unsubscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
+		manager::Event::unsubscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
 
 		// 最后销毁物理世界
 		destroy_physics_world(registry_);

@@ -18,8 +18,8 @@ namespace pd::factory::detail
 		auto d = b2DefaultShapeDef();
 
 		// user data
-		// TODO: user data可以设置什么数据?或者说我们需要什么数据?
-		d.userData = nullptr;
+		// 这决定了我们如何派分物理事件
+		d.userData = utility::Physics::to_user_data(def.category);
 
 		// material
 		d.material.friction = def.material.friction;
