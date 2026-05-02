@@ -11,6 +11,7 @@
 
 namespace pd::event::door
 {
+	// 任意实体与门接触
 	class ContactBegin final
 	{
 	public:
@@ -20,6 +21,7 @@ namespace pd::event::door
 		blueprint::PhysicsShapeType other_type;
 	};
 
+	// 任意实体与门接触
 	class ContactEnd final
 	{
 	public:
@@ -29,6 +31,7 @@ namespace pd::event::door
 		blueprint::PhysicsShapeType other_type;
 	};
 
+	// 任意实体与感应器接触
 	class SensorBegin final
 	{
 	public:
@@ -38,6 +41,7 @@ namespace pd::event::door
 		blueprint::PhysicsShapeType other_type;
 	};
 
+	// 任意实体与感应器接触
 	class SensorEnd final
 	{
 	public:
@@ -46,4 +50,11 @@ namespace pd::event::door
 
 		blueprint::PhysicsShapeType other_type;
 	};
+
+	// 请求开启所有门(如果其无需钥匙)
+	// 需要钥匙的门在ContactBegin中处理
+	class RequestOpen final {};
+
+	// 请求关闭所有门
+	class RequestClose final {};
 }

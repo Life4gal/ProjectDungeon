@@ -358,6 +358,8 @@ namespace pd::scene
 		manager::Event::subscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
 		manager::Event::subscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
 		manager::Event::subscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
+		manager::Event::subscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
+		manager::Event::subscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
 
 		// 
 	}
@@ -393,6 +395,8 @@ namespace pd::scene
 		manager::Event::unsubscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
 		manager::Event::unsubscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
 		manager::Event::unsubscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
+		manager::Event::unsubscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
+		manager::Event::unsubscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
 
 		// 最后销毁物理世界
 		destroy_physics_world(registry_);
@@ -462,6 +466,17 @@ namespace pd::scene
 				else if (kp->code == Key::C)
 				{
 					manager::Event::enqueue(event::camera::Resize{.width = 270, .height = 180});
+				}
+				// =====================
+				// DUNGEON -- LEVEL -- ROOM -- DOOR
+				// =====================
+				else if (kp->code == Key::O)
+				{
+					manager::Event::enqueue(event::door::RequestOpen{});
+				}
+				else if (kp->code == Key::P)
+				{
+					manager::Event::enqueue(event::door::RequestClose{});
 				}
 			}
 			else if (const auto* kr = event.getIf<sf::Event::KeyReleased>())

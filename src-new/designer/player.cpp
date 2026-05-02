@@ -44,7 +44,7 @@ namespace pd::designer
 						.category = blueprint::PhysicsShapeType::PLAYER,
 						.category_mask = blueprint::PhysicsShapeCollisionMask::player,
 						.is_sensor = false,
-						.enable_sensor_events = false,
+						.enable_sensor_events = true,
 						.enable_contact_events = true,
 				},
 				.radius = 32,

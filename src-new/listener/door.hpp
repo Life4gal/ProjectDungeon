@@ -18,4 +18,8 @@ namespace pd::listener::door
 	auto on_sensor_begin(entt::registry& registry, const event::door::SensorBegin& sensor_begin) noexcept -> void;
 
 	auto on_sensor_end(entt::registry& registry, const event::door::SensorEnd& sensor_end) noexcept -> void;
+
+	auto on_request_open(entt::registry& registry, const event::door::RequestOpen& request_open) noexcept -> void;
+
+	auto on_request_close(entt::registry& registry, const event::door::RequestClose& request_close) noexcept -> void;
 }
