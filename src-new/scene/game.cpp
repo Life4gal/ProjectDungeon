@@ -287,6 +287,7 @@ namespace pd::scene
 
 			return draw;
 		}();
+		auto g_physics_world_draw_on = false;
 	}
 
 	auto Game::start_game() noexcept -> bool
@@ -421,6 +422,14 @@ namespace pd::scene
 					is_paused_ = true;
 				}
 				// =====================
+				// PHYSICS_WORLD
+				// =====================
+
+				else if (kp->code == Key::Num1)
+				{
+					g_physics_world_draw_on = not g_physics_world_draw_on;
+				}
+				// =====================
 				// PLAYER_CONTROLLER
 				// =====================
 				else if (kp->code == Key::A)
@@ -510,8 +519,11 @@ namespace pd::scene
 
 		render::player(registry_, window);
 
-		g_physics_world_draw.context = &window;
-		b2World_Draw(utility::Physics::world_id, &g_physics_world_draw);
+		if (g_physics_world_draw_on)
+		{
+			g_physics_world_draw.context = &window;
+			b2World_Draw(utility::Physics::world_id, &g_physics_world_draw);
+		}
 
 		if (is_paused_)
 		{
