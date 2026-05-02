@@ -16,8 +16,6 @@ namespace pd::factory
 	public:
 		static auto spawn(entt::registry& registry, const blueprint::Floor& floor) noexcept -> entt::entity;
 
-		static auto destroy(entt::registry& registry, entt::entity entity) noexcept -> void;
-
 		static auto destroy_all(entt::registry& registry) noexcept -> void;
 	};
 }

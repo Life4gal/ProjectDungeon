@@ -482,7 +482,7 @@ namespace pd::designer
 
 				const auto type = *element;
 
-				auto room = [x, y,type] noexcept -> blueprint::Room
+				auto room = [&] noexcept -> blueprint::Room
 				{
 					switch (type)
 					{
@@ -520,7 +520,7 @@ namespace pd::designer
 							// TODO
 							return Room::standard(x, y);
 						}
-						default:
+						default: // NOLINT(clang-diagnostic-covered-switch-default)
 						{
 							PROMETHEUS_PLATFORM_UNREACHABLE();
 						}

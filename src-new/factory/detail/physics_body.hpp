@@ -32,6 +32,8 @@ namespace pd::factory::detail
 		def.position = utility::Physics::to_physics({transform.x, transform.y});
 		def.rotation = utility::Physics::to_physics(sf::degrees(transform.rotation));
 		def.userData = utility::Physics::to_user_data(entity);
+		def.fixedRotation = physics_body.fixed_rotation;
+		def.isBullet = physics_body.is_bullet;
 
 		auto body_id = b2CreateBody(utility::Physics::world_id, &def);
 

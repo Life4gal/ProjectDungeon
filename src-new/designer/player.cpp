@@ -9,30 +9,47 @@ namespace pd::designer
 {
 	auto Player::test_character() noexcept -> blueprint::Player
 	{
-		return
+		constexpr blueprint::Transform transform
 		{
-				.transform = {.x = 0, .y = 0, .scale_x = 1, .scale_y = 1, .rotation = 0},
-				.animation =
-				{
-						.frames =
-						{
-								// 第一帧
-								{.texture = "./assets/tileset/player.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
-								// 第二帧
-								{.texture = "./assets/tileset/player.png", .x = 64, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
-								// 第三帧
-								{.texture = "./assets/tileset/player.png", .x = 128, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
-								// 第四帧
-								{.texture = "./assets/tileset/player.png", .x = 192, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
-						},
-						.durations_ms = {250, 250, 250, 250},
-						.looping = true,
-						.reversed = false,
-				},
-				.physics_body = {.type = blueprint::PhysicsBodyType::DYNAMIC, .is_bullet = false},
-				// clang-format off
-				.physics_shape = {.def = {.material = {.friction = 0.5f, .restitution = 0.1f}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = true}, .radius = 32},
-				// clang-format on
+				.x = 0,
+				.y = 0,
+				.scale_x = 1,
+				.scale_y = 1,
+				.rotation = 0,
 		};
+		blueprint::SpriteAnimation animation
+		{
+				.frames =
+				{
+						// 第一帧
+						{.texture = "./assets/tileset/player.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						// 第二帧
+						{.texture = "./assets/tileset/player.png", .x = 64, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						// 第三帧
+						{.texture = "./assets/tileset/player.png", .x = 128, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						// 第四帧
+						{.texture = "./assets/tileset/player.png", .x = 192, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+				},
+				.durations_ms = {250, 250, 250, 250},
+				.looping = true,
+				.reversed = false,
+		};
+		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::DYNAMIC, .fixed_rotation = true, .is_bullet = false};
+		constexpr blueprint::PhysicsShapeCircle physics_shape
+		{
+				.def =
+				{
+						.material = {.friction = 0.3f, .restitution = 0},
+						.density = 1,
+						.category = blueprint::PhysicsShapeType::PLAYER,
+						.category_mask = blueprint::PhysicsShapeCollisionMask::player,
+						.is_sensor = false,
+						.enable_sensor_events = false,
+						.enable_contact_events = true,
+				},
+				.radius = 32,
+		};
+
+		return {.transform = transform, .animation = std::move(animation), .physics_body = physics_body, .physics_shape = physics_shape};
 	}
 }

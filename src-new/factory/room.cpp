@@ -7,6 +7,7 @@
 
 #include <factory/floor.hpp>
 #include <factory/wall.hpp>
+#include <factory/door.hpp>
 
 namespace pd::factory
 {
@@ -26,11 +27,19 @@ namespace pd::factory
 
 			Wall::spawn(registry, wall);
 		}
+		for (auto door: room.doors)
+		{
+			door.transform.x += room.offset_x;
+			door.transform.y += room.offset_y;
+
+			Door::spawn(registry, door);
+		}
 	}
 
 	auto Room::destroy(entt::registry& registry) noexcept -> void
 	{
 		Floor::destroy_all(registry);
 		Wall::destroy_all(registry);
+		Door::destroy_all(registry);
 	}
 }

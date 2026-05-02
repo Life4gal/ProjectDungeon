@@ -651,6 +651,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/floor.hpp
 	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/wall.hpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/door.hpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
 	# 地下城 -- 关卡
@@ -698,6 +700,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/floor.hpp
 	# 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/wall.hpp
+	# 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door.hpp
 		
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
@@ -725,6 +729,9 @@ add_executable(
 	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.cpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.cpp
@@ -766,6 +773,9 @@ add_executable(
 	# 同步物理世界更新的变换信息
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sync_physics_transform.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sync_physics_transform.cpp
+	# 处理物理世界事件
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.cpp
 	
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.hpp
@@ -779,12 +789,15 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.cpp
 
-	# 房间 -- 地板
+	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.cpp
-	# 房间 -- 墙壁
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/door.cpp
 
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.hpp

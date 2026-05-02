@@ -5,61 +5,127 @@
 
 #include <designer/room.hpp>
 
+#include <prometheus/platform/os.hpp>
+
 namespace pd::designer
 {
+	namespace
+	{
+		// "door"占整个碰撞体比例
+		constexpr float DoorBodyRatio = 0.6667f;
+		// "sensor"占整个碰撞体比例
+		constexpr float DoorSensorRatio = 0.2333f;
+		// "blocker"占整个碰撞体比例
+		constexpr float DoorBlockerRatio = 1 - DoorBodyRatio - DoorSensorRatio;
+	}
+
 	auto Room::standard(const size_type offset_x, const size_type offset_y) noexcept -> blueprint::Room
 	{
+		// ===========================================
+		// FLOOR
+		// ===========================================
+
 		constexpr auto make_floor = [](const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Floor
 		{
-			return
+			const blueprint::Transform transform
 			{
-					// clang-format off
-					.transform = {.x = static_cast<float>(tile_origin_x + tile_x * tile_width), .y = static_cast<float>(tile_origin_y + tile_y * tile_height), .scale_x = 1, .scale_y = 1, .rotation = 0},
-					// clang-format on
-					.sprite = {.texture = "./assets/tileset/floor.png", .x = 0, .y = 0, .width = tile_width, .height = tile_height, .origin_x = tile_origin_x, .origin_y = tile_origin_y},
+					.x = static_cast<float>(tile_origin_x + tile_x * tile_width),
+					.y = static_cast<float>(tile_origin_y + tile_y * tile_height),
+					.scale_x = 1,
+					.scale_y = 1,
+					.rotation = 0,
 			};
+			blueprint::Sprite sprite
+			{
+					.texture = "./assets/tileset/floor.png",
+					.x = 0,
+					.y = 0,
+					.width = tile_width,
+					.height = tile_height,
+					.origin_x = tile_origin_x,
+					.origin_y = tile_origin_y,
+			};
+
+			return {.transform = transform, .sprite = std::move(sprite)};
 		};
-		constexpr auto make_floors = [] noexcept -> std::vector<blueprint::Floor>
+
+		auto floors = [] noexcept -> std::vector<blueprint::Floor>
 		{
-			std::vector<blueprint::Floor> floors{};
-			floors.reserve(static_cast<std::size_t>(horizontal_count) * vertical_count);
+			std::vector<blueprint::Floor> fs{};
+			fs.reserve(static_cast<std::size_t>(horizontal_count) * vertical_count);
 
 			for (size_type y = 1; y < vertical_count - 1; ++y)
 			{
 				for (size_type x = 1; x < horizontal_count - 1; ++x)
 				{
-					floors.push_back(make_floor(x, y));
+					fs.push_back(make_floor(x, y));
 				}
 			}
 
-			return floors;
-		};
+			return fs;
+		}();
+
+		// ===========================================
+		// WALL
+		// ===========================================
 
 		constexpr auto make_wall = [](const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Wall
 		{
-			return
+			const blueprint::Transform transform
 			{
-					// clang-format off
-					.transform = {.x = static_cast<float>(tile_origin_x + tile_x * tile_width), .y = static_cast<float>(tile_origin_y + tile_y * tile_height), .scale_x = 1, .scale_y = 1, .rotation = 0},
-					// clang-format on
-					.sprite = {.texture = "./assets/tileset/wall.png", .x = 0, .y = 0, .width = tile_width, .height = tile_height, .origin_x = tile_origin_x, .origin_y = tile_origin_y},
-					.physics_body = {.type = blueprint::PhysicsBodyType::STATIC, .is_bullet = false},
-					// clang-format off
-					.physics_shape = {.def = {.material = {.friction = 0, .restitution = 0}, .is_sensor = false, .enable_sensor_events = false, .enable_contact_events = false}, .width = tile_width, .height =tile_height},
-					// clang-format on
+					.x = static_cast<float>(tile_origin_x + tile_x * tile_width),
+					.y = static_cast<float>(tile_origin_y + tile_y * tile_height),
+					.scale_x = 1,
+					.scale_y = 1,
+					.rotation = 0,
 			};
+			blueprint::Sprite sprite
+			{
+					.texture = "./assets/tileset/wall.png",
+					.x = 0,
+					.y = 0,
+					.width = tile_width,
+					.height = tile_height,
+					.origin_x = tile_origin_x,
+					.origin_y = tile_origin_y,
+			};
+			constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::STATIC, .fixed_rotation = true, .is_bullet = false};
+			constexpr blueprint::PhysicsShapeBox physics_shape
+			{
+					.def =
+					{
+							.material = {.friction = 0.6f, .restitution = 0},
+							.density = 0,
+							.category = blueprint::PhysicsShapeType::WALL,
+							.category_mask = blueprint::PhysicsShapeCollisionMask::wall,
+							.is_sensor = false,
+							.enable_sensor_events = false,
+							.enable_contact_events = false,
+					},
+					.width = tile_width,
+					.height = tile_height,
+			};
+
+			return {.transform = transform, .sprite = std::move(sprite), .physics_body = physics_body, .physics_shape = physics_shape};
 		};
-		constexpr auto make_walls = [] noexcept -> std::vector<blueprint::Wall>
+
+		auto walls = [] noexcept -> std::vector<blueprint::Wall>
 		{
-			std::vector<blueprint::Wall> walls{};
-			walls.reserve(horizontal_count * 2 + (vertical_count - 2) * 2);
+			std::vector<blueprint::Wall> ws{};
+			ws.reserve(horizontal_count * 2 + (vertical_count - 2) * 2);
 
 			// 上面/下面
 			for (const size_type y: {size_type{0}, vertical_count - 1})
 			{
 				for (size_type x = 0; x < horizontal_count; ++x)
 				{
-					walls.push_back(make_wall(x, y));
+					// 跳过中间那一格,那是门所在
+					if (x == horizontal_count / 2)
+					{
+						continue;
+					}
+
+					ws.push_back(make_wall(x, y));
 				}
 			}
 			// 左面/右面
@@ -67,13 +133,198 @@ namespace pd::designer
 			{
 				for (size_type y = 1; y < vertical_count - 1; ++y)
 				{
-					walls.push_back(make_wall(x, y));
+					// 跳过中间那一格,那是门所在
+					if (y == vertical_count / 2)
+					{
+						continue;
+					}
+
+					ws.push_back(make_wall(x, y));
 				}
 			}
 
-			return walls;
+			return ws;
+		}();
+
+		// ===========================================
+		// DOOR
+		// ===========================================
+
+		constexpr auto make_door = [](const size_type tile_x, const size_type tile_y, const blueprint::DoorDirection direction) noexcept -> blueprint::Door
+		{
+			struct desc_type
+			{
+				float width;
+				float height;
+				float offset_x;
+				float offset_y;
+			};
+
+			desc_type door_desc{};
+			desc_type sensor_desc{};
+			desc_type blocker_desc{};
+
+			if (direction == blueprint::DoorDirection::NORTH or direction == blueprint::DoorDirection::SOUTH)
+			{
+				constexpr auto half_tile_height = tile_height * 0.5f;
+
+				door_desc.width = tile_width;
+				door_desc.height = tile_height * DoorBodyRatio;
+				door_desc.offset_x = 0;
+
+				sensor_desc.width = tile_width;
+				sensor_desc.height = tile_height * DoorSensorRatio;
+				sensor_desc.offset_x = 0;
+
+				blocker_desc.width = tile_width;
+				blocker_desc.height = tile_height * DoorBlockerRatio;
+				blocker_desc.offset_x = 0;
+
+				if (direction == blueprint::DoorDirection::NORTH)
+				{
+					door_desc.offset_y = half_tile_height - door_desc.height * 0.5f;
+					sensor_desc.offset_y = half_tile_height - door_desc.height - sensor_desc.height * 0.5f;
+					blocker_desc.offset_y = -half_tile_height + blocker_desc.height * 0.5f;
+				}
+				else
+				{
+					door_desc.offset_y = -half_tile_height + door_desc.height * 0.5f;
+					sensor_desc.offset_y = -half_tile_height + door_desc.height + sensor_desc.height * 0.5f;
+					blocker_desc.offset_y = half_tile_height - blocker_desc.height * 0.5f;
+				}
+			}
+			else if (direction == blueprint::DoorDirection::WEST or direction == blueprint::DoorDirection::EAST)
+			{
+				constexpr auto half_tile_width = tile_width * 0.5f;
+
+				door_desc.width = tile_width * DoorBodyRatio;
+				door_desc.height = tile_height;
+				door_desc.offset_y = 0;
+
+				sensor_desc.width = tile_width * DoorSensorRatio;
+				sensor_desc.height = tile_height;
+				sensor_desc.offset_y = 0;
+
+				blocker_desc.width = tile_width * DoorBlockerRatio;
+				sensor_desc.height = tile_height;
+				sensor_desc.offset_y = 0;
+
+				if (direction == blueprint::DoorDirection::WEST)
+				{
+					door_desc.offset_x = half_tile_width - door_desc.width * 0.5f;
+					sensor_desc.offset_x = half_tile_width - door_desc.width - sensor_desc.width * 0.5f;
+					blocker_desc.offset_x = -half_tile_width + blocker_desc.width * 0.5f;
+				}
+				else
+				{
+					door_desc.offset_x = -half_tile_width + door_desc.width * 0.5f;
+					sensor_desc.offset_x = -half_tile_width + door_desc.width + sensor_desc.width * 0.5f;
+					blocker_desc.offset_x = half_tile_width - blocker_desc.width * 0.5f;
+				}
+			}
+			else
+			{
+				PROMETHEUS_PLATFORM_UNREACHABLE();
+			}
+
+			const blueprint::Transform transform
+			{
+					.x = static_cast<float>(tile_origin_x + tile_x * tile_width),
+					.y = static_cast<float>(tile_origin_y + tile_y * tile_height),
+					.scale_x = 1,
+					.scale_y = 1,
+					.rotation = 0,
+			};
+			blueprint::Sprite sprite
+			{
+					.texture = "./assets/tileset/door.png",
+					.x = 0,
+					.y = 0,
+					.width = tile_width,
+					.height = tile_height,
+					.origin_x = tile_origin_x,
+					.origin_y = tile_origin_y,
+			};
+			constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::STATIC, .fixed_rotation = true, .is_bullet = false};
+			const blueprint::PhysicsShapeOffsetBox physics_shape_door
+			{
+					.def =
+					{
+							.material = {.friction = 0.6f, .restitution = 0},
+							.density = 0,
+							.category = blueprint::PhysicsShapeType::DOOR,
+							.category_mask = blueprint::PhysicsShapeCollisionMask::door_close,
+							.is_sensor = false,
+							.enable_sensor_events = false,
+							.enable_contact_events = true,
+					},
+					.width = door_desc.width,
+					.height = door_desc.height,
+					.offset_x = door_desc.offset_x,
+					.offset_y = door_desc.offset_y,
+			};
+			const blueprint::PhysicsShapeOffsetBox physics_shape_sensor
+			{
+					.def =
+					{
+							.material = {.friction = 0, .restitution = 0},
+							.density = 0,
+							.category = blueprint::PhysicsShapeType::DOOR,
+							.category_mask = blueprint::PhysicsShapeCollisionMask::door_sensor,
+							.is_sensor = true,
+							.enable_sensor_events = true,
+							.enable_contact_events = false,
+					},
+					.width = sensor_desc.width,
+					.height = sensor_desc.height,
+					.offset_x = sensor_desc.offset_x,
+					.offset_y = sensor_desc.offset_y,
+			};
+			const blueprint::PhysicsShapeOffsetBox physics_shape_blocker
+			{
+					.def =
+					{
+							.material = {.friction = 0, .restitution = 0},
+							.density = 0,
+							.category = blueprint::PhysicsShapeType::DOOR,
+							.category_mask = blueprint::PhysicsShapeCollisionMask::door_blocker,
+							.is_sensor = false,
+							.enable_sensor_events = false,
+							.enable_contact_events = false,
+					},
+					.width = blocker_desc.width,
+					.height = blocker_desc.height,
+					.offset_x = blocker_desc.offset_x,
+					.offset_y = blocker_desc.offset_y,
+			};
+
+			return {
+					.transform = transform,
+					.sprite = std::move(sprite),
+					.physics_body = physics_body,
+					.physics_shape_door = physics_shape_door,
+					.physics_shape_sensor = physics_shape_sensor,
+					.physics_shape_blocker = physics_shape_blocker
+			};
 		};
 
-		return {.offset_x = static_cast<float>(offset_x * width), .offset_y = static_cast<float>(offset_y * height), .floors = make_floors(), .walls = make_walls(),};
+		// TODO: 门是否创建取决于邻接房间是否存在
+		auto doors = [] noexcept -> std::array<blueprint::Door, 4>
+		{
+			std::array<blueprint::Door, 4> ds{};
+
+			ds[std::to_underlying(blueprint::DoorDirection::NORTH)] = make_door(horizontal_count / 2, 0, blueprint::DoorDirection::NORTH);
+			ds[std::to_underlying(blueprint::DoorDirection::SOUTH)] = make_door(horizontal_count / 2, vertical_count - 1, blueprint::DoorDirection::SOUTH);
+			ds[std::to_underlying(blueprint::DoorDirection::WEST)] = make_door(0, vertical_count / 2, blueprint::DoorDirection::WEST);
+			ds[std::to_underlying(blueprint::DoorDirection::EAST)] = make_door(horizontal_count - 1, vertical_count / 2, blueprint::DoorDirection::EAST);
+
+			return ds;
+		}();
+
+		// ===========================================
+		// ROOM
+		// ===========================================
+
+		return {.offset_x = static_cast<float>(offset_x * width), .offset_y = static_cast<float>(offset_y * height), .floors = std::move(floors), .walls = std::move(walls), .doors = std::move(doors)};
 	}
 }

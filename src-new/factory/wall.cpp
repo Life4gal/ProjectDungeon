@@ -39,11 +39,6 @@ namespace pd::factory
 		return entity;
 	}
 
-	auto Wall::destroy(entt::registry& registry, const entt::entity entity) noexcept -> void
-	{
-		registry.destroy(entity);
-	}
-
 	auto Wall::destroy_all(entt::registry& registry) noexcept -> void
 	{
 		const auto view = registry.view<wall::Wall>();

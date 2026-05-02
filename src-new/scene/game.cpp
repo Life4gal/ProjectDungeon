@@ -40,6 +40,7 @@
 #include <update/player_controller.hpp>
 #include <update/physics_world.hpp>
 #include <update/sync_physics_transform.hpp>
+#include <update/process_physics_events.hpp>
 #include <update/sprite_animation.hpp>
 
 // =========
@@ -48,6 +49,7 @@
 #include <render/camera.hpp>
 #include <render/floor.hpp>
 #include <render/wall.hpp>
+#include <render/door.hpp>
 #include <render/player.hpp>
 
 // =========
@@ -463,6 +465,7 @@ namespace pd::scene
 
 			update::physics_world(registry_, delta);
 			update::sync_physics_transform(registry_, delta);
+			update::process_physics_events(registry_, delta);
 
 			update::sprite_animation(registry_, delta);
 		}
@@ -474,6 +477,7 @@ namespace pd::scene
 
 		render::floor(registry_, window);
 		render::wall(registry_, window);
+		render::door(registry_, window);
 
 		render::player(registry_, window);
 

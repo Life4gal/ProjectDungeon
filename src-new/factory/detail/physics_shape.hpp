@@ -17,9 +17,21 @@ namespace pd::factory::detail
 	{
 		auto d = b2DefaultShapeDef();
 
+		// user data
+		// TODO: user data可以设置什么数据?或者说我们需要什么数据?
+		d.userData = nullptr;
+
 		// material
 		d.material.friction = def.material.friction;
 		d.material.restitution = def.material.restitution;
+
+		// density
+		d.density = def.density;
+
+		// filter
+		d.filter = b2DefaultFilter();
+		d.filter.categoryBits = std::to_underlying(def.category);
+		d.filter.maskBits = def.category_mask;
 
 		// sensor
 		d.isSensor = def.is_sensor;

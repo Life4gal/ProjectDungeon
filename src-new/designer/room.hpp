@@ -20,9 +20,9 @@ namespace pd::designer
 		constexpr static int tile_origin_y = tile_height / 2;
 
 		// 房间横向瓦片的数量
-		constexpr static size_type horizontal_count = 15;
+		constexpr static size_type horizontal_count = 17;
 		// 房间纵向瓦片的数量
-		constexpr static size_type vertical_count = 9;
+		constexpr static size_type vertical_count = 11;
 		// 房间宽度
 		constexpr static size_type width = horizontal_count * tile_width;
 		// 房间高度

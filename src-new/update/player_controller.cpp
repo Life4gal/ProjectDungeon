@@ -5,6 +5,8 @@
 
 #include <update/player_controller.hpp>
 
+#include <algorithm>
+
 #include <utility/physics.hpp>
 
 #include <component/player_controller.hpp>
@@ -18,8 +20,10 @@ namespace pd::update
 {
 	using namespace component;
 
-	auto player_controller(entt::registry& registry, [[maybe_unused]] const sf::Time delta) noexcept -> void
+	auto player_controller(entt::registry& registry, const sf::Time delta) noexcept -> void
 	{
+		const auto delta_seconds = delta.asSeconds();
+
 		const auto* target = registry.ctx().find<player_controller::Target>();
 		if (target == nullptr)
 		{
@@ -43,21 +47,29 @@ namespace pd::update
 			return d;
 		}();
 
-		if (direction == sf::Vector2f{0, 0})
-		{
-			return;
-		}
-
 		// 如果含有物理刚体组件
 		if (const auto* body_id = registry.try_get<physics_body::Id>(target->entity))
 		{
-			// TODO: 系数如何计算?
-			constexpr auto speed = utility::Physics::to_physics(120);
-			const auto direction_normalize = direction.normalized();
-			const auto mass = b2Body_GetMass(body_id->id);
-			const auto force = mass * direction_normalize * speed;
+			if (direction == sf::Vector2f{0, 0})
+			{
+				// 没有方向输入时停止
+				b2Body_SetLinearVelocity(body_id->id, {.x = 0, .y = 0});
+			}
+			else
+			{
+				constexpr auto responsiveness = 10.f;
+				constexpr auto pixels_max_speed = 120.f;
+				constexpr auto physics_max_speed = utility::Physics::to_physics(pixels_max_speed);
 
-			b2Body_ApplyForceToCenter(body_id->id, {.x = force.x, .y = force.y}, true);
+				const auto direction_normalize = direction.normalized();
+				const auto max_velocity = direction_normalize * physics_max_speed;
+				const auto current_velocity = b2Body_GetLinearVelocity(body_id->id);
+
+				const auto t = std::ranges::clamp(delta_seconds * responsiveness, 0.f, 1.f);
+				const auto velocity = current_velocity + (b2Vec2{.x = max_velocity.x, .y = max_velocity.y} - current_velocity) * t;
+
+				b2Body_SetLinearVelocity(body_id->id, velocity);
+			}
 
 			return;
 		}

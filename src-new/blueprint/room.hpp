@@ -5,10 +5,12 @@
 
 #pragma once
 
+#include <array>
 #include <vector>
 
 #include <blueprint/floor.hpp>
 #include <blueprint/wall.hpp>
+#include <blueprint/door.hpp>
 
 namespace pd::blueprint
 {
@@ -24,6 +26,8 @@ namespace pd::blueprint
 		std::vector<Floor> floors;
 		// 房间 -- 墙壁
 		std::vector<Wall> walls;
+		// 房间 -- 门
+		std::array<Door, 4> doors;
 
 		//
 	};

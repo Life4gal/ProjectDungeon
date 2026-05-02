@@ -26,6 +26,10 @@ namespace pd::blueprint
 	public:
 		PhysicsBodyType type;
 
+		// b2BodyDef::fixedRotation
+		bool fixed_rotation;
+
+		// b2BodyDef::isBullet
 		bool is_bullet;
 
 		// TODO: 其他需要的信息?
