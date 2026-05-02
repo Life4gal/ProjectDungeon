@@ -36,15 +36,19 @@
 // 事件
 
 #include <event/camera.hpp>
+#include <event/player.hpp>
 #include <event/wall.hpp>
 #include <event/door.hpp>
+#include <event/room.hpp>
 
 // =========
 // 监听
 
 #include <listener/camera.hpp>
+#include <listener/player.hpp>
 #include <listener/wall.hpp>
 #include <listener/door.hpp>
+#include <listener/room.hpp>
 
 // =========
 // 更新
@@ -299,6 +303,8 @@ namespace pd::scene
 		// 关卡
 		const auto level = designer::Level::generate(8, 5, 15, 4, 2);
 		factory::Level::create(registry_, level);
+		manager::Event::enqueue(event::room::Enter{});
+
 		// 玩家
 		const auto& start_room = level.rooms.find(blueprint::RoomType::START)->second;
 		auto player = designer::Player::test_character();
@@ -348,18 +354,25 @@ namespace pd::scene
 
 		// 相机
 		manager::Event::subscribe<event::camera::Set, &listener::camera::on_set>(registry_);
-		manager::Event::subscribe<event::camera::Move, &listener::camera::on_move>(registry_);
+		manager::Event::subscribe<event::camera::MoveTo, &listener::camera::on_move_to>(registry_);
+		manager::Event::subscribe<event::camera::Translate, &listener::camera::on_translate>(registry_);
 		manager::Event::subscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
-		// 地下城-- 关卡-- 房间-- 墙壁
+		// 玩家
+		manager::Event::subscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
+		manager::Event::subscribe<event::player::Translate, &listener::player::on_translate>(registry_);
+		// 地下城 -- 关卡 -- 房间-- 墙壁
 		manager::Event::subscribe<event::wall::ContactBegin, &listener::wall::on_contact_begin>(registry_);
 		manager::Event::subscribe<event::wall::ContactEnd, &listener::wall::on_contact_end>(registry_);
-		// 地下城-- 关卡-- 房间-- 门
+		// 地下城 -- 关卡 -- 房间-- 门
 		manager::Event::subscribe<event::door::ContactBegin, &listener::door::on_contact_begin>(registry_);
 		manager::Event::subscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
 		manager::Event::subscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
 		manager::Event::subscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
 		manager::Event::subscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
 		manager::Event::subscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
+		// 地下城 -- 关卡-- 房间
+		manager::Event::subscribe<event::room::Leave, &listener::room::on_leave>(registry_);
+		manager::Event::subscribe<event::room::Enter, &listener::room::on_enter>(registry_);
 
 		// 
 	}
@@ -385,18 +398,25 @@ namespace pd::scene
 
 		// 相机
 		manager::Event::unsubscribe<event::camera::Set, &listener::camera::on_set>(registry_);
-		manager::Event::unsubscribe<event::camera::Move, &listener::camera::on_move>(registry_);
+		manager::Event::unsubscribe<event::camera::MoveTo, &listener::camera::on_move_to>(registry_);
+		manager::Event::unsubscribe<event::camera::Translate, &listener::camera::on_translate>(registry_);
 		manager::Event::unsubscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
-		// 地下城-- 关卡-- 房间-- 墙壁
+		// 玩家
+		manager::Event::unsubscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
+		manager::Event::unsubscribe<event::player::Translate, &listener::player::on_translate>(registry_);
+		// 地下城 -- 关卡-- 房间-- 墙壁
 		manager::Event::unsubscribe<event::wall::ContactBegin, &listener::wall::on_contact_begin>(registry_);
 		manager::Event::unsubscribe<event::wall::ContactEnd, &listener::wall::on_contact_end>(registry_);
-		// 地下城-- 关卡-- 房间-- 门
+		// 地下城 -- 关卡-- 房间-- 门
 		manager::Event::unsubscribe<event::door::ContactBegin, &listener::door::on_contact_begin>(registry_);
 		manager::Event::unsubscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
 		manager::Event::unsubscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
 		manager::Event::unsubscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
 		manager::Event::unsubscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
 		manager::Event::unsubscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
+		// 地下城 -- 关卡-- 房间
+		manager::Event::unsubscribe<event::room::Leave, &listener::room::on_leave>(registry_);
+		manager::Event::unsubscribe<event::room::Enter, &listener::room::on_enter>(registry_);
 
 		// 最后销毁物理世界
 		destroy_physics_world(registry_);

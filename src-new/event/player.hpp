@@ -5,17 +5,9 @@
 
 #pragma once
 
-namespace pd::event::camera
+namespace pd::event::player
 {
-	class Set final
-	{
-	public:
-		float x;
-		float y;
-		float width;
-		float height;
-	};
-
+	// 仅在非玩家控制的移动时才触发该事件
 	class MoveTo final
 	{
 	public:
@@ -23,17 +15,11 @@ namespace pd::event::camera
 		float y;
 	};
 
+	// 仅在非玩家控制的移动时才触发该事件
 	class Translate final
 	{
 	public:
 		float x;
 		float y;
-	};
-
-	class Resize final
-	{
-	public:
-		float width;
-		float height;
 	};
 }

@@ -9,6 +9,16 @@
 
 namespace pd::designer
 {
+	enum class RoomNeighbor : std::uint8_t
+	{
+		NONE = 0,
+
+		NORTH = 0b0001,
+		SOUTH = 0b0010,
+		WEST = 0b0100,
+		EAST = 0b1000
+	};
+
 	class Room final
 	{
 	public:
@@ -30,6 +40,6 @@ namespace pd::designer
 		// 房间位置 = (offset_x * width, offset_y * height)
 
 		// 生成一个标准房间
-		[[nodiscard]] static auto standard(size_type offset_x, size_type offset_y) noexcept -> blueprint::Room;
+		[[nodiscard]] static auto standard(size_type offset_x, size_type offset_y, std::underlying_type_t<RoomNeighbor> neighbors) noexcept -> blueprint::Room;
 	};
 }

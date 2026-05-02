@@ -13,7 +13,9 @@ namespace pd::listener::camera
 {
 	auto on_set(entt::registry& registry, const event::camera::Set& set) noexcept -> void;
 
-	auto on_move(entt::registry& registry, const event::camera::Move& move) noexcept -> void;
+	auto on_move_to(entt::registry& registry, const event::camera::MoveTo& move_to) noexcept -> void;
+
+	auto on_translate(entt::registry& registry, const event::camera::Translate& translate) noexcept -> void;
 
 	auto on_resize(entt::registry& registry, const event::camera::Resize& resize) noexcept -> void;
 }

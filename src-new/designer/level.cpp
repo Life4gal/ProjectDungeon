@@ -45,6 +45,28 @@ namespace pd::designer
 				{1, 0}
 		}};
 
+		[[nodiscard]] constexpr auto direction_of(const RoomNeighbor neighbor) noexcept -> sf::Vector2<std::make_signed_t<size_type>>
+		{
+			if (neighbor == RoomNeighbor::NORTH)
+			{
+				return Directions[0];
+			}
+			if (neighbor == RoomNeighbor::SOUTH)
+			{
+				return Directions[1];
+			}
+			if (neighbor == RoomNeighbor::WEST)
+			{
+				return Directions[2];
+			}
+			if (neighbor == RoomNeighbor::EAST)
+			{
+				return Directions[3];
+			}
+
+			PROMETHEUS_PLATFORM_UNREACHABLE();
+		}
+
 		[[nodiscard]] auto make_matrix(const matrix_memory_type& memory, const size_type horizontal_count, const size_type vertical_count) noexcept -> matrix_type
 		{
 			return matrix_type
@@ -121,6 +143,19 @@ namespace pd::designer
 			return all_neighbors;
 		}
 
+		[[nodiscard]] auto has_placed_neighbor(const matrix_type& matrix, const position_type position, const RoomNeighbor neighbor) noexcept -> bool
+		{
+			const auto direction = direction_of(neighbor);
+			const position_type next_position = {position.x + direction.x, position.y + direction.y};
+
+			if (not is_within_bounds(matrix, next_position))
+			{
+				return false;
+			}
+
+			return element_of(matrix, next_position).has_value();
+		}
+
 		[[nodiscard]] auto count_placed_neighbors(const matrix_type& matrix, const position_type position) noexcept -> size_type
 		{
 			size_type count = 0;
@@ -142,6 +177,30 @@ namespace pd::designer
 			}
 
 			return count;
+		}
+
+		[[nodiscard]] auto get_placed_neighbors_mask(const matrix_type& matrix, const position_type position) noexcept -> std::underlying_type_t<RoomNeighbor>
+		{
+			std::underlying_type_t<RoomNeighbor> mask = std::to_underlying(RoomNeighbor::NONE);
+
+			if (has_placed_neighbor(matrix, position, RoomNeighbor::NORTH))
+			{
+				mask |= std::to_underlying(RoomNeighbor::NORTH);
+			}
+			if (has_placed_neighbor(matrix, position, RoomNeighbor::SOUTH))
+			{
+				mask |= std::to_underlying(RoomNeighbor::SOUTH);
+			}
+			if (has_placed_neighbor(matrix, position, RoomNeighbor::WEST))
+			{
+				mask |= std::to_underlying(RoomNeighbor::WEST);
+			}
+			if (has_placed_neighbor(matrix, position, RoomNeighbor::EAST))
+			{
+				mask |= std::to_underlying(RoomNeighbor::EAST);
+			}
+
+			return mask;
 		}
 
 		template<typename DoClean>
@@ -480,6 +539,7 @@ namespace pd::designer
 					continue;
 				}
 
+				const auto mask = get_placed_neighbors_mask(matrix, position);
 				const auto type = *element;
 
 				auto room = [&] noexcept -> blueprint::Room
@@ -489,36 +549,36 @@ namespace pd::designer
 						case blueprint::RoomType::START:
 						{
 							// TODO
-							return Room::standard(x, y);
+							return Room::standard(x, y, mask);
 						}
 						case blueprint::RoomType::STANDARD:
 						{
-							return Room::standard(x, y);
+							return Room::standard(x, y, mask);
 						}
 						case blueprint::RoomType::BOSS:
 						{
 							// TODO
-							return Room::standard(x, y);
+							return Room::standard(x, y, mask);
 						}
 						case blueprint::RoomType::KEY:
 						{
 							// TODO
-							return Room::standard(x, y);
+							return Room::standard(x, y, mask);
 						}
 						case blueprint::RoomType::MERCHANT:
 						{
 							// TODO
-							return Room::standard(x, y);
+							return Room::standard(x, y, mask);
 						}
 						case blueprint::RoomType::BONUS:
 						{
 							// TODO
-							return Room::standard(x, y);
+							return Room::standard(x, y, mask);
 						}
 						case blueprint::RoomType::EXIT:
 						{
 							// TODO
-							return Room::standard(x, y);
+							return Room::standard(x, y, mask);
 						}
 						default: // NOLINT(clang-diagnostic-covered-switch-default)
 						{

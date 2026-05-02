@@ -41,5 +41,8 @@ namespace pd::blueprint
 		PhysicsShapeOffsetBox physics_shape_door;
 		PhysicsShapeOffsetBox physics_shape_sensor;
 		PhysicsShapeOffsetBox physics_shape_blocker;
+
+		// 门所在方向
+		DoorDirection direction;
 	};
 }

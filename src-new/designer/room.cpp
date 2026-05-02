@@ -5,6 +5,9 @@
 
 #include <designer/room.hpp>
 
+// std::popcount
+#include <bit>
+
 #include <prometheus/platform/os.hpp>
 
 namespace pd::designer
@@ -19,8 +22,10 @@ namespace pd::designer
 		constexpr float DoorBlockerRatio = 1 - DoorBodyRatio - DoorSensorRatio;
 	}
 
-	auto Room::standard(const size_type offset_x, const size_type offset_y) noexcept -> blueprint::Room
+	auto Room::standard(const size_type offset_x, const size_type offset_y, const std::underlying_type_t<RoomNeighbor> neighbors) noexcept -> blueprint::Room
 	{
+		const auto neighbors_count = std::popcount(neighbors);
+
 		// ===========================================
 		// FLOOR
 		// ===========================================
@@ -109,7 +114,7 @@ namespace pd::designer
 			return {.transform = transform, .sprite = std::move(sprite), .physics_body = physics_body, .physics_shape = physics_shape};
 		};
 
-		auto walls = [] noexcept -> std::vector<blueprint::Wall>
+		auto walls = [&] noexcept -> std::vector<blueprint::Wall>
 		{
 			std::vector<blueprint::Wall> ws{};
 			ws.reserve(horizontal_count * 2 + (vertical_count - 2) * 2);
@@ -122,7 +127,15 @@ namespace pd::designer
 					// 跳过中间那一格,那是门所在
 					if (x == horizontal_count / 2)
 					{
-						continue;
+						if (y == 0 and (neighbors & std::to_underlying(RoomNeighbor::NORTH)))
+						{
+							continue;
+						}
+
+						if (y == vertical_count - 1 and (neighbors & std::to_underlying(RoomNeighbor::SOUTH)))
+						{
+							continue;
+						}
 					}
 
 					ws.push_back(make_wall(x, y));
@@ -136,7 +149,15 @@ namespace pd::designer
 					// 跳过中间那一格,那是门所在
 					if (y == vertical_count / 2)
 					{
-						continue;
+						if (x == 0 and (neighbors & std::to_underlying(RoomNeighbor::WEST)))
+						{
+							continue;
+						}
+
+						if (x == horizontal_count - 1 and (neighbors & std::to_underlying(RoomNeighbor::EAST)))
+						{
+							continue;
+						}
 					}
 
 					ws.push_back(make_wall(x, y));
@@ -304,19 +325,32 @@ namespace pd::designer
 					.physics_body = physics_body,
 					.physics_shape_door = physics_shape_door,
 					.physics_shape_sensor = physics_shape_sensor,
-					.physics_shape_blocker = physics_shape_blocker
+					.physics_shape_blocker = physics_shape_blocker,
+					.direction = direction
 			};
 		};
 
-		// TODO: 门是否创建取决于邻接房间是否存在
-		auto doors = [] noexcept -> std::array<blueprint::Door, 4>
+		auto doors = [&] noexcept -> std::vector<blueprint::Door>
 		{
-			std::array<blueprint::Door, 4> ds{};
+			std::vector<blueprint::Door> ds;
+			ds.reserve(neighbors_count);
 
-			ds[std::to_underlying(blueprint::DoorDirection::NORTH)] = make_door(horizontal_count / 2, 0, blueprint::DoorDirection::NORTH);
-			ds[std::to_underlying(blueprint::DoorDirection::SOUTH)] = make_door(horizontal_count / 2, vertical_count - 1, blueprint::DoorDirection::SOUTH);
-			ds[std::to_underlying(blueprint::DoorDirection::WEST)] = make_door(0, vertical_count / 2, blueprint::DoorDirection::WEST);
-			ds[std::to_underlying(blueprint::DoorDirection::EAST)] = make_door(horizontal_count - 1, vertical_count / 2, blueprint::DoorDirection::EAST);
+			if (neighbors & std::to_underlying(RoomNeighbor::NORTH))
+			{
+				ds.push_back(make_door(horizontal_count / 2, 0, blueprint::DoorDirection::NORTH));
+			}
+			if (neighbors & std::to_underlying(RoomNeighbor::SOUTH))
+			{
+				ds.push_back(make_door(horizontal_count / 2, vertical_count - 1, blueprint::DoorDirection::SOUTH));
+			}
+			if (neighbors & std::to_underlying(RoomNeighbor::WEST))
+			{
+				ds.push_back(make_door(0, vertical_count / 2, blueprint::DoorDirection::WEST));
+			}
+			if (neighbors & std::to_underlying(RoomNeighbor::EAST))
+			{
+				ds.push_back(make_door(horizontal_count - 1, vertical_count / 2, blueprint::DoorDirection::EAST));
+			}
 
 			return ds;
 		}();

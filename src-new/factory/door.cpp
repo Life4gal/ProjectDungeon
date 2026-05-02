@@ -40,6 +40,9 @@ namespace pd::factory
 			registry.emplace<door::PhysicsShapeBlocker>(entity, blocker_shape_id);
 		}
 
+		// direction
+		registry.emplace<door::Direction>(entity, static_cast<door::Direction>(door.direction));
+
 		registry.emplace<door::Door>(entity);
 
 		return entity;

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <blueprint/door.hpp>
+
 #include <component/transform.hpp>
 #include <component/sprite.hpp>
 #include <component/physics_body.hpp>
@@ -31,6 +33,15 @@ namespace pd::component::door
 	{
 	public:
 		b2ShapeId shape;
+	};
+
+	// blueprint::DoorDirection
+	enum class Direction : std::uint8_t
+	{
+		NORTH = 0b00,
+		SOUTH = 0b01,
+		WEST = 0b10,
+		EAST = 0b11,
 	};
 
 	class Door final {};

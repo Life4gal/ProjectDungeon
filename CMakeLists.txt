@@ -631,11 +631,15 @@ add_executable(
 
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/camera.hpp
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/player.hpp
 
 	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/wall.hpp
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/door.hpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/room.hpp
 
 	# ============================
 	# BLUEPRINT
@@ -701,12 +705,14 @@ add_executable(
 	# 屏幕
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/screen.hpp
 
-	# 房间 -- 地板
+	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/floor.hpp
-	# 房间 -- 墙壁
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/wall.hpp
-	# 房间 -- 门
+	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door.hpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
 		
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
@@ -763,12 +769,19 @@ add_executable(
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.cpp
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.cpp
+
 	# 地下城 -- 关卡 -- 房间 -- 墙壁
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/wall.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/wall.cpp
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.cpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/room.cpp
 
 	# ============================
 	# SYSTEM -- UPDATE
