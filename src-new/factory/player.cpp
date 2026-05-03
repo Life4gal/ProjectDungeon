@@ -11,6 +11,7 @@
 #include <factory/detail/sprite_animation.hpp>
 #include <factory/detail/physics_body.hpp>
 #include <factory/detail/physics_shape.hpp>
+#include <factory/detail/actor.hpp>
 
 #include <entt/entt.hpp>
 
@@ -33,6 +34,9 @@ namespace pd::factory
 			const auto shape_id = detail::create(body_id, player.transform, player.physics_shape);
 			registry.emplace<player::PhysicsShape>(entity, shape_id);
 		}
+		// actor
+		// FIXME: 如果animation的各个Sprite大小不一致,生命值条&魔法值条的偏移应该对应地调整,如何调整?
+		detail::attach(registry, entity, player.actor, player.animation.frames.front());
 
 		registry.emplace<player::Player>(entity);
 

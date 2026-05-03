@@ -655,6 +655,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_body.hpp
 	# 物理形状
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_shape.hpp
+	# Actor
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/actor.hpp
 
 	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/floor.hpp
@@ -713,7 +715,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door.hpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
-		
+	
+	# Actor
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/actor.hpp
+
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
 	# 玩家控制器
@@ -725,14 +730,22 @@ add_executable(
 
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.cpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.cpp
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite_animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite_animation.cpp
 	# 物理刚体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_body.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_body.cpp
 	# 物理形状
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_shape.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_shape.cpp
+	# Actor
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/actor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/actor.cpp
 
 	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.hpp
@@ -826,6 +839,10 @@ add_executable(
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.cpp
+
+	# 生命值&魔法值条
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.cpp
 
 	# ============================
 	# MENU

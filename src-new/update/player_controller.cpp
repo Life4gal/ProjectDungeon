@@ -10,6 +10,7 @@
 #include <utility/physics.hpp>
 
 #include <component/player_controller.hpp>
+#include <component/actor.hpp>
 #include <component/physics_body.hpp>
 
 #include <entt/entt.hpp>
@@ -58,8 +59,17 @@ namespace pd::update
 			else
 			{
 				constexpr auto responsiveness = 10.f;
-				constexpr auto pixels_max_speed = 120.f;
-				constexpr auto physics_max_speed = utility::Physics::to_physics(pixels_max_speed);
+				const auto pixels_max_speed = [&] noexcept -> float
+				{
+					if (const auto* speed = registry.try_get<actor::Speed>(target->entity);
+						speed)
+					{
+						return speed->speed;
+					}
+
+					return 120.f;
+				}();
+				const auto physics_max_speed = utility::Physics::to_physics(pixels_max_speed);
 
 				const auto direction_normalize = direction.normalized();
 				const auto max_velocity = direction_normalize * physics_max_speed;

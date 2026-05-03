@@ -49,7 +49,8 @@ namespace pd::designer
 				},
 				.radius = 32,
 		};
+		constexpr blueprint::Actor actor{.health = 50, .mana = 20, .speed = 120};
 
-		return {.transform = transform, .animation = std::move(animation), .physics_body = physics_body, .physics_shape = physics_shape};
+		return {.transform = transform, .animation = std::move(animation), .physics_body = physics_body, .physics_shape = physics_shape, .actor = actor};
 	}
 }

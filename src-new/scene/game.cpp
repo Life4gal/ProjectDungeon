@@ -67,6 +67,7 @@
 #include <render/wall.hpp>
 #include <render/door.hpp>
 #include <render/player.hpp>
+#include <render/health_mana_bar.hpp>
 
 // =========
 // 依赖
@@ -553,6 +554,7 @@ namespace pd::scene
 		render::door(registry_, window);
 
 		render::player(registry_, window);
+		render::health_mana_bar(registry_, window);
 
 		if (g_physics_world_draw_on)
 		{

@@ -5,11 +5,14 @@
 
 #pragma once
 
-#include <blueprint/detail/sprite.hpp>
-
 #include <entt/entity/fwd.hpp>
 
-namespace pd::factory::detail
+namespace sf
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void;
+	class RenderWindow;
+}
+
+namespace pd::render
+{
+	auto health_mana_bar(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
 }

@@ -5,11 +5,12 @@
 
 #pragma once
 
+#include <blueprint/detail/actor.hpp>
 #include <blueprint/detail/sprite.hpp>
 
-#include <entt/entity/fwd.hpp>
+#include <entt/entity/registry.hpp>
 
 namespace pd::factory::detail
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void;
+	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Actor& actor, const blueprint::Sprite& sprite) noexcept -> void;
 }

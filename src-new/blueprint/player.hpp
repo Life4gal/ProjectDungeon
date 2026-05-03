@@ -9,6 +9,7 @@
 #include <blueprint/detail/sprite_animation.hpp>
 #include <blueprint/detail/physics_body.hpp>
 #include <blueprint/detail/physics_shape.hpp>
+#include <blueprint/detail/actor.hpp>
 
 namespace pd::blueprint
 {
@@ -22,5 +23,7 @@ namespace pd::blueprint
 		PhysicsBody physics_body;
 		// 圆形碰撞体
 		PhysicsShapeCircle physics_shape;
+
+		Actor actor;
 	};
 }

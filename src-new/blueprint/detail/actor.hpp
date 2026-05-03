@@ -5,11 +5,17 @@
 
 #pragma once
 
-#include <blueprint/detail/sprite.hpp>
-
-#include <entt/entity/fwd.hpp>
-
-namespace pd::factory::detail
+namespace pd::blueprint
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void;
+	class Actor final
+	{
+	public:
+		// 最大生命值
+		float health;
+		// 最大魔法值
+		float mana;
+		// 最大移动速度
+		// 像素/秒
+		float speed;
+	};
 }

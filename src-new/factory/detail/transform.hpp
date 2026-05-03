@@ -7,18 +7,9 @@
 
 #include <blueprint/detail/transform.hpp>
 
-#include <component/transform.hpp>
-
-#include <entt/entity/registry.hpp>
+#include <entt/entity/fwd.hpp>
 
 namespace pd::factory::detail
 {
-	inline auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Transform& transform) noexcept -> void
-	{
-		using namespace component;
-
-		registry.emplace<transform::Position>(entity, sf::Vector2f{transform.x, transform.y});
-		registry.emplace<transform::Scale>(entity, sf::Vector2f{transform.scale_x, transform.scale_y});
-		registry.emplace<transform::Rotation>(entity, sf::degrees(transform.rotation));
-	}
+	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Transform& transform) noexcept -> void;
 }
