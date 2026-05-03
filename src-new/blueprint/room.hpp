@@ -10,6 +10,7 @@
 #include <blueprint/floor.hpp>
 #include <blueprint/wall.hpp>
 #include <blueprint/door.hpp>
+#include <blueprint/enemy.hpp>
 
 namespace pd::blueprint
 {
@@ -27,6 +28,10 @@ namespace pd::blueprint
 		std::vector<Wall> walls;
 		// 房间 -- 门
 		std::vector<Door> doors;
+
+		// 房间 -- 敌人
+		// TODO: 理论上敌人应该是独立于房间的存在?
+		std::vector<Enemy> enemies;
 
 		//
 	};

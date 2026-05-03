@@ -35,17 +35,11 @@ namespace pd::factory
 			registry.emplace<player::PhysicsShape>(entity, shape_id);
 		}
 		// actor
-		// FIXME: 如果animation的各个Sprite大小不一致,生命值条&魔法值条的偏移应该对应地调整,如何调整?
 		detail::attach(registry, entity, player.actor, player.animation.frames.front());
 
 		registry.emplace<player::Player>(entity);
 
 		return entity;
-	}
-
-	auto Player::destroy(entt::registry& registry, const entt::entity entity) noexcept -> void
-	{
-		registry.destroy(entity);
 	}
 
 	auto Player::destroy_all(entt::registry& registry) noexcept -> void

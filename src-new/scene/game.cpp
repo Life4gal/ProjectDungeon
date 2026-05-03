@@ -54,6 +54,7 @@
 // 更新
 
 #include <update/player_controller.hpp>
+#include <update/ai.hpp>
 #include <update/physics_world.hpp>
 #include <update/sync_physics_transform.hpp>
 #include <update/process_physics_events.hpp>
@@ -66,6 +67,7 @@
 #include <render/floor.hpp>
 #include <render/wall.hpp>
 #include <render/door.hpp>
+#include <render/enemy.hpp>
 #include <render/player.hpp>
 #include <render/health_mana_bar.hpp>
 
@@ -293,6 +295,8 @@ namespace pd::scene
 			return draw;
 		}();
 		auto g_physics_world_draw_on = false;
+
+		auto g_stop_ai = false;
 	}
 
 	auto Game::start_game() noexcept -> bool
@@ -309,8 +313,8 @@ namespace pd::scene
 		// 玩家
 		const auto& start_room = level.rooms.find(blueprint::RoomType::START)->second;
 		auto player = designer::Player::test_character();
-		player.transform.x = start_room.offset_x + 200;
-		player.transform.y = start_room.offset_y + 200;
+		player.transform.x += start_room.offset_x;
+		player.transform.y += start_room.offset_y;
 		const auto player_entity = factory::Player::spawn(registry_, player);
 		registry_.ctx().emplace<component::player_controller::Target>(player_entity);
 
@@ -473,6 +477,10 @@ namespace pd::scene
 				{
 					registry_.ctx().emplace<cpc::VerticalMovement>(cpc::MovementType::FORWARD);
 				}
+				else if (kp->code == Key::Q)
+				{
+					g_stop_ai = not g_stop_ai;
+				}
 				// =====================
 				// CAMERA
 				// =====================
@@ -537,6 +545,11 @@ namespace pd::scene
 		{
 			update::player_controller(registry_, delta);
 
+			if (not g_stop_ai)
+			{
+				update::ai(registry_, delta);
+			}
+
 			update::physics_world(registry_, delta);
 			update::sync_physics_transform(registry_, delta);
 			update::process_physics_events(registry_, delta);
@@ -553,6 +566,7 @@ namespace pd::scene
 		render::wall(registry_, window);
 		render::door(registry_, window);
 
+		render::enemy(registry_, window);
 		render::player(registry_, window);
 		render::health_mana_bar(registry_, window);
 

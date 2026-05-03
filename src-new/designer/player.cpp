@@ -5,14 +5,16 @@
 
 #include <designer/player.hpp>
 
+#include <designer/room.hpp>
+
 namespace pd::designer
 {
 	auto Player::test_character() noexcept -> blueprint::Player
 	{
 		constexpr blueprint::Transform transform
 		{
-				.x = 0,
-				.y = 0,
+				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
 				.scale_x = 1,
 				.scale_y = 1,
 				.rotation = 0,
@@ -51,6 +53,6 @@ namespace pd::designer
 		};
 		constexpr blueprint::Actor actor{.health = 50, .mana = 20, .speed = 120};
 
-		return {.transform = transform, .animation = std::move(animation), .physics_body = physics_body, .physics_shape = physics_shape, .actor = actor};
+		return {.transform = transform, .animation = std::move(animation), .actor = actor, .physics_body = physics_body, .physics_shape = physics_shape};
 	}
 }

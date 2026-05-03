@@ -7,21 +7,24 @@
 
 #include <component/wall.hpp>
 
+#include <prometheus/meta/enumeration.hpp>
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 
 namespace pd::listener::wall
 {
+	using namespace prometheus;
+
 	namespace cw = component::wall;
 	namespace ew = event::wall;
 
 	auto on_contact_begin([[maybe_unused]] entt::registry& registry, const ew::ContactBegin& contact_begin) noexcept -> void
 	{
-		SPDLOG_INFO("ContactBegin: [WALL]=0x{:08X}, [OTHER]=0x{:08X}", entt::to_integral(contact_begin.wall), entt::to_integral(contact_begin.other));
+		SPDLOG_INFO("ContactBegin: [WALL]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(contact_begin.wall), entt::to_integral(contact_begin.other), meta::name_of(contact_begin.other_type));
 	}
 
 	auto on_contact_end([[maybe_unused]] entt::registry& registry, const ew::ContactEnd& contact_end) noexcept -> void
 	{
-		SPDLOG_INFO("ContactEnd: [WALL]=0x{:08X}, [OTHER]=0x{:08X}", entt::to_integral(contact_end.wall), entt::to_integral(contact_end.other));
+		SPDLOG_INFO("ContactEnd: [WALL]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(contact_end.wall), entt::to_integral(contact_end.other), meta::name_of(contact_end.other_type));
 	}
 }

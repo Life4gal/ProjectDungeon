@@ -9,6 +9,17 @@
 
 namespace pd::designer
 {
+	enum class RoomConnection : std::uint8_t
+	{
+		NONE = 0,
+
+		NORTH = 0b0001,
+		SOUTH = 0b0010,
+		WEST = 0b0100,
+		EAST = 0b1000
+	};
+
+
 	enum class RoomNeighbor : std::uint8_t
 	{
 		NONE = 0,

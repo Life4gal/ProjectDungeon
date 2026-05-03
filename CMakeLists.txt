@@ -631,6 +631,7 @@ add_executable(
 
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/camera.hpp
+
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/player.hpp
 
@@ -657,6 +658,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_shape.hpp
 	# Actor
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/actor.hpp
+	# AI
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/ai.hpp
 
 	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/floor.hpp
@@ -668,7 +671,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/level.hpp
-
+	
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/enemy.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
 			
@@ -676,13 +681,25 @@ add_executable(
 	# DESIGNER
 	# ============================
 	
+	# 地下城 -- 关卡 -- 房间 -- 地板
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/floor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/floor.cpp
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/wall.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/wall.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/door.cpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.cpp
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.cpp
-
+	
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.cpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.cpp
@@ -718,12 +735,16 @@ add_executable(
 	
 	# Actor
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/actor.hpp
+	# AI
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
 
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/enemy.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player_controller.hpp
-
+	
 	# ============================
 	# SYSTEM -- FACTORY
 	# ============================
@@ -763,6 +784,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.cpp
 
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/enemy.cpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.cpp
@@ -782,6 +806,7 @@ add_executable(
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.cpp
+
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.cpp
@@ -804,6 +829,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.cpp
 	
+	# AI
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/ai.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/ai.cpp
+
 	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
@@ -836,6 +865,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/door.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/door.cpp
 
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/enemy.cpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.cpp

@@ -19,6 +19,7 @@
 #include <component/state.hpp>
 #include <component/player.hpp>
 
+#include <prometheus/meta/enumeration.hpp>
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
@@ -26,6 +27,8 @@
 
 namespace pd::listener::door
 {
+	using namespace prometheus;
+
 	namespace cd = component::door;
 	namespace ed = event::door;
 
@@ -44,12 +47,12 @@ namespace pd::listener::door
 
 	auto on_contact_begin([[maybe_unused]] entt::registry& registry, const ed::ContactBegin& contact_begin) noexcept -> void
 	{
-		SPDLOG_INFO("ContactBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}", entt::to_integral(contact_begin.door), entt::to_integral(contact_begin.other));
+		SPDLOG_INFO("ContactBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(contact_begin.door), entt::to_integral(contact_begin.other), meta::name_of(contact_begin.other_type));
 	}
 
 	auto on_contact_end([[maybe_unused]] entt::registry& registry, const ed::ContactEnd& contact_end) noexcept -> void
 	{
-		SPDLOG_INFO("ContactEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}", entt::to_integral(contact_end.door), entt::to_integral(contact_end.other));
+		SPDLOG_INFO("ContactEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(contact_end.door), entt::to_integral(contact_end.other), meta::name_of(contact_end.other_type));
 	}
 
 	auto on_sensor_begin([[maybe_unused]] entt::registry& registry, const ed::SensorBegin& sensor_begin) noexcept -> void
@@ -59,7 +62,7 @@ namespace pd::listener::door
 
 		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<cd::Door, cd::Direction>(sensor_begin.door)));
 
-		SPDLOG_INFO("SensorBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}", entt::to_integral(sensor_begin.door), entt::to_integral(sensor_begin.other));
+		SPDLOG_INFO("SensorBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(sensor_begin.door), entt::to_integral(sensor_begin.other), meta::name_of(sensor_begin.other_type));
 
 		// 无视非玩家实体
 		if (sensor_begin.other_type != blueprint::PhysicsShapeType::PLAYER or not registry.all_of<component::player::Player>(sensor_begin.other))
@@ -116,7 +119,7 @@ namespace pd::listener::door
 
 		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<cd::Door, cd::Direction>(sensor_end.door)));
 
-		SPDLOG_INFO("SensorEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}", entt::to_integral(sensor_end.door), entt::to_integral(sensor_end.other));
+		SPDLOG_INFO("SensorEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(sensor_end.door), entt::to_integral(sensor_end.other), meta::name_of(sensor_end.other_type));
 
 		// 无视非玩家实体
 		if (sensor_end.other_type != blueprint::PhysicsShapeType::PLAYER or not registry.all_of<component::player::Player>(sensor_end.other))

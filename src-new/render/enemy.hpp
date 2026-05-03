@@ -5,17 +5,14 @@
 
 #pragma once
 
-#include <blueprint/player.hpp>
-
 #include <entt/entity/fwd.hpp>
 
-namespace pd::factory
+namespace sf
 {
-	class Player final
-	{
-	public:
-		static auto spawn(entt::registry& registry, const blueprint::Player& player) noexcept -> entt::entity;
+	class RenderWindow;
+}
 
-		static auto destroy_all(entt::registry& registry) noexcept -> void;
-	};
+namespace pd::render
+{
+	auto enemy(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
 }

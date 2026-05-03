@@ -8,31 +8,27 @@
 #include <factory/floor.hpp>
 #include <factory/wall.hpp>
 #include <factory/door.hpp>
+#include <factory/enemy.hpp>
 
 namespace pd::factory
 {
 	auto Room::create(entt::registry& registry, const blueprint::Room& room) noexcept -> void
 	{
-		for (auto floor: room.floors)
+		for (const auto& floor: room.floors)
 		{
-			floor.transform.x += room.offset_x;
-			floor.transform.y += room.offset_y;
-
 			Floor::spawn(registry, floor);
 		}
-		for (auto wall: room.walls)
+		for (const auto& wall: room.walls)
 		{
-			wall.transform.x += room.offset_x;
-			wall.transform.y += room.offset_y;
-
 			Wall::spawn(registry, wall);
 		}
-		for (auto door: room.doors)
+		for (const auto& door: room.doors)
 		{
-			door.transform.x += room.offset_x;
-			door.transform.y += room.offset_y;
-
 			Door::spawn(registry, door);
+		}
+		for (const auto& enemy: room.enemies)
+		{
+			Enemy::spawn(registry, enemy);
 		}
 	}
 
@@ -41,5 +37,6 @@ namespace pd::factory
 		Floor::destroy_all(registry);
 		Wall::destroy_all(registry);
 		Door::destroy_all(registry);
+		Enemy::destroy_all(registry);
 	}
 }
