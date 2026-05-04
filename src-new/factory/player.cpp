@@ -35,7 +35,7 @@ namespace pd::factory
 			registry.emplace<player::PhysicsShape>(entity, shape_id);
 		}
 		// actor
-		detail::attach(registry, entity, player.actor, player.animation.frames.front());
+		detail::attach(registry, entity, player.actor, player.animation);
 
 		registry.emplace<player::Player>(entity);
 

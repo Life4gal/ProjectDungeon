@@ -19,40 +19,37 @@ namespace pd::update
 	{
 		const auto view = registry
 				.view<
-					const sprite_animation::Sprites,
-					const sprite_animation::Total,
+					const sprite_animation::Frames,
+					const sprite_animation::FramesCount,
+					const sprite_animation::Duration,
 					sprite_animation::Timer,
 					sprite_animation::Index,
 					const sprite_animation::Mode,
-					const sprite_animation::Direction,
-					// FIXME: 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture/Position/Size/Origin其实会比较浪费性能,可以考虑在动画帧切换时才获取&更新这些组件
-					sprite::Texture,
-					sprite::Position,
-					sprite::Size,
-					sprite::Origin
-				>(entt::exclude<
-					// 如果动画暂停则无需更新动画
-					sprite_animation::Paused,
-					// 如果动画已经结束(例如非循环动画播完了最后一帧)则无需更新动画
-					sprite_animation::Ended
-				>);
+					const sprite_animation::Direction>(
+					entt::exclude<
+						// 如果动画暂停则无需更新动画
+						sprite_animation::Paused,
+						// 如果动画已经结束(例如非循环动画播完了最后一帧)则无需更新动画
+						sprite_animation::Ended
+					>
+				);
 
-		for (const auto [entity, sprites, total, timer, index, mode, direction, texture, position, size, origin]: view.each())
+		for (const auto [entity, frames, frames_count, duration, timer, index, mode, direction]: view.each())
 		{
 			timer.elapsed += delta;
 			// 如果此帧未结束,无需更新
-			if (timer.elapsed < timer.duration)
+			if (timer.elapsed < duration.duration)
 			{
 				continue;
 			}
 
 			// 帧计时并不重置为0,而是减去当前帧的持续时间
-			timer.elapsed -= timer.duration;
+			timer.elapsed -= duration.duration;
 
 			using helper::SpriteAnimation;
 
 			// 跳转到下一帧
-			if (const auto next_frame_index = SpriteAnimation::jump_to_next_frame(total, index, mode, direction);
+			if (const auto next_frame_index = SpriteAnimation::jump_to_next_frame(frames_count, index, mode, direction);
 				next_frame_index == SpriteAnimation::animation_ended)
 			{
 				// 如果动画已结束则标记为已结束
@@ -61,12 +58,13 @@ namespace pd::update
 			else
 			{
 				// 切换sprite
-				const auto& sprite = sprites.sprites[next_frame_index];
+				const auto& [texture, position] = frames.frames[next_frame_index];
 
-				texture.texture = sprite.texture;
-				position.position = sprite.position;
-				size.size = sprite.size;
-				origin.origin = sprite.origin;
+				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position会比较浪费性能
+				// 在动画帧切换时才获取&更新这些组件
+				// Size&Origin无需更新,因为SpriteAnimation要求所有帧必须相同
+				registry.replace<sprite::Texture>(entity, texture);
+				registry.replace<sprite::Position>(entity, position);
 			}
 		}
 	}

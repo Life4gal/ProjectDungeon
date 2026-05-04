@@ -7,11 +7,13 @@
 
 #include <blueprint/detail/actor.hpp>
 #include <blueprint/detail/sprite.hpp>
+#include <blueprint/detail/sprite_animation.hpp>
 
 #include <entt/entity/registry.hpp>
 
 namespace pd::factory::detail
 {
-	// FIXME: 如果animation的各个Sprite大小不一致,生命值条&魔法值条的偏移应该对应地调整,如何调整?
 	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Actor& actor, const blueprint::Sprite& sprite) noexcept -> void;
+
+	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Actor& actor, const blueprint::SpriteAnimation& sprite_animation) noexcept -> void;
 }

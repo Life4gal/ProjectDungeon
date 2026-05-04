@@ -24,15 +24,19 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/rat.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/rat.png", .x = 0, .y = 0},
 						// 第二帧
-						{.texture = "./assets/tileset/rat.png", .x = 64, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/rat.png", .x = 64, .y = 0},
 						// 第三帧
-						{.texture = "./assets/tileset/rat.png", .x = 128, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/rat.png", .x = 128, .y = 0},
 						// 第四帧
-						{.texture = "./assets/tileset/rat.png", .x = 192, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/rat.png", .x = 192, .y = 0},
 				},
-				.durations_ms = {350, 350, 350, 350},
+				.width = 64,
+				.height = 64,
+				.origin_x = 32,
+				.origin_y = 32,
+				.duration_ms = 350,
 				.looping = true,
 				.reversed = false,
 		};
@@ -81,15 +85,19 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/slime.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/slime.png", .x = 0, .y = 0},
 						// 第二帧
-						{.texture = "./assets/tileset/slime.png", .x = 64, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/slime.png", .x = 64, .y = 0},
 						// 第三帧
-						{.texture = "./assets/tileset/slime.png", .x = 128, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/slime.png", .x = 128, .y = 0},
 						// 第四帧
-						{.texture = "./assets/tileset/slime.png", .x = 192, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/slime.png", .x = 192, .y = 0},
 				},
-				.durations_ms = {200, 200, 200, 200},
+				.width = 64,
+				.height = 64,
+				.origin_x = 32,
+				.origin_y = 32,
+				.duration_ms = 200,
 				.looping = true,
 				.reversed = false,
 		};
@@ -137,15 +145,19 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/bat.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/bat.png", .x = 0, .y = 0},
 						// 第二帧
-						{.texture = "./assets/tileset/bat.png", .x = 64, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/bat.png", .x = 64, .y = 0},
 						// 第三帧
-						{.texture = "./assets/tileset/bat.png", .x = 128, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/bat.png", .x = 128, .y = 0},
 						// 第四帧
-						{.texture = "./assets/tileset/bat.png", .x = 192, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/bat.png", .x = 192, .y = 0},
 				},
-				.durations_ms = {300, 300, 300, 300},
+				.width = 64,
+				.height = 64,
+				.origin_x = 32,
+				.origin_y = 32,
+				.duration_ms = 300,
 				.looping = true,
 				.reversed = false,
 		};

@@ -15,48 +15,45 @@ namespace pd::component::sprite_animation
 {
 	// sprite
 
-	// 所有精灵
-	class Sprites final
+	// 所有帧信息
+	class Frames final
 	{
 	public:
-		// 切换精灵时读取的信息
-		class Sprite final
+		class Frame final
 		{
 		public:
 			// sprite::Texture
 			manager::texture_handler texture;
 			// sprite::Position
 			sf::Vector2i position;
-			// sprite::Size
-			sf::Vector2i size;
-			// sprite::Origin
-			sf::Vector2i origin;
-
-			// blueprint::SpriteAnimation::durations_ms
-			int duration_ms;
 		};
 
-		std::vector<Sprite> sprites;
+		std::vector<Frame> frames;
 	};
 
-	// 精灵总数(sprites.size())
-	class Total final
+	// 总帧数
+	class FramesCount final
 	{
 	public:
-		std::size_t total;
+		// Frames::frames.size()
+		std::size_t frames_count;
 	};
 
-	// 当前动画帧计时器
+	// 每一帧的持续时间
+	class Duration final
+	{
+	public:
+		sf::Time duration;
+	};
+
+	// 帧计时器
 	class Timer final
 	{
 	public:
-		// 当前帧总持续时间
-		sf::Time duration;
-		// 当前帧已持续时间
 		sf::Time elapsed;
 	};
 
-	// 当前动画帧索引
+	// 帧索引
 	class Index final
 	{
 	public:
@@ -73,12 +70,12 @@ namespace pd::component::sprite_animation
 	};
 
 	// 当前动画播放方向
-	enum class Direction : std::int8_t
+	enum class Direction : std::uint8_t
 	{
 		// 正向播放
-		FORWARD = -1,
-		// 方向播放
-		BACKWARD = 1,
+		FORWARD,
+		// 反向播放
+		BACKWARD,
 	};
 
 	// 标记当前动画是否暂停

@@ -25,28 +25,24 @@ namespace pd::factory::detail
 
 		constexpr auto begin_frame_index = 0uz;
 
-		// sprites
-		auto& [sprites] = registry.emplace<sprite_animation::Sprites>(entity);
-		sprites.reserve(std::ranges::min(sprite_animation.frames.size(), sprite_animation.durations_ms.size()));
-		for (const auto [sprite, duration]: std::views::zip(sprite_animation.frames, sprite_animation.durations_ms))
+		// frames
 		{
-			auto texture = manager::Texture::load(std::string_view{sprite.texture});
+			auto& [frames] = registry.emplace<sprite_animation::Frames>(entity);
+			frames.reserve(sprite_animation.frames.size());
 
-			sprite_animation::Sprites::Sprite s
+			for (const auto& [texture, x, y]: sprite_animation.frames)
 			{
-					.texture = std::move(texture),
-					.position = sf::Vector2i{sprite.x, sprite.y},
-					.size = sf::Vector2i{sprite.width, sprite.height},
-					.origin = sf::Vector2i{sprite.origin_x, sprite.origin_y},
-					.duration_ms = duration
-			};
+				auto texture_handler = manager::Texture::load(std::string_view{texture});
 
-			sprites.emplace_back(std::move(s));
+				frames.emplace_back(std::move(texture_handler), sf::Vector2i{x, y});
+			}
 		}
-		// total
-		registry.emplace<sprite_animation::Total>(entity, sprites.size());
+		// frames_count
+		registry.emplace<sprite_animation::FramesCount>(entity, sprite_animation.frames.size());
+		// duration
+		registry.emplace<sprite_animation::Duration>(entity, sf::milliseconds(sprite_animation.duration_ms));
 		// timer
-		registry.emplace<sprite_animation::Timer>(entity, sprite_animation::Timer{.duration = sf::milliseconds(sprite_animation.durations_ms[begin_frame_index]), .elapsed = sf::Time::Zero});
+		registry.emplace<sprite_animation::Timer>(entity, sf::Time::Zero);
 		// index
 		registry.emplace<sprite_animation::Index>(entity, begin_frame_index);
 		// mode
@@ -55,6 +51,17 @@ namespace pd::factory::detail
 		registry.emplace<sprite_animation::Direction>(entity, sprite_animation.reversed ? sprite_animation::Direction::BACKWARD : sprite_animation::Direction::FORWARD);
 
 		// sprite
-		attach(registry, entity, sprite_animation.frames[begin_frame_index]);
+		const auto& [texture, x, y] = sprite_animation.frames[begin_frame_index];
+		const blueprint::Sprite sprite
+		{
+				.texture = texture,
+				.x = x,
+				.y = y,
+				.width = sprite_animation.width,
+				.height = sprite_animation.height,
+				.origin_x = sprite_animation.origin_x,
+				.origin_y = sprite_animation.origin_y,
+		};
+		attach(registry, entity, sprite);
 	}
 }

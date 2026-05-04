@@ -23,7 +23,7 @@ namespace pd::helper
 		//
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		[[nodiscard]] static auto get_next_frame_index(
-			const component::sprite_animation::Total& total,
+			const component::sprite_animation::FramesCount& frames_count,
 			const component::sprite_animation::Index& index,
 			const component::sprite_animation::Mode& mode,
 			const component::sprite_animation::Direction& direction
@@ -39,8 +39,7 @@ namespace pd::helper
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		// *不会*标记动画结束(显然如此,因为未传入registry&entity)
 		static auto set_next_frame(
-			const component::sprite_animation::Sprites& sprites,
-			const component::sprite_animation::Total& total,
+			const component::sprite_animation::FramesCount& frames_count,
 			component::sprite_animation::Timer& timer,
 			component::sprite_animation::Index& index,
 			const component::sprite_animation::Mode& mode,
@@ -58,7 +57,7 @@ namespace pd::helper
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		// *不会*标记动画结束(显然如此,因为未传入registry&entity)
 		static auto jump_to_next_frame(
-			const component::sprite_animation::Total& total,
+			const component::sprite_animation::FramesCount& frames_count,
 			component::sprite_animation::Index& index,
 			const component::sprite_animation::Mode& mode,
 			const component::sprite_animation::Direction& direction
@@ -75,24 +74,24 @@ namespace pd::helper
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		static auto set_frame(
 			index_type frame_index,
-			const component::sprite_animation::Sprites& sprites,
-			const component::sprite_animation::Total& total,
+			const component::sprite_animation::FramesCount& frames_count,
 			component::sprite_animation::Timer& timer,
 			component::sprite_animation::Index& index
-		) noexcept -> void;
+		) noexcept -> index_type;
 
 		// 使实体的动画播放到第N帧
 		//
 		// 假定实体存在动画组件
 		// 会更新Timer组件,即重置当前帧的计时(如果当前帧快结束时跳转到其他帧,则至少会保证在新帧停留duration_ms的时间)
-		static auto set_frame(entt::registry& registry, entt::entity entity_with_animation, index_type frame_index) noexcept -> void;
+		// 如果frame_index小于动画总帧数则返回frame_index,否则返回frame_index%frames_count
+		static auto set_frame(entt::registry& registry, entt::entity entity_with_animation, index_type frame_index) noexcept -> index_type;
 
 		// 使实体的动画播放到第N帧
 		//
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		static auto jump_to_frame(
 			index_type frame_index,
-			const component::sprite_animation::Total& total,
+			const component::sprite_animation::FramesCount& frames_count,
 			component::sprite_animation::Index& index
 		) noexcept -> index_type;
 
@@ -100,7 +99,7 @@ namespace pd::helper
 		//
 		// 假定实体存在动画组件
 		// 不会更新Timer组件,即不会重置当前帧的计时(如果当前帧快结束时跳转到其他帧,则可能会很快就进入下一帧)
-		// 如果frame_index小于动画总帧数则返回frame_index,否则返回frame_index%total
+		// 如果frame_index小于动画总帧数则返回frame_index,否则返回frame_index%frames_count
 		static auto jump_to_frame(entt::registry& registry, entt::entity entity_with_animation, index_type frame_index) noexcept -> index_type;
 
 		// 使指定实体的动画循环

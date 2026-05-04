@@ -40,7 +40,7 @@ namespace pd::factory
 			registry.emplace<enemy::PhysicsShape>(entity, shape_id);
 		}
 		// actor
-		detail::attach(registry, entity, enemy.actor, enemy.animation.frames.front());
+		detail::attach(registry, entity, enemy.actor, enemy.animation);
 		// type
 		registry.emplace<enemy::Type>(entity, static_cast<enemy::Type>(enemy.type));
 		// ai

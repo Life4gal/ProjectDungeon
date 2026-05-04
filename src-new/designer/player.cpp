@@ -24,15 +24,19 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/player.png", .x = 0, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/player.png", .x = 0, .y = 0},
 						// 第二帧
-						{.texture = "./assets/tileset/player.png", .x = 64, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/player.png", .x = 64, .y = 0},
 						// 第三帧
-						{.texture = "./assets/tileset/player.png", .x = 128, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/player.png", .x = 128, .y = 0},
 						// 第四帧
-						{.texture = "./assets/tileset/player.png", .x = 192, .y = 0, .width = 64, .height = 64, .origin_x = 32, .origin_y = 32},
+						{.texture = "./assets/tileset/player.png", .x = 192, .y = 0},
 				},
-				.durations_ms = {250, 250, 250, 250},
+				.width = 64,
+				.height = 64,
+				.origin_x = 32,
+				.origin_y = 32,
+				.duration_ms = 250,
 				.looping = true,
 				.reversed = false,
 		};

@@ -12,9 +12,9 @@ namespace pd::helper
 {
 	using namespace component::sprite_animation;
 
-	auto SpriteAnimation::get_next_frame_index(const Total& total, const Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
+	auto SpriteAnimation::get_next_frame_index(const FramesCount& frames_count, const Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
 	{
-		const auto last_index = total.total - 1;
+		const auto last_index = frames_count.frames_count - 1;
 		const auto current = index.index;
 
 		// 如果到了最后一帧(或第一帧)且不是循环动画则返回animation_ended
@@ -24,26 +24,26 @@ namespace pd::helper
 			return animation_ended;
 		}
 
-		const auto next_frame_index = direction == Direction::BACKWARD ? (current == 0 ? last_index : current - 1) : (current + 1) % total.total;
+		const auto next_frame_index = direction == Direction::BACKWARD ? (current == 0 ? last_index : current - 1) : (current + 1) % frames_count.frames_count;
 		return next_frame_index;
 	}
 
 	auto SpriteAnimation::get_next_frame_index(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Sprites,Index,Mode, Direction>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount,Index,Mode, Direction>(entity_with_animation)));
 
-		const auto& total = registry.get<const Total>(entity_with_animation);
+		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
 		const auto& index = registry.get<const Index>(entity_with_animation);
 		const auto& mode = registry.get<const Mode>(entity_with_animation);
 		const auto& direction = registry.get<const Direction>(entity_with_animation);
 
-		return get_next_frame_index(total, index, mode, direction);
+		return get_next_frame_index(frames_count, index, mode, direction);
 	}
 
-	auto SpriteAnimation::set_next_frame(const Sprites& sprites, const Total& total, Timer& timer, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
+	auto SpriteAnimation::set_next_frame(const FramesCount& frames_count, Timer& timer, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
 	{
 		// 获取下一帧索引
-		const auto next_frame_index = get_next_frame_index(total, index, mode, direction);
+		const auto next_frame_index = get_next_frame_index(frames_count, index, mode, direction);
 
 		// 如果动画已结束则什么也不做
 		if (next_frame_index == animation_ended)
@@ -52,20 +52,18 @@ namespace pd::helper
 		}
 
 		// 设置为指定帧
-		set_frame(next_frame_index, sprites, total, timer, index);
-		return next_frame_index;
+		return set_frame(next_frame_index, frames_count, timer, index);
 	}
 
 	auto SpriteAnimation::set_next_frame(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		const auto& sprites = registry.get<const Sprites>(entity_with_animation);
-		const auto& total = registry.get<const Total>(entity_with_animation);
+		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
 		auto& timer = registry.get<Timer>(entity_with_animation);
 		auto& index = registry.get<Index>(entity_with_animation);
 		const auto& mode = registry.get<const Mode>(entity_with_animation);
 		const auto& direction = registry.get<const Direction>(entity_with_animation);
 
-		const auto next_frame_index = set_next_frame(sprites, total, timer, index, mode, direction);
+		const auto next_frame_index = set_next_frame(frames_count, timer, index, mode, direction);
 
 		// 标记为已结束
 		if (next_frame_index == animation_ended)
@@ -76,10 +74,10 @@ namespace pd::helper
 		return next_frame_index;
 	}
 
-	auto SpriteAnimation::jump_to_next_frame(const Total& total, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
+	auto SpriteAnimation::jump_to_next_frame(const FramesCount& frames_count, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
 	{
 		// 获取下一帧索引
-		const auto next_frame_index = get_next_frame_index(total, index, mode, direction);
+		const auto next_frame_index = get_next_frame_index(frames_count, index, mode, direction);
 
 		// 如果动画已结束则什么也不做
 		if (next_frame_index == animation_ended)
@@ -88,17 +86,17 @@ namespace pd::helper
 		}
 
 		// 跳转到指定帧
-		return jump_to_frame(next_frame_index, total, index);
+		return jump_to_frame(next_frame_index, frames_count, index);
 	}
 
 	auto SpriteAnimation::jump_to_next_frame(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		const auto& total = registry.get<const Total>(entity_with_animation);
+		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
 		auto& index = registry.get<Index>(entity_with_animation);
 		const auto& mode = registry.get<const Mode>(entity_with_animation);
 		const auto& direction = registry.get<const Direction>(entity_with_animation);
 
-		const auto next_frame_index = jump_to_next_frame(total, index, mode, direction);
+		const auto next_frame_index = jump_to_next_frame(frames_count, index, mode, direction);
 
 		// 标记为已结束
 		if (next_frame_index == animation_ended)
@@ -109,35 +107,32 @@ namespace pd::helper
 		return next_frame_index;
 	}
 
-	auto SpriteAnimation::set_frame(index_type frame_index, const Sprites& sprites, const Total& total, Timer& timer, Index& index) noexcept -> void
+	auto SpriteAnimation::set_frame(index_type frame_index, const FramesCount& frames_count, Timer& timer, Index& index) noexcept -> index_type
 	{
 		// 跳转到指定帧
-		frame_index = jump_to_frame(frame_index, total, index);
-
-		// 指定帧动画时长
-		const auto frame_duration = sprites.sprites[frame_index].duration_ms;
+		frame_index = jump_to_frame(frame_index, frames_count, index);
 
 		// 设置帧计时器
-		timer.duration = sf::milliseconds(frame_duration);
 		timer.elapsed = sf::Time::Zero;
+
+		return frame_index;
 	}
 
-	auto SpriteAnimation::set_frame(entt::registry& registry, const entt::entity entity_with_animation, const index_type frame_index) noexcept -> void
+	auto SpriteAnimation::set_frame(entt::registry& registry, const entt::entity entity_with_animation, const index_type frame_index) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Sprites, Total, Timer, Index>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount, Timer, Index>(entity_with_animation)));
 
-		const auto& sprites = registry.get<const Sprites>(entity_with_animation);
-		const auto& total = registry.get<const Total>(entity_with_animation);
+		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
 		auto& timer = registry.get<Timer>(entity_with_animation);
 		auto& index = registry.get<Index>(entity_with_animation);
 
-		set_frame(frame_index, sprites, total, timer, index);
+		return set_frame(frame_index, frames_count, timer, index);
 	}
 
-	auto SpriteAnimation::jump_to_frame(index_type frame_index, const Total& total, Index& index) noexcept -> index_type
+	auto SpriteAnimation::jump_to_frame(index_type frame_index, const FramesCount& frames_count, Index& index) noexcept -> index_type
 	{
 		// 确保帧数不会超出总量
-		frame_index %= total.total;
+		frame_index %= frames_count.frames_count;
 
 		// 设置当前帧索引
 		index.index = frame_index;
@@ -146,12 +141,12 @@ namespace pd::helper
 
 	auto SpriteAnimation::jump_to_frame(entt::registry& registry, const entt::entity entity_with_animation, const index_type frame_index) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Sprites, Index>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount, Index>(entity_with_animation)));
 
-		const auto& total = registry.get<const Total>(entity_with_animation);
+		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
 		auto& index = registry.get<Index>(entity_with_animation);
 
-		return jump_to_frame(frame_index, total, index);
+		return jump_to_frame(frame_index, frames_count, index);
 	}
 
 	auto SpriteAnimation::looping(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void

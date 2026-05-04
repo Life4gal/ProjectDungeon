@@ -11,12 +11,28 @@
 
 namespace pd::blueprint
 {
+	// SpriteAnimation != vector<Sprite>
+	// SpriteAnimation要求所有帧的大小&原点&时长相同,仅是纹理&位置不同
 	class SpriteAnimation final
 	{
 	public:
-		std::vector<Sprite> frames;
+		class Frame final
+		{
+		public:
+			std::string texture;
+
+			int x;
+			int y;
+		};
+
+		std::vector<Frame> frames;
+
+		int width;
+		int height;
+		int origin_x;
+		int origin_y;
 		// 毫秒
-		std::vector<int> durations_ms;
+		int duration_ms;
 
 		// 是否循环播放
 		bool looping;
