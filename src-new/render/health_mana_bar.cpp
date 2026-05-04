@@ -39,6 +39,12 @@ namespace pd::render
 
 		for (const auto [entity, health, health_max, mana, mana_max, health_bar_size, health_bar_offset, mana_bar_size, mana_bar_offset, position]: view.each())
 		{
+			// 如果生命值为满则不显示
+			if (health.health == health_max.health) // NOLINT(clang-diagnostic-float-equal)
+			{
+				continue;
+			}
+
 			// 生命值条
 			{
 				constexpr auto health_bar_background_color = sf::Color::Red;

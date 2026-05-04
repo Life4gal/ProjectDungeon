@@ -493,11 +493,24 @@ namespace pd::scene
 				{
 					using namespace component;
 
-					// 击杀所有敌人
-					const auto view = registry_.view<state::InCameraArea, enemy::Enemy>();
-					for (const auto [entity]: view.each())
+					if (kp->control)
 					{
-						manager::Event::enqueue(event::actor::Dead{.attacker = entt::null, .victim = entity});
+						// 击杀所有敌人
+
+						for (const auto view = registry_.view<state::InCameraArea, enemy::Enemy>();
+						     const auto [entity]: view.each())
+						{
+							manager::Event::enqueue(event::actor::Dead{.attacker = entt::null, .victim = entity});
+						}
+					}
+					else
+					{
+						// 所有敌人生命值减半
+						for (const auto view = registry_.view<state::InCameraArea, enemy::Enemy, actor::Health>();
+						     const auto [entity, health]: view.each())
+						{
+							manager::Event::enqueue(event::actor::Hurt{.attacker = entt::null, .victim = entity, .damage = health.health / 2.f});
+						}
 					}
 				}
 				// =====================
