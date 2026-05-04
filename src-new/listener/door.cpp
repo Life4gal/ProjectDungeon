@@ -29,9 +29,6 @@ namespace pd::listener::door
 {
 	using namespace prometheus;
 
-	namespace cd = component::door;
-	namespace ed = event::door;
-
 	namespace
 	{
 		constexpr auto RoomWidth = static_cast<float>(designer::Room::width);
@@ -45,63 +42,118 @@ namespace pd::listener::door
 		constexpr auto PlayerOffsetY = 2.25f * TileHeight;
 	}
 
-	auto on_contact_begin([[maybe_unused]] entt::registry& registry, const ed::ContactBegin& contact_begin) noexcept -> void
+	auto on_contact_begin([[maybe_unused]] entt::registry& registry, const event::physics::ContactBegin& contact_begin) noexcept -> void
 	{
-		SPDLOG_INFO("ContactBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(contact_begin.door), entt::to_integral(contact_begin.other), meta::name_of(contact_begin.other_type));
-	}
+		namespace door = component::door;
 
-	auto on_contact_end([[maybe_unused]] entt::registry& registry, const ed::ContactEnd& contact_end) noexcept -> void
-	{
-		SPDLOG_INFO("ContactEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(contact_end.door), entt::to_integral(contact_end.other), meta::name_of(contact_end.other_type));
-	}
-
-	auto on_sensor_begin([[maybe_unused]] entt::registry& registry, const ed::SensorBegin& sensor_begin) noexcept -> void
-	{
-		using namespace event;
-		using manager::Event;
-
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<cd::Door, cd::Direction>(sensor_begin.door)));
-
-		SPDLOG_INFO("SensorBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(sensor_begin.door), entt::to_integral(sensor_begin.other), meta::name_of(sensor_begin.other_type));
-
-		// 无视非玩家实体
-		if (sensor_begin.other_type != blueprint::PhysicsShapeType::PLAYER or not registry.all_of<component::player::Player>(sensor_begin.other))
+		// 不是门直接跳过
+		if (contact_begin.a_type != blueprint::PhysicsShapeType::DOOR and contact_begin.b_type != blueprint::PhysicsShapeType::DOOR)
 		{
 			return;
 		}
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(contact_begin.a) or registry.all_of<door::Door>(contact_begin.b));
+
+		const auto a = contact_begin.a_type == blueprint::PhysicsShapeType::DOOR;
+
+		const auto door_entity = a ? contact_begin.a : contact_begin.b;
+		const auto other_entity = a ? contact_begin.b : contact_begin.a;
+		const auto other_type = a ? contact_begin.b_type : contact_begin.a_type;
+
+		SPDLOG_INFO(
+			"ContactBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})",
+			entt::to_integral(door_entity),
+			entt::to_integral(other_entity),
+			meta::name_of(other_type)
+		);
+	}
+
+	auto on_contact_end([[maybe_unused]] entt::registry& registry, const event::physics::ContactEnd& contact_end) noexcept -> void
+	{
+		namespace door = component::door;
+
+		// 不是门直接跳过
+		if (contact_end.a_type != blueprint::PhysicsShapeType::DOOR and contact_end.b_type != blueprint::PhysicsShapeType::DOOR)
+		{
+			return;
+		}
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(contact_end.a) or registry.all_of<door::Door>(contact_end.b));
+
+		const auto a = contact_end.a_type == blueprint::PhysicsShapeType::DOOR;
+
+		const auto door_entity = a ? contact_end.a : contact_end.b;
+		const auto other_entity = a ? contact_end.b : contact_end.a;
+		const auto other_type = a ? contact_end.b_type : contact_end.a_type;
+
+		SPDLOG_INFO(
+			"ContactEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})",
+			entt::to_integral(door_entity),
+			entt::to_integral(other_entity),
+			meta::name_of(other_type)
+		);
+	}
+
+	auto on_sensor_begin([[maybe_unused]] entt::registry& registry, const event::physics::SensorBegin& sensor_begin) noexcept -> void
+	{
+		namespace door = component::door;
+		namespace player = component::player;
+
+		using manager::Event;
+
+		// 不是门直接跳过
+		if (sensor_begin.sensor_type != blueprint::PhysicsShapeType::DOOR)
+		{
+			return;
+		}
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(sensor_begin.sensor));
+
+		SPDLOG_INFO(
+			"SensorBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})",
+			entt::to_integral(sensor_begin.sensor),
+			entt::to_integral(sensor_begin.visitor),
+			meta::name_of(sensor_begin.visitor_type)
+		);
+
+		// 无视非玩家实体
+		if (sensor_begin.visitor_type != blueprint::PhysicsShapeType::PLAYER)
+		{
+			return;
+		}
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<player::Player>(sensor_begin.visitor));
+
+		const auto door_direction = registry.get<const door::Direction>(sensor_begin.sensor);
+		const auto [room] = registry.get<const door::Room>(sensor_begin.sensor);
 
 		// 离开房间事件
-		Event::enqueue(room::Leave{});
+		Event::enqueue(event::room::Leave{.room = room});
 
 		// 移动相机和玩家
-		switch (const auto door_direction = registry.get<const cd::Direction>(sensor_begin.door);
-			door_direction)
+		switch (door_direction)
 		{
-			case component::door::Direction::NORTH:
+			case door::Direction::NORTH:
 			{
-				Event::enqueue(camera::Translate{.x = 0, .y = -CameraOffsetY});
-				Event::enqueue(player::Translate{.x = 0, .y = -PlayerOffsetY});
+				Event::enqueue(event::camera::Translate{.x = 0, .y = -CameraOffsetY});
+				Event::enqueue(event::player::Translate{.x = 0, .y = -PlayerOffsetY});
 
 				break;
 			}
-			case component::door::Direction::SOUTH:
+			case door::Direction::SOUTH:
 			{
-				Event::enqueue(camera::Translate{.x = 0, .y = CameraOffsetY});
-				Event::enqueue(player::Translate{.x = 0, .y = PlayerOffsetY});
+				Event::enqueue(event::camera::Translate{.x = 0, .y = CameraOffsetY});
+				Event::enqueue(event::player::Translate{.x = 0, .y = PlayerOffsetY});
 
 				break;
 			}
-			case component::door::Direction::WEST:
+			case door::Direction::WEST:
 			{
-				Event::enqueue(camera::Translate{.x = -CameraOffsetX, .y = 0});
-				Event::enqueue(player::Translate{.x = -PlayerOffsetX, .y = 0});
+				Event::enqueue(event::camera::Translate{.x = -CameraOffsetX, .y = 0});
+				Event::enqueue(event::player::Translate{.x = -PlayerOffsetX, .y = 0});
 
 				break;
 			}
-			case component::door::Direction::EAST:
+			case door::Direction::EAST:
 			{
-				Event::enqueue(camera::Translate{.x = CameraOffsetX, .y = 0});
-				Event::enqueue(player::Translate{.x = PlayerOffsetX, .y = 0});
+				Event::enqueue(event::camera::Translate{.x = CameraOffsetX, .y = 0});
+				Event::enqueue(event::player::Translate{.x = PlayerOffsetX, .y = 0});
 
 				break;
 			}
@@ -112,63 +164,74 @@ namespace pd::listener::door
 		}
 	}
 
-	auto on_sensor_end([[maybe_unused]] entt::registry& registry, const ed::SensorEnd& sensor_end) noexcept -> void
+	auto on_sensor_end([[maybe_unused]] entt::registry& registry, const event::physics::SensorEnd& sensor_end) noexcept -> void
 	{
-		using namespace event;
+		namespace door = component::door;
+		namespace player = component::player;
+
 		using manager::Event;
 
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<cd::Door, cd::Direction>(sensor_end.door)));
-
-		SPDLOG_INFO("SensorEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})", entt::to_integral(sensor_end.door), entt::to_integral(sensor_end.other), meta::name_of(sensor_end.other_type));
-
-		// 无视非玩家实体
-		if (sensor_end.other_type != blueprint::PhysicsShapeType::PLAYER or not registry.all_of<component::player::Player>(sensor_end.other))
+		// 不是门直接跳过
+		if (sensor_end.sensor_type != blueprint::PhysicsShapeType::DOOR)
 		{
 			return;
 		}
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(sensor_end.sensor));
+
+		SPDLOG_INFO(
+			"SensorEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})",
+			entt::to_integral(sensor_end.sensor),
+			entt::to_integral(sensor_end.visitor),
+			meta::name_of(sensor_end.visitor_type)
+		);
+
+		// 无视非玩家实体
+		if (sensor_end.visitor_type != blueprint::PhysicsShapeType::PLAYER)
+		{
+			return;
+		}
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<player::Player>(sensor_end.visitor));
 
 		// 进入门感应区 --> SensorBegin --> 离开房间&移动相机&移动玩家 --> SensorEnd
 		// 我们可以信赖此条调用链吗?
 
+		const auto [target_room] = registry.get<const door::TargetRoom>(sensor_end.sensor);
+
 		// 进入房间
-		Event::enqueue(room::Enter{});
+		Event::enqueue(event::room::Enter{.room = target_room});
 	}
 
-	auto on_request_open(entt::registry& registry, [[maybe_unused]] const ed::RequestOpen& request_open) noexcept -> void
+	auto on_request_open(entt::registry& registry, [[maybe_unused]] const event::door::RequestOpen& request_open) noexcept -> void
 	{
-		using namespace component;
+		namespace door = component::door;
 
-		for (const auto view = registry.view<state::InCameraArea, cd::Door, cd::PhysicsShapeDoor>();
-		     const auto [entity, physics_shape_door]: view.each())
+		// TODO: 如果门需要钥匙,检测玩家是否拥有钥匙?
+
+		// physics
+		if (const auto* physics_shape_door = registry.try_get<const door::PhysicsShapeDoor>(request_open.door))
 		{
-			// physics
-			{
-				auto filter = b2Shape_GetFilter(physics_shape_door.shape);
-				filter.maskBits = blueprint::PhysicsShapeCollisionMask::door_open;
+			auto filter = b2Shape_GetFilter(physics_shape_door->shape);
+			filter.maskBits = blueprint::PhysicsShapeCollisionMask::door_open;
 
-				b2Shape_SetFilter(physics_shape_door.shape, filter);
-			}
-
-			// TODO: animation
+			b2Shape_SetFilter(physics_shape_door->shape, filter);
 		}
+
+		// TODO: animation
 	}
 
-	auto on_request_close(entt::registry& registry, [[maybe_unused]] const ed::RequestClose& request_close) noexcept -> void
+	auto on_request_close(entt::registry& registry, [[maybe_unused]] const event::door::RequestClose& request_close) noexcept -> void
 	{
-		using namespace component;
+		namespace door = component::door;
 
-		for (const auto view = registry.view<state::InCameraArea, cd::Door, cd::PhysicsShapeDoor>();
-		     const auto [entity, physics_shape_door]: view.each())
+		// physics
+		if (const auto* physics_shape_door = registry.try_get<const door::PhysicsShapeDoor>(request_close.door))
 		{
-			// physics
-			{
-				auto filter = b2Shape_GetFilter(physics_shape_door.shape);
-				filter.maskBits = blueprint::PhysicsShapeCollisionMask::door_close;
+			auto filter = b2Shape_GetFilter(physics_shape_door->shape);
+			filter.maskBits = blueprint::PhysicsShapeCollisionMask::door_close;
 
-				b2Shape_SetFilter(physics_shape_door.shape, filter);
-			}
-
-			// TODO: animation
+			b2Shape_SetFilter(physics_shape_door->shape, filter);
 		}
+
+		// TODO: animation
 	}
 }

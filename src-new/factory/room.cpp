@@ -7,6 +7,7 @@
 
 #include <component/room.hpp>
 #include <component/door.hpp>
+#include <component/enemy.hpp>
 
 #include <factory/floor.hpp>
 #include <factory/wall.hpp>
@@ -34,14 +35,24 @@ namespace pd::factory
 			Wall::spawn(registry, wall);
 		}
 		// doors
-		for (const auto& door: room.doors)
 		{
-			const auto door_entity = Door::spawn(registry, door);
+			auto& [doors] = registry.emplace<room::Doors>(entity);
+			doors.reserve(room.doors.size());
 
-			// 先将门的目标房间设置为当前房间
-			// 如此在factory::Level我们便可以确定遍历到的门实体属于那个房间
-			registry.emplace<door::TargetRoom>(door_entity, entity); // NOLINT(readability-suspicious-call-argument)
+			for (const auto& door: room.doors)
+			{
+				const auto door_entity = Door::spawn(registry, door);
+
+				// 当前房间
+				registry.emplace<door::Room>(door_entity, entity); // NOLINT(readability-suspicious-call-argument)
+				// 先将门的目标房间设置为当前房间
+				// 如此在factory::Level我们便可以确定遍历到的门实体属于那个房间
+				registry.emplace<door::TargetRoom>(door_entity, entity); // NOLINT(readability-suspicious-call-argument)
+
+				doors.push_back(door_entity);
+			}
 		}
+
 		// enemies
 		{
 			auto& [enemies] = registry.emplace<room::Enemies>(entity);
@@ -50,6 +61,10 @@ namespace pd::factory
 			for (const auto& enemy: room.enemies)
 			{
 				const auto enemy_entity = Enemy::spawn(registry, enemy);
+
+				// 设置敌人所属房间
+				registry.emplace<enemy::Room>(enemy_entity, entity); // NOLINT(readability-suspicious-call-argument)
+
 				enemies.push_back(enemy_entity);
 			}
 		}

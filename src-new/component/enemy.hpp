@@ -8,12 +8,16 @@
 #include <component/transform.hpp>
 #include <component/sprite_animation.hpp>
 #include <component/physics_body.hpp>
+#include <component/actor.hpp>
+#include <component/ai.hpp>
 
 namespace pd::component::enemy
 {
 	// transform
 	// sprite_animation
 	// physics_body
+	// actor
+	// AI
 
 	class PhysicsShape final
 	{
@@ -27,6 +31,14 @@ namespace pd::component::enemy
 		RAT = 0,
 		SLIME,
 		BAT,
+	};
+
+	// 敌人所属房间
+	// 该组件不由factory::Enemy附加,而是由factory::Room附加
+	class Room final
+	{
+	public:
+		entt::entity room;
 	};
 
 	class Enemy final {};

@@ -5,27 +5,25 @@
 
 #pragma once
 
-#include <blueprint/detail/physics_shape.hpp>
-
 #include <entt/entity/fwd.hpp>
 
-namespace pd::event::wall
+namespace pd::event::actor
 {
-	class ContactBegin final
+	// 受到伤害
+	class Hurt final
 	{
 	public:
-		entt::entity wall;
-		entt::entity other;
+		entt::entity attacker;
+		entt::entity victim;
 
-		blueprint::PhysicsShapeType other_type;
+		float damage;
 	};
 
-	class ContactEnd final
+	// 死亡
+	class Dead final
 	{
 	public:
-		entt::entity wall;
-		entt::entity other;
-
-		blueprint::PhysicsShapeType other_type;
+		entt::entity attacker;
+		entt::entity victim;
 	};
 }

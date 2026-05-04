@@ -5,56 +5,21 @@
 
 #pragma once
 
-#include <blueprint/detail/physics_shape.hpp>
-
 #include <entt/entity/fwd.hpp>
 
 namespace pd::event::door
 {
-	// 任意实体与门接触
-	class ContactBegin final
+	// 请求开启指定门
+	class RequestOpen final
 	{
 	public:
 		entt::entity door;
-		entt::entity other;
-
-		blueprint::PhysicsShapeType other_type;
 	};
 
-	// 任意实体与门接触
-	class ContactEnd final
+	// 请求关闭指定门
+	class RequestClose final
 	{
 	public:
 		entt::entity door;
-		entt::entity other;
-
-		blueprint::PhysicsShapeType other_type;
 	};
-
-	// 任意实体与感应器接触
-	class SensorBegin final
-	{
-	public:
-		entt::entity door;
-		entt::entity other;
-
-		blueprint::PhysicsShapeType other_type;
-	};
-
-	// 任意实体与感应器接触
-	class SensorEnd final
-	{
-	public:
-		entt::entity door;
-		entt::entity other;
-
-		blueprint::PhysicsShapeType other_type;
-	};
-
-	// 请求开启所有门(如果其无需钥匙)
-	// 需要钥匙的门在ContactBegin中处理
-	class RequestOpen final {};
-
-	// 请求关闭所有门
-	class RequestClose final {};
 }

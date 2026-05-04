@@ -16,14 +16,13 @@
 
 namespace pd::listener::player
 {
-	namespace cpc = component::player_controller;
-	namespace ep = event::player;
-
-	auto on_move_to(entt::registry& registry, const ep::MoveTo& move_to) noexcept -> void
+	auto on_move_to(entt::registry& registry, const event::player::MoveTo& move_to) noexcept -> void
 	{
-		using namespace component;
+		namespace player_controller = component::player_controller;
+		namespace physics_body = component::physics_body;
+		namespace transform = component::transform;
 
-		const auto* target = registry.ctx().find<cpc::Target>();
+		const auto* target = registry.ctx().find<player_controller::Target>();
 		if (target == nullptr)
 		{
 			return;
@@ -57,11 +56,13 @@ namespace pd::listener::player
 		}
 	}
 
-	auto on_translate(entt::registry& registry, const ep::Translate& translate) noexcept -> void
+	auto on_translate(entt::registry& registry, const event::player::Translate& translate) noexcept -> void
 	{
-		using namespace component;
+		namespace player_controller = component::player_controller;
+		namespace physics_body = component::physics_body;
+		namespace transform = component::transform;
 
-		const auto* target = registry.ctx().find<cpc::Target>();
+		const auto* target = registry.ctx().find<player_controller::Target>();
 		if (target == nullptr)
 		{
 			return;

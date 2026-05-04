@@ -11,7 +11,14 @@
 
 namespace pd::component::room
 {
-	// 当前房间的敌人
+	// 当前房间的门实体
+	class Doors final
+	{
+	public:
+		std::vector<entt::entity> doors;
+	};
+
+	// 当前房间的敌人实体
 	// 在生成房间时填充列表
 	// 在敌人死亡时替换为null
 	// 在所有元素全部为null时打开门

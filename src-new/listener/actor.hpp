@@ -5,23 +5,13 @@
 
 #pragma once
 
+#include <event/actor.hpp>
+
 #include <entt/entity/fwd.hpp>
 
-namespace pd::event::room
+namespace pd::listener::actor
 {
-	// 离开房间
-	class Leave final
-	{
-	public:
-		// 离开的房间实体
-		entt::entity room;
-	};
+	auto on_hurt(entt::registry& registry, const event::actor::Hurt& hurt) noexcept -> void;
 
-	// 进入房间
-	class Enter final
-	{
-	public:
-		// 进入的房间实体
-		entt::entity room;
-	};
+	auto on_dead(entt::registry& registry, const event::actor::Dead& dead) noexcept -> void;
 }

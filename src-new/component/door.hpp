@@ -44,11 +44,20 @@ namespace pd::component::door
 		EAST = 0b11,
 	};
 
+	// 门所属房间实体
+	// 该组件不由factory::Door附加,而是由factory::Room附加
+	class Room final
+	{
+	public:
+		entt::entity room;
+	};
+
+	// 门所连接的房间实体
 	// 该组件不由factory::Door附加,而是由factory::Level附加
 	class TargetRoom final
 	{
 	public:
-		entt::entity target;
+		entt::entity target_room;
 	};
 
 	class Door final {};

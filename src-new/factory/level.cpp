@@ -79,7 +79,7 @@ namespace pd::factory
 			using namespace component;
 
 			const auto do_set = [&](
-				door::TargetRoom& target,
+				door::TargetRoom& target_room,
 				const entt::entity room,
 				const position_type room_position,
 				const entt::entity door,
@@ -101,14 +101,14 @@ namespace pd::factory
 					neighbor_room_position.y
 				);
 
-				target.target = neighbor_room;
+				target_room.target_room = neighbor_room;
 			};
 
 			for (const auto view = registry.view<door::Door, door::Direction, door::TargetRoom>();
 			     const auto [entity, direction, target_room]: view.each())
 			{
 				// target_room一开始设置为door所属房间
-				const auto room_entity = target_room.target;
+				const auto room_entity = target_room.target_room;
 
 				const auto it_room_position = entity_to_positions.find(room_entity);
 				if (it_room_position == entity_to_positions.end())

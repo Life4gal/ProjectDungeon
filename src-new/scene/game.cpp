@@ -26,6 +26,8 @@
 // 测试用
 
 #include <component/player_controller.hpp>
+#include <component/state.hpp>
+#include <component/enemy.hpp>
 
 #include <designer/level.hpp>
 #include <designer/player.hpp>
@@ -36,8 +38,8 @@
 // 事件
 
 #include <event/camera.hpp>
+#include <event/actor.hpp>
 #include <event/player.hpp>
-#include <event/wall.hpp>
 #include <event/door.hpp>
 #include <event/room.hpp>
 
@@ -45,8 +47,8 @@
 // 监听
 
 #include <listener/camera.hpp>
+#include <listener/actor.hpp>
 #include <listener/player.hpp>
-#include <listener/wall.hpp>
 #include <listener/door.hpp>
 #include <listener/room.hpp>
 
@@ -362,20 +364,23 @@ namespace pd::scene
 		manager::Event::subscribe<event::camera::MoveTo, &listener::camera::on_move_to>(registry_);
 		manager::Event::subscribe<event::camera::Translate, &listener::camera::on_translate>(registry_);
 		manager::Event::subscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
+		// Actor
+		manager::Event::subscribe<event::actor::Hurt, &listener::actor::on_hurt>(registry_);
+		manager::Event::subscribe<event::actor::Dead, &listener::actor::on_dead>(registry_);
+		// 敌人
+		//
 		// 玩家
 		manager::Event::subscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
 		manager::Event::subscribe<event::player::Translate, &listener::player::on_translate>(registry_);
-		// 地下城 -- 关卡 -- 房间-- 墙壁
-		manager::Event::subscribe<event::wall::ContactBegin, &listener::wall::on_contact_begin>(registry_);
-		manager::Event::subscribe<event::wall::ContactEnd, &listener::wall::on_contact_end>(registry_);
 		// 地下城 -- 关卡 -- 房间-- 门
-		manager::Event::subscribe<event::door::ContactBegin, &listener::door::on_contact_begin>(registry_);
-		manager::Event::subscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
-		manager::Event::subscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
-		manager::Event::subscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
+		manager::Event::subscribe<event::physics::ContactBegin, &listener::door::on_contact_begin>(registry_);
+		manager::Event::subscribe<event::physics::ContactEnd, &listener::door::on_contact_end>(registry_);
+		manager::Event::subscribe<event::physics::SensorBegin, &listener::door::on_sensor_begin>(registry_);
+		manager::Event::subscribe<event::physics::SensorEnd, &listener::door::on_sensor_end>(registry_);
 		manager::Event::subscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
 		manager::Event::subscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
 		// 地下城 -- 关卡-- 房间
+		manager::Event::subscribe<event::actor::Dead, &listener::room::on_dead>(registry_);
 		manager::Event::subscribe<event::room::Leave, &listener::room::on_leave>(registry_);
 		manager::Event::subscribe<event::room::Enter, &listener::room::on_enter>(registry_);
 
@@ -406,20 +411,23 @@ namespace pd::scene
 		manager::Event::unsubscribe<event::camera::MoveTo, &listener::camera::on_move_to>(registry_);
 		manager::Event::unsubscribe<event::camera::Translate, &listener::camera::on_translate>(registry_);
 		manager::Event::unsubscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
+		// Actor
+		manager::Event::unsubscribe<event::actor::Hurt, &listener::actor::on_hurt>(registry_);
+		manager::Event::unsubscribe<event::actor::Dead, &listener::actor::on_dead>(registry_);
+		// 敌人
+		//
 		// 玩家
 		manager::Event::unsubscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
 		manager::Event::unsubscribe<event::player::Translate, &listener::player::on_translate>(registry_);
-		// 地下城 -- 关卡-- 房间-- 墙壁
-		manager::Event::unsubscribe<event::wall::ContactBegin, &listener::wall::on_contact_begin>(registry_);
-		manager::Event::unsubscribe<event::wall::ContactEnd, &listener::wall::on_contact_end>(registry_);
 		// 地下城 -- 关卡-- 房间-- 门
-		manager::Event::unsubscribe<event::door::ContactBegin, &listener::door::on_contact_begin>(registry_);
-		manager::Event::unsubscribe<event::door::ContactEnd, &listener::door::on_contact_end>(registry_);
-		manager::Event::unsubscribe<event::door::SensorBegin, &listener::door::on_sensor_begin>(registry_);
-		manager::Event::unsubscribe<event::door::SensorEnd, &listener::door::on_sensor_end>(registry_);
+		manager::Event::unsubscribe<event::physics::ContactBegin, &listener::door::on_contact_begin>(registry_);
+		manager::Event::unsubscribe<event::physics::ContactEnd, &listener::door::on_contact_end>(registry_);
+		manager::Event::unsubscribe<event::physics::SensorBegin, &listener::door::on_sensor_begin>(registry_);
+		manager::Event::unsubscribe<event::physics::SensorEnd, &listener::door::on_sensor_end>(registry_);
 		manager::Event::unsubscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
 		manager::Event::unsubscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
 		// 地下城 -- 关卡-- 房间
+		manager::Event::unsubscribe<event::actor::Dead, &listener::room::on_dead>(registry_);
 		manager::Event::unsubscribe<event::room::Leave, &listener::room::on_leave>(registry_);
 		manager::Event::unsubscribe<event::room::Enter, &listener::room::on_enter>(registry_);
 
@@ -444,7 +452,7 @@ namespace pd::scene
 			if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
 			{
 				using sf::Keyboard::Key;
-				namespace cpc = component::player_controller;
+				namespace player_controller = component::player_controller;
 
 				if (kp->code == Key::Escape)
 				{
@@ -463,23 +471,34 @@ namespace pd::scene
 				// =====================
 				else if (kp->code == Key::A)
 				{
-					registry_.ctx().emplace<cpc::HorizontalMovement>(cpc::MovementType::BACKWARD);
+					registry_.ctx().emplace<player_controller::HorizontalMovement>(player_controller::MovementType::BACKWARD);
 				}
 				else if (kp->code == Key::D)
 				{
-					registry_.ctx().emplace<cpc::HorizontalMovement>(cpc::MovementType::FORWARD);
+					registry_.ctx().emplace<player_controller::HorizontalMovement>(player_controller::MovementType::FORWARD);
 				}
 				else if (kp->code == Key::W)
 				{
-					registry_.ctx().emplace<cpc::VerticalMovement>(cpc::MovementType::BACKWARD);
+					registry_.ctx().emplace<player_controller::VerticalMovement>(player_controller::MovementType::BACKWARD);
 				}
 				else if (kp->code == Key::S)
 				{
-					registry_.ctx().emplace<cpc::VerticalMovement>(cpc::MovementType::FORWARD);
+					registry_.ctx().emplace<player_controller::VerticalMovement>(player_controller::MovementType::FORWARD);
 				}
 				else if (kp->code == Key::Q)
 				{
 					g_stop_ai = not g_stop_ai;
+				}
+				else if (kp->code == Key::E)
+				{
+					using namespace component;
+
+					// 击杀所有敌人
+					const auto view = registry_.view<state::InCameraArea, enemy::Enemy>();
+					for (const auto [entity]: view.each())
+					{
+						manager::Event::enqueue(event::actor::Dead{.attacker = entt::null, .victim = entity});
+					}
 				}
 				// =====================
 				// CAMERA
@@ -511,18 +530,18 @@ namespace pd::scene
 			else if (const auto* kr = event.getIf<sf::Event::KeyReleased>())
 			{
 				using sf::Keyboard::Key;
-				namespace cpc = component::player_controller;
+				namespace player_controller = component::player_controller;
 
 				// =====================
 				// PLAYER_CONTROLLER
 				// =====================
 				if (kr->code == Key::A or kr->code == Key::D)
 				{
-					registry_.ctx().erase<cpc::HorizontalMovement>();
+					registry_.ctx().erase<player_controller::HorizontalMovement>();
 				}
 				else if (kr->code == Key::W or kr->code == Key::S)
 				{
-					registry_.ctx().erase<cpc::VerticalMovement>();
+					registry_.ctx().erase<player_controller::VerticalMovement>();
 				}
 			}
 		}

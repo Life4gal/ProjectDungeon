@@ -5,23 +5,11 @@
 
 #pragma once
 
+#include <event/enemy.hpp>
+
 #include <entt/entity/fwd.hpp>
 
-namespace pd::event::room
+namespace pd::listener::enemy
 {
-	// 离开房间
-	class Leave final
-	{
-	public:
-		// 离开的房间实体
-		entt::entity room;
-	};
-
-	// 进入房间
-	class Enter final
-	{
-	public:
-		// 进入的房间实体
-		entt::entity room;
-	};
+	//
 }

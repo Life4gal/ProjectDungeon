@@ -632,11 +632,17 @@ add_executable(
 	# 相机
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/camera.hpp
 
+	# 物理
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/physics.hpp
+	
+	# Actor
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/actor.hpp
+	
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/enemy.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/player.hpp
 
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/wall.hpp
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/door.hpp
 	# 地下城 -- 关卡 -- 房间
@@ -807,13 +813,17 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.cpp
 
+	# Actor
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/actor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/actor.cpp
+	
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/enemy.cpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.cpp
 
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/wall.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/wall.cpp
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.cpp

@@ -12,24 +12,25 @@
 
 namespace pd::listener::camera
 {
-	namespace cc = component::camera;
-	namespace ec = event::camera;
-
-	auto on_set(entt::registry& registry, const ec::Set& set) noexcept -> void
+	auto on_set(entt::registry& registry, const event::camera::Set& set) noexcept -> void
 	{
-		registry.ctx().emplace<cc::Dirty>();
+		namespace camera = component::camera;
 
-		registry.ctx().insert_or_assign(cc::Position{.position = {set.x, set.y}});
-		registry.ctx().insert_or_assign(cc::Size{.size = {set.width, set.height}});
+		registry.ctx().emplace<camera::Dirty>();
+
+		registry.ctx().insert_or_assign(camera::Position{.position = {set.x, set.y}});
+		registry.ctx().insert_or_assign(camera::Size{.size = {set.width, set.height}});
 
 		SPDLOG_INFO("Camera Set: [X]={}, [Y]={}, [Width]={}, [Height]={}", set.x, set.y, set.width, set.height);
 	}
 
-	auto on_move_to(entt::registry& registry, const ec::MoveTo& move_to) noexcept -> void
+	auto on_move_to(entt::registry& registry, const event::camera::MoveTo& move_to) noexcept -> void
 	{
-		registry.ctx().emplace<cc::Dirty>();
+		namespace camera = component::camera;
 
-		auto& [position] = registry.ctx().get<cc::Position>();
+		registry.ctx().emplace<camera::Dirty>();
+
+		auto& [position] = registry.ctx().get<camera::Position>();
 		const sf::Vector2f new_position{move_to.x, move_to.y};
 
 		SPDLOG_INFO("Camera MoveTo: [X]={} -> {}, [Y]={} -> {}", position.x, new_position.x, position.y, new_position.y);
@@ -37,11 +38,13 @@ namespace pd::listener::camera
 		position = new_position;
 	}
 
-	auto on_translate(entt::registry& registry, const ec::Translate& translate) noexcept -> void
+	auto on_translate(entt::registry& registry, const event::camera::Translate& translate) noexcept -> void
 	{
-		registry.ctx().emplace<cc::Dirty>();
+		namespace camera = component::camera;
 
-		auto& [position] = registry.ctx().get<cc::Position>();
+		registry.ctx().emplace<camera::Dirty>();
+
+		auto& [position] = registry.ctx().get<camera::Position>();
 		const sf::Vector2f new_position{position.x + translate.x, position.y + translate.y};
 
 		SPDLOG_INFO("Camera Translate: [X]={} -> {}, [Y]={} -> {}", position.x, new_position.x, position.y, new_position.y);
@@ -49,11 +52,13 @@ namespace pd::listener::camera
 		position = new_position;
 	}
 
-	auto on_resize(entt::registry& registry, const ec::Resize& resize) noexcept -> void
+	auto on_resize(entt::registry& registry, const event::camera::Resize& resize) noexcept -> void
 	{
-		registry.ctx().emplace<cc::Dirty>();
+		namespace camera = component::camera;
 
-		auto& [size] = registry.ctx().get<cc::Size>();
+		registry.ctx().emplace<camera::Dirty>();
+
+		auto& [size] = registry.ctx().get<camera::Size>();
 		const sf::Vector2f new_size{resize.width, resize.height};
 
 		SPDLOG_INFO("Camera Resize: [Width]={} -> {}, [Height]={} -> {}", size.x, new_size.x, size.y, new_size.y);
