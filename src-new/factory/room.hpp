@@ -14,8 +14,8 @@ namespace pd::factory
 	class Room final
 	{
 	public:
-		static auto create(entt::registry& registry, const blueprint::Room& room) noexcept -> void;
+		static auto spawn(entt::registry& registry, const blueprint::Room& room) noexcept -> entt::entity;
 
-		static auto destroy(entt::registry& registry) noexcept -> void;
+		static auto destroy_all(entt::registry& registry) noexcept -> void;
 	};
 }

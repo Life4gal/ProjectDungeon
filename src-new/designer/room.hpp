@@ -5,29 +5,65 @@
 
 #pragma once
 
+#include <array>
+
 #include <blueprint/room.hpp>
 
 namespace pd::designer
 {
-	enum class RoomConnection : std::uint8_t
+	class RoomNavigation final
 	{
-		NONE = 0,
+	public:
+		enum class DirectionValue : std::int32_t
+		{
+			BACKWARD = -1,
+			NONE = 0,
+			FORWARD = 1,
+		};
 
-		NORTH = 0b0001,
-		SOUTH = 0b0010,
-		WEST = 0b0100,
-		EAST = 0b1000
-	};
+		class Direction final
+		{
+		public:
+			using value_type = std::underlying_type_t<DirectionValue>;
 
+			value_type x;
+			value_type y;
+		};
 
-	enum class RoomNeighbor : std::uint8_t
-	{
-		NONE = 0,
+		// 各个方向的坐标偏移
+		constexpr static std::array<Direction, 4> directions
+		{{
+				// NORTH
+				{.x = std::to_underlying(DirectionValue::NONE), .y = std::to_underlying(DirectionValue::BACKWARD)},
+				// SOUTH
+				{.x = std::to_underlying(DirectionValue::NONE), .y = std::to_underlying(DirectionValue::FORWARD)},
+				// WEST
+				{.x = std::to_underlying(DirectionValue::BACKWARD), .y = std::to_underlying(DirectionValue::NONE)},
+				// EAST
+				{.x = std::to_underlying(DirectionValue::FORWARD), .y = std::to_underlying(DirectionValue::NONE)}
+		}};
 
-		NORTH = 0b0001,
-		SOUTH = 0b0010,
-		WEST = 0b0100,
-		EAST = 0b1000
+		[[nodiscard]] constexpr static auto direction_of(const blueprint::RoomConnection neighbor) noexcept -> Direction
+		{
+			if (neighbor == blueprint::RoomConnection::NORTH)
+			{
+				return directions[0];
+			}
+			if (neighbor == blueprint::RoomConnection::SOUTH)
+			{
+				return directions[1];
+			}
+			if (neighbor == blueprint::RoomConnection::WEST)
+			{
+				return directions[2];
+			}
+			if (neighbor == blueprint::RoomConnection::EAST)
+			{
+				return directions[3];
+			}
+
+			return {.x = std::to_underlying(DirectionValue::NONE), .y = std::to_underlying(DirectionValue::NONE)};
+		}
 	};
 
 	class Room final
@@ -51,6 +87,6 @@ namespace pd::designer
 		// 房间位置 = (offset_x * width, offset_y * height)
 
 		// 生成一个标准房间
-		[[nodiscard]] static auto standard(size_type offset_x, size_type offset_y, std::underlying_type_t<RoomNeighbor> neighbors) noexcept -> blueprint::Room;
+		[[nodiscard]] static auto standard(size_type offset_x, size_type offset_y, std::underlying_type_t<blueprint::RoomConnection> neighbors) noexcept -> blueprint::Room;
 	};
 }

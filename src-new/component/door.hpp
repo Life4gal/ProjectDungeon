@@ -44,5 +44,12 @@ namespace pd::component::door
 		EAST = 0b11,
 	};
 
+	// 该组件不由factory::Door附加,而是由factory::Level附加
+	class TargetRoom final
+	{
+	public:
+		entt::entity target;
+	};
+
 	class Door final {};
 }

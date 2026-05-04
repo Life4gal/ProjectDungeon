@@ -5,7 +5,22 @@
 
 #pragma once
 
+#include <vector>
+
+#include <entt/entity/fwd.hpp>
+
 namespace pd::component::room
 {
-	// 
+	// 当前房间的敌人
+	// 在生成房间时填充列表
+	// 在敌人死亡时替换为null
+	// 在所有元素全部为null时打开门
+	// 在离开房间时删除该组件
+	class Enemies final
+	{
+	public:
+		std::vector<entt::entity> enemies;
+	};
+
+	class Room final {};
 }

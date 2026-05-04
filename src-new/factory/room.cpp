@@ -5,38 +5,66 @@
 
 #include <factory/room.hpp>
 
+#include <component/room.hpp>
+#include <component/door.hpp>
+
 #include <factory/floor.hpp>
 #include <factory/wall.hpp>
 #include <factory/door.hpp>
 #include <factory/enemy.hpp>
 
+#include <entt/entt.hpp>
+
 namespace pd::factory
 {
-	auto Room::create(entt::registry& registry, const blueprint::Room& room) noexcept -> void
+	using namespace component;
+
+	auto Room::spawn(entt::registry& registry, const blueprint::Room& room) noexcept -> entt::entity
 	{
+		const auto entity = registry.create();
+
+		// floors
 		for (const auto& floor: room.floors)
 		{
 			Floor::spawn(registry, floor);
 		}
+		// walls
 		for (const auto& wall: room.walls)
 		{
 			Wall::spawn(registry, wall);
 		}
+		// doors
 		for (const auto& door: room.doors)
 		{
-			Door::spawn(registry, door);
+			const auto door_entity = Door::spawn(registry, door);
+
+			// 先将门的目标房间设置为当前房间
+			// 如此在factory::Level我们便可以确定遍历到的门实体属于那个房间
+			registry.emplace<door::TargetRoom>(door_entity, entity); // NOLINT(readability-suspicious-call-argument)
 		}
-		for (const auto& enemy: room.enemies)
+		// enemies
 		{
-			Enemy::spawn(registry, enemy);
+			auto& [enemies] = registry.emplace<room::Enemies>(entity);
+			enemies.reserve(room.enemies.size());
+
+			for (const auto& enemy: room.enemies)
+			{
+				const auto enemy_entity = Enemy::spawn(registry, enemy);
+				enemies.push_back(enemy_entity);
+			}
 		}
+
+		return entity;
 	}
 
-	auto Room::destroy(entt::registry& registry) noexcept -> void
+	auto Room::destroy_all(entt::registry& registry) noexcept -> void
 	{
 		Floor::destroy_all(registry);
 		Wall::destroy_all(registry);
 		Door::destroy_all(registry);
 		Enemy::destroy_all(registry);
+
+		const auto view = registry.view<room::Room>();
+		registry.destroy(view.begin(), view.end());
 	}
 }

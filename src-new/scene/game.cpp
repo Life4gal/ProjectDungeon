@@ -311,7 +311,7 @@ namespace pd::scene
 		manager::Event::enqueue(event::room::Enter{});
 
 		// 玩家
-		const auto& start_room = level.rooms.find(blueprint::RoomType::START)->second;
+		const auto& start_room = level.rooms.at(level.start_position);
 		auto player = designer::Player::test_character();
 		player.transform.x += start_room.offset_x;
 		player.transform.y += start_room.offset_y;

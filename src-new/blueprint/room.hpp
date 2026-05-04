@@ -14,9 +14,42 @@
 
 namespace pd::blueprint
 {
+	// 房间类型
+	enum class RoomType : std::uint8_t
+	{
+		// 起始房间
+		START,
+		// 标准房间
+		STANDARD,
+		// BOSS房间
+		BOSS,
+		// BOSS房间门钥匙房间
+		KEY,
+		// 商人房间
+		MERCHANT,
+		// 奖励房间
+		BONUS,
+		// 出口房间
+		EXIT,
+	};
+
+	// 房间的连接状态(邻居)
+	enum class RoomConnection : std::uint8_t
+	{
+		NONE = 0,
+
+		NORTH = 0b0001,
+		SOUTH = 0b0010,
+		WEST = 0b0100,
+		EAST = 0b1000
+	};
+
 	class Room final
 	{
 	public:
+		RoomType type;
+		std::underlying_type_t<RoomConnection> connection;
+
 		// 房间偏移
 		// entity-position = room-offset + position
 		float offset_x;

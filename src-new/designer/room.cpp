@@ -18,7 +18,7 @@
 
 namespace pd::designer
 {
-	auto Room::standard(const size_type offset_x, const size_type offset_y, const std::underlying_type_t<RoomNeighbor> neighbors) noexcept -> blueprint::Room
+	auto Room::standard(const size_type offset_x, const size_type offset_y, const std::underlying_type_t<blueprint::RoomConnection> neighbors) noexcept -> blueprint::Room
 	{
 		const auto neighbors_count = std::popcount(neighbors);
 
@@ -59,12 +59,12 @@ namespace pd::designer
 					// 跳过中间那一格,那是门所在
 					if (x == horizontal_count / 2)
 					{
-						if (y == 0 and (neighbors & std::to_underlying(RoomNeighbor::NORTH)))
+						if (y == 0 and (neighbors & std::to_underlying(blueprint::RoomConnection::NORTH)))
 						{
 							continue;
 						}
 
-						if (y == vertical_count - 1 and (neighbors & std::to_underlying(RoomNeighbor::SOUTH)))
+						if (y == vertical_count - 1 and (neighbors & std::to_underlying(blueprint::RoomConnection::SOUTH)))
 						{
 							continue;
 						}
@@ -81,12 +81,12 @@ namespace pd::designer
 					// 跳过中间那一格,那是门所在
 					if (y == vertical_count / 2)
 					{
-						if (x == 0 and (neighbors & std::to_underlying(RoomNeighbor::WEST)))
+						if (x == 0 and (neighbors & std::to_underlying(blueprint::RoomConnection::WEST)))
 						{
 							continue;
 						}
 
-						if (x == horizontal_count - 1 and (neighbors & std::to_underlying(RoomNeighbor::EAST)))
+						if (x == horizontal_count - 1 and (neighbors & std::to_underlying(blueprint::RoomConnection::EAST)))
 						{
 							continue;
 						}
@@ -108,19 +108,19 @@ namespace pd::designer
 			std::vector<blueprint::Door> ds;
 			ds.reserve(neighbors_count);
 
-			if (neighbors & std::to_underlying(RoomNeighbor::NORTH))
+			if (neighbors & std::to_underlying(blueprint::RoomConnection::NORTH))
 			{
 				ds.push_back(Door::standard(horizontal_count / 2, 0, blueprint::DoorDirection::NORTH));
 			}
-			if (neighbors & std::to_underlying(RoomNeighbor::SOUTH))
+			if (neighbors & std::to_underlying(blueprint::RoomConnection::SOUTH))
 			{
 				ds.push_back(Door::standard(horizontal_count / 2, vertical_count - 1, blueprint::DoorDirection::SOUTH));
 			}
-			if (neighbors & std::to_underlying(RoomNeighbor::WEST))
+			if (neighbors & std::to_underlying(blueprint::RoomConnection::WEST))
 			{
 				ds.push_back(Door::standard(0, vertical_count / 2, blueprint::DoorDirection::WEST));
 			}
-			if (neighbors & std::to_underlying(RoomNeighbor::EAST))
+			if (neighbors & std::to_underlying(blueprint::RoomConnection::EAST))
 			{
 				ds.push_back(Door::standard(horizontal_count - 1, vertical_count / 2, blueprint::DoorDirection::EAST));
 			}
@@ -164,6 +164,8 @@ namespace pd::designer
 
 		return
 		{
+				.type = blueprint::RoomType::STANDARD,
+				.connection = neighbors,
 				.offset_x = room_offset_x,
 				.offset_y = room_offset_y,
 				.floors = std::move(floors),

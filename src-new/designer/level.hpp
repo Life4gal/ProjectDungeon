@@ -12,7 +12,8 @@ namespace pd::designer
 	class Level final
 	{
 	public:
-		using size_type = std::uint32_t;
+		using position_type = blueprint::RoomPosition;
+		using size_type = position_type::size_type;
 
 		// 关卡横向房间的最小数量
 		constexpr static size_type horizontal_min_count = 6;
