@@ -8,18 +8,18 @@
 #include <component/transform.hpp>
 #include <component/sprite.hpp>
 #include <component/physics_body.hpp>
+#include <component/tags.hpp>
 
 namespace pd::component::wall
 {
 	// transform
 	// sprite
 	// physics_body
+	// tags
 
 	class PhysicsShape final
 	{
 	public:
 		b2ShapeId shape;
 	};
-
-	class Wall final {};
 }

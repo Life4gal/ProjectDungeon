@@ -6,6 +6,7 @@
 #include <listener/actor.hpp>
 
 #include <component/actor.hpp>
+#include <component/state.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -16,22 +17,26 @@ namespace pd::listener::actor
 	{
 		namespace actor = component::actor;
 
-		SPDLOG_INFO("实体(0x{:08X})受到来自实体(0x{:08X})的{:.1f}点伤害", entt::to_integral(hurt.victim), entt::to_integral(hurt.attacker), hurt.damage);
-
 		auto& [health] = registry.get<actor::Health>(hurt.victim);
+		auto& [damage_history] = registry.get<actor::DamageHistory>(hurt.victim);
+
 		health -= hurt.damage;
+		damage_history.emplace_back(hurt.attacker, hurt.damage);
+
+		SPDLOG_INFO("实体(0x{:08X})受到来自实体(0x{:08X})的{:.1f}点伤害,剩余{:.1f}点生命值", entt::to_integral(hurt.victim), entt::to_integral(hurt.attacker), hurt.damage, health);
 
 		// 死亡计算不在这里进行
+		// 见update::actor
 
 		// TODO: 受击效果?
 	}
 
 	auto on_dead(entt::registry& registry, const event::actor::Dead& dead) noexcept -> void
 	{
-		namespace actor = component::actor;
+		namespace state = component::state;
 
 		SPDLOG_INFO("实体(0x{:08X})被实体(0x{:08X})击杀", entt::to_integral(dead.victim), entt::to_integral(dead.attacker));
 
-		registry.emplace<actor::Dead>(dead.victim);
+		registry.emplace<state::Dead>(dead.victim);
 	}
 }

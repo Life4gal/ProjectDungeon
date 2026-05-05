@@ -31,35 +31,33 @@
 
 #include <designer/level.hpp>
 #include <designer/player.hpp>
+#include <designer/projectile.hpp>
 #include <factory/level.hpp>
 #include <factory/player.hpp>
-
-// =========
-// 事件
-
-#include <event/camera.hpp>
-#include <event/actor.hpp>
-#include <event/player.hpp>
-#include <event/door.hpp>
-#include <event/room.hpp>
+#include <factory/projectile.hpp>
 
 // =========
 // 监听
 
 #include <listener/camera.hpp>
 #include <listener/actor.hpp>
+// #include <listener/enemy.hpp>
 #include <listener/player.hpp>
+#include <listener/projectile.hpp>
 #include <listener/door.hpp>
 #include <listener/room.hpp>
 
 // =========
 // 更新
 
+#include <update/graveyard.hpp>
 #include <update/player_controller.hpp>
 #include <update/ai.hpp>
 #include <update/physics_world.hpp>
 #include <update/sync_physics_transform.hpp>
 #include <update/process_physics_events.hpp>
+#include <update/actor.hpp>
+#include <update/projectile.hpp>
 #include <update/sprite_animation.hpp>
 
 // =========
@@ -72,6 +70,7 @@
 #include <render/enemy.hpp>
 #include <render/player.hpp>
 #include <render/health_mana_bar.hpp>
+#include <render/projectile.hpp>
 
 // =========
 // 依赖
@@ -372,6 +371,9 @@ namespace pd::scene
 		// 玩家
 		manager::Event::subscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
 		manager::Event::subscribe<event::player::Translate, &listener::player::on_translate>(registry_);
+		// 飞弹
+		manager::Event::subscribe<event::physics::ContactBegin, &listener::projectile::on_contact_begin>(registry_);
+		manager::Event::subscribe<event::physics::ContactEnd, &listener::projectile::on_contact_end>(registry_);
 		// 地下城 -- 关卡 -- 房间-- 门
 		manager::Event::subscribe<event::physics::ContactBegin, &listener::door::on_contact_begin>(registry_);
 		manager::Event::subscribe<event::physics::ContactEnd, &listener::door::on_contact_end>(registry_);
@@ -419,6 +421,9 @@ namespace pd::scene
 		// 玩家
 		manager::Event::unsubscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
 		manager::Event::unsubscribe<event::player::Translate, &listener::player::on_translate>(registry_);
+		// 飞弹
+		manager::Event::unsubscribe<event::physics::ContactBegin, &listener::projectile::on_contact_begin>(registry_);
+		manager::Event::unsubscribe<event::physics::ContactEnd, &listener::projectile::on_contact_end>(registry_);
 		// 地下城 -- 关卡-- 房间-- 门
 		manager::Event::unsubscribe<event::physics::ContactBegin, &listener::door::on_contact_begin>(registry_);
 		manager::Event::unsubscribe<event::physics::ContactEnd, &listener::door::on_contact_end>(registry_);
@@ -485,6 +490,33 @@ namespace pd::scene
 				{
 					registry_.ctx().emplace<player_controller::VerticalMovement>(player_controller::MovementType::FORWARD);
 				}
+				else if (kp->code == Key::Left or kp->code == Key::Right or kp->code == Key::Up or kp->code == Key::Down)
+				{
+					// TODO: 蓝图持久化?
+					const static auto projectile_blueprint = designer::Projectile::standard();
+
+					if (const auto* target = registry_.ctx().find<const player_controller::Target>())
+					{
+						const auto direction = [&] noexcept -> sf::Vector2f
+						{
+							if (kp->code == Key::Left)
+							{
+								return {-1, 0};
+							}
+							if (kp->code == Key::Right)
+							{
+								return {1, 0};
+							}
+							if (kp->code == Key::Up)
+							{
+								return {0, -1};
+							}
+							return {0, 1};
+						}();
+
+						factory::Projectile::spawn(registry_, projectile_blueprint, target->entity, direction);
+					}
+				}
 				else if (kp->code == Key::Q)
 				{
 					g_stop_ai = not g_stop_ai;
@@ -497,7 +529,7 @@ namespace pd::scene
 					{
 						// 击杀所有敌人
 
-						for (const auto view = registry_.view<state::InCameraArea, enemy::Enemy>();
+						for (const auto view = registry_.view<state::InCameraArea, tags::Enemy>();
 						     const auto [entity]: view.each())
 						{
 							manager::Event::enqueue(event::actor::Dead{.attacker = entt::null, .victim = entity});
@@ -506,7 +538,7 @@ namespace pd::scene
 					else
 					{
 						// 所有敌人生命值减半
-						for (const auto view = registry_.view<state::InCameraArea, enemy::Enemy, actor::Health>();
+						for (const auto view = registry_.view<state::InCameraArea, tags::Enemy, actor::Health>();
 						     const auto [entity, health]: view.each())
 						{
 							manager::Event::enqueue(event::actor::Hurt{.attacker = entt::null, .victim = entity, .damage = health.health / 2.f});
@@ -575,6 +607,12 @@ namespace pd::scene
 		}
 		else
 		{
+			// 我们让(且只让)墓地来销毁实体
+			// 我们让其在每一帧开头(或者说每一帧末尾)来销毁那些被标记死亡的实体
+			// 如此便能够保证那些压入事件中的实体在被监听器处理时依然有效
+			// TODO: 这会引入一个新的问题,被标记死亡的实体并没有被立刻销毁,如果其存在物理刚体,那这一帧内该物理刚体依然会起效果(且该效果并非我们本意)
+			update::graveyard(registry_, delta);
+
 			update::player_controller(registry_, delta);
 
 			if (not g_stop_ai)
@@ -585,6 +623,10 @@ namespace pd::scene
 			update::physics_world(registry_, delta);
 			update::sync_physics_transform(registry_, delta);
 			update::process_physics_events(registry_, delta);
+
+			update::actor(registry_, delta);
+
+			update::projectile(registry_, delta);
 
 			update::sprite_animation(registry_, delta);
 		}
@@ -601,6 +643,8 @@ namespace pd::scene
 		render::enemy(registry_, window);
 		render::player(registry_, window);
 		render::health_mana_bar(registry_, window);
+
+		render::projectile(registry_, window);
 
 		if (g_physics_world_draw_on)
 		{

@@ -16,8 +16,6 @@
 #include <event/player.hpp>
 
 #include <component/door.hpp>
-#include <component/state.hpp>
-#include <component/player.hpp>
 
 #include <prometheus/meta/enumeration.hpp>
 #include <prometheus/platform/os.hpp>
@@ -44,14 +42,14 @@ namespace pd::listener::door
 
 	auto on_contact_begin([[maybe_unused]] entt::registry& registry, const event::physics::ContactBegin& contact_begin) noexcept -> void
 	{
-		namespace door = component::door;
+		namespace tags = component::tags;
 
 		// 不是门直接跳过
 		if (contact_begin.a_type != blueprint::PhysicsShapeType::DOOR and contact_begin.b_type != blueprint::PhysicsShapeType::DOOR)
 		{
 			return;
 		}
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(contact_begin.a) or registry.all_of<door::Door>(contact_begin.b));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Door>(contact_begin.a) or registry.all_of<tags::Door>(contact_begin.b));
 
 		const auto a = contact_begin.a_type == blueprint::PhysicsShapeType::DOOR;
 
@@ -69,14 +67,14 @@ namespace pd::listener::door
 
 	auto on_contact_end([[maybe_unused]] entt::registry& registry, const event::physics::ContactEnd& contact_end) noexcept -> void
 	{
-		namespace door = component::door;
+		namespace tags = component::tags;
 
 		// 不是门直接跳过
 		if (contact_end.a_type != blueprint::PhysicsShapeType::DOOR and contact_end.b_type != blueprint::PhysicsShapeType::DOOR)
 		{
 			return;
 		}
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(contact_end.a) or registry.all_of<door::Door>(contact_end.b));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Door>(contact_end.a) or registry.all_of<tags::Door>(contact_end.b));
 
 		const auto a = contact_end.a_type == blueprint::PhysicsShapeType::DOOR;
 
@@ -94,8 +92,8 @@ namespace pd::listener::door
 
 	auto on_sensor_begin([[maybe_unused]] entt::registry& registry, const event::physics::SensorBegin& sensor_begin) noexcept -> void
 	{
+		namespace tags = component::tags;
 		namespace door = component::door;
-		namespace player = component::player;
 
 		using manager::Event;
 
@@ -104,7 +102,7 @@ namespace pd::listener::door
 		{
 			return;
 		}
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(sensor_begin.sensor));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Door>(sensor_begin.sensor));
 
 		SPDLOG_INFO(
 			"SensorBegin: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})",
@@ -118,7 +116,7 @@ namespace pd::listener::door
 		{
 			return;
 		}
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<player::Player>(sensor_begin.visitor));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Player>(sensor_begin.visitor));
 
 		const auto door_direction = registry.get<const door::Direction>(sensor_begin.sensor);
 		const auto [room] = registry.get<const door::Room>(sensor_begin.sensor);
@@ -166,8 +164,8 @@ namespace pd::listener::door
 
 	auto on_sensor_end([[maybe_unused]] entt::registry& registry, const event::physics::SensorEnd& sensor_end) noexcept -> void
 	{
+		namespace tags = component::tags;
 		namespace door = component::door;
-		namespace player = component::player;
 
 		using manager::Event;
 
@@ -176,7 +174,7 @@ namespace pd::listener::door
 		{
 			return;
 		}
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<door::Door>(sensor_end.sensor));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Door>(sensor_end.sensor));
 
 		SPDLOG_INFO(
 			"SensorEnd: [DOOR]=0x{:08X}, [OTHER]=0x{:08X}({})",
@@ -190,7 +188,7 @@ namespace pd::listener::door
 		{
 			return;
 		}
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<player::Player>(sensor_end.visitor));
+		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Player>(sensor_end.visitor));
 
 		// 进入门感应区 --> SensorBegin --> 离开房间&移动相机&移动玩家 --> SensorEnd
 		// 我们可以信赖此条调用链吗?

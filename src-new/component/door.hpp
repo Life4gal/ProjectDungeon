@@ -10,12 +10,14 @@
 #include <component/transform.hpp>
 #include <component/sprite.hpp>
 #include <component/physics_body.hpp>
+#include <component/tags.hpp>
 
 namespace pd::component::door
 {
 	// transform
 	// sprite
 	// physics_body
+	// tags
 
 	class PhysicsShapeDoor final
 	{
@@ -59,6 +61,4 @@ namespace pd::component::door
 	public:
 		entt::entity target_room;
 	};
-
-	class Door final {};
 }

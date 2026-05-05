@@ -80,14 +80,14 @@ namespace pd::factory
 			}
 		}
 
-		registry.emplace<enemy::Enemy>(entity);
+		registry.emplace<tags::Enemy>(entity);
 
 		return entity;
 	}
 
 	auto Enemy::destroy_all(entt::registry& registry) noexcept -> void
 	{
-		const auto view = registry.view<enemy::Enemy>();
+		const auto view = registry.view<tags::Enemy>();
 		registry.destroy(view.begin(), view.end());
 	}
 }

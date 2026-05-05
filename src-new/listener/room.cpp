@@ -21,10 +21,11 @@ namespace pd::listener::room
 {
 	auto on_dead(entt::registry& registry, const event::actor::Dead& dead) noexcept -> void
 	{
+		namespace tags = component::tags;
 		namespace room = component::room;
 		namespace enemy = component::enemy;
 
-		if (not registry.all_of<enemy::Enemy>(dead.victim))
+		if (not registry.all_of<tags::Enemy>(dead.victim))
 		{
 			// 不是敌人不处理
 			return;

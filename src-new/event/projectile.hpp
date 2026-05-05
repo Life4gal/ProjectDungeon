@@ -5,13 +5,9 @@
 
 #pragma once
 
-#include <component/transform.hpp>
-#include <component/sprite.hpp>
-#include <component/tags.hpp>
+#include <entt/entity/fwd.hpp>
 
-namespace pd::component::floor
+namespace pd::event::projectile
 {
-	// transform
-	// sprite
-	// tags
+	//
 }

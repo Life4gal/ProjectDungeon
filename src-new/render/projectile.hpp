@@ -5,13 +5,14 @@
 
 #pragma once
 
-#include <component/transform.hpp>
-#include <component/sprite.hpp>
-#include <component/tags.hpp>
+#include <entt/entity/fwd.hpp>
 
-namespace pd::component::floor
+namespace sf
 {
-	// transform
-	// sprite
-	// tags
+	class RenderWindow;
+}
+
+namespace pd::render
+{
+	auto projectile(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
 }

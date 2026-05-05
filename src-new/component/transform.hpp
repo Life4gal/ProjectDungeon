@@ -10,18 +10,21 @@
 
 namespace pd::component::transform
 {
+	// 世界位置
 	class Position final
 	{
 	public:
 		sf::Vector2f position;
 	};
 
+	// 缩放
 	class Scale final
 	{
 	public:
 		sf::Vector2f scale;
 	};
 
+	// 旋转
 	class Rotation final
 	{
 	public:

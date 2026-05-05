@@ -79,7 +79,7 @@ namespace pd::factory
 		Door::destroy_all(registry);
 		Enemy::destroy_all(registry);
 
-		const auto view = registry.view<room::Room>();
+		const auto view = registry.view<tags::Room>();
 		registry.destroy(view.begin(), view.end());
 	}
 }

@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <vector>
+
+#include <entt/entity/fwd.hpp>
+
 #include <SFML/System/Vector2.hpp>
 
 namespace pd::component::actor
@@ -74,6 +78,19 @@ namespace pd::component::actor
 		sf::Vector2f offset;
 	};
 
-	// Actor已死亡
-	class Dead final {};
+	// ============================================
+
+	// 受伤记录
+	class DamageHistory
+	{
+	public:
+		class Info final
+		{
+		public:
+			entt::entity attacker;
+			float damage;
+		};
+
+		std::vector<Info> damage_history;
+	};
 }

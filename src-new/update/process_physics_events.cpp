@@ -49,10 +49,11 @@ namespace pd::update
 			const auto entity_a = utility::Physics::to_entity(user_data_a);
 			const auto entity_b = utility::Physics::to_entity(user_data_b);
 
-			if (not registry.valid(entity_a) or not registry.valid(entity_b))
-			{
-				return;
-			}
+			// if (not registry.valid(entity_a) or not registry.valid(entity_b))
+			// {
+			// 	return;
+			// }
+			PROMETHEUS_PLATFORM_ASSUME(registry.valid(entity_a) and registry.valid(entity_b));
 
 			if constexpr (T == Type::BEGIN)
 			{
@@ -120,10 +121,11 @@ namespace pd::update
 			const auto sensor_entity = utility::Physics::to_entity(sensor_user_data);
 			const auto visitor_entity = utility::Physics::to_entity(visitor_user_data);
 
-			if (not registry.valid(sensor_entity) or not registry.valid(visitor_entity))
-			{
-				return;
-			}
+			// if (not registry.valid(sensor_entity) or not registry.valid(visitor_entity))
+			// {
+			// 	return;
+			// }
+			PROMETHEUS_PLATFORM_ASSUME(registry.valid(sensor_entity) and registry.valid(visitor_entity));
 
 			if constexpr (T == Type::BEGIN)
 			{

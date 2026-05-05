@@ -25,14 +25,14 @@ namespace pd::factory
 		// sprite
 		detail::attach(registry, entity, floor.sprite);
 
-		registry.emplace<floor::Floor>(entity);
+		registry.emplace<tags::Floor>(entity);
 
 		return entity;
 	}
 
 	auto Floor::destroy_all(entt::registry& registry) noexcept -> void
 	{
-		const auto view = registry.view<floor::Floor>();
+		const auto view = registry.view<tags::Floor>();
 		registry.destroy(view.begin(), view.end());
 	}
 }

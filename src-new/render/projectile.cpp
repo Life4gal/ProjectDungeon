@@ -3,11 +3,11 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <render/player.hpp>
+#include <render/projectile.hpp>
 
 #include <manager/resource.hpp>
 
-#include <component/player.hpp>
+#include <component/projectile.hpp>
 #include <component/state.hpp>
 
 #include <entt/entt.hpp>
@@ -23,12 +23,12 @@ namespace pd::render
 		sf::RenderStates g_shared_states{};
 	}
 
-	auto player(entt::registry& registry, sf::RenderWindow& window) noexcept -> void
+	auto projectile(entt::registry& registry, sf::RenderWindow& window) noexcept -> void
 	{
 		const auto view = registry
 				.view<
 					state::InCameraArea,
-					tags::Player,
+					tags::Projectile,
 					sprite::Texture,
 					sprite::Position,
 					sprite::Size,
@@ -45,7 +45,7 @@ namespace pd::render
 			if (sprite_texture.texture == manager::InvalidHandler)
 			{
 				SPDLOG_WARN(
-					"无法渲染位于({:.1f}:{:.1f})的玩家[0x{:08x}],无效的纹理资源句柄[{}]!",
+					"无法渲染位于({:.1f}:{:.1f})的飞弹[0x{:08x}],无效的纹理资源句柄[{}]!",
 					transform_position.position.x,
 					transform_position.position.y,
 					static_cast<std::uint32_t>(entity),

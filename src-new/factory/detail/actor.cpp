@@ -68,6 +68,8 @@ namespace pd::factory::detail
 				registry.emplace<actor::ManaBarSize>(entity, sf::Vector2f{bar_width, bar_height});
 				registry.emplace<actor::ManaBarOffset>(entity, sf::Vector2f{0, 0});
 			}
+			// 受伤记录
+			registry.emplace<actor::DamageHistory>(entity);
 		}
 	}
 

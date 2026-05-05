@@ -28,7 +28,7 @@ namespace pd::render
 		const auto view = registry
 				.view<
 					state::InCameraArea,
-					floor::Floor,
+					tags::Floor,
 					sprite::Texture,
 					sprite::Position,
 					sprite::Size,
@@ -38,7 +38,7 @@ namespace pd::render
 					transform::Position,
 					transform::Scale,
 					transform::Rotation
-				>(entt::exclude<sprite::Invisible>);
+				>(entt::exclude<state::Invisible>);
 
 		for (const auto [entity, sprite_texture, sprite_position, sprite_size, sprite_origin, sprite_color, sprite_scale, transform_position, transform_scale, transform_rotation]: view.each())
 		{

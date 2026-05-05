@@ -7,10 +7,14 @@
 
 #include <vector>
 
+#include <component/tags.hpp>
+
 #include <entt/entity/fwd.hpp>
 
 namespace pd::component::room
 {
+	// tags
+
 	// 当前房间的门实体
 	class Doors final
 	{
@@ -28,6 +32,4 @@ namespace pd::component::room
 	public:
 		std::vector<entt::entity> enemies;
 	};
-
-	class Room final {};
 }

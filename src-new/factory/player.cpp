@@ -37,14 +37,14 @@ namespace pd::factory
 		// actor
 		detail::attach(registry, entity, player.actor, player.animation);
 
-		registry.emplace<player::Player>(entity);
+		registry.emplace<tags::Player>(entity);
 
 		return entity;
 	}
 
 	auto Player::destroy_all(entt::registry& registry) noexcept -> void
 	{
-		const auto view = registry.view<player::Player>();
+		const auto view = registry.view<tags::Player>();
 		registry.destroy(view.begin(), view.end());
 	}
 }

@@ -223,7 +223,7 @@ namespace pd::update
 						ai::wander::DirectionTimer,
 						const actor::Speed,
 						const physics_body::Id //
-					>(entt::exclude<actor::Dead>);
+					>(entt::exclude<state::Dead>);
 
 			for (const auto [entity, direction, direction_timer, speed, body_id]: view.each())
 			{
@@ -243,7 +243,7 @@ namespace pd::update
 						ai::jump::AirTimer,
 						const transform::Position,
 						const physics_body::Id //
-					>(entt::exclude<actor::Dead>);
+					>(entt::exclude<state::Dead>);
 
 			for (const auto [entity, state, air_timer, position, body_id]: view.each())
 			{
@@ -263,7 +263,7 @@ namespace pd::update
 						const actor::Speed,
 						const transform::Position,
 						const physics_body::Id //
-					>(entt::exclude<actor::Dead>);
+					>(entt::exclude<state::Dead>);
 
 			for (const auto [entity, speed, position, body_id]: view.each())
 			{

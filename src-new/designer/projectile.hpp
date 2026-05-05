@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <component/transform.hpp>
-#include <component/sprite.hpp>
-#include <component/tags.hpp>
+#include <blueprint/projectile.hpp>
 
-namespace pd::component::floor
+namespace pd::designer
 {
-	// transform
-	// sprite
-	// tags
+	class Projectile final
+	{
+	public:
+		[[nodiscard]] static auto standard() noexcept -> blueprint::Projectile;
+	};
 }

@@ -5,13 +5,11 @@
 
 #pragma once
 
-#include <component/transform.hpp>
-#include <component/sprite.hpp>
-#include <component/tags.hpp>
+#include <entt/fwd.hpp>
 
-namespace pd::component::floor
+#include <SFML/System/Time.hpp>
+
+namespace pd::update
 {
-	// transform
-	// sprite
-	// tags
+	auto projectile(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

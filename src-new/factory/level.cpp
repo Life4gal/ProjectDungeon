@@ -104,7 +104,7 @@ namespace pd::factory
 				target_room.target_room = neighbor_room;
 			};
 
-			for (const auto view = registry.view<door::Door, door::Direction, door::TargetRoom>();
+			for (const auto view = registry.view<tags::Door, door::Direction, door::TargetRoom>();
 			     const auto [entity, direction, target_room]: view.each())
 			{
 				// target_room一开始设置为door所属房间

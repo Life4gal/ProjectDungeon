@@ -9,37 +9,54 @@
 #include <component/sprite_animation.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
-#include <component/actor.hpp>
-#include <component/ai.hpp>
 
-namespace pd::component::enemy
+#include <SFML/System/Time.hpp>
+
+namespace pd::component::projectile
 {
 	// transform
 	// sprite_animation
 	// physics_body
 	// tags
-	// actor
-	// AI
 
+	// 飞弹碰撞体
 	class PhysicsShape final
 	{
 	public:
 		b2ShapeId shape;
 	};
 
-	// blueprint::EnemyType
+	// blueprint::ProjectileType
 	enum class Type : std::uint8_t
 	{
-		RAT = 0,
-		SLIME,
-		BAT,
+		STANDARD = 0,
 	};
 
-	// 敌人所属房间
-	// 该组件不由factory::Enemy附加,而是由factory::Room附加
-	class Room final
+	// 飞弹所有者
+	class Owner final
 	{
 	public:
-		entt::entity room;
+		entt::entity owner;
+	};
+
+	// 飞弹伤害
+	class Damage final
+	{
+	public:
+		float damage;
+	};
+
+	// 飞弹飞行生命周期
+	class Lifetime final
+	{
+	public:
+		sf::Time remaining;
+	};
+
+	// 飞弹飞行速度(实际速度取决于物理体)
+	class Speed final
+	{
+	public:
+		float speed;
 	};
 }

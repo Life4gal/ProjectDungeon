@@ -9,4 +9,10 @@ namespace pd::component::state
 {
 	// 处于相机(可视)区域内
 	class InCameraArea {};
+
+	// 实体隐藏(不渲染)
+	class Invisible final {};
+
+	// 实体已死亡(可以被销毁)
+	class Dead final {};
 }

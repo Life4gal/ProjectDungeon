@@ -58,7 +58,4 @@ namespace pd::component::sprite
 	public:
 		sf::Vector2f scale;
 	};
-
-	// 标记实体隐藏(不渲染)
-	class Invisible final {};
 }

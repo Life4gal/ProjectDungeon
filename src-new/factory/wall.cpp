@@ -34,14 +34,14 @@ namespace pd::factory
 			registry.emplace<wall::PhysicsShape>(entity, shape_id);
 		}
 
-		registry.emplace<wall::Wall>(entity);
+		registry.emplace<tags::Wall>(entity);
 
 		return entity;
 	}
 
 	auto Wall::destroy_all(entt::registry& registry) noexcept -> void
 	{
-		const auto view = registry.view<wall::Wall>();
+		const auto view = registry.view<tags::Wall>();
 		registry.destroy(view.begin(), view.end());
 	}
 }

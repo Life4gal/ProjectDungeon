@@ -26,18 +26,19 @@ namespace pd::render
 	auto enemy(entt::registry& registry, sf::RenderWindow& window) noexcept -> void
 	{
 		const auto view = registry
-				.view<state::InCameraArea,
-				      enemy::Enemy,
-				      sprite::Texture,
-				      sprite::Position,
-				      sprite::Size,
-				      sprite::Origin,
-				      sprite::Color,
-				      sprite::Scale,
-				      transform::Position,
-				      transform::Scale,
-				      transform::Rotation
-				>(entt::exclude<sprite::Invisible>);
+				.view<
+					state::InCameraArea,
+					tags::Enemy,
+					sprite::Texture,
+					sprite::Position,
+					sprite::Size,
+					sprite::Origin,
+					sprite::Color,
+					sprite::Scale,
+					transform::Position,
+					transform::Scale,
+					transform::Rotation
+				>(entt::exclude<state::Invisible>);
 
 		for (const auto [entity, sprite_texture, sprite_position, sprite_size, sprite_origin, sprite_color, sprite_scale, transform_position, transform_scale, transform_rotation]: view.each())
 		{

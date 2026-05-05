@@ -643,6 +643,9 @@ add_executable(
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/player.hpp
 
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/projectile.hpp
+
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/door.hpp
 	# 地下城 -- 关卡 -- 房间
@@ -682,6 +685,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/enemy.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
+
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/projectile.hpp
 			
 	# ============================
 	# DESIGNER
@@ -710,6 +716,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.cpp
 
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.cpp
+
 	# ============================
 	# COMPONENT
 	# ============================
@@ -724,6 +734,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_animation.hpp
 	# 物理刚体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/physics_body.hpp
+	# 标签
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tags.hpp
 
 	# 相机(可视区域)
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp
@@ -750,6 +762,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player_controller.hpp
+
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/projectile.hpp
 	
 	# ============================
 	# SYSTEM -- FACTORY
@@ -796,7 +811,11 @@ add_executable(
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.cpp
-	
+
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.cpp
+
 	# ============================
 	# SYSTEM -- HELPER
 	# ============================
@@ -824,6 +843,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.cpp
 
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/projectile.cpp
+
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.cpp
@@ -835,6 +858,10 @@ add_executable(
 	# SYSTEM -- UPDATE
 	# ============================
 	
+	# 墓地
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/graveyard.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/graveyard.cpp
+
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.cpp
@@ -853,6 +880,14 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.cpp
 	
+	# Actor
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/actor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/actor.cpp
+
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.cpp
+
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.cpp
@@ -881,10 +916,14 @@ add_executable(
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.cpp
-
+	
 	# 生命值&魔法值条
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.cpp
+	
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/projectile.cpp
 
 	# ============================
 	# MENU

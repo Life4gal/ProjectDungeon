@@ -43,14 +43,14 @@ namespace pd::factory
 		// direction
 		registry.emplace<door::Direction>(entity, static_cast<door::Direction>(door.direction));
 
-		registry.emplace<door::Door>(entity);
+		registry.emplace<tags::Door>(entity);
 
 		return entity;
 	}
 
 	auto Door::destroy_all(entt::registry& registry) noexcept -> void
 	{
-		const auto view = registry.view<door::Door>();
+		const auto view = registry.view<tags::Door>();
 		registry.destroy(view.begin(), view.end());
 	}
 }
