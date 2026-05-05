@@ -5,11 +5,14 @@
 
 #pragma once
 
+#include <event/physics.hpp>
 #include <event/enemy.hpp>
 
 #include <entt/entity/fwd.hpp>
 
 namespace pd::listener::enemy
 {
-	//
+	auto on_contact_begin(entt::registry& registry, const event::physics::ContactBegin& contact_begin) noexcept -> void;
+
+	auto on_contact_end(entt::registry& registry, const event::physics::ContactEnd& contact_end) noexcept -> void;
 }

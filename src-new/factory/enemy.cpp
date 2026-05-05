@@ -41,6 +41,8 @@ namespace pd::factory
 		}
 		// actor
 		detail::attach(registry, entity, enemy.actor, enemy.animation);
+		// contact_damage
+		registry.emplace<enemy::ContactDamage>(entity, enemy.contact_damage);
 		// type
 		registry.emplace<enemy::Type>(entity, static_cast<enemy::Type>(enemy.type));
 		// ai

@@ -33,6 +33,9 @@ namespace pd::blueprint
 
 		Actor actor;
 
+		// 接触伤害
+		float contact_damage;
+
 		EnemyType type;
 		Ai ai;
 

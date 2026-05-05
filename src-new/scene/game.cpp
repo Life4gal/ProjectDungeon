@@ -41,7 +41,7 @@
 
 #include <listener/camera.hpp>
 #include <listener/actor.hpp>
-// #include <listener/enemy.hpp>
+#include <listener/enemy.hpp>
 #include <listener/player.hpp>
 #include <listener/projectile.hpp>
 #include <listener/door.hpp>
@@ -367,7 +367,8 @@ namespace pd::scene
 		manager::Event::subscribe<event::actor::Hurt, &listener::actor::on_hurt>(registry_);
 		manager::Event::subscribe<event::actor::Dead, &listener::actor::on_dead>(registry_);
 		// 敌人
-		//
+		manager::Event::subscribe<event::physics::ContactBegin, &listener::enemy::on_contact_begin>(registry_);
+		manager::Event::subscribe<event::physics::ContactEnd, &listener::enemy::on_contact_end>(registry_);
 		// 玩家
 		manager::Event::subscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
 		manager::Event::subscribe<event::player::Translate, &listener::player::on_translate>(registry_);
@@ -417,7 +418,8 @@ namespace pd::scene
 		manager::Event::unsubscribe<event::actor::Hurt, &listener::actor::on_hurt>(registry_);
 		manager::Event::unsubscribe<event::actor::Dead, &listener::actor::on_dead>(registry_);
 		// 敌人
-		//
+		manager::Event::unsubscribe<event::physics::ContactBegin, &listener::enemy::on_contact_begin>(registry_);
+		manager::Event::unsubscribe<event::physics::ContactEnd, &listener::enemy::on_contact_end>(registry_);
 		// 玩家
 		manager::Event::unsubscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
 		manager::Event::unsubscribe<event::player::Translate, &listener::player::on_translate>(registry_);

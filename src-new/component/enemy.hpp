@@ -27,6 +27,13 @@ namespace pd::component::enemy
 		b2ShapeId shape;
 	};
 
+	// 接触伤害
+	class ContactDamage final
+	{
+	public:
+		float contact_damage;
+	};
+
 	// blueprint::EnemyType
 	enum class Type : std::uint8_t
 	{
