@@ -9,7 +9,7 @@
 
 #include <component/projectile.hpp>
 
-#include <factory/detail/transform.hpp>
+#include <factory/detail/position.hpp>
 #include <factory/detail/sprite_animation.hpp>
 #include <factory/detail/physics_body.hpp>
 #include <factory/detail/physics_shape.hpp>
@@ -25,27 +25,22 @@ namespace pd::factory
 	{
 		direction = direction.normalized();
 
-		const auto [owner_position] = registry.get<const transform::Position>(owner);
-		const auto transform = [&] -> blueprint::Transform
-		{
-			auto t = projectile.transform;
-			t.x += owner_position.x;
-			t.y += owner_position.y;
-
-			return t;
-		}();
+		const auto [owner_position] = registry.get<const position::World>(owner);
+		// TODO: 基于发射的方向给初始位置一个偏移
+		const auto position_offset = direction * 10.f;
+		const auto position = blueprint::Position{.x = owner_position.x + position_offset.x, .y = owner_position.y + position_offset.y};
 
 		const auto entity = registry.create();
 
-		// transform
-		detail::attach(registry, entity, transform);
+		// position
+		detail::attach(registry, entity, position);
 		// sprite_animation
 		detail::attach(registry, entity, projectile.animation);
 		// physics_body & physics_shape & velocity
 		{
-			const auto body_id = detail::create_attach(registry, entity, transform, projectile.physics_body);
+			const auto body_id = detail::create_attach(registry, entity, projectile.physics_body, position);
 
-			const auto shape_id = detail::create(body_id, transform, projectile.physics_shape);
+			const auto shape_id = detail::create(body_id, projectile.physics_shape, projectile.animation);
 			registry.emplace<projectile::PhysicsShape>(entity, shape_id);
 
 			// TODO: 要解决飞弹刚发射就碰撞到自己有两种简易解决方案(不考虑在碰撞时判断)

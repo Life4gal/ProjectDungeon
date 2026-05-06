@@ -5,39 +5,42 @@
 
 #pragma once
 
-#include <blueprint/door.hpp>
-
-#include <component/transform.hpp>
+#include <component/position.hpp>
 #include <component/sprite.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::door
 {
-	// transform
-	// sprite
-	// physics_body
-	// tags
+	// position::World --> 门绝对位置
+	// position::Screen --> 门屏幕位置
+	// sprite --> 门精灵
+	// physics_body --> 门物理刚体
+	// tags --> 门标签
 
+	// *门*物理碰撞体
 	class PhysicsShapeDoor final
 	{
 	public:
 		b2ShapeId shape;
 	};
 
+	// *感应区*物理碰撞体
 	class PhysicsShapeSensor final
 	{
 	public:
 		b2ShapeId shape;
 	};
 
+	// *阻挡区*物理碰撞体
 	class PhysicsShapeBlocker final
 	{
 	public:
 		b2ShapeId shape;
 	};
 
-	// blueprint::DoorDirection
+	// 门方向
+	// 必须等价于blueprint::DoorDirection
 	enum class Direction : std::uint8_t
 	{
 		NORTH = 0b00,
@@ -45,6 +48,8 @@ namespace pd::component::door
 		WEST = 0b10,
 		EAST = 0b11,
 	};
+
+	// ============================================
 
 	// 门所属房间实体
 	// 该组件不由factory::Door附加,而是由factory::Room附加

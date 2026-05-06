@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <blueprint/detail/transform.hpp>
+#include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite.hpp>
 #include <blueprint/detail/physics_body.hpp>
 #include <blueprint/detail/physics_shape.hpp>
@@ -15,7 +15,7 @@ namespace pd::blueprint
 	class Wall final
 	{
 	public:
-		Transform transform;
+		Position position;
 		Sprite sprite;
 
 		// 物理刚体

@@ -5,18 +5,20 @@
 
 #pragma once
 
-#include <component/transform.hpp>
+#include <component/position.hpp>
 #include <component/sprite.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::wall
 {
-	// transform
-	// sprite
-	// physics_body
-	// tags
+	// position::World --> 墙壁绝对位置
+	// position::Screen --> 墙壁屏幕位置
+	// sprite --> 墙壁精灵
+	// physics_body --> 墙壁物理刚体
+	// tags --> 墙壁标签
 
+	// 物理碰撞体
 	class PhysicsShape final
 	{
 	public:

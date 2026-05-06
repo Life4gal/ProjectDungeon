@@ -11,25 +11,20 @@ namespace pd::designer
 {
 	auto Floor::standard(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Floor
 	{
-		const blueprint::Transform transform
+		const blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-				.scale_x = 1,
-				.scale_y = 1,
-				.rotation = 0,
 		};
 		blueprint::Sprite sprite
 		{
 				.texture = "./assets/tileset/floor.png",
-				.x = 0,
-				.y = 0,
-				.width = Room::tile_width,
-				.height = Room::tile_height,
-				.origin_x = Room::tile_origin_x,
-				.origin_y = Room::tile_origin_y,
+				.position = {.x = 0, .y = 0},
+				.size = {.width = Room::tile_width, .height = Room::tile_height},
+				.origin = {.x = Room::tile_origin_x, .y = Room::tile_origin_y},
+				.scale = {.x = 1, .y = 1},
 		};
 
-		return {.transform = transform, .sprite = std::move(sprite)};
+		return {.position = position, .sprite = std::move(sprite)};
 	}
 }

@@ -7,7 +7,7 @@
 
 #include <component/camera.hpp>
 #include <component/state.hpp>
-#include <component/transform.hpp>
+#include <component/position.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
@@ -31,7 +31,7 @@ namespace pd::render
 		window.setView(sf::View{camera_area});
 
 		// 更新可视实体
-		for (const auto view = registry.view<transform::Position>();
+		for (const auto view = registry.view<position::World>();
 		     const auto [entity, position]: view.each())
 		{
 			// TODO: 不能简单地用position筛选处于相机范围内的实体,还需要考虑实体的size,当且仅当实体的bounding box完全不与相机范围相交时才认为实体不在相机范围内

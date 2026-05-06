@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#include <blueprint/detail/size.hpp>
 #include <blueprint/floor.hpp>
 #include <blueprint/wall.hpp>
 #include <blueprint/door.hpp>
@@ -50,10 +51,10 @@ namespace pd::blueprint
 		RoomType type;
 		std::underlying_type_t<RoomConnection> connection;
 
-		// 房间偏移
-		// entity-position = room-offset + position
-		float offset_x;
-		float offset_y;
+		// 房间位置
+		Position position;
+		// 房间大小
+		Size size;
 
 		// 房间 -- 地板
 		std::vector<Floor> floors;

@@ -7,7 +7,7 @@
 
 #include <variant>
 
-#include <blueprint/detail/transform.hpp>
+#include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite_animation.hpp>
 #include <blueprint/detail/physics_body.hpp>
 #include <blueprint/detail/physics_shape.hpp>
@@ -28,7 +28,7 @@ namespace pd::blueprint
 	public:
 		using physics_shape_type = std::variant<PhysicsShapeCircle, PhysicsShapeCapsule, PhysicsShapeBox>;
 
-		Transform transform;
+		Position position;
 		SpriteAnimation animation;
 
 		Actor actor;

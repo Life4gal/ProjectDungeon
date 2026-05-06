@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <component/transform.hpp>
+#include <component/position.hpp>
 #include <component/sprite_animation.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
@@ -14,19 +14,21 @@
 
 namespace pd::component::projectile
 {
-	// transform
-	// sprite_animation
-	// physics_body
-	// tags
+	// position::World --> 飞弹绝对位置
+	// position::Screen --> 飞弹屏幕位置
+	// sprite_animation --> 飞弹精灵动画
+	// physics_body --> 飞弹物理刚体
+	// tags --> 飞弹标签
 
-	// 飞弹碰撞体
+	// 物理碰撞体
 	class PhysicsShape final
 	{
 	public:
 		b2ShapeId shape;
 	};
 
-	// blueprint::ProjectileType
+	// 飞弹类型
+	// 必须等价于blueprint::ProjectileType
 	enum class Type : std::uint8_t
 	{
 		STANDARD = 0,

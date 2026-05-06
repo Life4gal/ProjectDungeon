@@ -5,15 +5,11 @@
 
 #pragma once
 
-#include <blueprint/detail/position.hpp>
-#include <blueprint/detail/sprite.hpp>
+#include <entt/fwd.hpp>
 
-namespace pd::blueprint
+#include <SFML/System/Time.hpp>
+
+namespace pd::update
 {
-	class Floor final
-	{
-	public:
-		Position position;
-		Sprite sprite;
-	};
+	auto sprite_effect(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

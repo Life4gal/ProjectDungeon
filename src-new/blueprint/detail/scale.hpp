@@ -5,15 +5,12 @@
 
 #pragma once
 
-#include <blueprint/detail/position.hpp>
-#include <blueprint/detail/sprite.hpp>
-
 namespace pd::blueprint
 {
-	class Floor final
+	class Scale final
 	{
 	public:
-		Position position;
-		Sprite sprite;
+		float x;
+		float y;
 	};
 }

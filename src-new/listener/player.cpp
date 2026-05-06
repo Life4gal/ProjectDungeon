@@ -20,7 +20,7 @@ namespace pd::listener::player
 	{
 		namespace player_controller = component::player_controller;
 		namespace physics_body = component::physics_body;
-		namespace transform = component::transform;
+		namespace position = component::position;
 
 		const auto* target = registry.ctx().find<player_controller::Target>();
 		if (target == nullptr)
@@ -47,7 +47,7 @@ namespace pd::listener::player
 		}
 		else
 		{
-			auto& [position] = registry.get<transform::Position>(target->entity);
+			auto& [position] = registry.get<position::World>(target->entity);
 			const sf::Vector2f new_position{move_to.x, move_to.y};
 
 			SPDLOG_INFO("Player MoveTo: [X]={} -> {}, [Y]={} -> {}", position.x, new_position.x, position.y, new_position.y);
@@ -60,7 +60,7 @@ namespace pd::listener::player
 	{
 		namespace player_controller = component::player_controller;
 		namespace physics_body = component::physics_body;
-		namespace transform = component::transform;
+		namespace position = component::position;
 
 		const auto* target = registry.ctx().find<player_controller::Target>();
 		if (target == nullptr)
@@ -90,7 +90,7 @@ namespace pd::listener::player
 		}
 		else
 		{
-			auto& [position] = registry.get<transform::Position>(target->entity);
+			auto& [position] = registry.get<position::World>(target->entity);
 			const sf::Vector2f new_position{position.x + translate.x, position.y + translate.y};
 
 			SPDLOG_INFO("Player Translate: [X]={} -> {}, [Y]={} -> {}", position.x, new_position.x, position.y, new_position.y);

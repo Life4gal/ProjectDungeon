@@ -13,7 +13,11 @@
 
 namespace pd::component::sprite
 {
-	// 渲染纹理
+	// ====================
+	// 纹理
+	// ====================
+
+	// 纹理的资源句柄
 	class Texture final
 	{
 	public:
@@ -22,40 +26,62 @@ namespace pd::component::sprite
 
 	// 纹理位置
 	// 如果使用整张纹理渲染则为{0,0}
-	class Position final
+	class TexturePosition final
 	{
 	public:
-		sf::Vector2i position;
+		sf::Vector2f position;
 	};
 
-	// 纹理大小
+	// 纹理的大小
 	// 如果使用整张纹理渲染则为整张纹理的大小
-	class Size final
+	class TextureSize final
 	{
 	public:
-		sf::Vector2i size;
+		sf::Vector2f size;
 	};
 
-	// 渲染区域原点(一般是size/2)
-	class Origin final
+	// 纹理的原点(一般是TextureSize/2)
+	class TextureOrigin final
 	{
 	public:
-		sf::Vector2i origin;
+		sf::Vector2f origin;
 	};
 
-	// 颜色
-	// 一般是白色,可以改变颜色以做到像是受击变色之类的效果
-	class Color final
+	// ====================
+	// 渲染
+	// ====================
+
+	// 渲染的位置的偏移
+	// 实际渲染位置 = position::World + offset
+	// 该组件允许我们*渲染*的位置与*实际*的位置不同
+	// 我们可以基于此做到一些动画效果(而不影响实体实际的位置)
+	class RenderPositionOffset final
 	{
 	public:
-		sf::Color color;
+		sf::Vector2f offset;
 	};
 
-	// 缩放
-	// 一般是{1,1},可以改变缩放以做到像是受击放大/缩小之类的效果
-	class Scale final
+	// 渲染的缩放
+	// 该组件允许我们*渲染*的大小与*实际*的大小不同
+	// 我们可以基于此做到一些动画效果(而不影响实体的实际大小)
+	class RenderScale final
 	{
 	public:
 		sf::Vector2f scale;
+	};
+
+	// 渲染的旋转
+	class RenderRotation final
+	{
+	public:
+		sf::Angle rotation;
+	};
+
+	// 渲染的颜色
+	// 默认为白色
+	class RenderColor final
+	{
+	public:
+		sf::Color color;
 	};
 }

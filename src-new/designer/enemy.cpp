@@ -11,31 +11,27 @@ namespace pd::designer
 {
 	auto Enemy::rat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
 	{
-		const blueprint::Transform transform
+		const blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-				.scale_x = 1,
-				.scale_y = 1,
-				.rotation = 0,
 		};
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/rat.png", .x = 0, .y = 0},
+						{.texture = "./assets/tileset/rat.png", .position = {.x = 0, .y = 0}},
 						// 第二帧
-						{.texture = "./assets/tileset/rat.png", .x = 64, .y = 0},
+						{.texture = "./assets/tileset/rat.png", .position = {.x = 64, .y = 0}},
 						// 第三帧
-						{.texture = "./assets/tileset/rat.png", .x = 128, .y = 0},
+						{.texture = "./assets/tileset/rat.png", .position = {.x = 128, .y = 0}},
 						// 第四帧
-						{.texture = "./assets/tileset/rat.png", .x = 192, .y = 0},
+						{.texture = "./assets/tileset/rat.png", .position = {.x = 192, .y = 0}},
 				},
-				.width = 64,
-				.height = 64,
-				.origin_x = 32,
-				.origin_y = 32,
+				.size = {.width = 64, .height = 64},
+				.origin = {.x = 32, .y = 32},
+				.scale = {.x = 1, .y = 1},
 				.duration_ms = 350,
 				.looping = true,
 				.reversed = false,
@@ -53,14 +49,13 @@ namespace pd::designer
 						.enable_sensor_events = false,
 						.enable_contact_events = true,
 				},
-				.width = 64,
-				.height = 64,
+				.size = {.width = 64, .height = 64},
 		};
 		constexpr blueprint::Actor actor{.health = 60, .mana = 0, .speed = 60};
 
 		return
 		{
-				.transform = transform,
+				.position = position,
 				.animation = std::move(animation),
 				.actor = actor,
 				.contact_damage = 20,
@@ -73,31 +68,27 @@ namespace pd::designer
 
 	auto Enemy::slime(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
 	{
-		const blueprint::Transform transform
+		const blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-				.scale_x = 1,
-				.scale_y = 1,
-				.rotation = 0,
 		};
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/slime.png", .x = 0, .y = 0},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 0, .y = 0}},
 						// 第二帧
-						{.texture = "./assets/tileset/slime.png", .x = 64, .y = 0},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 64, .y = 0}},
 						// 第三帧
-						{.texture = "./assets/tileset/slime.png", .x = 128, .y = 0},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 128, .y = 0}},
 						// 第四帧
-						{.texture = "./assets/tileset/slime.png", .x = 192, .y = 0},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 192, .y = 0}},
 				},
-				.width = 64,
-				.height = 64,
-				.origin_x = 32,
-				.origin_y = 32,
+				.size = {.width = 64, .height = 64},
+				.origin = {.x = 32, .y = 32},
+				.scale = {.x = 1, .y = 1},
 				.duration_ms = 200,
 				.looping = true,
 				.reversed = false,
@@ -121,7 +112,7 @@ namespace pd::designer
 
 		return
 		{
-				.transform = transform,
+				.position = position,
 				.animation = std::move(animation),
 				.actor = actor,
 				.contact_damage = 15,
@@ -134,31 +125,27 @@ namespace pd::designer
 
 	auto Enemy::bat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
 	{
-		const blueprint::Transform transform
+		const blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-				.scale_x = 1,
-				.scale_y = 1,
-				.rotation = 0,
 		};
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/bat.png", .x = 0, .y = 0},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 0, .y = 0}},
 						// 第二帧
-						{.texture = "./assets/tileset/bat.png", .x = 64, .y = 0},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 64, .y = 0}},
 						// 第三帧
-						{.texture = "./assets/tileset/bat.png", .x = 128, .y = 0},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 128, .y = 0}},
 						// 第四帧
-						{.texture = "./assets/tileset/bat.png", .x = 192, .y = 0},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 192, .y = 0}},
 				},
-				.width = 64,
-				.height = 64,
-				.origin_x = 32,
-				.origin_y = 32,
+				.size = {.width = 64, .height = 64},
+				.origin = {.x = 32, .y = 32},
+				.scale = {.x = 1, .y = 1},
 				.duration_ms = 300,
 				.looping = true,
 				.reversed = false,
@@ -182,7 +169,7 @@ namespace pd::designer
 
 		return
 		{
-				.transform = transform,
+				.position = position,
 				.animation = std::move(animation),
 				.actor = actor,
 				.contact_damage = 10,

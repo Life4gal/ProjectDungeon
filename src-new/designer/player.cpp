@@ -11,31 +11,27 @@ namespace pd::designer
 {
 	auto Player::test_character() noexcept -> blueprint::Player
 	{
-		constexpr blueprint::Transform transform
+		constexpr blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
-				.scale_x = 1,
-				.scale_y = 1,
-				.rotation = 0,
 		};
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/player.png", .x = 0, .y = 0},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 0, .y = 0}},
 						// 第二帧
-						{.texture = "./assets/tileset/player.png", .x = 64, .y = 0},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 64, .y = 0}},
 						// 第三帧
-						{.texture = "./assets/tileset/player.png", .x = 128, .y = 0},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 128, .y = 0}},
 						// 第四帧
-						{.texture = "./assets/tileset/player.png", .x = 192, .y = 0},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 192, .y = 0}},
 				},
-				.width = 64,
-				.height = 64,
-				.origin_x = 32,
-				.origin_y = 32,
+				.size = {.width = 64, .height = 64},
+				.origin = {.x = 32, .y = 32},
+				.scale = {.x = 1, .y = 1},
 				.duration_ms = 250,
 				.looping = true,
 				.reversed = false,
@@ -57,6 +53,6 @@ namespace pd::designer
 		};
 		constexpr blueprint::Actor actor{.health = 50, .mana = 20, .speed = 120};
 
-		return {.transform = transform, .animation = std::move(animation), .actor = actor, .physics_body = physics_body, .physics_shape = physics_shape};
+		return {.position = position, .animation = std::move(animation), .actor = actor, .physics_body = physics_body, .physics_shape = physics_shape};
 	}
 }

@@ -7,7 +7,7 @@
 
 #include <component/floor.hpp>
 
-#include <factory/detail/transform.hpp>
+#include <factory/detail/position.hpp>
 #include <factory/detail/sprite.hpp>
 
 #include <entt/entt.hpp>
@@ -20,8 +20,8 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
-		// transform
-		detail::attach(registry, entity, floor.transform);
+		// position
+		detail::attach(registry, entity, floor.position);
 		// sprite
 		detail::attach(registry, entity, floor.sprite);
 

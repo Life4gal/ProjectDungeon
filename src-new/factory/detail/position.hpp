@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <blueprint/detail/transform.hpp>
+#include <blueprint/detail/position.hpp>
 
 #include <entt/entity/fwd.hpp>
 
 namespace pd::factory::detail
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Transform& transform) noexcept -> void;
+	auto attach(entt::registry& registry, entt::entity entity, blueprint::Position position) noexcept -> void;
 }

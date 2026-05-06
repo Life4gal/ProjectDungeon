@@ -8,6 +8,9 @@
 #include <utility>
 #include <type_traits>
 
+#include <blueprint/detail/position.hpp>
+#include <blueprint/detail/size.hpp>
+
 namespace pd::blueprint
 {
 	enum class PhysicsShapeType : std::uint32_t
@@ -145,6 +148,7 @@ namespace pd::blueprint
 	public:
 		PhysicsShapeDef def;
 
+		// 半径
 		float radius;
 	};
 
@@ -153,12 +157,11 @@ namespace pd::blueprint
 	public:
 		PhysicsShapeDef def;
 
-		float center1_offset_x;
-		float center1_offset_y;
-
-		float center2_offset_x;
-		float center2_offset_y;
-
+		// 原点1
+		Position center1;
+		// 原点2
+		Position center2;
+		// 半径
 		float radius;
 	};
 
@@ -167,8 +170,8 @@ namespace pd::blueprint
 	public:
 		PhysicsShapeDef def;
 
-		float width;
-		float height;
+		// 大小
+		Size size;
 	};
 
 	class PhysicsShapeOffsetBox final
@@ -176,10 +179,11 @@ namespace pd::blueprint
 	public:
 		PhysicsShapeDef def;
 
-		float width;
-		float height;
-
-		float offset_x;
-		float offset_y;
+		// 大小
+		Size size;
+		// 偏移
+		Position offset;
+		// 旋转(角度)
+		float rotation;
 	};
 }

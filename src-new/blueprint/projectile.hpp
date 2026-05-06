@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <blueprint/detail/transform.hpp>
+// #include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite_animation.hpp>
 #include <blueprint/detail/physics_body.hpp>
 #include <blueprint/detail/physics_shape.hpp>
@@ -21,10 +21,8 @@ namespace pd::blueprint
 	class Projectile final
 	{
 	public:
-		// TODO: 这里的transform起一个什么作用?
-		//  Transform::x/y作为基础偏移,然后实际位置=偏移+发射者位置?
-		//  如果是偏移还要考虑朝向
-		Transform transform;
+		// position == owner.position
+		// Position position;
 		SpriteAnimation animation;
 
 		float damage;

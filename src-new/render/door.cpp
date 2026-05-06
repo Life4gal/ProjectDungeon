@@ -8,7 +8,6 @@
 #include <manager/resource.hpp>
 
 #include <component/door.hpp>
-#include <component/state.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -29,26 +28,28 @@ namespace pd::render
 				.view<state::InCameraArea,
 				      tags::Door,
 				      sprite::Texture,
-				      sprite::Position,
-				      sprite::Size,
-				      sprite::Origin,
-				      sprite::Color,
-				      sprite::Scale,
-				      transform::Position,
-				      transform::Scale,
-				      transform::Rotation
+				      sprite::TexturePosition,
+				      sprite::TextureSize,
+				      sprite::TextureOrigin,
+				      sprite::RenderPositionOffset,
+				      sprite::RenderScale,
+				      sprite::RenderRotation,
+				      sprite::RenderColor,
+				      position::World
 				>(entt::exclude<state::Invisible>);
 
-		for (const auto [entity, sprite_texture, sprite_position, sprite_size, sprite_origin, sprite_color, sprite_scale, transform_position, transform_scale, transform_rotation]: view.each())
+		for (const auto [entity, texture, texture_position, texture_size, texture_origin, render_position_offset, render_scale, render_rotation, render_color, position]: view.each())
 		{
-			if (sprite_texture.texture == manager::InvalidHandler)
+			const auto render_position = position.position + render_position_offset.offset;
+
+			if (texture.texture == manager::InvalidHandler)
 			{
 				SPDLOG_WARN(
 					"无法渲染位于({:.1f}:{:.1f})的门[0x{:08x}],无效的纹理资源句柄[{}]!",
-					transform_position.position.x,
-					transform_position.position.y,
+					render_position.x,
+					render_position.y,
 					static_cast<std::uint32_t>(entity),
-					manager::Texture::path_of(sprite_texture.texture)
+					manager::Texture::path_of(texture.texture)
 				);
 
 				// TODO: 如何做?默认纹理?还是直接销毁实体?
@@ -58,35 +59,34 @@ namespace pd::render
 
 			const auto vertices = [&] noexcept -> auto
 			{
-				const auto x = static_cast<float>(sprite_position.position.x);
-				const auto y = static_cast<float>(sprite_position.position.y);
-				const auto width = static_cast<float>(sprite_size.size.x);
-				const auto height = static_cast<float>(sprite_size.size.y);
+				const auto x = texture_position.position.x;
+				const auto y = texture_position.position.y;
+				const auto width = texture_size.size.x;
+				const auto height = texture_size.size.y;
 
 				const auto right = x + width;
 				const auto bottom = y + height;
 
 				return std::array<sf::Vertex, 4>
 				{{
-						{.position = {0, 0}, .color = sprite_color.color, .texCoords = {x, y}},
-						{.position = {width, 0}, .color = sprite_color.color, .texCoords = {right, y}},
-						{.position = {0, height}, .color = sprite_color.color, .texCoords = {x, bottom}},
-						{.position = {width, height}, .color = sprite_color.color, .texCoords = {right, bottom}},
+						{.position = {0, 0}, .color = render_color.color, .texCoords = {x, y}},
+						{.position = {width, 0}, .color = render_color.color, .texCoords = {right, y}},
+						{.position = {0, height}, .color = render_color.color, .texCoords = {x, bottom}},
+						{.position = {width, height}, .color = render_color.color, .texCoords = {right, bottom}},
 				}};
 			}();
 
-			g_shared_states.texture = sprite_texture.texture.operator->();
+			g_shared_states.texture = texture.texture.operator->();
 			g_shared_states.transform = [&] noexcept -> sf::Transform
 			{
-				// 缩放叠加
-				const auto scale_x = sprite_scale.scale.x * transform_scale.scale.x;
-				const auto scale_y = sprite_scale.scale.y * transform_scale.scale.y;
-				const auto origin_x = static_cast<float>(sprite_origin.origin.x) * scale_x;
-				const auto origin_y = static_cast<float>(sprite_origin.origin.y) * scale_y;
+				const auto scale_x = render_scale.scale.x;
+				const auto scale_y = render_scale.scale.y;
+				const auto origin_x = texture_origin.origin.x * scale_x;
+				const auto origin_y = texture_origin.origin.y * scale_y;
 
 				return sf::Transform{} //
-				       .translate(transform_position.position)
-				       .rotate(transform_rotation.rotation)
+				       .translate(render_position)
+				       .rotate(render_rotation.rotation)
 				       .scale({scale_x, scale_y})
 				       .translate({-origin_x, -origin_y});
 			}();

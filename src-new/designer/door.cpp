@@ -98,23 +98,18 @@ namespace pd::designer
 			PROMETHEUS_PLATFORM_UNREACHABLE();
 		}
 
-		const blueprint::Transform transform
+		const blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-				.scale_x = 1,
-				.scale_y = 1,
-				.rotation = 0,
 		};
 		blueprint::Sprite sprite
 		{
 				.texture = "./assets/tileset/door.png",
-				.x = 0,
-				.y = 0,
-				.width = Room::tile_width,
-				.height = Room::tile_height,
-				.origin_x = Room::tile_origin_x,
-				.origin_y = Room::tile_origin_y,
+				.position = {.x = 0, .y = 0},
+				.size = {.width = Room::tile_width, .height = Room::tile_height},
+				.origin = {.x = Room::tile_origin_x, .y = Room::tile_origin_y},
+				.scale = {.x = 1, .y = 1},
 		};
 		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::STATIC, .fixed_rotation = true, .is_bullet = false};
 		const blueprint::PhysicsShapeOffsetBox physics_shape_door
@@ -129,10 +124,9 @@ namespace pd::designer
 						.enable_sensor_events = false,
 						.enable_contact_events = true,
 				},
-				.width = door_desc.width,
-				.height = door_desc.height,
-				.offset_x = door_desc.offset_x,
-				.offset_y = door_desc.offset_y,
+				.size = {.width = door_desc.width, .height = door_desc.height},
+				.offset = {.x = door_desc.offset_x, .y = door_desc.offset_y},
+				.rotation = 0,
 		};
 		const blueprint::PhysicsShapeOffsetBox physics_shape_sensor
 		{
@@ -146,10 +140,9 @@ namespace pd::designer
 						.enable_sensor_events = true,
 						.enable_contact_events = false,
 				},
-				.width = sensor_desc.width,
-				.height = sensor_desc.height,
-				.offset_x = sensor_desc.offset_x,
-				.offset_y = sensor_desc.offset_y,
+				.size = {.width = sensor_desc.width, .height = sensor_desc.height},
+				.offset = {.x = sensor_desc.offset_x, .y = sensor_desc.offset_y},
+				.rotation = 0,
 		};
 		const blueprint::PhysicsShapeOffsetBox physics_shape_blocker
 		{
@@ -163,15 +156,14 @@ namespace pd::designer
 						.enable_sensor_events = false,
 						.enable_contact_events = false,
 				},
-				.width = blocker_desc.width,
-				.height = blocker_desc.height,
-				.offset_x = blocker_desc.offset_x,
-				.offset_y = blocker_desc.offset_y,
+				.size = {.width = blocker_desc.width, .height = blocker_desc.height},
+				.offset = {.x = blocker_desc.offset_x, .y = blocker_desc.offset_y},
+				.rotation = 0,
 		};
 
 		return
 		{
-				.transform = transform,
+				.position = position,
 				.sprite = std::move(sprite),
 				.physics_body = physics_body,
 				.physics_shape_door = physics_shape_door,

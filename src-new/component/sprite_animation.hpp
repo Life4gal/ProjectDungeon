@@ -13,9 +13,10 @@
 
 namespace pd::component::sprite_animation
 {
-	// sprite
+	// 精灵动画 == 精灵 + 每帧切换
+	// sprite --> 精灵动画精灵
 
-	// 所有帧信息
+	// 精灵动画所有帧信息
 	class Frames final
 	{
 	public:
@@ -24,8 +25,8 @@ namespace pd::component::sprite_animation
 		public:
 			// sprite::Texture
 			manager::texture_handler texture;
-			// sprite::Position
-			sf::Vector2i position;
+			// sprite::TexturePosition
+			sf::Vector2f position;
 		};
 
 		std::vector<Frame> frames;

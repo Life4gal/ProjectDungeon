@@ -8,7 +8,7 @@
 #include <component/enemy.hpp>
 #include <component/ai.hpp>
 
-#include <factory/detail/transform.hpp>
+#include <factory/detail/position.hpp>
 #include <factory/detail/sprite_animation.hpp>
 #include <factory/detail/physics_body.hpp>
 #include <factory/detail/physics_shape.hpp>
@@ -24,17 +24,17 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
-		// transform
-		detail::attach(registry, entity, enemy.transform);
+		// position
+		detail::attach(registry, entity, enemy.position);
 		// sprite_animation
 		detail::attach(registry, entity, enemy.animation);
 		// physics_body & physics_shape
 		{
-			const auto body_id = detail::create_attach(registry, entity, enemy.transform, enemy.physics_body);
+			const auto body_id = detail::create_attach(registry, entity, enemy.physics_body, enemy.position);
 
 			const auto creator = [&](const auto& shape) noexcept -> b2ShapeId
 			{
-				return detail::create(body_id, enemy.transform, shape);
+				return detail::create(body_id, shape, enemy.animation);
 			};
 			const auto shape_id = std::visit(creator, enemy.physics_shape);
 			registry.emplace<enemy::PhysicsShape>(entity, shape_id);

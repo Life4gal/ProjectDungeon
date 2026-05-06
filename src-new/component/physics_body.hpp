@@ -9,6 +9,7 @@
 
 namespace pd::component::physics_body
 {
+	// 物理刚体ID
 	class Id final
 	{
 	public:

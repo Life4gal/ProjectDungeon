@@ -6,28 +6,21 @@
 #pragma once
 
 #include <SFML/System/Vector2.hpp>
-#include <SFML/System/Angle.hpp>
 
-namespace pd::component::transform
+namespace pd::component::position
 {
-	// 世界位置
-	class Position final
+	// 世界坐标
+	class World final
 	{
 	public:
 		sf::Vector2f position;
 	};
 
-	// 缩放
-	class Scale final
-	{
-	public:
-		sf::Vector2f scale;
-	};
-
-	// 旋转
-	class Rotation final
-	{
-	public:
-		sf::Angle rotation;
-	};
+	// // 屏幕坐标
+	// // 当且仅当目标实体在屏幕(相机?)区域才存在该组件
+	// class Screen final
+	// {
+	// public:
+	// 	sf::Vector2i position;
+	// };
 }

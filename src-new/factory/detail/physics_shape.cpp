@@ -44,25 +44,35 @@ namespace pd::factory::detail
 		}
 	}
 
-	auto create(const b2BodyId body_id, const blueprint::Transform& transform, const blueprint::PhysicsShapeCircle& circle) noexcept -> b2ShapeId
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeCircle& circle, const blueprint::Scale scale) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
-		const auto radius = Physics::to_physics(circle.radius * std::ranges::max(transform.scale_x, transform.scale_y));
+		const auto radius = Physics::to_physics(circle.radius * std::ranges::max(scale.x, scale.y));
 
 		const auto def = make_shape_def(circle.def);
-		const b2Circle shape{.center = {0, 0}, .radius = radius};
+		const b2Circle shape{.center = {.x = 0, .y = 0}, .radius = radius};
 
 		return b2CreateCircleShape(body_id, &def, &shape);
 	}
 
-	auto create(const b2BodyId body_id, const blueprint::Transform& transform, const blueprint::PhysicsShapeCapsule& capsule) noexcept -> b2ShapeId
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeCircle& circle, const blueprint::Sprite& sprite) noexcept -> b2ShapeId
+	{
+		return create(body_id, circle, sprite.scale);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeCircle& circle, const blueprint::SpriteAnimation& sprite_animation) noexcept -> b2ShapeId
+	{
+		return create(body_id, circle, sprite_animation.scale);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeCapsule& capsule, const blueprint::Scale scale) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
-		const auto center1 = Physics::to_physics({capsule.center1_offset_x * transform.scale_x, capsule.center1_offset_y * transform.scale_y});
-		const auto center2 = Physics::to_physics({capsule.center2_offset_x * transform.scale_x, capsule.center2_offset_y * transform.scale_y});
-		const auto radius = Physics::to_physics(capsule.radius * std::ranges::max(transform.scale_x, transform.scale_y));
+		const auto center1 = Physics::to_physics({capsule.center1.x * scale.x, capsule.center1.y * scale.y});
+		const auto center2 = Physics::to_physics({capsule.center2.x * scale.x, capsule.center2.y * scale.y});
+		const auto radius = Physics::to_physics(capsule.radius * std::ranges::max(scale.x, scale.y));
 
 		const auto def = make_shape_def(capsule.def);
 		const b2Capsule shape{.center1 = center1, .center2 = center2, .radius = radius};
@@ -70,12 +80,22 @@ namespace pd::factory::detail
 		return b2CreateCapsuleShape(body_id, &def, &shape);
 	}
 
-	auto create(const b2BodyId body_id, const blueprint::Transform& transform, const blueprint::PhysicsShapeBox& box) noexcept -> b2ShapeId
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeCapsule& capsule, const blueprint::Sprite& sprite) noexcept -> b2ShapeId
+	{
+		return create(body_id, capsule, sprite.scale);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeCapsule& capsule, const blueprint::SpriteAnimation& sprite_animation) noexcept -> b2ShapeId
+	{
+		return create(body_id, capsule, sprite_animation.scale);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeBox& box, const blueprint::Scale scale) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
-		const auto width = Physics::to_physics(box.width * transform.scale_x);
-		const auto height = Physics::to_physics(box.height * transform.scale_y);
+		const auto width = Physics::to_physics(box.size.width * scale.x);
+		const auto height = Physics::to_physics(box.size.height * scale.y);
 
 		const auto def = make_shape_def(box.def);
 		const auto shape = b2MakeBox(width / 2, height / 2);
@@ -83,18 +103,38 @@ namespace pd::factory::detail
 		return b2CreatePolygonShape(body_id, &def, &shape);
 	}
 
-	auto create(const b2BodyId body_id, const blueprint::Transform& transform, const blueprint::PhysicsShapeOffsetBox& offset_box) noexcept -> b2ShapeId
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeBox& box, const blueprint::Sprite& sprite) noexcept -> b2ShapeId
+	{
+		return create(body_id, box, sprite.scale);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeBox& box, const blueprint::SpriteAnimation& sprite_animation) noexcept -> b2ShapeId
+	{
+		return create(body_id, box, sprite_animation.scale);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeOffsetBox& offset_box, const blueprint::Scale scale) noexcept -> b2ShapeId
 	{
 		using utility::Physics;
 
-		const auto width = Physics::to_physics(offset_box.width * transform.scale_x);
-		const auto height = Physics::to_physics(offset_box.height * transform.scale_y);
-		const auto center = Physics::to_physics({offset_box.offset_x * transform.scale_x, offset_box.offset_y * transform.scale_y});
-		const auto rotation = Physics::to_physics(sf::degrees(transform.rotation));
+		const auto width = Physics::to_physics(offset_box.size.width * scale.x);
+		const auto height = Physics::to_physics(offset_box.size.height * scale.y);
+		const auto center = Physics::to_physics({offset_box.offset.x * scale.x, offset_box.offset.y * scale.y});
+		const auto r = Physics::to_physics(sf::degrees(offset_box.rotation));
 
 		const auto def = make_shape_def(offset_box.def);
-		const auto shape = b2MakeOffsetBox(width / 2, height / 2, center, rotation);
+		const auto shape = b2MakeOffsetBox(width / 2, height / 2, center, r);
 
 		return b2CreatePolygonShape(body_id, &def, &shape);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeOffsetBox& offset_box, const blueprint::Sprite& sprite) noexcept -> b2ShapeId
+	{
+		return create(body_id, offset_box, sprite.scale);
+	}
+
+	auto create(const b2BodyId body_id, const blueprint::PhysicsShapeOffsetBox& offset_box, const blueprint::SpriteAnimation& sprite_animation) noexcept -> b2ShapeId
+	{
+		return create(body_id, offset_box, sprite_animation.scale);
 	}
 }

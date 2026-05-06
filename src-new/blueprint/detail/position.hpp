@@ -7,16 +7,10 @@
 
 namespace pd::blueprint
 {
-	class Transform final
+	class Position final
 	{
 	public:
 		float x;
 		float y;
-
-		float scale_x;
-		float scale_y;
-
-		// degree
-		float rotation;
 	};
 }

@@ -148,26 +148,26 @@ namespace pd::designer
 		// ROOM
 		// ===========================================
 
-		const auto room_offset_x = static_cast<float>(offset_x * width);
-		const auto room_offset_y = static_cast<float>(offset_y * height);
+		const auto room_x = static_cast<float>(offset_x * width);
+		const auto room_y = static_cast<float>(offset_y * height);
 
-		const auto process_offset = [room_offset_x, room_offset_y](blueprint::Transform& transform) noexcept -> void
+		const auto process_offset = [room_x, room_y](blueprint::Position& position) noexcept -> void
 		{
-			transform.x += room_offset_x;
-			transform.y += room_offset_y;
+			position.x += room_x;
+			position.y += room_y;
 		};
 
-		std::ranges::for_each(floors, process_offset, &blueprint::Floor::transform);
-		std::ranges::for_each(walls, process_offset, &blueprint::Wall::transform);
-		std::ranges::for_each(doors, process_offset, &blueprint::Door::transform);
-		std::ranges::for_each(enemies, process_offset, &blueprint::Enemy::transform);
+		std::ranges::for_each(floors, process_offset, &blueprint::Floor::position);
+		std::ranges::for_each(walls, process_offset, &blueprint::Wall::position);
+		std::ranges::for_each(doors, process_offset, &blueprint::Door::position);
+		std::ranges::for_each(enemies, process_offset, &blueprint::Enemy::position);
 
 		return
 		{
 				.type = blueprint::RoomType::STANDARD,
 				.connection = neighbors,
-				.offset_x = room_offset_x,
-				.offset_y = room_offset_y,
+				.position = {.x = room_x, .y = room_y},
+				.size = {.width = width, .height = height},
 				.floors = std::move(floors),
 				.walls = std::move(walls),
 				.doors = std::move(doors),

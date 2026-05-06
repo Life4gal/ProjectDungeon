@@ -655,8 +655,12 @@ add_executable(
 	# BLUEPRINT
 	# ============================
 	
-	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
+	# 位置
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/position.hpp
+	# 大小
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/size.hpp
+	# 缩放
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/scale.hpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite.hpp
 	# 精灵动画
@@ -726,12 +730,14 @@ add_executable(
 	
 	# 状态
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/state.hpp
-	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
+	# 位置
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/position.hpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite.hpp
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_animation.hpp
+	# 精灵动画特效
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_effect.hpp
 	# 物理刚体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/physics_body.hpp
 	# 标签
@@ -770,9 +776,9 @@ add_executable(
 	# SYSTEM -- FACTORY
 	# ============================
 
-	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.cpp
+	# 位置
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/position.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/position.cpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.cpp
@@ -823,7 +829,10 @@ add_executable(
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.cpp
-	
+	# 精灵动画特效
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.cpp
+
 	# ============================
 	# SYSTEM -- LISTENER
 	# ============================
@@ -891,6 +900,9 @@ add_executable(
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.cpp
+	# 精灵动画特效
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.cpp
 
 	# ============================
 	# SYSTEM -- RENDER

@@ -36,6 +36,8 @@
 #include <factory/player.hpp>
 #include <factory/projectile.hpp>
 
+#include <helper/sprite_effect.hpp>
+
 // =========
 // 监听
 
@@ -59,6 +61,7 @@
 #include <update/actor.hpp>
 #include <update/projectile.hpp>
 #include <update/sprite_animation.hpp>
+#include <update/sprite_effect.hpp>
 
 // =========
 // 渲染
@@ -314,13 +317,13 @@ namespace pd::scene
 		// 玩家
 		const auto& start_room = level.rooms.at(level.start_position);
 		auto player = designer::Player::test_character();
-		player.transform.x += start_room.offset_x;
-		player.transform.y += start_room.offset_y;
+		player.position.x += start_room.position.x;
+		player.position.y += start_room.position.y;
 		const auto player_entity = factory::Player::spawn(registry_, player);
 		registry_.ctx().emplace<component::player_controller::Target>(player_entity);
 
 		// 相机
-		manager::Event::enqueue(event::camera::Set{.x = start_room.offset_x, .y = start_room.offset_y, .width = 1080, .height = 720});
+		manager::Event::enqueue(event::camera::Set{.x = start_room.position.x, .y = start_room.position.y, .width = 1080, .height = 720});
 
 		return true;
 	}
@@ -547,6 +550,35 @@ namespace pd::scene
 						}
 					}
 				}
+				else if (kp->code == Key::Numpad1 or kp->code == Key::Numpad2 or kp->code == Key::Numpad3 or kp->code == Key::Numpad4 or kp->code == Key::Numpad5)
+				{
+					using scale = helper::SpriteEffect::Scale;
+					using color = helper::SpriteEffect::Color;
+
+					if (const auto* target = registry_.ctx().find<const player_controller::Target>())
+					{
+						if (kp->code == Key::Numpad1)
+						{
+							scale::linear(registry_, target->entity, sf::Vector2f{0.5f, 0.5f}, sf::Vector2f{1.0f, 1.0f}, sf::seconds(3));
+						}
+						else if (kp->code == Key::Numpad2)
+						{
+							scale::shockwave(registry_, target->entity, sf::Vector2f{1.0f, 1.0f}, 3, sf::seconds(3));
+						}
+						else if (kp->code == Key::Numpad3)
+						{
+							scale::bounce(registry_, target->entity, sf::Vector2f{0.5f, 0.5f}, sf::Vector2f{1.0f, 1.0f}, 0.3f, sf::seconds(3));
+						}
+						else if (kp->code == Key::Numpad4)
+						{
+							scale::breathing(registry_, target->entity, sf::Vector2f{1.0f, 1.0f}, 0.45f, 1.55f, 1, sf::seconds(3));
+						}
+						else if (kp->code == Key::Numpad5)
+						{
+							color::linear(registry_, target->entity, sf::Color::Red, sf::Color::White, sf::seconds(3));
+						}
+					}
+				}
 				// =====================
 				// CAMERA
 				// =====================
@@ -631,6 +663,7 @@ namespace pd::scene
 			update::projectile(registry_, delta);
 
 			update::sprite_animation(registry_, delta);
+			update::sprite_effect(registry_, delta);
 		}
 	}
 

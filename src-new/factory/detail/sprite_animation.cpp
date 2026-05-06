@@ -5,8 +5,6 @@
 
 #include <factory/detail/sprite_animation.hpp>
 
-#include <ranges>
-
 #include <manager/resource.hpp>
 
 #include <blueprint/detail/sprite_animation.hpp>
@@ -15,7 +13,7 @@
 
 #include <factory/detail/sprite.hpp>
 
-#include <entt/entity/registry.hpp>
+#include <entt/entt.hpp>
 
 namespace pd::factory::detail
 {
@@ -30,11 +28,11 @@ namespace pd::factory::detail
 			auto& [frames] = registry.emplace<sprite_animation::Frames>(entity);
 			frames.reserve(sprite_animation.frames.size());
 
-			for (const auto& [texture, x, y]: sprite_animation.frames)
+			for (const auto& [texture, position]: sprite_animation.frames)
 			{
 				auto texture_handler = manager::Texture::load(std::string_view{texture});
 
-				frames.emplace_back(std::move(texture_handler), sf::Vector2i{x, y});
+				frames.emplace_back(std::move(texture_handler), sf::Vector2f{position.x, position.y});
 			}
 		}
 		// frames_count
@@ -51,16 +49,14 @@ namespace pd::factory::detail
 		registry.emplace<sprite_animation::Direction>(entity, sprite_animation.reversed ? sprite_animation::Direction::BACKWARD : sprite_animation::Direction::FORWARD);
 
 		// sprite
-		const auto& [texture, x, y] = sprite_animation.frames[begin_frame_index];
+		const auto& [texture,position] = sprite_animation.frames[begin_frame_index];
 		const blueprint::Sprite sprite
 		{
 				.texture = texture,
-				.x = x,
-				.y = y,
-				.width = sprite_animation.width,
-				.height = sprite_animation.height,
-				.origin_x = sprite_animation.origin_x,
-				.origin_y = sprite_animation.origin_y,
+				.position = position,
+				.size = sprite_animation.size,
+				.origin = sprite_animation.origin,
+				.scale = sprite_animation.scale,
 		};
 		attach(registry, entity, sprite);
 	}

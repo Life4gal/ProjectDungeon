@@ -5,6 +5,11 @@
 
 #pragma once
 
+// tags和state没有依赖关系
+// 但是考虑到用到tags的地方基本都会用到state
+// 不如直接引入其作为依赖 :)
+#include <component/state.hpp>
+
 namespace pd::component::tags
 {
 	// 地下城 -- 关卡 -- 房间 -- 地板

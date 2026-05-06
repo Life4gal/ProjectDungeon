@@ -9,31 +9,22 @@ namespace pd::designer
 {
 	auto Projectile::standard() noexcept -> blueprint::Projectile
 	{
-		constexpr blueprint::Transform transform
-		{
-				.x = 0,
-				.y = 0,
-				.scale_x = 1,
-				.scale_y = 1,
-				.rotation = 0,
-		};
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/wall.png", .x = 0, .y = 0},
+						{.texture = "./assets/tileset/wall.png", .position = {.x = 0, .y = 0}},
 						// 第二帧
-						{.texture = "./assets/tileset/wall.png", .x = 64, .y = 0},
+						{.texture = "./assets/tileset/wall.png", .position = {.x = 64, .y = 0}},
 						// 第三帧
-						{.texture = "./assets/tileset/wall.png", .x = 128, .y = 0},
+						{.texture = "./assets/tileset/wall.png", .position = {.x = 128, .y = 0}},
 						// 第四帧
-						{.texture = "./assets/tileset/wall.png", .x = 192, .y = 0},
+						{.texture = "./assets/tileset/wall.png", .position = {.x = 192, .y = 0}},
 				},
-				.width = 32,
-				.height = 32,
-				.origin_x = 16,
-				.origin_y = 16,
+				.size = {.width = 32, .height = 32},
+				.origin = {.x = 16, .y = 16},
+				.scale = {.x = 1, .y = 1},
 				.duration_ms = 100,
 				.looping = true,
 				.reversed = false,
@@ -56,7 +47,6 @@ namespace pd::designer
 
 		return
 		{
-				.transform = transform,
 				.animation = std::move(animation),
 				.damage = 10,
 				.lifetime = 3,

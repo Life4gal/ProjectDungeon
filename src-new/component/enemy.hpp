@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <component/transform.hpp>
+#include <component/position.hpp>
 #include <component/sprite_animation.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
@@ -14,13 +14,15 @@
 
 namespace pd::component::enemy
 {
-	// transform
-	// sprite_animation
-	// physics_body
-	// tags
-	// actor
-	// AI
+	// position::World --> 敌人绝对位置
+	// position::Screen --> 敌人屏幕位置
+	// sprite --> 敌人精灵
+	// physics_body --> 敌人物理刚体
+	// tags --> 敌人标签
+	// actor --> 敌人Actor属性
+	// AI --> 敌人AI属性
 
+	// 物理碰撞体
 	class PhysicsShape final
 	{
 	public:
@@ -34,13 +36,16 @@ namespace pd::component::enemy
 		float contact_damage;
 	};
 
-	// blueprint::EnemyType
+	// 敌人类型
+	// 必须等价于blueprint::EnemyType
 	enum class Type : std::uint8_t
 	{
 		RAT = 0,
 		SLIME,
 		BAT,
 	};
+
+	// ============================================
 
 	// 敌人所属房间
 	// 该组件不由factory::Enemy附加,而是由factory::Room附加

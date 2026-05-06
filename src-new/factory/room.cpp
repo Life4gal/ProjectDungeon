@@ -24,6 +24,13 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
+		// position
+		registry.emplace<room::Position>(entity, sf::Vector2f{room.position.x, room.position.y});
+		// size
+		registry.emplace<room::Size>(entity, sf::Vector2f{room.size.width, room.size.height});
+
+		// ============================================
+
 		// floors
 		for (const auto& floor: room.floors)
 		{

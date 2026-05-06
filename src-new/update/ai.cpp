@@ -11,11 +11,8 @@
 
 #include <manager/random.hpp>
 
-#include <component/ai.hpp>
-#include <component/state.hpp>
-#include <component/actor.hpp>
-#include <component/transform.hpp>
-#include <component/physics_body.hpp>
+#include <component/enemy.hpp>
+#include <component/player.hpp>
 
 // get_player_position
 #include <component/player_controller.hpp>
@@ -39,7 +36,7 @@ namespace pd::update
 				return {0, 0};
 			}
 
-			const auto& [position] = registry.get<const transform::Position>(target->entity);
+			const auto& [position] = registry.get<const position::World>(target->entity);
 			return position;
 		}
 
@@ -109,7 +106,7 @@ namespace pd::update
 				const sf::Time delta,
 				aj::State& state,
 				aj::AirTimer& air_timer,
-				const transform::Position position,
+				const position::World position,
 				const physics_body::Id body_id
 			) noexcept -> void
 			{
@@ -175,7 +172,7 @@ namespace pd::update
 			auto update(
 				entt::registry& registry,
 				const actor::Speed& max_speed,
-				const transform::Position position,
+				const position::World position,
 				const physics_body::Id body_id
 			) noexcept -> void
 			{
@@ -241,7 +238,7 @@ namespace pd::update
 						state::InCameraArea,
 						ai::jump::State,
 						ai::jump::AirTimer,
-						const transform::Position,
+						const position::World,
 						const physics_body::Id //
 					>(entt::exclude<state::Dead>);
 
@@ -261,7 +258,7 @@ namespace pd::update
 						state::InCameraArea,
 						ai::chase::Placeholder,
 						const actor::Speed,
-						const transform::Position,
+						const position::World,
 						const physics_body::Id //
 					>(entt::exclude<state::Dead>);
 

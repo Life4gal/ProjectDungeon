@@ -6,7 +6,7 @@
 #pragma once
 
 #include <blueprint/detail/physics_body.hpp>
-#include <blueprint/detail/transform.hpp>
+#include <blueprint/detail/position.hpp>
 
 #include <entt/entity/fwd.hpp>
 
@@ -14,5 +14,6 @@
 
 namespace pd::factory::detail
 {
-	[[nodiscard]] auto create_attach(entt::registry& registry, entt::entity entity, const blueprint::Transform& transform, const blueprint::PhysicsBody& physics_body) noexcept -> b2BodyId;
+	// position == 物理刚体位置
+	[[nodiscard]] auto create_attach(entt::registry& registry, entt::entity entity, const blueprint::PhysicsBody& physics_body, blueprint::Position position) noexcept -> b2BodyId;
 }
