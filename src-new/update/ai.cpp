@@ -36,7 +36,7 @@ namespace pd::update
 				return {0, 0};
 			}
 
-			const auto& [position] = registry.get<const position::World>(target->entity);
+			const auto& [position] = registry.get<const transform::Position>(target->entity);
 			return position;
 		}
 
@@ -106,7 +106,7 @@ namespace pd::update
 				const sf::Time delta,
 				aj::State& state,
 				aj::AirTimer& air_timer,
-				const position::World position,
+				const transform::Position position,
 				const physics_body::Id body_id
 			) noexcept -> void
 			{
@@ -172,7 +172,7 @@ namespace pd::update
 			auto update(
 				entt::registry& registry,
 				const actor::Speed& max_speed,
-				const position::World position,
+				const transform::Position position,
 				const physics_body::Id body_id
 			) noexcept -> void
 			{
@@ -238,7 +238,7 @@ namespace pd::update
 						state::InCameraArea,
 						ai::jump::State,
 						ai::jump::AirTimer,
-						const position::World,
+						const transform::Position,
 						const physics_body::Id //
 					>(entt::exclude<state::Dead>);
 
@@ -258,7 +258,7 @@ namespace pd::update
 						state::InCameraArea,
 						ai::chase::Placeholder,
 						const actor::Speed,
-						const position::World,
+						const transform::Position,
 						const physics_body::Id //
 					>(entt::exclude<state::Dead>);
 

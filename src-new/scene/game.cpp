@@ -550,35 +550,6 @@ namespace pd::scene
 						}
 					}
 				}
-				else if (kp->code == Key::Numpad1 or kp->code == Key::Numpad2 or kp->code == Key::Numpad3 or kp->code == Key::Numpad4 or kp->code == Key::Numpad5)
-				{
-					using scale = helper::SpriteEffect::Scale;
-					using color = helper::SpriteEffect::Color;
-
-					if (const auto* target = registry_.ctx().find<const player_controller::Target>())
-					{
-						if (kp->code == Key::Numpad1)
-						{
-							scale::linear(registry_, target->entity, sf::Vector2f{0.5f, 0.5f}, sf::Vector2f{1.0f, 1.0f}, sf::seconds(3));
-						}
-						else if (kp->code == Key::Numpad2)
-						{
-							scale::shockwave(registry_, target->entity, sf::Vector2f{1.0f, 1.0f}, 3, sf::seconds(3));
-						}
-						else if (kp->code == Key::Numpad3)
-						{
-							scale::bounce(registry_, target->entity, sf::Vector2f{0.5f, 0.5f}, sf::Vector2f{1.0f, 1.0f}, 0.3f, sf::seconds(3));
-						}
-						else if (kp->code == Key::Numpad4)
-						{
-							scale::breathing(registry_, target->entity, sf::Vector2f{1.0f, 1.0f}, 0.45f, 1.55f, 1, sf::seconds(3));
-						}
-						else if (kp->code == Key::Numpad5)
-						{
-							color::linear(registry_, target->entity, sf::Color::Red, sf::Color::White, sf::seconds(3));
-						}
-					}
-				}
 				// =====================
 				// CAMERA
 				// =====================

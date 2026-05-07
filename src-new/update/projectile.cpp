@@ -22,7 +22,7 @@ namespace pd::update
 					tags::Projectile,
 					const projectile::Type,
 					projectile::Lifetime,
-					position::World
+					transform::Position
 				>(entt::exclude<state::Dead>);
 
 		for (const auto [entity, type, lifetime, position]: view.each())

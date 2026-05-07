@@ -6,6 +6,7 @@
 #include <update/sprite_animation.hpp>
 
 #include <component/sprite_animation.hpp>
+#include <component/state.hpp>
 
 #include <helper/sprite_animation.hpp>
 
@@ -19,6 +20,7 @@ namespace pd::update
 	{
 		const auto view = registry
 				.view<
+					state::InCameraArea,
 					const sprite_animation::Frames,
 					const sprite_animation::FramesCount,
 					const sprite_animation::Duration,
@@ -60,11 +62,11 @@ namespace pd::update
 				// 切换sprite
 				const auto& [texture, position] = frames.frames[next_frame_index];
 
-				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&TexturePosition会比较浪费性能
+				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position会比较浪费性能
 				// 在动画帧切换时才获取&更新这些组件
 				// Size&Origin无需更新,因为SpriteAnimation要求所有帧必须相同
 				registry.replace<sprite::Texture>(entity, texture);
-				registry.replace<sprite::TexturePosition>(entity, position);
+				registry.replace<sprite::Position>(entity, position);
 			}
 		}
 	}

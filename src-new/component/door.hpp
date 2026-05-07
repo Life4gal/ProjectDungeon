@@ -5,15 +5,14 @@
 
 #pragma once
 
-#include <component/position.hpp>
+#include <component/transform.hpp>
 #include <component/sprite.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::door
 {
-	// position::World --> 门绝对位置
-	// position::Screen --> 门屏幕位置
+	// transform --> 门变换
 	// sprite --> 门精灵
 	// physics_body --> 门物理刚体
 	// tags --> 门标签

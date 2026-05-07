@@ -7,7 +7,7 @@
 
 #include <component/actor.hpp>
 #include <component/state.hpp>
-#include <component/position.hpp>
+#include <component/transform.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
@@ -29,7 +29,7 @@ namespace pd::render
 					actor::HealthBarOffset,
 					actor::ManaBarSize,
 					actor::ManaBarOffset,
-					position::World
+					transform::Position
 				>(entt::exclude<state::Dead>);
 		const auto count = view.size_hint();
 

@@ -5,15 +5,14 @@
 
 #pragma once
 
-#include <component/position.hpp>
+#include <component/transform.hpp>
 #include <component/sprite_animation.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::player
 {
-	// position::World --> 玩家绝对位置
-	// position::Screen --> 玩家屏幕位置
+	// transform --> 玩家变换
 	// sprite_animation --> 玩家精灵动画
 	// physics_body --> 玩家物理刚体
 	// tags --> 玩家标签

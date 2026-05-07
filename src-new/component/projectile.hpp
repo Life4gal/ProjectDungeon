@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <component/position.hpp>
+#include <component/transform.hpp>
 #include <component/sprite_animation.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
@@ -14,8 +14,7 @@
 
 namespace pd::component::projectile
 {
-	// position::World --> 飞弹绝对位置
-	// position::Screen --> 飞弹屏幕位置
+	// transform --> 飞弹变换
 	// sprite_animation --> 飞弹精灵动画
 	// physics_body --> 飞弹物理刚体
 	// tags --> 飞弹标签

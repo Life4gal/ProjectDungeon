@@ -20,23 +20,23 @@ namespace pd::factory::detail
 		using namespace component;
 
 		// ====================
-		// 纹理
+		// SPRITE
 		// ====================
 
 		auto texture = manager::Texture::load(std::filesystem::path{sprite.texture});
 
 		registry.emplace<sprite::Texture>(entity, std::move(texture));
-		registry.emplace<sprite::TexturePosition>(entity, sf::Vector2f{sprite.position.x, sprite.position.y});
-		registry.emplace<sprite::TextureSize>(entity, sf::Vector2f{sprite.size.width, sprite.size.height});
-		registry.emplace<sprite::TextureOrigin>(entity, sf::Vector2f{sprite.origin.x, sprite.origin.y});
+		registry.emplace<sprite::Position>(entity, sf::Vector2f{sprite.position.x, sprite.position.y});
+		registry.emplace<sprite::Size>(entity, sf::Vector2f{sprite.size.width, sprite.size.height});
+		registry.emplace<sprite::Origin>(entity, sf::Vector2f{sprite.origin.x, sprite.origin.y});
 
 		// ====================
-		// 渲染
+		// SPRITE EFFECT
 		// ====================
 
-		registry.emplace<sprite::RenderPositionOffset>(entity, sf::Vector2f{0, 0});
-		registry.emplace<sprite::RenderScale>(entity, sf::Vector2f{sprite.scale.x, sprite.scale.y});
-		registry.emplace<sprite::RenderRotation>(entity, sf::degrees(0));
-		registry.emplace<sprite::RenderColor>(entity, sf::Color::White);
+		registry.emplace<sprite_effect::Position>(entity, sf::Vector2f{0, 0});
+		registry.emplace<sprite_effect::Scale>(entity, sf::Vector2f{1, 1});
+		registry.emplace<sprite_effect::Rotation>(entity, sf::degrees(0));
+		registry.emplace<sprite_effect::Color>(entity, sf::Color::White);
 	}
 }

@@ -5,15 +5,14 @@
 
 #pragma once
 
-#include <component/position.hpp>
+#include <component/transform.hpp>
 #include <component/sprite.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::wall
 {
-	// position::World --> 墙壁绝对位置
-	// position::Screen --> 墙壁屏幕位置
+	// transform --> 墙壁变换
 	// sprite --> 墙壁精灵
 	// physics_body --> 墙壁物理刚体
 	// tags --> 墙壁标签

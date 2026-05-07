@@ -730,8 +730,8 @@ add_executable(
 	
 	# 状态
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/state.hpp
-	# 位置
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/position.hpp
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite.hpp
 	# 精灵动画
@@ -776,9 +776,9 @@ add_executable(
 	# SYSTEM -- FACTORY
 	# ============================
 
-	# 位置
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/position.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/position.cpp
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.cpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.cpp
@@ -826,6 +826,9 @@ add_executable(
 	# SYSTEM -- HELPER
 	# ============================
 	
+	# 精灵
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite.cpp
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.cpp

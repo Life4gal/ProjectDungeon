@@ -5,14 +5,13 @@
 
 #pragma once
 
-#include <component/position.hpp>
+#include <component/transform.hpp>
 #include <component/sprite.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::floor
 {
-	// position::World --> 地板绝对位置
-	// position::Screen --> 地板屏幕位置
+	// transform --> 地板变换
 	// sprite --> 地板精灵
 	// tags --> 地板标签
 }

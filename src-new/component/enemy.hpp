@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <component/position.hpp>
+#include <component/transform.hpp>
 #include <component/sprite_animation.hpp>
 #include <component/physics_body.hpp>
 #include <component/tags.hpp>
@@ -14,9 +14,8 @@
 
 namespace pd::component::enemy
 {
-	// position::World --> 敌人绝对位置
-	// position::Screen --> 敌人屏幕位置
-	// sprite --> 敌人精灵
+	// transform --> 敌人变换
+	// sprite_animation --> 敌人精灵动画
 	// physics_body --> 敌人物理刚体
 	// tags --> 敌人标签
 	// actor --> 敌人Actor属性

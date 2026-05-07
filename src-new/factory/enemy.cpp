@@ -8,7 +8,7 @@
 #include <component/enemy.hpp>
 #include <component/ai.hpp>
 
-#include <factory/detail/position.hpp>
+#include <factory/detail/transform.hpp>
 #include <factory/detail/sprite_animation.hpp>
 #include <factory/detail/physics_body.hpp>
 #include <factory/detail/physics_shape.hpp>
@@ -24,8 +24,8 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
-		// position
-		detail::attach(registry, entity, enemy.position);
+		// transform
+		detail::attach(registry, entity, enemy.position, enemy.animation);
 		// sprite_animation
 		detail::attach(registry, entity, enemy.animation);
 		// physics_body & physics_shape

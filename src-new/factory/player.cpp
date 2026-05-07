@@ -7,7 +7,7 @@
 
 #include <component/player.hpp>
 
-#include <factory/detail/position.hpp>
+#include <factory/detail/transform.hpp>
 #include <factory/detail/sprite_animation.hpp>
 #include <factory/detail/physics_body.hpp>
 #include <factory/detail/physics_shape.hpp>
@@ -23,8 +23,8 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
-		// position
-		detail::attach(registry, entity, player.position);
+		// transform
+		detail::attach(registry, entity, player.position, player.animation);
 		// sprite_animation
 		detail::attach(registry, entity, player.animation);
 		// physics_body & physics_shape

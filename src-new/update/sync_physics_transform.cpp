@@ -8,8 +8,7 @@
 #include <utility/physics.hpp>
 
 #include <component/physics_body.hpp>
-#include <component/position.hpp>
-#include <component/sprite.hpp>
+#include <component/transform.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
@@ -42,12 +41,10 @@ namespace pd::update
 			const auto pixels_position = Physics::from_physics(position);
 			const auto pixels_rotation = Physics::from_physics(rotation);
 
-			// 世界坐标
-			registry.emplace_or_replace<position::World>(entity, pixels_position);
-			// 屏幕坐标
-			//
-			// 渲染的旋转
-			registry.emplace_or_replace<sprite::RenderRotation>(entity, pixels_rotation);
+			// 位置
+			registry.emplace_or_replace<transform::Position>(entity, pixels_position);
+			// 旋转
+			registry.emplace_or_replace<transform::Rotation>(entity, pixels_rotation);
 		}
 	}
 }

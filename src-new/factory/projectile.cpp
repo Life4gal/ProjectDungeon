@@ -9,7 +9,7 @@
 
 #include <component/projectile.hpp>
 
-#include <factory/detail/position.hpp>
+#include <factory/detail/transform.hpp>
 #include <factory/detail/sprite_animation.hpp>
 #include <factory/detail/physics_body.hpp>
 #include <factory/detail/physics_shape.hpp>
@@ -25,15 +25,15 @@ namespace pd::factory
 	{
 		direction = direction.normalized();
 
-		const auto [owner_position] = registry.get<const position::World>(owner);
+		const auto [owner_position] = registry.get<const transform::Position>(owner);
 		// TODO: 基于发射的方向给初始位置一个偏移
 		const auto position_offset = direction * 10.f;
 		const auto position = blueprint::Position{.x = owner_position.x + position_offset.x, .y = owner_position.y + position_offset.y};
 
 		const auto entity = registry.create();
 
-		// position
-		detail::attach(registry, entity, position);
+		// transform
+		detail::attach(registry, entity, position, projectile.animation);
 		// sprite_animation
 		detail::attach(registry, entity, projectile.animation);
 		// physics_body & physics_shape & velocity

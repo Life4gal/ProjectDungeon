@@ -7,7 +7,7 @@
 
 #include <component/wall.hpp>
 
-#include <factory/detail/position.hpp>
+#include <factory/detail/transform.hpp>
 #include <factory/detail/sprite.hpp>
 #include <factory/detail/physics_body.hpp>
 #include <factory/detail/physics_shape.hpp>
@@ -22,8 +22,8 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
-		// position
-		detail::attach(registry, entity, wall.position);
+		// transform
+		detail::attach(registry, entity, wall.position, wall.sprite);
 		// sprite
 		detail::attach(registry, entity, wall.sprite);
 		// physics_body & physics_shape
