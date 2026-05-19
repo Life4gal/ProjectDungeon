@@ -1,8 +1,0 @@
-{
-	"animation_id": "AntleredRascal",
-	"health": 50,
-	"mana": 0,
-	"speed": 150,
-	"collision_damage": 5,
-	"weapons": [ "goblin-claw" ]
-}

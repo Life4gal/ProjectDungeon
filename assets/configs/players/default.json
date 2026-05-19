@@ -1,7 +1,0 @@
-{
-	"animation_id": "AntleredRascal",
-	"health": 100,
-	"mana": 20,
-	"speed": 200,
-	"weapons": [ "fireball" ]
-}
