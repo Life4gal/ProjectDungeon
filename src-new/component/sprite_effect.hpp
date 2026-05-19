@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <variant>
 #include <vector>
 
 #include <SFML/System/Vector2.hpp>
@@ -353,6 +354,17 @@ namespace pd::component::sprite_effect
 			// 已持续时间(秒)
 			float elapsed;
 		};
+
+		class Effect final : public std::variant<
+					Linear,
+					Oscillator,
+					Spring,
+					Path,
+					Orbit,
+					Shake,
+					Wave,
+					Swing
+				> {};
 	}
 
 	// ============================================
@@ -653,6 +665,17 @@ namespace pd::component::sprite_effect
 			// 已持续时间(秒)
 			float elapsed;
 		};
+
+		class Effect final : public std::variant<
+					Oscillator,
+					Spring,
+					Breathing,
+					SquashStretch,
+					DirectionalPulse,
+					Jelly,
+					ElasticHit,
+					Ripple
+				> {};
 	}
 
 	// ============================================
@@ -885,5 +908,15 @@ namespace pd::component::sprite_effect
 			// 已持续时间(秒)
 			float elapsed;
 		};
+
+		class Effect final : public std::variant<
+					Fade,
+					AlphaFade,
+					Flash,
+					Breathing,
+					Pulse,
+					RainbowCycle,
+					Oscillator
+				> {};
 	}
 }

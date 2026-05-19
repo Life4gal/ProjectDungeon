@@ -9,8 +9,7 @@
 
 #include <factory/detail/transform.hpp>
 #include <factory/detail/sprite.hpp>
-#include <factory/detail/physics_body.hpp>
-#include <factory/detail/physics_shape.hpp>
+#include <factory/detail/physics.hpp>
 
 #include <entt/entt.hpp>
 
@@ -23,23 +22,22 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, door.position, door.sprite);
+		detail::attach(registry, entity, door.position);
 		// sprite
 		detail::attach(registry, entity, door.sprite);
-		// physics_body & physics_shape
+		// physics
 		{
-			const auto body_id = detail::create_attach(registry, entity, door.physics_body, door.position);
+			const auto body_id = detail::create_attach(registry, entity, door.body_desc, door.position);
 
-			const auto door_shape_id = detail::create(body_id, door.physics_shape_door, door.sprite);
+			const auto door_shape_id = detail::create(body_id, door.shape_door_desc, door.shape_door);
 			registry.emplace<door::PhysicsShapeDoor>(entity, door_shape_id);
 
-			const auto sensor_shape_id = detail::create(body_id, door.physics_shape_sensor, door.sprite);
+			const auto sensor_shape_id = detail::create(body_id, door.shape_sensor_desc, door.shape_sensor);
 			registry.emplace<door::PhysicsShapeSensor>(entity, sensor_shape_id);
 
-			const auto blocker_shape_id = detail::create(body_id, door.physics_shape_blocker, door.sprite);
+			const auto blocker_shape_id = detail::create(body_id, door.shape_blocker_desc, door.shape_blocker);
 			registry.emplace<door::PhysicsShapeBlocker>(entity, blocker_shape_id);
 		}
-
 		// direction
 		registry.emplace<door::Direction>(entity, static_cast<door::Direction>(door.direction));
 

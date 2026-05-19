@@ -11,8 +11,7 @@
 
 #include <factory/detail/transform.hpp>
 #include <factory/detail/sprite_animation.hpp>
-#include <factory/detail/physics_body.hpp>
-#include <factory/detail/physics_shape.hpp>
+#include <factory/detail/physics.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
@@ -33,14 +32,14 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, position, projectile.animation);
+		detail::attach(registry, entity, position);
 		// sprite_animation
 		detail::attach(registry, entity, projectile.animation);
 		// physics_body & physics_shape & velocity
 		{
-			const auto body_id = detail::create_attach(registry, entity, projectile.physics_body, position);
+			const auto body_id = detail::create_attach(registry, entity, projectile.body_desc, position);
 
-			const auto shape_id = detail::create(body_id, projectile.physics_shape, projectile.animation);
+			const auto shape_id = detail::create(body_id, projectile.shape_desc, projectile.shape);
 			registry.emplace<projectile::PhysicsShape>(entity, shape_id);
 
 			// TODO: 要解决飞弹刚发射就碰撞到自己有两种简易解决方案(不考虑在碰撞时判断)
@@ -56,11 +55,11 @@ namespace pd::factory
 					if (const auto player = registry.all_of<tags::Player>(owner);
 						player)
 					{
-						f.maskBits &= ~static_cast<std::uint64_t>(std::to_underlying(blueprint::PhysicsShapeType::PLAYER));
+						f.maskBits &= ~static_cast<std::uint64_t>(std::to_underlying(blueprint::ShapeType::PLAYER));
 					}
 					else
 					{
-						f.maskBits &= ~static_cast<std::uint64_t>(std::to_underlying(blueprint::PhysicsShapeType::ENEMY));
+						f.maskBits &= ~static_cast<std::uint64_t>(std::to_underlying(blueprint::ShapeType::ENEMY));
 					}
 
 					return f;

@@ -12,7 +12,7 @@
 namespace pd::blueprint
 {
 	// SpriteAnimation != vector<Sprite>
-	// SpriteAnimation要求所有帧的大小&原点&时长相同,仅是纹理&位置&旋转不同
+	// SpriteAnimation要求所有帧的大小&原点&时长相同,仅是纹理&位置不同
 	class SpriteAnimation final
 	{
 	public:
@@ -32,8 +32,6 @@ namespace pd::blueprint
 		Size size;
 		// 每一帧纹理原点
 		Position origin;
-		// 每一帧纹理缩放
-		Scale scale;
 
 		// 每一帧持续时间(毫秒)
 		int duration_ms;

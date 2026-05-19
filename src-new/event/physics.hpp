@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <blueprint/detail/physics_shape.hpp>
+#include <blueprint/detail/physics.hpp>
 
 #include <entt/entity/fwd.hpp>
 
@@ -18,8 +18,8 @@ namespace pd::event::physics
 		entt::entity a;
 		entt::entity b;
 
-		blueprint::PhysicsShapeType a_type;
-		blueprint::PhysicsShapeType b_type;
+		blueprint::ShapeType a_type;
+		blueprint::ShapeType b_type;
 	};
 
 	// 任意实体结束接触
@@ -29,8 +29,8 @@ namespace pd::event::physics
 		entt::entity a;
 		entt::entity b;
 
-		blueprint::PhysicsShapeType a_type;
-		blueprint::PhysicsShapeType b_type;
+		blueprint::ShapeType a_type;
+		blueprint::ShapeType b_type;
 	};
 
 	// 任意实体与感应器开始接触
@@ -40,8 +40,8 @@ namespace pd::event::physics
 		entt::entity sensor;
 		entt::entity visitor;
 
-		blueprint::PhysicsShapeType sensor_type;
-		blueprint::PhysicsShapeType visitor_type;
+		blueprint::ShapeType sensor_type;
+		blueprint::ShapeType visitor_type;
 	};
 
 	// 任意实体与感应器结束接触
@@ -51,7 +51,7 @@ namespace pd::event::physics
 		entt::entity sensor;
 		entt::entity visitor;
 
-		blueprint::PhysicsShapeType sensor_type;
-		blueprint::PhysicsShapeType visitor_type;
+		blueprint::ShapeType sensor_type;
+		blueprint::ShapeType visitor_type;
 	};
 }

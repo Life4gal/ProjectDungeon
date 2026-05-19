@@ -26,14 +26,11 @@ namespace pd::component::transform
 	// 	sf::Vector2i position;
 	// };
 
-	// 基础缩放(蓝图缩放)
-	// 该组件原本应该属于sprite,或者其它用于渲染的组件
-	// 该组件创建后一般是只读的
-	class Scale final
-	{
-	public:
-		sf::Vector2f scale;
-	};
+	// class [[deprecated("这个组件应该用不到了")]] Scale final
+	// {
+	// public:
+	// 	sf::Vector2f scale;
+	// };
 
 	// 旋转
 	// 无物理体: Rotation == 实体旋转

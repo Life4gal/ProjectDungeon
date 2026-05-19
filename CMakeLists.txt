@@ -655,20 +655,14 @@ add_executable(
 	# BLUEPRINT
 	# ============================
 	
-	# 位置
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/position.hpp
-	# 大小
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/size.hpp
-	# 缩放
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/scale.hpp
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite.hpp
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite_animation.hpp
-	# 物理刚体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_body.hpp
-	# 物理形状
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics_shape.hpp
+	# 物理体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics.hpp
 	# Actor
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/actor.hpp
 	# AI
@@ -730,6 +724,9 @@ add_executable(
 	
 	# 状态
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/state.hpp
+	# 标签
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tags.hpp
+
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
 	# 精灵
@@ -738,10 +735,12 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_animation.hpp
 	# 精灵动画特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_effect.hpp
-	# 物理刚体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/physics_body.hpp
-	# 标签
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tags.hpp
+	# 物理体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/physics.hpp
+	# Actor
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/actor.hpp
+	# AI
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
 
 	# 相机(可视区域)
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp
@@ -756,11 +755,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door.hpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
-	
-	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/actor.hpp
-	# AI
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
 
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/enemy.hpp
@@ -785,15 +779,15 @@ add_executable(
 	# 精灵动画
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite_animation.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite_animation.cpp
-	# 物理刚体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_body.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_body.cpp
-	# 物理形状
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_shape.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics_shape.cpp
+	# 物理体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics.cpp
 	# Actor
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/actor.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/actor.cpp
+	# AI
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.cpp
 
 	# 地下城 -- 关卡 -- 房间 -- 地板
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.hpp

@@ -19,6 +19,43 @@ namespace pd::designer
 		constexpr float DoorSensorRatio = 0.2333f;
 		// "blocker"占整个碰撞体比例
 		constexpr float DoorBlockerRatio = 1 - DoorBodyRatio - DoorSensorRatio;
+
+		constexpr blueprint::BodyDesc BodyDesc
+		{
+				.type = blueprint::BodyType::STATIC,
+				.fixed_rotation = true,
+				.is_bullet = false,
+		};
+		constexpr blueprint::ShapeDesc ShapeDoorDesc
+		{
+				.material = {.friction = 0.6f, .restitution = 0},
+				.density = 0,
+				.category = blueprint::ShapeType::DOOR,
+				.category_mask = blueprint::CollisionMask::door_close,
+				.is_sensor = false,
+				.enable_sensor_events = false,
+				.enable_contact_events = true,
+		};
+		constexpr blueprint::ShapeDesc ShapeSensorDesc
+		{
+				.material = {.friction = 0, .restitution = 0},
+				.density = 0,
+				.category = blueprint::ShapeType::DOOR,
+				.category_mask = blueprint::CollisionMask::door_sensor,
+				.is_sensor = true,
+				.enable_sensor_events = true,
+				.enable_contact_events = false,
+		};
+		constexpr blueprint::ShapeDesc ShapeBlockerDesc
+		{
+				.material = {.friction = 0, .restitution = 0},
+				.density = 0,
+				.category = blueprint::ShapeType::DOOR,
+				.category_mask = blueprint::CollisionMask::door_blocker,
+				.is_sensor = false,
+				.enable_sensor_events = false,
+				.enable_contact_events = false,
+		};
 	}
 
 	auto Door::standard(const size_type tile_x, const size_type tile_y, const blueprint::DoorDirection direction) noexcept -> blueprint::Door
@@ -31,9 +68,9 @@ namespace pd::designer
 			float offset_y;
 		};
 
-		desc_type door_desc{};
-		desc_type sensor_desc{};
-		desc_type blocker_desc{};
+		desc_type door_desc;
+		desc_type sensor_desc;
+		desc_type blocker_desc;
 
 		if (direction == blueprint::DoorDirection::NORTH or direction == blueprint::DoorDirection::SOUTH)
 		{
@@ -77,8 +114,8 @@ namespace pd::designer
 			sensor_desc.offset_y = 0;
 
 			blocker_desc.width = Room::tile_width * DoorBlockerRatio;
-			sensor_desc.height = Room::tile_height;
-			sensor_desc.offset_y = 0;
+			blocker_desc.height = Room::tile_height;
+			blocker_desc.offset_y = 0;
 
 			if (direction == blueprint::DoorDirection::WEST)
 			{
@@ -98,77 +135,48 @@ namespace pd::designer
 			PROMETHEUS_PLATFORM_UNREACHABLE();
 		}
 
-		const blueprint::Position position
-		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-		};
 		blueprint::Sprite sprite
 		{
 				.texture = "./assets/tileset/door.png",
 				.position = {.x = 0, .y = 0},
 				.size = {.width = Room::tile_width, .height = Room::tile_height},
 				.origin = {.x = Room::tile_origin_x, .y = Room::tile_origin_y},
-				.scale = {.x = 1, .y = 1},
 		};
-		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::STATIC, .fixed_rotation = true, .is_bullet = false};
-		const blueprint::PhysicsShapeOffsetBox physics_shape_door
+		const blueprint::Position position
 		{
-				.def =
-				{
-						.material = {.friction = 0.6f, .restitution = 0},
-						.density = 0,
-						.category = blueprint::PhysicsShapeType::DOOR,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::door_close,
-						.is_sensor = false,
-						.enable_sensor_events = false,
-						.enable_contact_events = true,
-				},
+				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
+		};
+		const blueprint::ShapeCategory::OffsetBox shape_door
+		{
 				.size = {.width = door_desc.width, .height = door_desc.height},
 				.offset = {.x = door_desc.offset_x, .y = door_desc.offset_y},
-				.rotation = 0,
+				.rotation = {.rotation = 0},
 		};
-		const blueprint::PhysicsShapeOffsetBox physics_shape_sensor
+		const blueprint::ShapeCategory::OffsetBox shape_sensor
 		{
-				.def =
-				{
-						.material = {.friction = 0, .restitution = 0},
-						.density = 0,
-						.category = blueprint::PhysicsShapeType::DOOR,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::door_sensor,
-						.is_sensor = true,
-						.enable_sensor_events = true,
-						.enable_contact_events = false,
-				},
 				.size = {.width = sensor_desc.width, .height = sensor_desc.height},
 				.offset = {.x = sensor_desc.offset_x, .y = sensor_desc.offset_y},
-				.rotation = 0,
+				.rotation = {.rotation = 0},
 		};
-		const blueprint::PhysicsShapeOffsetBox physics_shape_blocker
+		const blueprint::ShapeCategory::OffsetBox shape_blocker
 		{
-				.def =
-				{
-						.material = {.friction = 0, .restitution = 0},
-						.density = 0,
-						.category = blueprint::PhysicsShapeType::DOOR,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::door_blocker,
-						.is_sensor = false,
-						.enable_sensor_events = false,
-						.enable_contact_events = false,
-				},
 				.size = {.width = blocker_desc.width, .height = blocker_desc.height},
 				.offset = {.x = blocker_desc.offset_x, .y = blocker_desc.offset_y},
-				.rotation = 0,
+				.rotation = {.rotation = 0},
 		};
 
 		return
 		{
-				.position = position,
 				.sprite = std::move(sprite),
-				.physics_body = physics_body,
-				.physics_shape_door = physics_shape_door,
-				.physics_shape_sensor = physics_shape_sensor,
-				.physics_shape_blocker = physics_shape_blocker,
+				.position = position,
+				.body_desc = BodyDesc,
+				.shape_door_desc = ShapeDoorDesc,
+				.shape_door = shape_door,
+				.shape_sensor_desc = ShapeSensorDesc,
+				.shape_sensor = shape_sensor,
+				.shape_blocker_desc = ShapeBlockerDesc,
+				.shape_blocker = shape_blocker,
 				.direction = direction
 		};
 	}

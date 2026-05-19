@@ -25,20 +25,20 @@ namespace pd::listener::enemy
 		using manager::Event;
 
 		// 不是敌人直接跳过
-		if (contact_begin.a_type != blueprint::PhysicsShapeType::ENEMY and contact_begin.b_type != blueprint::PhysicsShapeType::ENEMY)
+		if (contact_begin.a_type != blueprint::ShapeType::ENEMY and contact_begin.b_type != blueprint::ShapeType::ENEMY)
 		{
 			return;
 		}
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Enemy>(contact_begin.a) or registry.all_of<tags::Enemy>(contact_begin.b));
 
-		const auto a = contact_begin.a_type == blueprint::PhysicsShapeType::ENEMY;
+		const auto a = contact_begin.a_type == blueprint::ShapeType::ENEMY;
 
 		const auto enemy_entity = a ? contact_begin.a : contact_begin.b;
 		const auto other_entity = a ? contact_begin.b : contact_begin.a;
 		const auto other_type = a ? contact_begin.b_type : contact_begin.a_type;
 
 		// 不是敌人接触玩家直接跳过
-		if (other_type != blueprint::PhysicsShapeType::PLAYER)
+		if (other_type != blueprint::ShapeType::PLAYER)
 		{
 			return;
 		}
@@ -59,20 +59,20 @@ namespace pd::listener::enemy
 		namespace tags = component::tags;
 
 		// 不是敌人直接跳过
-		if (contact_end.a_type != blueprint::PhysicsShapeType::ENEMY and contact_end.b_type != blueprint::PhysicsShapeType::ENEMY)
+		if (contact_end.a_type != blueprint::ShapeType::ENEMY and contact_end.b_type != blueprint::ShapeType::ENEMY)
 		{
 			return;
 		}
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Enemy>(contact_end.a) or registry.all_of<tags::Enemy>(contact_end.b));
 
-		const auto a = contact_end.a_type == blueprint::PhysicsShapeType::ENEMY;
+		const auto a = contact_end.a_type == blueprint::ShapeType::ENEMY;
 
 		const auto enemy_entity = a ? contact_end.a : contact_end.b;
 		const auto other_entity = a ? contact_end.b : contact_end.a;
 		const auto other_type = a ? contact_end.b_type : contact_end.a_type;
 
 		// 不是敌人接触玩家直接跳过
-		if (other_type != blueprint::PhysicsShapeType::PLAYER)
+		if (other_type != blueprint::ShapeType::PLAYER)
 		{
 			return;
 		}

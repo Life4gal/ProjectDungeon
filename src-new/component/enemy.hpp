@@ -7,7 +7,7 @@
 
 #include <component/transform.hpp>
 #include <component/sprite_animation.hpp>
-#include <component/physics_body.hpp>
+#include <component/physics.hpp>
 #include <component/tags.hpp>
 #include <component/actor.hpp>
 #include <component/ai.hpp>
@@ -16,7 +16,7 @@ namespace pd::component::enemy
 {
 	// transform --> 敌人变换
 	// sprite_animation --> 敌人精灵动画
-	// physics_body --> 敌人物理刚体
+	// physics --> 敌人物理体
 	// tags --> 敌人标签
 	// actor --> 敌人Actor属性
 	// AI --> 敌人AI属性

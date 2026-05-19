@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite.hpp>
 
 namespace pd::blueprint
@@ -13,7 +12,10 @@ namespace pd::blueprint
 	class Floor final
 	{
 	public:
-		Position position;
+		// 精灵
 		Sprite sprite;
+
+		// 生成位置
+		Position position;
 	};
 }

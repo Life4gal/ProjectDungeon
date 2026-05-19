@@ -7,6 +7,26 @@
 
 namespace pd::designer
 {
+	namespace
+	{
+		constexpr blueprint::BodyDesc BodyDesc
+		{
+				.type = blueprint::BodyType::DYNAMIC,
+				.fixed_rotation = true,
+				.is_bullet = true,
+		};
+		constexpr blueprint::ShapeDesc ShapeDesc
+		{
+				.material = {.friction = 0.3f, .restitution = 0},
+				.density = 1,
+				.category = blueprint::ShapeType::PROJECTILE,
+				.category_mask = blueprint::CollisionMask::projectile,
+				.is_sensor = false,
+				.enable_sensor_events = true,
+				.enable_contact_events = true,
+		};
+	}
+
 	auto Projectile::standard() noexcept -> blueprint::Projectile
 	{
 		blueprint::SpriteAnimation animation
@@ -24,24 +44,12 @@ namespace pd::designer
 				},
 				.size = {.width = 32, .height = 32},
 				.origin = {.x = 16, .y = 16},
-				.scale = {.x = 1, .y = 1},
 				.duration_ms = 100,
 				.looping = true,
 				.reversed = false,
 		};
-		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::DYNAMIC, .fixed_rotation = true, .is_bullet = true};
-		constexpr blueprint::PhysicsShapeCircle physics_shape
+		constexpr blueprint::ShapeCategory::Circle shape
 		{
-				.def =
-				{
-						.material = {.friction = 0.3f, .restitution = 0},
-						.density = 1,
-						.category = blueprint::PhysicsShapeType::PROJECTILE,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::projectile,
-						.is_sensor = false,
-						.enable_sensor_events = true,
-						.enable_contact_events = true,
-				},
 				.radius = 16,
 		};
 
@@ -52,8 +60,9 @@ namespace pd::designer
 				.lifetime = 3,
 				.speed = 200,
 				.type = blueprint::ProjectileType::STANDARD,
-				.physics_body = physics_body,
-				.physics_shape = physics_shape,
+				.body_desc = BodyDesc,
+				.shape_desc = ShapeDesc,
+				.shape = shape,
 		};
 	}
 }

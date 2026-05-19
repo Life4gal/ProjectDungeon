@@ -41,7 +41,6 @@ namespace pd::helper
 						sprite_effect::Rotation,
 						sprite_effect::Color,
 						transform::Position,
-						transform::Scale,
 						transform::Rotation
 					>(entt::exclude<state::Invisible>);
 
@@ -56,12 +55,11 @@ namespace pd::helper
 				     effect_rotation,
 				     effect_color,
 				     position,
-				     scale,
 				     rotation
 			     ]: view.each())
 			{
 				const auto render_position = position.position + effect_position.extra;
-				const auto render_scale = sf::Vector2f{scale.scale.x * effect_scale.extra.x, scale.scale.y * effect_scale.extra.y};
+				const auto render_scale = effect_scale.extra;
 				const auto render_rotation = rotation.rotation + effect_rotation.extra;
 				const auto render_color = effect_color.color;
 				const auto render_origin = texture_origin.origin;

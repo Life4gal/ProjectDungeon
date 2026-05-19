@@ -19,7 +19,7 @@
 // 物理世界特别处理
 
 #include <utility/physics.hpp>
-#include <component/physics_body.hpp>
+#include <component/physics.hpp>
 #include <box2d/box2d.h>
 
 // =========
@@ -35,8 +35,6 @@
 #include <factory/level.hpp>
 #include <factory/player.hpp>
 #include <factory/projectile.hpp>
-
-#include <helper/sprite_effect.hpp>
 
 // =========
 // 监听
@@ -94,7 +92,7 @@ namespace pd::scene
 
 		auto on_destroy_physics_body(entt::registry& registry, const entt::entity entity) noexcept -> void
 		{
-			const auto [body_id] = registry.get<const component::physics_body::Id>(entity);
+			const auto [body_id] = registry.get<const component::physics::BodyId>(entity);
 			b2DestroyBody(body_id);
 		}
 
@@ -112,7 +110,7 @@ namespace pd::scene
 
 			// 订阅组件销毁事件,以便在组件销毁时销毁物理刚体
 			// 如此便不需要在销毁实体前手动调用deattach函数销毁物理刚体组件
-			registry.on_destroy<component::physics_body::Id>().connect<&on_destroy_physics_body>();
+			registry.on_destroy<component::physics::BodyId>().connect<&on_destroy_physics_body>();
 		}
 
 		// 销毁物理世界
@@ -122,7 +120,7 @@ namespace pd::scene
 
 			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NON_NULL(world_id), "物理世界未创建");
 
-			registry.on_destroy<component::physics_body::Id>().disconnect<&on_destroy_physics_body>();
+			registry.on_destroy<component::physics::BodyId>().disconnect<&on_destroy_physics_body>();
 
 			b2DestroyWorld(world_id);
 			world_id = b2_nullWorldId;

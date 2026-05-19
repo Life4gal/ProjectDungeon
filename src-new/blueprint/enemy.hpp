@@ -5,17 +5,14 @@
 
 #pragma once
 
-#include <variant>
-
-#include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite_animation.hpp>
-#include <blueprint/detail/physics_body.hpp>
-#include <blueprint/detail/physics_shape.hpp>
+#include <blueprint/detail/physics.hpp>
 #include <blueprint/detail/actor.hpp>
 #include <blueprint/detail/ai.hpp>
 
 namespace pd::blueprint
 {
+	// 敌人类型
 	enum class EnemyType : std::uint8_t
 	{
 		RAT = 0,
@@ -26,23 +23,26 @@ namespace pd::blueprint
 	class Enemy
 	{
 	public:
-		using physics_shape_type = std::variant<PhysicsShapeCircle, PhysicsShapeCapsule, PhysicsShapeBox>;
-
-		Position position;
+		// 精灵动画
 		SpriteAnimation animation;
 
+		// 生成位置
+		Position position;
+
+		// 敌人类型
+		EnemyType type;
+		// AI
+		Ai ai;
+		// Actor
 		Actor actor;
 
 		// 接触伤害
 		float contact_damage;
 
-		EnemyType type;
-		Ai ai;
-
-		// 物理刚体
-		PhysicsBody physics_body;
-		// 物理碰撞体
+		// 任意形状物理体
 		// TODO: 如果敌人存在多个碰撞体时如何处理?
-		physics_shape_type physics_shape;
+		BodyDesc body_desc;
+		ShapeDesc shape_desc;
+		ShapeCategory::Any shape;
 	};
 }

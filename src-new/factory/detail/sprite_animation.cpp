@@ -56,7 +56,6 @@ namespace pd::factory::detail
 				.position = position,
 				.size = sprite_animation.size,
 				.origin = sprite_animation.origin,
-				.scale = sprite_animation.scale,
 		};
 		attach(registry, entity, sprite);
 	}

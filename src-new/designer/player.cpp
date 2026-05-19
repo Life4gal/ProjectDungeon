@@ -9,13 +9,28 @@
 
 namespace pd::designer
 {
+	namespace
+	{
+		constexpr blueprint::BodyDesc BodyDesc
+		{
+				.type = blueprint::BodyType::DYNAMIC,
+				.fixed_rotation = true,
+				.is_bullet = false,
+		};
+		constexpr blueprint::ShapeDesc ShapeDesc
+		{
+				.material = {.friction = 0.3f, .restitution = 0},
+				.density = 1,
+				.category = blueprint::ShapeType::PLAYER,
+				.category_mask = blueprint::CollisionMask::player,
+				.is_sensor = false,
+				.enable_sensor_events = true,
+				.enable_contact_events = true,
+		};
+	}
+
 	auto Player::test_character() noexcept -> blueprint::Player
 	{
-		constexpr blueprint::Position position
-		{
-				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
-		};
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
@@ -31,28 +46,29 @@ namespace pd::designer
 				},
 				.size = {.width = 64, .height = 64},
 				.origin = {.x = 32, .y = 32},
-				.scale = {.x = 1, .y = 1},
 				.duration_ms = 250,
 				.looping = true,
 				.reversed = false,
 		};
-		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::DYNAMIC, .fixed_rotation = true, .is_bullet = false};
-		constexpr blueprint::PhysicsShapeCircle physics_shape
+		constexpr blueprint::Position position
 		{
-				.def =
-				{
-						.material = {.friction = 0.3f, .restitution = 0},
-						.density = 1,
-						.category = blueprint::PhysicsShapeType::PLAYER,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::player,
-						.is_sensor = false,
-						.enable_sensor_events = true,
-						.enable_contact_events = true,
-				},
-				.radius = 32,
+				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
 		};
 		constexpr blueprint::Actor actor{.health = 50, .mana = 20, .speed = 120};
+		constexpr blueprint::ShapeCategory::Circle shape
+		{
+				.radius = 32,
+		};
 
-		return {.position = position, .animation = std::move(animation), .actor = actor, .physics_body = physics_body, .physics_shape = physics_shape};
+		return
+		{
+				.animation = std::move(animation),
+				.position = position,
+				.actor = actor,
+				.body_desc = BodyDesc,
+				.shape_desc = ShapeDesc,
+				.shape = shape,
+		};
 	}
 }

@@ -39,7 +39,9 @@ namespace pd::blueprint
 	public:
 		using rooms_type = std::unordered_map<RoomPosition, Room>;
 
+		// 所有房间
 		rooms_type rooms;
+		// 起始房间位置
 		RoomPosition start_position;
 	};
 }

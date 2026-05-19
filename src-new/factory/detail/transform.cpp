@@ -11,22 +11,18 @@
 
 namespace pd::factory::detail
 {
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Position position, const blueprint::Scale scale) noexcept -> void
-	{
-		using namespace component;
+	using namespace component;
 
+	auto attach(
+		entt::registry& registry,
+		const entt::entity entity,
+		const blueprint::Position position,
+		[[maybe_unused]] const blueprint::Scale scale,
+		const blueprint::Rotation rotation
+	) noexcept -> void
+	{
 		registry.emplace<transform::Position>(entity, sf::Vector2f{position.x, position.y});
-		registry.emplace<transform::Scale>(entity, sf::Vector2f{scale.x, scale.y});
-		registry.emplace<transform::Rotation>(entity, sf::degrees(0));
-	}
-
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Position position, const blueprint::Sprite& sprite) noexcept -> void
-	{
-		attach(registry, entity, position, sprite.scale);
-	}
-
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Position position, const blueprint::SpriteAnimation& sprite_animation) noexcept -> void
-	{
-		attach(registry, entity, position, sprite_animation.scale);
+		// registry.emplace<transform::Scale>(entity, sf::Vector2f{scale.x, scale.y});
+		registry.emplace<transform::Rotation>(entity, sf::degrees(rotation.rotation));
 	}
 }

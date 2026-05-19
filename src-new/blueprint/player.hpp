@@ -5,10 +5,8 @@
 
 #pragma once
 
-#include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite_animation.hpp>
-#include <blueprint/detail/physics_body.hpp>
-#include <blueprint/detail/physics_shape.hpp>
+#include <blueprint/detail/physics.hpp>
 #include <blueprint/detail/actor.hpp>
 
 namespace pd::blueprint
@@ -16,14 +14,18 @@ namespace pd::blueprint
 	class Player final
 	{
 	public:
-		Position position;
+		// 精灵动画
 		SpriteAnimation animation;
 
+		// 生成位置
+		Position position;
+
+		// Actor
 		Actor actor;
 
-		// 物理刚体
-		PhysicsBody physics_body;
-		// 圆形碰撞体
-		PhysicsShapeCircle physics_shape;
+		// 圆形物理体
+		BodyDesc body_desc;
+		ShapeDesc shape_desc;
+		ShapeCategory::Circle shape;
 	};
 }

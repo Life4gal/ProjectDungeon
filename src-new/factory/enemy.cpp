@@ -6,13 +6,12 @@
 #include <factory/enemy.hpp>
 
 #include <component/enemy.hpp>
-#include <component/ai.hpp>
 
 #include <factory/detail/transform.hpp>
 #include <factory/detail/sprite_animation.hpp>
-#include <factory/detail/physics_body.hpp>
-#include <factory/detail/physics_shape.hpp>
+#include <factory/detail/physics.hpp>
 #include <factory/detail/actor.hpp>
+#include <factory/detail/ai.hpp>
 
 #include <entt/entt.hpp>
 
@@ -25,62 +24,24 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, enemy.position, enemy.animation);
+		detail::attach(registry, entity, enemy.position);
 		// sprite_animation
 		detail::attach(registry, entity, enemy.animation);
-		// physics_body & physics_shape
+		// physics
 		{
-			const auto body_id = detail::create_attach(registry, entity, enemy.physics_body, enemy.position);
+			const auto body_id = detail::create_attach(registry, entity, enemy.body_desc, enemy.position);
 
-			const auto creator = [&](const auto& shape) noexcept -> b2ShapeId
-			{
-				return detail::create(body_id, shape, enemy.animation);
-			};
-			const auto shape_id = std::visit(creator, enemy.physics_shape);
+			const auto shape_id = std::visit(detail::creator(body_id, enemy.shape_desc), enemy.shape);
 			registry.emplace<enemy::PhysicsShape>(entity, shape_id);
 		}
+		// type
+		registry.emplace<enemy::Type>(entity, static_cast<enemy::Type>(enemy.type));
+		// ai
+		detail::attach(registry, entity, enemy.ai);
 		// actor
 		detail::attach(registry, entity, enemy.actor, enemy.animation);
 		// contact_damage
 		registry.emplace<enemy::ContactDamage>(entity, enemy.contact_damage);
-		// type
-		registry.emplace<enemy::Type>(entity, static_cast<enemy::Type>(enemy.type));
-		// ai
-		{
-			switch (enemy.ai.move_behavior)
-			{
-				case blueprint::MoveBehavior::STATIONARY:
-				{
-					// 静止的敌人无需任何额外组件
-					break;
-				}
-				case blueprint::MoveBehavior::WANDER:
-				{
-					registry.emplace<ai::wander::Direction>(entity, sf::degrees(0));
-					registry.emplace<ai::wander::DirectionTimer>(entity, sf::Time::Zero);
-
-					break;
-				}
-				case blueprint::MoveBehavior::JUMP:
-				{
-					registry.emplace<ai::jump::State>(entity, ai::jump::State::IDLE);
-					registry.emplace<ai::jump::AirTimer>(entity, sf::Time::Zero);
-
-					break;
-				}
-				case blueprint::MoveBehavior::CHASE:
-				{
-					registry.emplace<ai::chase::Placeholder>(entity);
-
-					break;
-				}
-				case blueprint::MoveBehavior::TELEPORT:
-				{
-					// TODO
-					break;
-				}
-			}
-		}
 
 		registry.emplace<tags::Enemy>(entity);
 

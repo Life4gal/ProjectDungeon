@@ -7,8 +7,7 @@
 
 // #include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite_animation.hpp>
-#include <blueprint/detail/physics_body.hpp>
-#include <blueprint/detail/physics_shape.hpp>
+#include <blueprint/detail/physics.hpp>
 
 namespace pd::blueprint
 {
@@ -21,18 +20,25 @@ namespace pd::blueprint
 	class Projectile final
 	{
 	public:
-		// position == owner.position
-		// Position position;
+		// 精灵动画
 		SpriteAnimation animation;
 
+		// 生成位置
+		// 生成位置取决于发射位置
+		// Position position;
+
+		// 攻击伤害
 		float damage;
+		// 最大飞行时长
 		float lifetime;
+		// 飞行速度
 		float speed;
+		// 飞弹类型
 		ProjectileType type;
 
-		// 物理刚体
-		PhysicsBody physics_body;
-		// 圆形碰撞体
-		PhysicsShapeCircle physics_shape;
+		// 圆形物理体
+		BodyDesc body_desc;
+		ShapeDesc shape_desc;
+		ShapeCategory::Circle shape;
 	};
 }

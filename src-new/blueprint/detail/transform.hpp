@@ -7,10 +7,32 @@
 
 namespace pd::blueprint
 {
+	class Position final
+	{
+	public:
+		float x;
+		float y;
+	};
+
 	class Scale final
 	{
 	public:
 		float x;
 		float y;
+	};
+
+	class Rotation final
+	{
+	public:
+		// degree
+		float rotation;
+	};
+
+	// 暂时没有合适的地方,先放这吧 :)
+	class Size final
+	{
+	public:
+		float width;
+		float height;
 	};
 }

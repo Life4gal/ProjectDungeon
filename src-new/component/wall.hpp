@@ -7,14 +7,14 @@
 
 #include <component/transform.hpp>
 #include <component/sprite.hpp>
-#include <component/physics_body.hpp>
+#include <component/physics.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::wall
 {
 	// transform --> 墙壁变换
 	// sprite --> 墙壁精灵
-	// physics_body --> 墙壁物理刚体
+	// physics --> 墙壁物理体
 	// tags --> 墙壁标签
 
 	// 物理碰撞体

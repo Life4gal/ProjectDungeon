@@ -9,13 +9,28 @@
 
 namespace pd::designer
 {
+	namespace
+	{
+		constexpr blueprint::BodyDesc BodyDesc
+		{
+				.type = blueprint::BodyType::DYNAMIC,
+				.fixed_rotation = true,
+				.is_bullet = false,
+		};
+		constexpr blueprint::ShapeDesc ShapeDesc
+		{
+				.material = {.friction = 0.3f, .restitution = 0},
+				.density = 1,
+				.category = blueprint::ShapeType::ENEMY,
+				.category_mask = blueprint::CollisionMask::enemy,
+				.is_sensor = false,
+				.enable_sensor_events = false,
+				.enable_contact_events = true,
+		};
+	}
+
 	auto Enemy::rat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
 	{
-		const blueprint::Position position
-		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-		};
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
@@ -31,48 +46,37 @@ namespace pd::designer
 				},
 				.size = {.width = 64, .height = 64},
 				.origin = {.x = 32, .y = 32},
-				.scale = {.x = 1, .y = 1},
 				.duration_ms = 350,
 				.looping = true,
 				.reversed = false,
 		};
-		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::DYNAMIC, .fixed_rotation = true, .is_bullet = false};
-		constexpr blueprint::PhysicsShapeBox physics_shape
-		{
-				.def =
-				{
-						.material = {.friction = 0.3f, .restitution = 0},
-						.density = 1,
-						.category = blueprint::PhysicsShapeType::ENEMY,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::enemy,
-						.is_sensor = false,
-						.enable_sensor_events = false,
-						.enable_contact_events = true,
-				},
-				.size = {.width = 64, .height = 64},
-		};
-		constexpr blueprint::Actor actor{.health = 60, .mana = 0, .speed = 60};
-
-		return
-		{
-				.position = position,
-				.animation = std::move(animation),
-				.actor = actor,
-				.contact_damage = 20,
-				.type = blueprint::EnemyType::RAT,
-				.ai = {.move_behavior = blueprint::MoveBehavior::WANDER},
-				.physics_body = physics_body,
-				.physics_shape = physics_shape,
-		};
-	}
-
-	auto Enemy::slime(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
-	{
 		const blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
 		};
+		constexpr blueprint::Actor actor{.health = 60, .mana = 0, .speed = 60};
+		constexpr blueprint::ShapeCategory::Box shape
+		{
+				.size = {.width = 64, .height = 64},
+		};
+
+		return
+		{
+				.animation = std::move(animation),
+				.position = position,
+				.type = blueprint::EnemyType::RAT,
+				.ai = {.move_behavior = blueprint::MoveBehavior::WANDER},
+				.actor = actor,
+				.contact_damage = 20,
+				.body_desc = BodyDesc,
+				.shape_desc = ShapeDesc,
+				.shape = {shape},
+		};
+	}
+
+	auto Enemy::slime(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
+	{
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
@@ -88,48 +92,37 @@ namespace pd::designer
 				},
 				.size = {.width = 64, .height = 64},
 				.origin = {.x = 32, .y = 32},
-				.scale = {.x = 1, .y = 1},
 				.duration_ms = 200,
 				.looping = true,
 				.reversed = false,
 		};
-		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::DYNAMIC, .fixed_rotation = true, .is_bullet = false};
-		constexpr blueprint::PhysicsShapeCircle physics_shape
-		{
-				.def =
-				{
-						.material = {.friction = 0.3f, .restitution = 0},
-						.density = 1,
-						.category = blueprint::PhysicsShapeType::ENEMY,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::enemy,
-						.is_sensor = false,
-						.enable_sensor_events = false,
-						.enable_contact_events = true,
-				},
-				.radius = 32,
-		};
-		constexpr blueprint::Actor actor{.health = 80, .mana = 0, .speed = 40};
-
-		return
-		{
-				.position = position,
-				.animation = std::move(animation),
-				.actor = actor,
-				.contact_damage = 15,
-				.type = blueprint::EnemyType::SLIME,
-				.ai = {.move_behavior = blueprint::MoveBehavior::JUMP},
-				.physics_body = physics_body,
-				.physics_shape = physics_shape,
-		};
-	}
-
-	auto Enemy::bat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
-	{
 		const blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
 		};
+		constexpr blueprint::Actor actor{.health = 80, .mana = 0, .speed = 40};
+		constexpr blueprint::ShapeCategory::Circle shape
+		{
+				.radius = 32,
+		};
+
+		return
+		{
+				.animation = std::move(animation),
+				.position = position,
+				.type = blueprint::EnemyType::SLIME,
+				.ai = {.move_behavior = blueprint::MoveBehavior::JUMP},
+				.actor = actor,
+				.contact_damage = 15,
+				.body_desc = BodyDesc,
+				.shape_desc = ShapeDesc,
+				.shape = {shape},
+		};
+	}
+
+	auto Enemy::bat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
+	{
 		blueprint::SpriteAnimation animation
 		{
 				.frames =
@@ -145,38 +138,32 @@ namespace pd::designer
 				},
 				.size = {.width = 64, .height = 64},
 				.origin = {.x = 32, .y = 32},
-				.scale = {.x = 1, .y = 1},
 				.duration_ms = 300,
 				.looping = true,
 				.reversed = false,
 		};
-		constexpr blueprint::PhysicsBody physics_body{.type = blueprint::PhysicsBodyType::DYNAMIC, .fixed_rotation = true, .is_bullet = false};
-		constexpr blueprint::PhysicsShapeCircle physics_shape
+		const blueprint::Position position
 		{
-				.def =
-				{
-						.material = {.friction = 0.3f, .restitution = 0},
-						.density = 1,
-						.category = blueprint::PhysicsShapeType::ENEMY,
-						.category_mask = blueprint::PhysicsShapeCollisionMask::enemy,
-						.is_sensor = false,
-						.enable_sensor_events = false,
-						.enable_contact_events = true,
-				},
-				.radius = 32,
+				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
 		};
 		constexpr blueprint::Actor actor{.health = 35, .mana = 0, .speed = 80};
+		constexpr blueprint::ShapeCategory::Circle shape
+		{
+				.radius = 32,
+		};
 
 		return
 		{
-				.position = position,
 				.animation = std::move(animation),
-				.actor = actor,
-				.contact_damage = 10,
+				.position = position,
 				.type = blueprint::EnemyType::BAT,
 				.ai = {.move_behavior = blueprint::MoveBehavior::CHASE},
-				.physics_body = physics_body,
-				.physics_shape = physics_shape,
+				.actor = actor,
+				.contact_damage = 10,
+				.body_desc = BodyDesc,
+				.shape_desc = ShapeDesc,
+				.shape = {shape},
 		};
 	}
 }

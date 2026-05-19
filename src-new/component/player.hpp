@@ -7,14 +7,14 @@
 
 #include <component/transform.hpp>
 #include <component/sprite_animation.hpp>
-#include <component/physics_body.hpp>
+#include <component/physics.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::player
 {
 	// transform --> 玩家变换
 	// sprite_animation --> 玩家精灵动画
-	// physics_body --> 玩家物理刚体
+	// physics --> 玩家物理体
 	// tags --> 玩家标签
 
 	// 物理碰撞体

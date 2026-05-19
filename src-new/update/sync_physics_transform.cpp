@@ -7,7 +7,7 @@
 
 #include <utility/physics.hpp>
 
-#include <component/physics_body.hpp>
+// #include <component/physics.hpp>
 #include <component/transform.hpp>
 
 #include <entt/entt.hpp>

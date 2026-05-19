@@ -31,13 +31,13 @@ namespace pd::listener::projectile
 		using manager::Event;
 
 		// 不是飞弹直接跳过
-		if (contact_begin.a_type != blueprint::PhysicsShapeType::PROJECTILE and contact_begin.b_type != blueprint::PhysicsShapeType::PROJECTILE)
+		if (contact_begin.a_type != blueprint::ShapeType::PROJECTILE and contact_begin.b_type != blueprint::ShapeType::PROJECTILE)
 		{
 			return;
 		}
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Projectile>(contact_begin.a) or registry.all_of<tags::Projectile>(contact_begin.b));
 
-		const auto a = contact_begin.a_type == blueprint::PhysicsShapeType::PROJECTILE;
+		const auto a = contact_begin.a_type == blueprint::ShapeType::PROJECTILE;
 
 		const auto projectile_entity = a ? contact_begin.a : contact_begin.b;
 		const auto other_entity = a ? contact_begin.b : contact_begin.a;
@@ -52,7 +52,7 @@ namespace pd::listener::projectile
 
 		// 如果命中了敌人或者玩家
 		// 发出伤害事件
-		if (other_type == blueprint::PhysicsShapeType::PLAYER or other_type == blueprint::PhysicsShapeType::ENEMY)
+		if (other_type == blueprint::ShapeType::PLAYER or other_type == blueprint::ShapeType::ENEMY)
 		{
 			const auto [owner] = registry.get<const projectile::Owner>(projectile_entity);
 			const auto [damage] = registry.get<const projectile::Damage>(projectile_entity);
@@ -73,13 +73,13 @@ namespace pd::listener::projectile
 		namespace tags = component::tags;
 
 		// 不是飞弹直接跳过
-		if (contact_end.a_type != blueprint::PhysicsShapeType::PROJECTILE and contact_end.b_type != blueprint::PhysicsShapeType::PROJECTILE)
+		if (contact_end.a_type != blueprint::ShapeType::PROJECTILE and contact_end.b_type != blueprint::ShapeType::PROJECTILE)
 		{
 			return;
 		}
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Projectile>(contact_end.a) or registry.all_of<tags::Projectile>(contact_end.b));
 
-		const auto a = contact_end.a_type == blueprint::PhysicsShapeType::PROJECTILE;
+		const auto a = contact_end.a_type == blueprint::ShapeType::PROJECTILE;
 
 		const auto projectile_entity = a ? contact_end.a : contact_end.b;
 		const auto other_entity = a ? contact_end.b : contact_end.a;

@@ -5,10 +5,8 @@
 
 #pragma once
 
-#include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite.hpp>
-#include <blueprint/detail/physics_body.hpp>
-#include <blueprint/detail/physics_shape.hpp>
+#include <blueprint/detail/physics.hpp>
 
 namespace pd::blueprint
 {
@@ -28,19 +26,24 @@ namespace pd::blueprint
 	class Door final
 	{
 	public:
-		Position position;
+		// 精灵
 		Sprite sprite;
 
-		// 物理刚体
-		PhysicsBody physics_body;
+		// 生成位置
+		Position position;
+
 		// 门的碰撞体分为三部分:
 		// 1.门: 当且仅当门关闭时存在,或者说当且仅当门关闭时才与玩家碰撞(从而阻止玩家穿过)
 		// 2.感应区: 当玩家进入感应区时会将其传送到门对应的房间中
 		// 3.阻挡区: 防止玩家意外地穿越感应区进入其本不应该进入的区域
-		// 理论上只使用一个PhysicsShapeBox就能描述整个门碰撞体(具体各个部分可以直接计算出来),但是拆分出来可以使结构更清晰,且factory创建时也更方便
-		PhysicsShapeOffsetBox physics_shape_door;
-		PhysicsShapeOffsetBox physics_shape_sensor;
-		PhysicsShapeOffsetBox physics_shape_blocker;
+		// 理论上只使用一个ShapeCategory::Box就能描述整个门碰撞体(具体各个部分可以直接计算出来),但是拆分出来可以使结构更清晰,且factory创建时也更方便
+		BodyDesc body_desc;
+		ShapeDesc shape_door_desc;
+		ShapeCategory::OffsetBox shape_door;
+		ShapeDesc shape_sensor_desc;
+		ShapeCategory::OffsetBox shape_sensor;
+		ShapeDesc shape_blocker_desc;
+		ShapeCategory::OffsetBox shape_blocker;
 
 		// 门所在方向
 		DoorDirection direction;

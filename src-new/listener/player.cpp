@@ -19,7 +19,7 @@ namespace pd::listener::player
 	auto on_move_to(entt::registry& registry, const event::player::MoveTo& move_to) noexcept -> void
 	{
 		namespace player_controller = component::player_controller;
-		namespace physics_body = component::physics_body;
+		namespace physics = component::physics;
 		namespace transform = component::transform;
 
 		const auto* target = registry.ctx().find<player_controller::Target>();
@@ -28,11 +28,11 @@ namespace pd::listener::player
 			return;
 		}
 
-		if (const auto* body_id = registry.try_get<physics_body::Id>(target->entity))
+		if (const auto* body_id = registry.try_get<physics::BodyId>(target->entity))
 		{
 			using utility::Physics;
 
-			const auto [position, rotation] = b2Body_GetTransform(body_id->id);
+			const auto [position, rotation] = b2Body_GetTransform(body_id->body_id);
 			const auto new_position = b2Vec2{.x = move_to.x, .y = move_to.y};
 
 			SPDLOG_INFO(
@@ -43,7 +43,7 @@ namespace pd::listener::player
 				Physics::from_physics(new_position.y)
 			);
 
-			b2Body_SetTransform(body_id->id, new_position, rotation);
+			b2Body_SetTransform(body_id->body_id, new_position, rotation);
 		}
 		else
 		{
@@ -59,7 +59,7 @@ namespace pd::listener::player
 	auto on_translate(entt::registry& registry, const event::player::Translate& translate) noexcept -> void
 	{
 		namespace player_controller = component::player_controller;
-		namespace physics_body = component::physics_body;
+		namespace physics = component::physics;
 		namespace transform = component::transform;
 
 		const auto* target = registry.ctx().find<player_controller::Target>();
@@ -68,14 +68,14 @@ namespace pd::listener::player
 			return;
 		}
 
-		if (const auto* body_id = registry.try_get<physics_body::Id>(target->entity))
+		if (const auto* body_id = registry.try_get<physics::BodyId>(target->entity))
 		{
 			using utility::Physics;
 
 			const auto physics_translate_x = Physics::to_physics(translate.x);
 			const auto physics_translate_y = Physics::to_physics(translate.y);
 
-			const auto [position, rotation] = b2Body_GetTransform(body_id->id);
+			const auto [position, rotation] = b2Body_GetTransform(body_id->body_id);
 			const auto new_position = position + b2Vec2{.x = physics_translate_x, .y = physics_translate_y};
 
 			SPDLOG_INFO(
@@ -86,7 +86,7 @@ namespace pd::listener::player
 				Physics::from_physics(new_position.y)
 			);
 
-			b2Body_SetTransform(body_id->id, new_position, rotation);
+			b2Body_SetTransform(body_id->body_id, new_position, rotation);
 		}
 		else
 		{

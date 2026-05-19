@@ -64,12 +64,12 @@ namespace pd::update
 				aw::Direction& direction,
 				aw::DirectionTimer& direction_timer,
 				const actor::Speed max_speed,
-				const physics_body::Id body_id
+				const physics::BodyId body_id
 			) noexcept -> void
 			{
 				if (direction_timer.remaining > sf::Time::Zero)
 				{
-					if (const auto velocity = b2Body_GetLinearVelocity(body_id.id);
+					if (const auto velocity = b2Body_GetLinearVelocity(body_id.body_id);
 						is_wall_stuck(velocity, max_speed))
 					{
 						direction_timer.remaining = sf::Time::Zero;
@@ -88,7 +88,7 @@ namespace pd::update
 
 				const auto d = b2Vec2{.x = std::cos(direction.angle.asDegrees()), .y = std::sin(direction.angle.asDegrees())};
 				const auto v = d * utility::Physics::to_physics(max_speed.speed);
-				b2Body_SetLinearVelocity(body_id.id, v);
+				b2Body_SetLinearVelocity(body_id.body_id, v);
 			}
 		}
 
@@ -107,7 +107,7 @@ namespace pd::update
 				aj::State& state,
 				aj::AirTimer& air_timer,
 				const transform::Position position,
-				const physics_body::Id body_id
+				const physics::BodyId body_id
 			) noexcept -> void
 			{
 				constexpr auto physics_jump_speed = utility::Physics::to_physics(JumSpeed);
@@ -131,12 +131,12 @@ namespace pd::update
 						const auto direction_normalized = direction.normalized();
 						const auto velocity = direction_normalized * physics_jump_speed;
 
-						b2Body_SetLinearVelocity(body_id.id, {.x = velocity.x, .y = velocity.y});
+						b2Body_SetLinearVelocity(body_id.body_id, {.x = velocity.x, .y = velocity.y});
 					}
 				}
 				else if (state == aj::State::JUMPING)
 				{
-					const auto velocity = b2Body_GetLinearVelocity(body_id.id);
+					const auto velocity = b2Body_GetLinearVelocity(body_id.body_id);
 					const auto speed_squared = b2LengthSquared(velocity);
 
 					if (speed_squared > 0.001f)
@@ -144,7 +144,7 @@ namespace pd::update
 						const auto scale = physics_jump_speed / std::sqrt(speed_squared);
 
 						const auto target_velocity = velocity * scale;
-						b2Body_SetLinearVelocity(body_id.id, target_velocity);
+						b2Body_SetLinearVelocity(body_id.body_id, target_velocity);
 					}
 
 					air_timer.remaining -= delta;
@@ -155,7 +155,7 @@ namespace pd::update
 						state = aj::State::IDLE;
 						air_timer.remaining = sf::seconds(next_jump_delay);
 
-						b2Body_SetLinearVelocity(body_id.id, b2Vec2_zero);
+						b2Body_SetLinearVelocity(body_id.body_id, b2Vec2_zero);
 					}
 				}
 				else
@@ -173,7 +173,7 @@ namespace pd::update
 				entt::registry& registry,
 				const actor::Speed& max_speed,
 				const transform::Position position,
-				const physics_body::Id body_id
+				const physics::BodyId body_id
 			) noexcept -> void
 			{
 				const auto player_position = get_player_position(registry);
@@ -186,19 +186,19 @@ namespace pd::update
 
 				const auto direction_normalized = direction.normalized();
 
-				if (const auto velocity = b2Body_GetLinearVelocity(body_id.id);
+				if (const auto velocity = b2Body_GetLinearVelocity(body_id.body_id);
 					is_wall_stuck(velocity, max_speed))
 				{
 					// 尝试垂直方向滑行
 					const auto new_velocity = b2Vec2{.x = -direction_normalized.y, .y = direction_normalized.x} * utility::Physics::to_physics(max_speed.speed);
 
-					b2Body_SetLinearVelocity(body_id.id, new_velocity);
+					b2Body_SetLinearVelocity(body_id.body_id, new_velocity);
 				}
 				else
 				{
 					const auto new_velocity = b2Vec2{.x = direction_normalized.x, .y = direction_normalized.y} * utility::Physics::to_physics(max_speed.speed);
 
-					b2Body_SetLinearVelocity(body_id.id, new_velocity);
+					b2Body_SetLinearVelocity(body_id.body_id, new_velocity);
 				}
 			}
 		}
@@ -219,7 +219,7 @@ namespace pd::update
 						ai::wander::Direction,
 						ai::wander::DirectionTimer,
 						const actor::Speed,
-						const physics_body::Id //
+						const physics::BodyId //
 					>(entt::exclude<state::Dead>);
 
 			for (const auto [entity, direction, direction_timer, speed, body_id]: view.each())
@@ -239,7 +239,7 @@ namespace pd::update
 						ai::jump::State,
 						ai::jump::AirTimer,
 						const transform::Position,
-						const physics_body::Id //
+						const physics::BodyId //
 					>(entt::exclude<state::Dead>);
 
 			for (const auto [entity, state, air_timer, position, body_id]: view.each())
@@ -259,7 +259,7 @@ namespace pd::update
 						ai::chase::Placeholder,
 						const actor::Speed,
 						const transform::Position,
-						const physics_body::Id //
+						const physics::BodyId //
 					>(entt::exclude<state::Dead>);
 
 			for (const auto [entity, speed, position, body_id]: view.each())

@@ -5,22 +5,23 @@
 
 #pragma once
 
-#include <blueprint/detail/position.hpp>
 #include <blueprint/detail/sprite.hpp>
-#include <blueprint/detail/physics_body.hpp>
-#include <blueprint/detail/physics_shape.hpp>
+#include <blueprint/detail/physics.hpp>
 
 namespace pd::blueprint
 {
 	class Wall final
 	{
 	public:
-		Position position;
+		// 精灵
 		Sprite sprite;
 
-		// 物理刚体
-		PhysicsBody physics_body;
-		// 矩形碰撞体
-		PhysicsShapeBox physics_shape;
+		// 生成位置
+		Position position;
+
+		// 矩形物理体
+		BodyDesc body_desc;
+		ShapeDesc shape_desc;
+		ShapeCategory::Box shape;
 	};
 }

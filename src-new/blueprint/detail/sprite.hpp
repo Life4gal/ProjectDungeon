@@ -7,9 +7,7 @@
 
 #include <string>
 
-#include <blueprint/detail/position.hpp>
-#include <blueprint/detail/size.hpp>
-#include <blueprint/detail/scale.hpp>
+#include <blueprint/detail/transform.hpp>
 
 namespace pd::blueprint
 {
@@ -22,9 +20,7 @@ namespace pd::blueprint
 		Position position;
 		// 纹理大小
 		Size size;
-		// 纹理原点
+		// 纹理原点(一般为size/2)
 		Position origin;
-		// 纹理缩放
-		Scale scale;
 	};
 }

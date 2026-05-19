@@ -21,7 +21,7 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, floor.position, floor.sprite);
+		detail::attach(registry, entity, floor.position);
 		// sprite
 		detail::attach(registry, entity, floor.sprite);
 

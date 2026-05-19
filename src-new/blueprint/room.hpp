@@ -7,7 +7,6 @@
 
 #include <vector>
 
-#include <blueprint/detail/size.hpp>
 #include <blueprint/floor.hpp>
 #include <blueprint/wall.hpp>
 #include <blueprint/door.hpp>
@@ -48,7 +47,9 @@ namespace pd::blueprint
 	class Room final
 	{
 	public:
+		// 房间类型
 		RoomType type;
+		// 房间的连接状态(邻居)
 		std::underlying_type_t<RoomConnection> connection;
 
 		// 房间位置

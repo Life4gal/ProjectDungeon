@@ -7,12 +7,12 @@
 
 #include <box2d/id.h>
 
-namespace pd::component::physics_body
+namespace pd::component::physics
 {
-	// 物理刚体ID
-	class Id final
+	// 物理体ID
+	class BodyId final
 	{
 	public:
-		b2BodyId id;
+		b2BodyId body_id;
 	};
 }

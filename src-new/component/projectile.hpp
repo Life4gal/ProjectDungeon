@@ -7,7 +7,7 @@
 
 #include <component/transform.hpp>
 #include <component/sprite_animation.hpp>
-#include <component/physics_body.hpp>
+#include <component/physics.hpp>
 #include <component/tags.hpp>
 
 #include <SFML/System/Time.hpp>
@@ -16,7 +16,7 @@ namespace pd::component::projectile
 {
 	// transform --> 飞弹变换
 	// sprite_animation --> 飞弹精灵动画
-	// physics_body --> 飞弹物理刚体
+	// physics --> 飞弹物理体
 	// tags --> 飞弹标签
 
 	// 物理碰撞体

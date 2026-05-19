@@ -7,14 +7,14 @@
 
 #include <component/transform.hpp>
 #include <component/sprite.hpp>
-#include <component/physics_body.hpp>
+#include <component/physics.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::door
 {
 	// transform --> 门变换
 	// sprite --> 门精灵
-	// physics_body --> 门物理刚体
+	// physics --> 门物理体
 	// tags --> 门标签
 
 	// *门*物理碰撞体

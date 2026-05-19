@@ -5,12 +5,11 @@
 
 #pragma once
 
-namespace pd::blueprint
+#include <blueprint/detail/ai.hpp>
+
+#include <entt/entity/registry.hpp>
+
+namespace pd::factory::detail
 {
-	class Position final
-	{
-	public:
-		float x;
-		float y;
-	};
+	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Ai& ai) noexcept -> void;
 }

@@ -26,10 +26,13 @@ namespace pd::update
 		{
 			namespace sep = se::position;
 
-			auto linear(entt::registry& registry, const float delta) noexcept -> void
+			class Invoker final // NOLINT(clang-diagnostic-padded)
 			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Linear, se::Position>();
-				     const auto [entity, linear, position]: view.each())
+			public:
+				std::reference_wrapper<entt::registry> registry;
+				float delta;
+
+				auto operator()(const entt::entity entity, se::Position& position, sep::Linear& linear) const noexcept -> void
 				{
 					// 此帧移动距离
 					const auto traveled = linear.speed * delta;
@@ -38,10 +41,10 @@ namespace pd::update
 					if (linear.traveled >= linear.distance)
 					{
 						// 移除特效
-						registry.remove<sep::Linear>(entity);
+						registry.get().remove<sep::Linear>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					const auto ratio = linear.traveled / linear.distance;
@@ -49,21 +52,17 @@ namespace pd::update
 
 					position.extra = linear.start + offset;
 				}
-			}
 
-			auto oscillator(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Oscillator, se::Position>();
-				     const auto [entity, oscillator, position]: view.each())
+				auto operator()(const entt::entity entity, se::Position& position, sep::Oscillator& oscillator) const noexcept -> void
 				{
 					oscillator.elapsed += delta;
 					if (oscillator.elapsed >= oscillator.duration)
 					{
 						// 移除特效
-						registry.remove<sep::Oscillator>(entity);
+						registry.get().remove<sep::Oscillator>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					// 已移动距离
@@ -83,21 +82,17 @@ namespace pd::update
 
 					position.extra = oscillator.p1 + offset;
 				}
-			}
 
-			auto spring(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Spring, se::Position>();
-				     const auto [entity, spring, position]: view.each())
+				auto operator()(const entt::entity entity, se::Position& position, sep::Spring& spring) const noexcept -> void
 				{
 					spring.elapsed += delta;
 					if (spring.elapsed >= spring.duration)
 					{
 						// 移除特效
-						registry.remove<sep::Spring>(entity);
+						registry.get().remove<sep::Spring>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					const auto displacement = spring.position - spring.target;
@@ -112,12 +107,8 @@ namespace pd::update
 
 					position.extra = spring.position;
 				}
-			}
 
-			auto path(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Path, se::Position>();
-				     const auto [entity, path, position]: view.each())
+				auto operator()(const entt::entity entity, se::Position& position, sep::Path& path) const noexcept -> void
 				{
 					const auto segment_count = path.waypoints.size() - 1;
 
@@ -125,10 +116,10 @@ namespace pd::update
 					if (path.elapsed >= path.duration or path.current_segment == segment_count)
 					{
 						// 移除特效
-						registry.remove<sep::Path>(entity);
+						registry.get().remove<sep::Path>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					// 此帧移动距离
@@ -152,21 +143,17 @@ namespace pd::update
 
 					position.extra = path.position;
 				}
-			}
 
-			auto orbit(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Orbit, se::Position>();
-				     const auto [entity, orbit, position]: view.each())
+				auto operator()(const entt::entity entity, se::Position& position, sep::Orbit& orbit) const noexcept -> void
 				{
 					orbit.elapsed += delta;
 					if (orbit.elapsed >= orbit.duration)
 					{
 						// 移除特效
-						registry.remove<sep::Orbit>(entity);
+						registry.get().remove<sep::Orbit>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					orbit.angle += orbit.speed * delta;
@@ -174,21 +161,17 @@ namespace pd::update
 
 					position.extra = orbit.center + offset;
 				}
-			}
 
-			auto shake(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Shake, se::Position>();
-				     const auto [entity, shake, position]: view.each())
+				auto operator()(const entt::entity entity, se::Position& position, sep::Shake& shake) const noexcept -> void
 				{
 					shake.elapsed += delta;
 					if (shake.elapsed >= shake.duration)
 					{
 						// 移除特效
-						registry.remove<sep::Shake>(entity);
+						registry.get().remove<sep::Shake>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					shake.phase += shake.frequency * delta;
@@ -207,21 +190,17 @@ namespace pd::update
 
 					position.extra = shake.center + offset;
 				}
-			}
 
-			auto wave(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Wave, se::Position>();
-				     const auto [entity, wave, position]: view.each())
+				auto operator()(const entt::entity entity, se::Position& position, sep::Wave& wave) const noexcept -> void
 				{
 					wave.elapsed += delta;
 					if (wave.elapsed >= wave.duration)
 					{
 						// 移除特效
-						registry.remove<sep::Wave>(entity);
+						registry.get().remove<sep::Wave>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					wave.traveled += wave.speed * delta;
@@ -235,21 +214,17 @@ namespace pd::update
 
 					position.extra = forward + perpendicular_offset;
 				}
-			}
 
-			auto swing(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sep::Swing, se::Position>();
-				     const auto [entity, swing, position]: view.each())
+				auto operator()(const entt::entity entity, se::Position& position, sep::Swing& swing) const noexcept -> void
 				{
 					swing.elapsed += delta;
 					if (swing.elapsed >= swing.duration)
 					{
 						// 移除特效
-						registry.remove<sep::Swing>(entity);
+						registry.get().remove<sep::Swing>(entity);
 						// 重置位置
 						position.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					const auto sign = swing.end_angle > swing.start_angle ? 1.f : -1.f;
@@ -272,26 +247,23 @@ namespace pd::update
 
 					position.extra = swing.pivot + offset;
 				}
-			}
+			};
 
 			auto update(entt::registry& registry, const float delta) noexcept -> void
 			{
-				// LINEAR
-				linear(registry, delta);
-				// OSCILLATOR
-				oscillator(registry, delta);
-				// SPRING
-				spring(registry, delta);
-				// PATH
-				path(registry, delta);
-				// ORBIT
-				orbit(registry, delta);
-				// SHAKE
-				shake(registry, delta);
-				// WAVE
-				wave(registry, delta);
-				// SWING
-				swing(registry, delta);
+				const Invoker invoker{.registry = std::ref(registry), .delta = delta};
+
+				for (const auto view = registry.view<state::InCameraArea, sep::Effect, se::Position>();
+				     const auto [entity, effect, position]: view.each())
+				{
+					std::visit(
+						[&invoker, &position, entity](auto& e) noexcept -> void // NOLINT(clang-diagnostic-padded)
+						{
+							invoker(entity, position, e);
+						},
+						effect
+					);
+				}
 			}
 		}
 
@@ -299,19 +271,22 @@ namespace pd::update
 		{
 			namespace ses = sprite_effect::scale;
 
-			auto oscillator(entt::registry& registry, const float delta) noexcept -> void
+			class Invoker final // NOLINT(clang-diagnostic-padded)
 			{
-				for (const auto view = registry.view<state::InCameraArea, ses::Oscillator, se::Scale>();
-				     const auto [entity, oscillator, scale]: view.each())
+			public:
+				std::reference_wrapper<entt::registry> registry;
+				float delta;
+
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::Oscillator& oscillator) const noexcept -> void
 				{
 					oscillator.elapsed += delta;
 					if (oscillator.elapsed >= oscillator.duration)
 					{
 						// 移除特效
-						registry.remove<ses::Oscillator>(entity);
+						registry.get().remove<ses::Oscillator>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					const auto traveled = oscillator.speed * oscillator.elapsed;
@@ -331,21 +306,17 @@ namespace pd::update
 
 					scale.extra = offset;
 				}
-			}
 
-			auto spring(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, ses::Spring, se::Scale>();
-				     const auto [entity, spring, scale]: view.each())
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::Spring& spring) const noexcept -> void
 				{
 					spring.elapsed += delta;
 					if (spring.elapsed >= spring.duration)
 					{
 						// 移除特效
-						registry.remove<ses::Spring>(entity);
+						registry.get().remove<ses::Spring>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					const auto displacement = spring.scale - spring.max;
@@ -360,21 +331,17 @@ namespace pd::update
 
 					scale.extra = spring.scale;
 				}
-			}
 
-			auto breathing(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, ses::Breathing, se::Scale>();
-				     const auto [entity, breathing,scale]: view.each())
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::Breathing& breathing) const noexcept -> void
 				{
 					breathing.elapsed += delta;
 					if (breathing.elapsed >= breathing.duration)
 					{
 						// 移除特效
-						registry.remove<ses::Breathing>(entity);
+						registry.get().remove<ses::Breathing>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					// 使用正弦波模拟平滑呼吸
@@ -384,21 +351,17 @@ namespace pd::update
 
 					scale.extra = breathing.min + offset;
 				}
-			}
 
-			auto squash_stretch(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, ses::SquashStretch, se::Scale>();
-				     const auto [entity, squash_stretch, scale]: view.each())
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::SquashStretch& squash_stretch) const noexcept -> void
 				{
 					squash_stretch.elapsed += delta;
 					if (squash_stretch.elapsed >= squash_stretch.duration)
 					{
 						// 移除特效
-						registry.remove<ses::SquashStretch>(entity);
+						registry.get().remove<ses::SquashStretch>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					const auto factor = [&] noexcept -> float
@@ -424,21 +387,17 @@ namespace pd::update
 					// scale.extra = {normal_scale.x * fx, normal_scale.y * fy};
 					scale.extra = {fx, fy};
 				}
-			}
 
-			auto directional_pulse(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, ses::DirectionalPulse, se::Scale>();
-				     const auto [entity, directional_pulse, scale]: view.each())
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::DirectionalPulse& directional_pulse) const noexcept -> void
 				{
 					directional_pulse.elapsed += delta;
 					if (directional_pulse.elapsed >= directional_pulse.duration)
 					{
 						// 移除特效
-						registry.remove<ses::DirectionalPulse>(entity);
+						registry.get().remove<ses::DirectionalPulse>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					// 脉冲波形
@@ -451,21 +410,17 @@ namespace pd::update
 
 					scale.extra = {perpendicular_scale, parallel_scale};
 				}
-			}
 
-			auto jelly(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, ses::Jelly, se::Scale>();
-				     const auto [entity, jelly, scale]: view.each())
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::Jelly& jelly) const noexcept -> void
 				{
 					jelly.elapsed += delta;
 					if (jelly.elapsed >= jelly.duration)
 					{
 						// 移除特效
-						registry.remove<ses::Jelly>(entity);
+						registry.get().remove<ses::Jelly>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					const auto displacement = jelly.current_scale - jelly.target_scale;
@@ -479,23 +434,19 @@ namespace pd::update
 
 					scale.extra = jelly.current_scale;
 				}
-			}
 
-			auto elastic_hit(entt::registry& registry, const float delta) noexcept -> void
-			{
-				using phase = ses::ElasticHit::Phase;
-
-				for (const auto view = registry.view<state::InCameraArea, ses::ElasticHit, se::Scale>();
-				     const auto [entity, elastic_hit, scale]: view.each())
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::ElasticHit& elastic_hit) const noexcept -> void
 				{
+					using phase = ses::ElasticHit::Phase;
+
 					elastic_hit.elapsed += delta;
 					if (elastic_hit.elapsed >= elastic_hit.duration)
 					{
 						// 移除特效
-						registry.remove<ses::ElasticHit>(entity);
+						registry.get().remove<ses::ElasticHit>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					elastic_hit.phase_elapsed += delta;
@@ -545,21 +496,17 @@ namespace pd::update
 						}
 					}
 				}
-			}
 
-			auto ripple(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, ses::Ripple, se::Scale>();
-				     const auto [entity, ripple, scale]: view.each())
+				auto operator()(const entt::entity entity, se::Scale& scale, ses::Ripple& ripple) const noexcept -> void
 				{
 					ripple.elapsed += delta;
 					if (ripple.elapsed >= ripple.duration)
 					{
 						// 移除特效
-						registry.remove<ses::Ripple>(entity);
+						registry.get().remove<ses::Ripple>(entity);
 						// 重置缩放
 						scale.extra = sf::Vector2f{0, 0};
-						continue;
+						return;
 					}
 
 					ripple.radius = ripple.elapsed / ripple.duration;
@@ -571,26 +518,23 @@ namespace pd::update
 
 					scale.extra = ripple.center_scale + offset;
 				}
-			}
+			};
 
 			auto update(entt::registry& registry, const float delta) noexcept -> void
 			{
-				// OSCILLATOR
-				oscillator(registry, delta);
-				// SPRING
-				spring(registry, delta);
-				// BREATHING
-				breathing(registry, delta);
-				// SQUASH STRETCH
-				squash_stretch(registry, delta);
-				// DIRECTIONAL PULSE
-				directional_pulse(registry, delta);
-				// JELLY
-				jelly(registry, delta);
-				// ELASTIC HIT
-				elastic_hit(registry, delta);
-				// RIPPLE
-				ripple(registry, delta);
+				const Invoker invoker{.registry = std::ref(registry), .delta = delta};
+
+				for (const auto view = registry.view<state::InCameraArea, ses::Effect, se::Scale>();
+				     const auto [entity, effect, scale]: view.each())
+				{
+					std::visit(
+						[&invoker, &scale, entity](auto& e) noexcept -> void // NOLINT(clang-diagnostic-padded)
+						{
+							invoker(entity, scale, e);
+						},
+						effect
+					);
+				}
 			}
 		}
 
@@ -598,122 +542,121 @@ namespace pd::update
 		{
 			namespace sec = sprite_effect::color;
 
-			// ReSharper disable once IdentifierTypo
-			[[nodiscard]] auto lerp_sd(const sf::Color start, const sf::Color diff, const float t) noexcept -> sf::Color
+			class Invoker final // NOLINT(clang-diagnostic-padded)
 			{
-				PROMETHEUS_PLATFORM_ASSUME(t >= 0 and t <= 1);
-
-				const auto calculate = [&](std::uint8_t sf::Color::* member) noexcept -> std::uint8_t
+				// ReSharper disable once IdentifierTypo
+				[[nodiscard]] static auto lerp_sd(const sf::Color start, const sf::Color diff, const float t) noexcept -> sf::Color
 				{
-					const auto s = static_cast<float>(start.*member) / 255.0f;
-					const auto d = static_cast<float>(diff.*member) / 255.0f;
+					PROMETHEUS_PLATFORM_ASSUME(t >= 0 and t <= 1);
 
-					const auto v = s + d * t;
-					return static_cast<std::uint8_t>(v * 255.0f);
-				};
-
-				const auto red = calculate(&sf::Color::r);
-				const auto green = calculate(&sf::Color::g);
-				const auto blue = calculate(&sf::Color::b);
-				const auto alpha = calculate(&sf::Color::a);
-
-				return {red, green, blue, alpha};
-			}
-
-			// // ReSharper disable once IdentifierTypo
-			// [[nodiscard]] auto lerp_se(const sf::Color start, const sf::Color end, const float t) noexcept -> sf::Color
-			// {
-			// 	const auto diff = end - start;
-			// 	return lerp_sd(start, diff, t);
-			// }
-
-			[[nodiscard]] auto from_hsv(float h, const float s, const float v) noexcept -> sf::Color
-			{
-				constexpr auto make_color = [](const float r, const float g, const float b) noexcept -> sf::Color
-				{
-					return
+					const auto calculate = [&](std::uint8_t sf::Color::* member) noexcept -> std::uint8_t
 					{
-							static_cast<std::uint8_t>(r * 255),
-							static_cast<std::uint8_t>(g * 255),
-							static_cast<std::uint8_t>(b * 255),
+						const auto s = static_cast<float>(start.*member) / 255.0f;
+						const auto d = static_cast<float>(diff.*member) / 255.0f;
+
+						const auto v = s + d * t;
+						return static_cast<std::uint8_t>(v * 255.0f);
 					};
-				};
 
-				h = std::fmod(h, 1.0f);
-				if (h < 0)
-				{
-					h += 1;
+					const auto red = calculate(&sf::Color::r);
+					const auto green = calculate(&sf::Color::g);
+					const auto blue = calculate(&sf::Color::b);
+					const auto alpha = calculate(&sf::Color::a);
+
+					return {red, green, blue, alpha};
 				}
 
-				const auto i = static_cast<int>(h * 6);
-				const auto f = h * 6 - static_cast<float>(i);
-				const auto p = v * (1 - s);
-				const auto q = v * (1 - f * s);
-				const auto t = v * (1 - (1 - f) * s);
+				// // ReSharper disable once IdentifierTypo
+				// [[nodiscard]] auto lerp_se(const sf::Color start, const sf::Color end, const float t) noexcept -> sf::Color
+				// {
+				// 	const auto diff = end - start;
+				// 	return lerp_sd(start, diff, t);
+				// }
 
-				switch (i)
+				[[nodiscard]] static auto from_hsv(float h, const float s, const float v) noexcept -> sf::Color
 				{
-					case 0:
+					constexpr auto make_color = [](const float r, const float g, const float b) noexcept -> sf::Color
 					{
-						return make_color(v, t, p);
+						return
+						{
+								static_cast<std::uint8_t>(r * 255),
+								static_cast<std::uint8_t>(g * 255),
+								static_cast<std::uint8_t>(b * 255),
+						};
+					};
+
+					h = std::fmod(h, 1.0f);
+					if (h < 0)
+					{
+						h += 1;
 					}
-					case 1:
+
+					const auto i = static_cast<int>(h * 6);
+					const auto f = h * 6 - static_cast<float>(i);
+					const auto p = v * (1 - s);
+					const auto q = v * (1 - f * s);
+					const auto t = v * (1 - (1 - f) * s);
+
+					switch (i)
 					{
-						return make_color(q, v, p);
-					}
-					case 2:
-					{
-						return make_color(p, v, t);
-					}
-					case 3:
-					{
-						return make_color(p, q, v);
-					}
-					case 4:
-					{
-						return make_color(t, p, v);
-					}
-					default:
-					{
-						return make_color(v, p, q);
+						case 0:
+						{
+							return make_color(v, t, p);
+						}
+						case 1:
+						{
+							return make_color(q, v, p);
+						}
+						case 2:
+						{
+							return make_color(p, v, t);
+						}
+						case 3:
+						{
+							return make_color(p, q, v);
+						}
+						case 4:
+						{
+							return make_color(t, p, v);
+						}
+						default:
+						{
+							return make_color(v, p, q);
+						}
 					}
 				}
-			}
 
-			auto fade(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sec::Fade, se::Color>();
-				     const auto [entity, fade, color]: view.each())
+			public:
+				std::reference_wrapper<entt::registry> registry;
+				float delta;
+
+				auto operator()(const entt::entity entity, se::Color& color, sec::Fade& fade) const noexcept -> void
 				{
 					fade.elapsed += delta;
 					if (fade.elapsed >= fade.duration)
 					{
 						// 移除特效
-						registry.remove<sec::Fade>(entity);
+						registry.get().remove<sec::Fade>(entity);
 						// 重置颜色(需要吗?)
 						// color.color = sf::Color::White;
-						continue;
+						return;
 					}
 
 					const auto t = fade.elapsed / fade.duration;
 
 					color.color = lerp_sd(fade.start, fade.diff, t);
 				}
-			}
 
-			auto alpha_fade(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sec::AlphaFade, se::Color>();
-				     const auto [entity, alpha_fade, color]: view.each())
+				auto operator()(const entt::entity entity, se::Color& color, sec::AlphaFade& alpha_fade) const noexcept -> void
 				{
 					alpha_fade.elapsed += delta;
 					if (alpha_fade.elapsed >= alpha_fade.duration)
 					{
 						// 移除特效
-						registry.remove<sec::AlphaFade>(entity);
+						registry.get().remove<sec::AlphaFade>(entity);
 						// 重置颜色(需要吗?)
 						// color.color = sf::Color::White;
-						continue;
+						return;
 					}
 
 					const auto t = alpha_fade.elapsed / alpha_fade.duration;
@@ -721,21 +664,17 @@ namespace pd::update
 
 					color.color.a = static_cast<std::uint8_t>(alpha * 255);
 				}
-			}
 
-			auto flash(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sec::Flash, se::Color>();
-				     const auto [entity, flash, color]: view.each())
+				auto operator()(const entt::entity entity, se::Color& color, sec::Flash& flash) const noexcept -> void
 				{
 					flash.elapsed += delta;
 					if (flash.elapsed >= flash.duration)
 					{
 						// 移除特效
-						registry.remove<sec::Fade>(entity);
+						registry.get().remove<sec::Fade>(entity);
 						// 重置颜色
 						color.color = sf::Color::White;
-						continue;
+						return;
 					}
 
 					// 方波闪烁
@@ -756,21 +695,17 @@ namespace pd::update
 						color.color = flash.base_color;
 					}
 				}
-			}
 
-			auto breathing(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sec::Breathing, se::Color>();
-				     const auto [entity, breathing, color]: view.each())
+				auto operator()(const entt::entity entity, se::Color& color, sec::Breathing& breathing) const noexcept -> void
 				{
 					breathing.elapsed += delta;
 					if (breathing.elapsed >= breathing.duration)
 					{
 						// 移除特效
-						registry.remove<sec::Breathing>(entity);
+						registry.get().remove<sec::Breathing>(entity);
 						// 重置颜色
 						color.color = sf::Color::White;
-						continue;
+						return;
 					}
 
 					// 使用正弦波模拟平滑呼吸
@@ -779,21 +714,17 @@ namespace pd::update
 
 					color.color = lerp_sd(breathing.min, breathing.diff, normalized);
 				}
-			}
 
-			auto pulse(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sec::Pulse, se::Color>();
-				     const auto [entity, pulse, color]: view.each())
+				auto operator()(const entt::entity entity, se::Color& color, sec::Pulse& pulse) const noexcept -> void
 				{
 					pulse.elapsed += delta;
 					if (pulse.elapsed >= pulse.duration)
 					{
 						// 移除特效
-						registry.remove<sec::Pulse>(entity);
+						registry.get().remove<sec::Pulse>(entity);
 						// 重置颜色
 						color.color = sf::Color::White;
-						continue;
+						return;
 					}
 
 					// 当前在脉冲周期位置
@@ -818,42 +749,34 @@ namespace pd::update
 
 					color.color = lerp_sd(pulse.base_color, pulse.diff, t);
 				}
-			}
 
-			auto rainbow_cycle(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sec::RainbowCycle, se::Color>();
-				     const auto [entity, rainbow_cycle, color]: view.each())
+				auto operator()(const entt::entity entity, se::Color& color, sec::RainbowCycle& rainbow_cycle) const noexcept -> void
 				{
 					rainbow_cycle.elapsed += delta;
 					if (rainbow_cycle.elapsed >= rainbow_cycle.duration)
 					{
 						// 移除特效
-						registry.remove<sec::RainbowCycle>(entity);
+						registry.get().remove<sec::RainbowCycle>(entity);
 						// 重置颜色
 						color.color = sf::Color::White;
-						continue;
+						return;
 					}
 
 					const auto hue = rainbow_cycle.speed * rainbow_cycle.elapsed;
 
 					color.color = from_hsv(hue, rainbow_cycle.saturation, rainbow_cycle.lightness);
 				}
-			}
 
-			auto oscillator(entt::registry& registry, const float delta) noexcept -> void
-			{
-				for (const auto view = registry.view<state::InCameraArea, sec::Oscillator, se::Color>();
-				     const auto [entity, oscillator, color]: view.each())
+				auto operator()(const entt::entity entity, se::Color& color, sec::Oscillator& oscillator) const noexcept -> void
 				{
 					oscillator.elapsed += delta;
 					if (oscillator.elapsed >= oscillator.duration)
 					{
 						// 移除特效
-						registry.remove<sec::Oscillator>(entity);
+						registry.get().remove<sec::Oscillator>(entity);
 						// 重置颜色
 						color.color = sf::Color::White;
-						continue;
+						return;
 					}
 
 					const auto traveled = oscillator.speed * oscillator.elapsed;
@@ -874,24 +797,23 @@ namespace pd::update
 
 					color.color = lerp_sd(oscillator.color1, oscillator.diff, offset);
 				}
-			}
+			};
 
 			auto update(entt::registry& registry, const float delta) noexcept -> void
 			{
-				// FADE
-				fade(registry, delta);
-				// ALPHA FADE
-				alpha_fade(registry, delta);
-				// FLASH
-				flash(registry, delta);
-				// BREATHING
-				breathing(registry, delta);
-				// PULSE
-				pulse(registry, delta);
-				// RAINBOW CYCLE
-				rainbow_cycle(registry, delta);
-				// OSCILLATOR
-				oscillator(registry, delta);
+				const Invoker invoker{.registry = std::ref(registry), .delta = delta};
+
+				for (const auto view = registry.view<state::InCameraArea, sec::Effect, se::Color>();
+				     const auto [entity, effect, color]: view.each())
+				{
+					std::visit(
+						[&invoker, &color, entity](auto& e) noexcept -> void // NOLINT(clang-diagnostic-padded)
+						{
+							invoker(entity, color, e);
+						},
+						effect
+					);
+				}
 			}
 		}
 	}

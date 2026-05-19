@@ -45,13 +45,13 @@ namespace pd::listener::door
 		namespace tags = component::tags;
 
 		// 不是门直接跳过
-		if (contact_begin.a_type != blueprint::PhysicsShapeType::DOOR and contact_begin.b_type != blueprint::PhysicsShapeType::DOOR)
+		if (contact_begin.a_type != blueprint::ShapeType::DOOR and contact_begin.b_type != blueprint::ShapeType::DOOR)
 		{
 			return;
 		}
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Door>(contact_begin.a) or registry.all_of<tags::Door>(contact_begin.b));
 
-		const auto a = contact_begin.a_type == blueprint::PhysicsShapeType::DOOR;
+		const auto a = contact_begin.a_type == blueprint::ShapeType::DOOR;
 
 		const auto door_entity = a ? contact_begin.a : contact_begin.b;
 		const auto other_entity = a ? contact_begin.b : contact_begin.a;
@@ -70,13 +70,13 @@ namespace pd::listener::door
 		namespace tags = component::tags;
 
 		// 不是门直接跳过
-		if (contact_end.a_type != blueprint::PhysicsShapeType::DOOR and contact_end.b_type != blueprint::PhysicsShapeType::DOOR)
+		if (contact_end.a_type != blueprint::ShapeType::DOOR and contact_end.b_type != blueprint::ShapeType::DOOR)
 		{
 			return;
 		}
 		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Door>(contact_end.a) or registry.all_of<tags::Door>(contact_end.b));
 
-		const auto a = contact_end.a_type == blueprint::PhysicsShapeType::DOOR;
+		const auto a = contact_end.a_type == blueprint::ShapeType::DOOR;
 
 		const auto door_entity = a ? contact_end.a : contact_end.b;
 		const auto other_entity = a ? contact_end.b : contact_end.a;
@@ -98,7 +98,7 @@ namespace pd::listener::door
 		using manager::Event;
 
 		// 不是门直接跳过
-		if (sensor_begin.sensor_type != blueprint::PhysicsShapeType::DOOR)
+		if (sensor_begin.sensor_type != blueprint::ShapeType::DOOR)
 		{
 			return;
 		}
@@ -112,7 +112,7 @@ namespace pd::listener::door
 		);
 
 		// 无视非玩家实体
-		if (sensor_begin.visitor_type != blueprint::PhysicsShapeType::PLAYER)
+		if (sensor_begin.visitor_type != blueprint::ShapeType::PLAYER)
 		{
 			return;
 		}
@@ -170,7 +170,7 @@ namespace pd::listener::door
 		using manager::Event;
 
 		// 不是门直接跳过
-		if (sensor_end.sensor_type != blueprint::PhysicsShapeType::DOOR)
+		if (sensor_end.sensor_type != blueprint::ShapeType::DOOR)
 		{
 			return;
 		}
@@ -184,7 +184,7 @@ namespace pd::listener::door
 		);
 
 		// 无视非玩家实体
-		if (sensor_end.visitor_type != blueprint::PhysicsShapeType::PLAYER)
+		if (sensor_end.visitor_type != blueprint::ShapeType::PLAYER)
 		{
 			return;
 		}
@@ -209,7 +209,7 @@ namespace pd::listener::door
 		if (const auto* physics_shape_door = registry.try_get<const door::PhysicsShapeDoor>(request_open.door))
 		{
 			auto filter = b2Shape_GetFilter(physics_shape_door->shape);
-			filter.maskBits = blueprint::PhysicsShapeCollisionMask::door_open;
+			filter.maskBits = blueprint::CollisionMask::door_open;
 
 			b2Shape_SetFilter(physics_shape_door->shape, filter);
 		}
@@ -225,7 +225,7 @@ namespace pd::listener::door
 		if (const auto* physics_shape_door = registry.try_get<const door::PhysicsShapeDoor>(request_close.door))
 		{
 			auto filter = b2Shape_GetFilter(physics_shape_door->shape);
-			filter.maskBits = blueprint::PhysicsShapeCollisionMask::door_close;
+			filter.maskBits = blueprint::CollisionMask::door_close;
 
 			b2Shape_SetFilter(physics_shape_door->shape, filter);
 		}
