@@ -1,0 +1,684 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 身体颜色渐变 - 暗灰色系 -->
+    <radialGradient id="body-grad" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#5a5a5a"/>
+      <stop offset="60%" stop-color="#3a3a3a"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </radialGradient>
+    <radialGradient id="belly-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8a8a7a"/>
+      <stop offset="100%" stop-color="#4a4a3a"/>
+    </radialGradient>
+    <radialGradient id="ear-inner" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d4a0a0"/>
+      <stop offset="100%" stop-color="#8a5a5a"/>
+    </radialGradient>
+    <radialGradient id="eye-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff3333"/>
+      <stop offset="60%" stop-color="#cc0000"/>
+      <stop offset="100%" stop-color="#440000"/>
+    </radialGradient>
+    <radialGradient id="nose-grad" cx="40%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#e8a0a0"/>
+      <stop offset="100%" stop-color="#8a5050"/>
+    </radialGradient>
+
+    <!-- 粗糙纹理滤镜 -->
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" result="noise"/>
+      <feColorMatrix type="matrix" values="0.8 0 0 0 0  0 0.8 0 0 0  0 0 0.8 0 0  0 0 0 0.15 0" in="noise" result="coloredNoise"/>
+      <feComposite in="SourceGraphic" in2="coloredNoise" operator="in" result="textured"/>
+      <feBlend in="SourceGraphic" in2="textured" mode="multiply"/>
+    </filter>
+
+    <!-- 阴影滤镜 -->
+    <filter id="drop-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="0.7"/>
+    </filter>
+
+    <!-- 污渍纹理 -->
+    <filter id="grime" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="2" result="noise"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.1 0" result="grimeColor"/>
+      <feComposite in="SourceGraphic" in2="grimeColor" operator="over"/>
+    </filter>
+
+    <!-- 鼠鼻模板 -->
+    <g id="nose">
+      <ellipse cx="0" cy="0" rx="3.5" ry="2.8" fill="url(#nose-grad)"/>
+      <line x1="0" y1="-2.5" x2="0" y2="2.5" stroke="#6a3030" stroke-width="0.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- 鼠耳模板 -->
+    <g id="ear">
+      <ellipse cx="0" cy="-6" rx="6" ry="8" fill="url(#body-grad)" filter="url(#drop-shadow)"/>
+      <ellipse cx="0" cy="-6" rx="3.5" ry="5" fill="url(#ear-inner)"/>
+      <path d="M -3,-6 Q 0,-12 3,-6" fill="none" stroke="#2a1a1a" stroke-width="0.6" opacity="0.5"/>
+    </g>
+
+    <!-- 鼠耳背模板 -->
+    <g id="ear-back">
+      <ellipse cx="0" cy="-6" rx="6" ry="8" fill="url(#body-grad)" filter="url(#drop-shadow)"/>
+    </g>
+
+    <!-- 鼠眼模板 -->
+    <g id="eye">
+      <circle cx="0" cy="0" r="3" fill="#111"/>
+      <circle cx="0" cy="0" r="2.2" fill="url(#eye-glow)"/>
+      <circle cx="-0.8" cy="-0.8" r="0.8" fill="#ff6666" opacity="0.6"/>
+    </g>
+
+    <!-- 尾部 - 上/下方向 -->
+    <g id="tail-vertical">
+      <path d="M 0,0 Q 6,12 2,22 Q -1,28 -3,30" fill="none" stroke="#3a3030" stroke-width="2.5" stroke-linecap="round" filter="url(#drop-shadow)"/>
+      <path d="M 0,0 Q 6,12 2,22 Q -1,28 -3,30" fill="none" stroke="#5a4a4a" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+    </g>
+
+    <!-- 尾部 - 左/右方向 -->
+    <g id="tail-horizontal">
+      <path d="M 0,0 Q 12,6 22,2 Q 28,-1 30,-3" fill="none" stroke="#3a3030" stroke-width="2.5" stroke-linecap="round" filter="url(#drop-shadow)"/>
+      <path d="M 0,0 Q 12,6 22,2 Q 28,-1 30,-3" fill="none" stroke="#5a4a4a" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+    </g>
+
+    <!-- 胡须组 -->
+    <g id="whiskers">
+      <path d="M 0,0 Q 8,-5 16,-3" fill="none" stroke="#888" stroke-width="0.6" opacity="0.5"/>
+      <path d="M 0,0 Q 9,0 17,0" fill="none" stroke="#888" stroke-width="0.6" opacity="0.5"/>
+      <path d="M 0,0 Q 8,5 16,3" fill="none" stroke="#888" stroke-width="0.6" opacity="0.5"/>
+    </g>
+  </defs>
+
+  <rect width="1024" height="1024" fill="#1a1a2a" opacity="0"/>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧1 (0,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 32)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="13" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="0" cy="11" rx="7" ry="8" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(-7, -5)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(7, -5)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-6" rx="9" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(-4, -6)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(4, -6)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(0, -4)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-3, -4) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(3, -4)"/>
+    <!-- 左前腿 - 站姿 -->
+    <path d="M -7,16 Q -10,22 -9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <!-- 右前腿 -->
+    <path d="M 7,16 Q 10,22 9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <!-- 左后腿 -->
+    <path d="M -8,18 Q -12,24 -11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <!-- 右后腿 -->
+    <path d="M 8,18 Q 12,24 11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧2 (128,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 32)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="13" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="14" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="0" cy="11" rx="7" ry="9" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(-7, -5) rotate(-10)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(7, -5) rotate(10)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-6" rx="9" ry="7.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(-4, -6)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(4, -6)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(0, -4)"/>
+    <!-- 胡须 -->
+    <use href="#whiskers" transform="translate(-3, -4) scale(-1,1)"/>
+    <use href="#whiskers" transform="translate(3, -4)"/>
+    <!-- 腿 - 迈步姿势 -->
+    <path d="M -6,16 Q -13,22 -10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 7,15 Q 9,22 11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -8,18 Q -5,24 -8,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-8" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,18 Q 13,24 10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧3 (256,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 32)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="13.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="0" cy="10" rx="7" ry="8.5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(-7, -5) rotate(-5)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(7, -5) rotate(5)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-6" rx="9" ry="7.2" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(-4, -6)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(4, -6)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(0, -4)"/>
+    <!-- 胡须 -->
+    <use href="#whiskers" transform="translate(-3, -4) scale(-1,1)"/>
+    <use href="#whiskers" transform="translate(3, -4)"/>
+    <!-- 腿 - 交替迈步 -->
+    <path d="M -6,16 Q -9,22 -11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 7,15 Q 12,22 10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -8,18 Q -13,24 -10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,18 Q 5,24 8,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="8" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧4 (384,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 32)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="13" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="0" cy="11" rx="7" ry="8" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(-7, -5)"/>
+    <use href="#ear" transform="translate(7, -5)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-6" rx="9" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(-4, -6)"/>
+    <use href="#eye" transform="translate(4, -6)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(0, -4)"/>
+    <!-- 胡须 -->
+    <use href="#whiskers" transform="translate(-3, -4) scale(-1,1)"/>
+    <use href="#whiskers" transform="translate(3, -4)"/>
+    <!-- 腿 - 恢复站姿 -->
+    <path d="M -7,16 Q -10,22 -9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 7,16 Q 10,22 9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -8,18 Q -12,24 -11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,18 Q 12,24 11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧1 (0,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 160)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="13" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-3, -5) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(3, -5)"/>
+    <!-- 左耳 -->
+    <use href="#ear-back" transform="translate(-7, -5)"/>
+    <!-- 右耳 -->
+    <use href="#ear-back" transform="translate(7, -5)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-7" rx="9" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腿 -->
+    <path d="M -7,16 Q -10,22 -9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 7,16 Q 10,22 9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -8,18 Q -12,24 -11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,18 Q 12,24 11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧2 (128,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 160)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="13" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="14" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-3, -5) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(3, -5)"/>
+    <!-- 左耳 -->
+    <use href="#ear-back" transform="translate(-7, -5) rotate(-10)"/>
+    <!-- 右耳 -->
+    <use href="#ear-back" transform="translate(7, -5) rotate(10)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-7" rx="9" ry="7.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腿 -->
+    <path d="M -6,16 Q -13,22 -10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 7,15 Q 9,22 11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -8,18 Q -5,24 -8,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-8" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,18 Q 13,24 10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧3 (256,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 160)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="13.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-3, -5) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(3, -5)"/>
+    <!-- 左耳 -->
+    <use href="#ear-back" transform="translate(-7, -5) rotate(-5)"/>
+    <!-- 右耳 -->
+    <use href="#ear-back" transform="translate(7, -5) rotate(5)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-7" rx="9" ry="7.2" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腿 -->
+    <path d="M -6,16 Q -9,22 -11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 7,15 Q 12,22 10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -8,18 Q -13,24 -10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,18 Q 5,24 8,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="8" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧4 (384,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 160)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-vertical" transform="translate(0, 12)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="11" ry="13" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-3, -5) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(3, -5)"/>
+    <!-- 左耳 -->
+    <use href="#ear-back" transform="translate(-7, -5)"/>
+    <!-- 右耳 -->
+    <use href="#ear-back" transform="translate(7, -5)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-7" rx="9" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腿 -->
+    <path d="M -7,16 Q -10,22 -9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 7,16 Q 10,22 9,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="9" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -8,18 Q -12,24 -11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,18 Q 12,24 11,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="11" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧1 (0,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 288)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(10, 10)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="13" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="-3" cy="8" rx="7" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(-8, -8) rotate(-20)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(2, -8) rotate(15)"/>
+    <!-- 头部 -->
+    <ellipse cx="-5" cy="-5" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(-12, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(-4, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(-8, -2)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-11, -2) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(-5, -2)"/>
+    <!-- 腿 -->
+    <path d="M 2,16 Q -2,22 0,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="0" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,14 Q 11,20 10,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -2,18 Q -5,23 -3,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-3" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 9,17 Q 13,23 12,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="12" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧2 (128,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 288)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="13" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(10, 10)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="14" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="-3" cy="8" rx="8" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(-8, -8) rotate(-25)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(2, -8) rotate(20)"/>
+    <!-- 头部 -->
+    <ellipse cx="-5" cy="-5" rx="8.5" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(-12, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(-4, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(-8, -2)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-11, -2) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(-5, -2)"/>
+    <!-- 腿 -->
+    <path d="M 1,15 Q -6,21 -3,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-3" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,14 Q 11,21 13,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="13" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -3,18 Q 1,23 -1,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-1" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 9,17 Q 6,23 8,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="8" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧3 (256,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 288)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(10, 10)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="13.5" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="-3" cy="8" rx="7.5" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(-8, -8) rotate(-22)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(2, -8) rotate(18)"/>
+    <!-- 头部 -->
+    <ellipse cx="-5" cy="-5" rx="8.2" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(-12, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(-4, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(-9, -3)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-11, -2) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(-5, -2)"/>
+    <!-- 腿 -->
+    <path d="M 2,16 Q -4,22 -2,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-2" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,14 Q 10,21 12,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="12" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -2,18 Q -7,23 -5,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-5" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 9,17 Q 12,23 10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧4 (384,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 288)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(10, 10)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="13" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="-3" cy="8" rx="7" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(-8, -8) rotate(-20)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(2, -8) rotate(15)"/>
+    <!-- 头部 -->
+    <ellipse cx="-5" cy="-5" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(-12, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(-4, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(-8, -2)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(-11, -2) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(-5, -2)"/>
+    <!-- 腿 -->
+    <path d="M 2,16 Q -2,22 0,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="0" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 8,14 Q 11,20 10,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -2,18 Q -5,23 -3,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-3" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 9,17 Q 13,23 12,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="12" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧1 (0,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(64, 416)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(-10, 10) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="13" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="3" cy="8" rx="7" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(1, -8) rotate(-15)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(11, -8) rotate(20)"/>
+    <!-- 头部 -->
+    <ellipse cx="5" cy="-5" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(4, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(12, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(9, -2)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(6, -2) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(12, -2)"/>
+    <!-- 腿 -->
+    <path d="M -8,14 Q -11,20 -10,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -2,16 Q 2,22 0,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="0" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -9,17 Q -13,23 -12,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-12" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 2,18 Q 5,23 3,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="3" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧2 (128,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(182, 416)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="13" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(-10, 10) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="14" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="3" cy="8" rx="8" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(1, -8) rotate(-20)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(11, -8) rotate(25)"/>
+    <!-- 头部 -->
+    <ellipse cx="5" cy="-5" rx="8.5" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(4, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(12, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(9, -2)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(6, -3) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(12, -3)"/>
+    <!-- 腿 -->
+    <path d="M -8,14 Q -11,21 -13,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-13" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -1,15 Q 6,21 3,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="3" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -9,17 Q -6,23 -8,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-8" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 3,18 Q -1,23 1,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="1" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧3 (256,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(320, 416)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(-10, 10) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="13.5" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="3" cy="8" rx="7.5" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(1, -8) rotate(-18)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(11, -8) rotate(22)"/>
+    <!-- 头部 -->
+    <ellipse cx="5" cy="-5" rx="8.2" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(4, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(12, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(9, -2)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(6, -2) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(12, -2)"/>
+    <!-- 腿 -->
+    <path d="M -8,14 Q -10,21 -12,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-12" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -2,16 Q 4,22 2,27" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="2" cy="28" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -9,17 Q -12,23 -10,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 2,18 Q 7,23 5,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="5" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧4 (384,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(448, 416)">
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="28" rx="12" ry="4" fill="#000" opacity="0.3"/>
+    <!-- 尾部 -->
+    <use href="#tail-horizontal" transform="translate(-10, 10) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="8" rx="13" ry="11" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 腹部 -->
+    <ellipse cx="3" cy="8" rx="7" ry="7" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 左耳 -->
+    <use href="#ear" transform="translate(1, -8) rotate(-15)"/>
+    <!-- 右耳 -->
+    <use href="#ear" transform="translate(11, -8) rotate(20)"/>
+    <!-- 头部 -->
+    <ellipse cx="5" cy="-5" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 左眼 -->
+    <use href="#eye" transform="translate(4, -5)"/>
+    <!-- 右眼 -->
+    <use href="#eye" transform="translate(12, -5)"/>
+    <!-- 鼻子 -->
+    <use href="#nose" transform="translate(9, -2)"/>
+    <!-- 胡须左 -->
+    <use href="#whiskers" transform="translate(6, -2) scale(-1,1)"/>
+    <!-- 胡须右 -->
+    <use href="#whiskers" transform="translate(12, -2)"/>
+    <!-- 腿 -->
+    <path d="M -8,14 Q -11,20 -10,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -2,16 Q 2,22 0,26" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="0" cy="27" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M -9,17 Q -13,23 -12,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-12" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+    <path d="M 2,18 Q 5,23 3,28" fill="none" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="3" cy="29" rx="3" ry="1.8" fill="#1a1a1a"/>
+  </g>
+
+</svg>

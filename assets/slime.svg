@@ -1,0 +1,348 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 主体颜色渐变 - 深绿色半透明 -->
+    <radialGradient id="slime-body" cx="45%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#7ab868"/>
+      <stop offset="15%" stop-color="#6aad5a"/>
+      <stop offset="40%" stop-color="#4a8a3a"/>
+      <stop offset="70%" stop-color="#2a5a1a"/>
+      <stop offset="100%" stop-color="#1a3a0a"/>
+    </radialGradient>
+    <radialGradient id="slime-core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#aaffaa" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#88dd66" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="#55aa33" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#338811" stop-opacity="0.1"/>
+    </radialGradient>
+    <radialGradient id="slime-below" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#336622" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#1a3300" stop-opacity="0.2"/>
+    </radialGradient>
+
+    <!-- 高光渐变 -->
+    <radialGradient id="highlight" cx="35%" cy="30%" r="40%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
+      <stop offset="50%" stop-color="#ccffcc" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#88cc66" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- 眼睛渐变 -->
+    <radialGradient id="eye-dark" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="60%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <radialGradient id="eye-highlight" cx="35%" cy="30%" r="30%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- 纹理滤镜 -->
+    <filter id="slime-texture" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" result="noise"/>
+      <feColorMatrix type="matrix" values="0.4 0 0 0 0.1  0 0.5 0 0 0.15  0 0 0.3 0 0.05  0 0 0 0.25 0" in="noise" result="coloredNoise"/>
+      <feComposite in="SourceGraphic" in2="coloredNoise" operator="in" result="textured"/>
+      <feBlend in="SourceGraphic" in2="textured" mode="multiply"/>
+    </filter>
+
+    <!-- 气泡纹理 -->
+    <filter id="bubbles" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.3" numOctaves="2" result="noise"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.15  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.15 0" result="bubbleColor"/>
+      <feComposite in="SourceGraphic" in2="bubbleColor" operator="over"/>
+    </filter>
+
+    <!-- 阴影 -->
+    <filter id="drop-shadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- 内部发光 -->
+    <filter id="inner-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="blur" in2="SourceAlpha" operator="in" result="glow"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.3  0 0 0 0 0.6  0 0 0 0 0.1  0 0 0 0.4 0" in="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 眼睛模板 -->
+    <g id="eye-ball">
+      <ellipse cx="0" cy="0" rx="3.5" ry="3.5" fill="url(#eye-dark)"/>
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="url(#eye-highlight)"/>
+      <circle cx="-0.8" cy="-0.8" r="0.9" fill="#fff" opacity="0.8"/>
+    </g>
+
+    <!-- 内部核心 -->
+    <g id="core">
+      <ellipse cx="0" cy="0" rx="6" ry="5" fill="url(#slime-core)"/>
+      <ellipse cx="0" cy="0" rx="3" ry="2.5" fill="#aaffaa" opacity="0.2"/>
+    </g>
+
+    <!-- 底部阴影滩 -->
+    <g id="puddle">
+      <ellipse cx="0" cy="0" rx="12" ry="3.5" fill="url(#slime-below)"/>
+      <ellipse cx="0" cy="0" rx="14" ry="4" fill="#1a3300" opacity="0.15"/>
+    </g>
+  </defs>
+
+  <rect width="1024" height="1024" fill="#1a1a2a" opacity="0"/>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧1 (0,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 32)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="-3" cy="2" rx="8" ry="6" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(0, 10)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(-5, 4)"/>
+    <use href="#eye-ball" transform="translate(5, 4)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧2 (128,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 32)">
+    <use href="#puddle" transform="translate(0, 22) scale(1.1, 1)"/>
+    <!-- 下压变形 -->
+    <ellipse cx="0" cy="10" rx="16" ry="12" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="10" rx="16" ry="12" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <ellipse cx="-3" cy="5" rx="9" ry="5" fill="url(#highlight)"/>
+    <use href="#core" transform="translate(0, 12)"/>
+    <use href="#eye-ball" transform="translate(-5.5, 7)"/>
+    <use href="#eye-ball" transform="translate(5.5, 7)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧3 (256,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 32)">
+    <use href="#puddle" transform="translate(0, 22)"/>
+    <!-- 向上拉伸 -->
+    <ellipse cx="0" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <ellipse cx="-3" cy="0" rx="7" ry="7" fill="url(#highlight)"/>
+    <use href="#core" transform="translate(0, 8)"/>
+    <use href="#eye-ball" transform="translate(-4.5, 2)"/>
+    <use href="#eye-ball" transform="translate(4.5, 2)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下移动 - 帧4 (384,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 32)">
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <ellipse cx="-3" cy="2" rx="8" ry="6" fill="url(#highlight)"/>
+    <use href="#core" transform="translate(0, 10)"/>
+    <use href="#eye-ball" transform="translate(-5, 4)"/>
+    <use href="#eye-ball" transform="translate(5, 4)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧1 (0,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 160)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(0, 10)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧2 (128,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 160)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 22) scale(1.1, 1)"/>
+    <!-- 主体 -->
+    <ellipse cx="0" cy="6" rx="16" ry="12" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="6" rx="16" ry="12" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(0, 8)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧3 (256,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 160)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="0" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(0, 8)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上移动 - 帧4 (384,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 160)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="0" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(0, 10)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧1 (0,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 288)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="-2" cy="8" rx="13" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="-2" cy="8" rx="13" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="-5" cy="2" rx="7" ry="6" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(-1, 10)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(-10, 4)"/>
+    <use href="#eye-ball" transform="translate(0, 4)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧2 (128,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 288)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 22) scale(1.1, 1)"/>
+    <!-- 主体 -->
+    <ellipse cx="-4" cy="10" rx="16" ry="12" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="-4" cy="10" rx="16" ry="12" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="-6" cy="5" rx="9" ry="5" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(-3, 12)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(-12, 7)"/>
+    <use href="#eye-ball" transform="translate(-2, 7)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧3 (256,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 288)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="-4" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="-4" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="-7" cy="0" rx="7" ry="7" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(-3, 8)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(-10, 2)"/>
+    <use href="#eye-ball" transform="translate(-2, 2)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左移动 - 帧4 (384,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 288)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="-2" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="-2" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="-5" cy="2" rx="8" ry="6" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(-1, 10)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(-10, 4)"/>
+    <use href="#eye-ball" transform="translate(0, 4)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧1 (0,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 416)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="2" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="2" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="-1" cy="2" rx="8" ry="6" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(1, 10)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(0, 4)"/>
+    <use href="#eye-ball" transform="translate(10, 4)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧2 (128,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 416)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 22) scale(1.1, 1)"/>
+    <!-- 主体 -->
+    <ellipse cx="4" cy="10" rx="16" ry="12" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="4" cy="10" rx="16" ry="12" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="1" cy="5" rx="9" ry="5" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(3, 12)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(2, 7)"/>
+    <use href="#eye-ball" transform="translate(12, 7)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧3 (256,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 416)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="4" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="4" cy="6" rx="13" ry="15" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="1" cy="0" rx="7" ry="7" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(3, 8)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(2, 2)"/>
+    <use href="#eye-ball" transform="translate(10, 2)"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右移动 - 帧4 (384,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 416)">
+    <!-- 底部阴影滩 -->
+    <use href="#puddle" transform="translate(0, 24)"/>
+    <!-- 主体 -->
+    <ellipse cx="2" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#slime-texture)"/>
+    <ellipse cx="2" cy="8" rx="14" ry="14" fill="url(#slime-body)" filter="url(#bubbles)"/>
+    <!-- 高光 -->
+    <ellipse cx="-1" cy="2" rx="8" ry="6" fill="url(#highlight)"/>
+    <!-- 内部核心 -->
+    <use href="#core" transform="translate(1, 10)"/>
+    <!-- 眼睛 -->
+    <use href="#eye-ball" transform="translate(0, 4)"/>
+    <use href="#eye-ball" transform="translate(10, 4)"/>
+  </g>
+
+</svg>

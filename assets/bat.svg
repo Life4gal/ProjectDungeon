@@ -1,0 +1,537 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 身体颜色渐变 -->
+    <radialGradient id="body-grad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#4a4a52"/>
+      <stop offset="50%" stop-color="#2a2a32"/>
+      <stop offset="100%" stop-color="#12121a"/>
+    </radialGradient>
+    <radialGradient id="wing-grad" cx="40%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#3a3a44"/>
+      <stop offset="50%" stop-color="#1e1e28"/>
+      <stop offset="100%" stop-color="#0a0a10"/>
+    </radialGradient>
+    <radialGradient id="belly-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6a6a72"/>
+      <stop offset="100%" stop-color="#3a3a40"/>
+    </radialGradient>
+    <radialGradient id="ear-inner" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#8a6a8a"/>
+      <stop offset="100%" stop-color="#4a2a4a"/>
+    </radialGradient>
+    <radialGradient id="eye-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffcc00"/>
+      <stop offset="40%" stop-color="#ff8800"/>
+      <stop offset="70%" stop-color="#cc4400"/>
+      <stop offset="100%" stop-color="#331100"/>
+    </radialGradient>
+    <radialGradient id="eye-glow-small" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffdd44"/>
+      <stop offset="100%" stop-color="#883300"/>
+    </radialGradient>
+    <radialGradient id="mouth-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cc6666"/>
+      <stop offset="100%" stop-color="#661111"/>
+    </radialGradient>
+
+    <!-- 纹理滤镜 -->
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="3" result="noise"/>
+      <feColorMatrix type="matrix" values="0.7 0 0 0 0  0 0.7 0 0 0  0 0 0.7 0 0  0 0 0 0.18 0" in="noise" result="coloredNoise"/>
+      <feComposite in="SourceGraphic" in2="coloredNoise" operator="in" result="textured"/>
+      <feBlend in="SourceGraphic" in2="textured" mode="multiply"/>
+    </filter>
+
+    <!-- 膜翼纹理 -->
+    <filter id="wing-texture" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="2" result="noise"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.05  0 0 0 0 0.03  0 0 0 0 0.02  0 0 0 0.2 0" result="veins"/>
+      <feComposite in="SourceGraphic" in2="veins" operator="over"/>
+    </filter>
+
+    <!-- 阴影滤镜 -->
+    <filter id="drop-shadow" x="-40%" y="-30%" width="180%" height="160%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+
+    <!-- 发光滤镜 -->
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 耳模板 -->
+    <g id="ear">
+      <path d="M 0,0 Q -5,-10 -2,-14 Q 0,-16 3,-12 Q 6,-8 2,0 Z" fill="url(#body-grad)" filter="url(#rough)"/>
+      <path d="M 0,-1 Q -3,-9 -1,-12 Q 0,-13 2,-10 Q 3,-7 1,-1 Z" fill="url(#ear-inner)"/>
+    </g>
+
+    <!-- 耳背模板 -->
+    <g id="ear-back">
+      <path d="M 0,0 Q -5,-10 -2,-14 Q 0,-16 3,-12 Q 6,-8 2,0 Z" fill="url(#body-grad)" filter="url(#rough)"/>
+    </g>
+
+    <!-- 眼模板 -->
+    <g id="eye">
+      <circle cx="0" cy="0" r="3.5" fill="#111"/>
+      <circle cx="0" cy="0" r="2.8" fill="url(#eye-glow)"/>
+      <circle cx="-0.8" cy="-0.8" r="0.9" fill="#ffee88" opacity="0.7"/>
+      <ellipse cx="0.5" cy="0.5" rx="1.2" ry="0.8" fill="#110000" opacity="0.6"/>
+    </g>
+
+    <!-- 小牙 -->
+    <g id="fangs">
+      <polygon points="0,0 1.2,4.5 -1.2,4.5" fill="#ddd" opacity="0.9"/>
+      <polygon points="0,0 0.8,3.5 -0.8,3.5" fill="#fff" opacity="0.3"/>
+    </g>
+
+    <!-- 膜翼 - 展开（侧面视角） -->
+    <g id="wing-open">
+      <path d="M 0,0 Q -15,-18 -28,-22 Q -34,-24 -36,-20 Q -34,-14 -30,-6 Q -26,2 -20,8 Q -14,14 -8,16 Q -2,18 0,16" fill="url(#wing-grad)" filter="url(#wing-texture)" stroke="#1a1a22" stroke-width="0.8"/>
+      <!-- 翼膜骨架 -->
+      <path d="M 0,0 Q -14,-12 -28,-22" fill="none" stroke="#1a1a22" stroke-width="1.5" opacity="0.6"/>
+      <path d="M 0,0 Q -12,-2 -28,-8" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+      <path d="M 0,0 Q -8,6 -18,12" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+    </g>
+
+    <!-- 膜翼 - 半收（侧面视角） -->
+    <g id="wing-half">
+      <path d="M 0,0 Q -12,-14 -22,-16 Q -26,-16 -28,-12 Q -26,-6 -22,0 Q -16,8 -8,12 Q -2,14 0,12" fill="url(#wing-grad)" filter="url(#wing-texture)" stroke="#1a1a22" stroke-width="0.8"/>
+      <path d="M 0,0 Q -10,-8 -22,-16" fill="none" stroke="#1a1a22" stroke-width="1.5" opacity="0.6"/>
+      <path d="M 0,0 Q -8,0 -20,-4" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+    </g>
+
+    <!-- 膜翼 - 收拢（侧面视角） -->
+    <g id="wing-close">
+      <path d="M 0,0 Q -8,-8 -14,-8 Q -16,-8 -18,-4 Q -16,2 -12,8 Q -6,12 -2,12 Q 0,12 0,10" fill="url(#wing-grad)" filter="url(#wing-texture)" stroke="#1a1a22" stroke-width="0.8"/>
+      <path d="M 0,0 Q -6,-4 -14,-8" fill="none" stroke="#1a1a22" stroke-width="1.5" opacity="0.6"/>
+    </g>
+
+    <!-- 向上飞行翼 - 展开 -->
+    <g id="wing-up-open">
+      <path d="M 0,0 Q -18,-14 -28,-10 Q -34,-8 -32,-2 Q -26,6 -18,14 Q -8,20 0,22" fill="url(#wing-grad)" filter="url(#wing-texture)" stroke="#1a1a22" stroke-width="0.8"/>
+      <path d="M 0,0 Q -14,-8 -28,-10" fill="none" stroke="#1a1a22" stroke-width="1.5" opacity="0.6"/>
+      <path d="M 0,0 Q -14,4 -26,4" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+      <path d="M 0,0 Q -8,12 -16,18" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+    </g>
+
+    <!-- 向上飞行翼 - 半收 -->
+    <g id="wing-up-half">
+      <path d="M 0,0 Q -14,-10 -22,-8 Q -26,-6 -24,0 Q -20,8 -12,14 Q -4,18 0,18" fill="url(#wing-grad)" filter="url(#wing-texture)" stroke="#1a1a22" stroke-width="0.8"/>
+      <path d="M 0,0 Q -10,-6 -22,-8" fill="none" stroke="#1a1a22" stroke-width="1.5" opacity="0.6"/>
+      <path d="M 0,0 Q -10,4 -18,8" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+    </g>
+
+    <!-- 向下飞行翼 - 展开 -->
+    <g id="wing-down-open">
+      <path d="M 0,0 Q -12,-10 -22,-8 Q -28,-6 -26,2 Q -22,10 -16,16 Q -10,20 -4,22 Q 0,22 0,20" fill="url(#wing-grad)" filter="url(#wing-texture)" stroke="#1a1a22" stroke-width="0.8"/>
+      <path d="M 0,0 Q -10,-6 -22,-8" fill="none" stroke="#1a1a22" stroke-width="1.5" opacity="0.6"/>
+      <path d="M 0,0 Q -14,2 -26,2" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+      <path d="M 0,0 Q -10,10 -18,16" fill="none" stroke="#1a1a22" stroke-width="1" opacity="0.4"/>
+    </g>
+
+    <!-- 爪子 -->
+    <g id="claws">
+      <path d="M 0,0 Q -2,4 -4,6" fill="none" stroke="#2a2a30" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M 0,0 Q 0,5 0,7" fill="none" stroke="#2a2a30" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M 0,0 Q 2,4 4,6" fill="none" stroke="#2a2a30" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="-4" cy="6" r="0.8" fill="#1a1a20"/>
+      <circle cx="0" cy="7" r="0.8" fill="#1a1a20"/>
+      <circle cx="4" cy="6" r="0.8" fill="#1a1a20"/>
+    </g>
+  </defs>
+
+  <rect width="1024" height="1024" fill="#1a1a2a" opacity="0"/>
+
+  <!-- ============================================ -->
+  <!-- 向下飞行 - 帧1 (0,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 32)">
+    <!-- 翼 -->
+    <use href="#wing-down-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-down-open" transform="translate(6, 4)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="4" rx="7" ry="9" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="0" cy="6" rx="4.5" ry="6" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(-5, -6) rotate(-15)"/>
+    <use href="#ear" transform="translate(5, -6) rotate(15)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-3" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(-3.5, -3)"/>
+    <use href="#eye" transform="translate(3.5, -3)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="0" cy="0" rx="2.5" ry="1.8" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-1.5, 0)"/>
+    <use href="#fangs" transform="translate(1.5, 0)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-4, 12)"/>
+    <use href="#claws" transform="translate(4, 12)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下飞行 - 帧2 (128,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 32)">
+    <use href="#wing-down-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-down-open" transform="translate(6, 4)"/>
+    <ellipse cx="0" cy="5" rx="7" ry="9" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="0" cy="7" rx="4.5" ry="6" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <use href="#ear" transform="translate(-5, -5) rotate(-18)"/>
+    <use href="#ear" transform="translate(5, -5) rotate(18)"/>
+    <ellipse cx="0" cy="-2" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <use href="#eye" transform="translate(-3.5, -2)"/>
+    <use href="#eye" transform="translate(3.5, -2)"/>
+    <ellipse cx="0" cy="1" rx="2.5" ry="1.8" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-1.5, 1)"/>
+    <use href="#fangs" transform="translate(1.5, 1)"/>
+    <use href="#claws" transform="translate(-4, 13)"/>
+    <use href="#claws" transform="translate(4, 13)"/>
+    <ellipse cx="0" cy="24" rx="15" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下飞行 - 帧3 (256,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 32)">
+    <use href="#wing-down-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-down-open" transform="translate(6, 4)"/>
+    <ellipse cx="0" cy="3" rx="7" ry="9" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="0" cy="5" rx="4.5" ry="6" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <use href="#ear" transform="translate(-5, -7) rotate(-12)"/>
+    <use href="#ear" transform="translate(5, -7) rotate(12)"/>
+    <ellipse cx="0" cy="-4" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <use href="#eye" transform="translate(-3.5, -4)"/>
+    <use href="#eye" transform="translate(3.5, -4)"/>
+    <ellipse cx="0" cy="-1" rx="2.5" ry="1.8" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-1.5, -1)"/>
+    <use href="#fangs" transform="translate(1.5, -1)"/>
+    <use href="#claws" transform="translate(-4, 11)"/>
+    <use href="#claws" transform="translate(4, 11)"/>
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向下飞行 - 帧4 (384,0) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 32)">
+    <use href="#wing-down-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-down-open" transform="translate(6, 4)"/>
+    <ellipse cx="0" cy="4" rx="7" ry="9" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="0" cy="6" rx="4.5" ry="6" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <use href="#ear" transform="translate(-5, -6) rotate(-15)"/>
+    <use href="#ear" transform="translate(5, -6) rotate(15)"/>
+    <ellipse cx="0" cy="-3" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <use href="#eye" transform="translate(-3.5, -3)"/>
+    <use href="#eye" transform="translate(3.5, -3)"/>
+    <ellipse cx="0" cy="0" rx="2.5" ry="1.8" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-1.5, 0)"/>
+    <use href="#fangs" transform="translate(1.5, 0)"/>
+    <use href="#claws" transform="translate(-4, 12)"/>
+    <use href="#claws" transform="translate(4, 12)"/>
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上飞行 - 帧1 (0,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 160)">
+    <!-- 耳 -->
+    <use href="#ear-back" transform="translate(-5, -6) rotate(-15)"/>
+    <use href="#ear-back" transform="translate(5, -6) rotate(15)"/>
+    <!-- 翼 -->
+    <use href="#wing-up-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-up-open" transform="translate(6, 4)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-3" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上飞行 - 帧2 (128,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 160)">
+    <!-- 耳 -->
+    <use href="#ear-back" transform="translate(-5, -5) rotate(-18)"/>
+    <use href="#ear-back" transform="translate(5, -5) rotate(18)"/>
+    <!-- 翼 -->
+    <use href="#wing-up-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-up-open" transform="translate(6, 4)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-2" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="15" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上飞行 - 帧3 (256,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 160)">
+    <!-- 耳 -->
+    <use href="#ear-back" transform="translate(-5, -7) rotate(-12)"/>
+    <use href="#ear-back" transform="translate(5, -7) rotate(12)"/>
+    <!-- 翼 -->
+    <use href="#wing-up-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-up-open" transform="translate(6, 4)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-4" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向上飞行 - 帧4 (384,128) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 160)">
+    <!-- 耳 -->
+    <use href="#ear-back" transform="translate(-5, -6) rotate(-15)"/>
+    <use href="#ear-back" transform="translate(5, -6) rotate(15)"/>
+    <!-- 翼 -->
+    <use href="#wing-up-open" transform="translate(-6, 4) scale(-1,1)"/>
+    <use href="#wing-up-open" transform="translate(6, 4)"/>
+    <!-- 头部 -->
+    <ellipse cx="0" cy="-3" rx="7" ry="6.5" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左飞行 - 帧1 (0,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 288)">
+    <!-- 翼 -->
+    <use href="#wing-open" transform="translate(-4, 3)"/>
+    <use href="#wing-open" transform="translate(4, 3) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="4" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="-2" cy="4" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(-2, -6) rotate(15)"/>
+    <use href="#ear" transform="translate(-8, -6) rotate(-20)"/>
+    <!-- 头部 -->
+    <ellipse cx="-3" cy="-2" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(-8, -2)"/>
+    <use href="#eye" transform="translate(-2, -2)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="-5" cy="1" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-6, 1)"/>
+    <use href="#fangs" transform="translate(-4, 1)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 10)"/>
+    <use href="#claws" transform="translate(3, 10)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左飞行 - 帧2 (128,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 288)">
+    <!-- 翼 -->
+    <use href="#wing-half" transform="translate(-4, 3)"/>
+    <use href="#wing-half" transform="translate(4, 3) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="5" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="-2" cy="5" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(-2, -5) rotate(18)"/>
+    <use href="#ear" transform="translate(-8, -5) rotate(-22)"/>
+    <!-- 头部 -->
+    <ellipse cx="-3" cy="-1" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(-8, -1)"/>
+    <use href="#eye" transform="translate(-2, -1)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="-5" cy="1" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-6, 1)"/>
+    <use href="#fangs" transform="translate(-4, 1)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 11)"/>
+    <use href="#claws" transform="translate(3, 11)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="13" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左飞行 - 帧3 (256,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 288)">
+    <!-- 翼 -->
+    <use href="#wing-close" transform="translate(-4, 3)"/>
+    <use href="#wing-close" transform="translate(4, 3) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="3" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="-2" cy="3" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(0, -6) rotate(12)"/>
+    <use href="#ear" transform="translate(-8, -6) rotate(-18)"/>
+    <!-- 头部 -->
+    <ellipse cx="-3" cy="-3" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(-8, -3)"/>
+    <use href="#eye" transform="translate(-2, -3)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="-5" cy="-1" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-6, -1)"/>
+    <use href="#fangs" transform="translate(-4, -1)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 9)"/>
+    <use href="#claws" transform="translate(3, 9)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="12" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向左飞行 - 帧4 (384,256) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 288)">
+    <!-- 翼 -->
+    <use href="#wing-half" transform="translate(-4, 3)"/>
+    <use href="#wing-half" transform="translate(4, 3) scale(-1,1)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="4" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="-2" cy="4" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(0, -6) rotate(15)"/>
+    <use href="#ear" transform="translate(-8, -6) rotate(-20)"/>
+    <!-- 头部 -->
+    <ellipse cx="-3" cy="-2" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(-7, -2)"/>
+    <use href="#eye" transform="translate(-1, -2)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="-4" cy="0" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(-5, 0)"/>
+    <use href="#fangs" transform="translate(-3, 0)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 10)"/>
+    <use href="#claws" transform="translate(3, 10)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右飞行 - 帧1 (0,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(32, 416)">
+    <!-- 翼 -->
+    <use href="#wing-open" transform="translate(-4, 3) scale(-1,1)"/>
+    <use href="#wing-open" transform="translate(4, 3)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="4" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="2" cy="4" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(0, -6) rotate(-15)"/>
+    <use href="#ear" transform="translate(6, -6) rotate(20)"/>
+    <!-- 头部 -->
+    <ellipse cx="3" cy="-2" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(2, -2)"/>
+    <use href="#eye" transform="translate(8, -2)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="5" cy="0" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(4, 0)"/>
+    <use href="#fangs" transform="translate(6, 0)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 10)"/>
+    <use href="#claws" transform="translate(3, 10)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右飞行 - 帧2 (128,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(160, 416)">
+    <!-- 翼 -->
+    <use href="#wing-half" transform="translate(-4, 3) scale(-1,1)"/>
+    <use href="#wing-half" transform="translate(4, 3)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="5" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="2" cy="5" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(0, -5) rotate(-18)"/>
+    <use href="#ear" transform="translate(6, -5) rotate(22)"/>
+    <!-- 头部 -->
+    <ellipse cx="3" cy="-1" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(2, -1)"/>
+    <use href="#eye" transform="translate(8, -1)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="5" cy="1" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(4, 1)"/>
+    <use href="#fangs" transform="translate(6, 1)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 11)"/>
+    <use href="#claws" transform="translate(3, 11)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="13" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右飞行 - 帧3 (256,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(288, 416)">
+    <!-- 翼 -->
+    <use href="#wing-close" transform="translate(-4, 3) scale(-1,1)"/>
+    <use href="#wing-close" transform="translate(4, 3)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="3" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="2" cy="3" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(0, -7) rotate(-12)"/>
+    <use href="#ear" transform="translate(6, -7) rotate(18)"/>
+    <!-- 头部 -->
+    <ellipse cx="3" cy="-3" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(2, -3)"/>
+    <use href="#eye" transform="translate(8, -3)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="5" cy="-1" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(4, -1)"/>
+    <use href="#fangs" transform="translate(6, -1)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 9)"/>
+    <use href="#claws" transform="translate(3, 9)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="12" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- 向右飞行 - 帧4 (384,384) -->
+  <!-- ============================================ -->
+  <g transform="translate(416, 416)">
+    <!-- 翼 -->
+    <use href="#wing-half" transform="translate(-4, 3) scale(-1,1)"/>
+    <use href="#wing-half" transform="translate(4, 3)"/>
+    <!-- 身体 -->
+    <ellipse cx="0" cy="4" rx="8" ry="7" fill="url(#body-grad)" filter="url(#rough)"/>
+    <ellipse cx="2" cy="4" rx="4.5" ry="5" fill="url(#belly-grad)" filter="url(#rough)"/>
+    <!-- 耳 -->
+    <use href="#ear" transform="translate(0, -6) rotate(-15)"/>
+    <use href="#ear" transform="translate(6, -6) rotate(20)"/>
+    <!-- 头部 -->
+    <ellipse cx="3" cy="-2" rx="7" ry="6" fill="url(#body-grad)" filter="url(#rough)"/>
+    <!-- 眼 -->
+    <use href="#eye" transform="translate(2, -2)"/>
+    <use href="#eye" transform="translate(8, -2)"/>
+    <!-- 嘴/牙 -->
+    <ellipse cx="5" cy="0" rx="2.2" ry="1.6" fill="url(#mouth-grad)"/>
+    <use href="#fangs" transform="translate(4, 0)"/>
+    <use href="#fangs" transform="translate(6, 0)"/>
+    <!-- 爪 -->
+    <use href="#claws" transform="translate(-3, 10)"/>
+    <use href="#claws" transform="translate(3, 10)"/>
+    <!-- 阴影 -->
+    <ellipse cx="0" cy="24" rx="14" ry="3.5" fill="#000" opacity="0.25"/>
+  </g>
+
+</svg>
