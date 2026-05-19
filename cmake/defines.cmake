@@ -29,7 +29,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 	# ==> macro.hpp
 	set(PD_PLATFORM_NAME PD_PLATFORM_DARWIN)
 else ()
-	message(FATAL_ERROR "[BPP] Unknown Platform: ${CMAKE_SYSTEM_NAME}")
+	message(FATAL_ERROR "[PD] Unknown Platform: ${CMAKE_SYSTEM_NAME}")
 endif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
 # ===================================================================================================
@@ -146,7 +146,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
 	# ==> macro.hpp
 	set(PD_COMPILER_NAME PD_COMPILER_CLANG_APPLE)
 else ()
-	message(FATAL_ERROR "[BPP] Unknown compiler: ${CMAKE_CXX_COMPILER}")
+	message(FATAL_ERROR "[PD] Unknown compiler: ${CMAKE_CXX_COMPILER}")
 endif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
 # ===================================================================================================
