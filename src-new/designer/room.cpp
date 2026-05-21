@@ -138,8 +138,8 @@ namespace pd::designer
 			es.reserve(3);
 
 			es.push_back(Enemy::rat(2, 2));
-			es.push_back(Enemy::slime(3, 3));
-			es.push_back(Enemy::bat(4, 4));
+			// es.push_back(Enemy::slime(3, 3));
+			// es.push_back(Enemy::bat(4, 4));
 
 			return es;
 		}();

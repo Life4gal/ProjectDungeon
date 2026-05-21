@@ -6,7 +6,6 @@
 #include <update/sprite_animation.hpp>
 
 #include <component/sprite_animation.hpp>
-#include <component/state.hpp>
 
 #include <helper/sprite_animation.hpp>
 
@@ -20,7 +19,6 @@ namespace pd::update
 	{
 		const auto view = registry
 				.view<
-					state::InCameraArea,
 					const sprite_animation::Frames,
 					const sprite_animation::FramesCount,
 					const sprite_animation::Duration,

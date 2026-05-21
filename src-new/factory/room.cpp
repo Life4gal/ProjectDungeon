@@ -76,6 +76,8 @@ namespace pd::factory
 			}
 		}
 
+		registry.emplace<tags::Room>(entity);
+
 		return entity;
 	}
 

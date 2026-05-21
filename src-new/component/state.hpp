@@ -8,11 +8,67 @@
 namespace pd::component::state
 {
 	// 处于相机(可视)区域内
-	class InCameraArea {};
+	// class InCameraArea {};
 
-	// 实体隐藏(不渲染)
-	class Invisible final {};
+	// 响应相机更新
+	// class CameraAware final {};
+	// 不响应相机更新
+	class CameraIgnore final {};
 
-	// 实体已死亡(可以被销毁)
-	class Dead final {};
+	// ====================================
+	// 实体
+	// ====================================
+
+	namespace entity
+	{
+		// 实体应当被销毁
+		class Dead final {};
+	}
+
+	// ====================================
+	// SPRITE
+	// ====================================
+
+	namespace sprite
+	{
+		// 由InCameraArea拆分而来
+		// O -> 参与更新&渲染
+		// X -> 不参与更新&渲染
+		class Awake {};
+
+		// 精灵不可见
+		// O -> 不参与渲染
+		// X -> 参与渲染
+		class Invisible final {};
+	}
+
+	// ====================================
+	// ACTOR
+	// ====================================
+
+	namespace actor
+	{
+		// 由InCameraArea拆分而来
+		// O -> 参与更新
+		// X -> 不参与更新
+		class Awake {};
+
+		// // 濒死
+		// // O -> 不参与更新&渲染
+		// // X -> 参与更新&渲染
+		// // TODO: 并不准确?如果我们会有死亡动画呢?动画不属于原实体?
+		// class Dying final {};
+	}
+
+	// ====================================
+	// AI
+	// ====================================
+
+	namespace ai
+	{
+		// 由InCameraArea拆分而来
+		// O -> 参与更新
+		// X -> 不参与更新
+		class Awake {};
+	}
 }

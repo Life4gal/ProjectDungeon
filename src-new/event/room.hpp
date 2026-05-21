@@ -9,11 +9,17 @@
 
 namespace pd::event::room
 {
+	// 房间敌人被清空
+	class Cleared final
+	{
+	public:
+		entt::entity room;
+	};
+
 	// 离开房间
 	class Leave final
 	{
 	public:
-		// 离开的房间实体
 		entt::entity room;
 	};
 
@@ -21,7 +27,6 @@ namespace pd::event::room
 	class Enter final
 	{
 	public:
-		// 进入的房间实体
 		entt::entity room;
 	};
 }

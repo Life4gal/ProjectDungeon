@@ -12,7 +12,7 @@
 
 #include <manager/resource.hpp>
 #include <manager/audio_player.hpp>
-#include <manager/event.hpp>
+// #include <manager/event.hpp>
 #include <manager/random.hpp>
 
 // =========
@@ -25,10 +25,6 @@
 // =========
 // 测试用
 
-#include <component/player_controller.hpp>
-#include <component/state.hpp>
-#include <component/enemy.hpp>
-
 #include <designer/level.hpp>
 #include <designer/player.hpp>
 #include <designer/projectile.hpp>
@@ -36,16 +32,9 @@
 #include <factory/player.hpp>
 #include <factory/projectile.hpp>
 
-// =========
-// 监听
-
-#include <listener/camera.hpp>
-#include <listener/actor.hpp>
-#include <listener/enemy.hpp>
-#include <listener/player.hpp>
-#include <listener/projectile.hpp>
-#include <listener/door.hpp>
-#include <listener/room.hpp>
+#include <helper/camera.hpp>
+#include <helper/player_controller.hpp>
+#include <helper/cheat.hpp>
 
 // =========
 // 更新
@@ -310,7 +299,6 @@ namespace pd::scene
 		// 关卡
 		const auto level = designer::Level::generate(8, 5, 15, 4, 2);
 		factory::Level::create(registry_, level);
-		manager::Event::enqueue(event::room::Enter{});
 
 		// 玩家
 		const auto& start_room = level.rooms.at(level.start_position);
@@ -318,10 +306,10 @@ namespace pd::scene
 		player.position.x += start_room.position.x;
 		player.position.y += start_room.position.y;
 		const auto player_entity = factory::Player::spawn(registry_, player);
-		registry_.ctx().emplace<component::player_controller::Target>(player_entity);
+		helper::PlayerController::set_target(registry_, player_entity);
 
 		// 相机
-		manager::Event::enqueue(event::camera::Set{.x = start_room.position.x, .y = start_room.position.y, .width = 1080, .height = 720});
+		helper::Camera::initialize(registry_, {{start_room.position.x, start_room.position.y}, sf::Vector2f{1080, 720}});
 
 		return true;
 	}
@@ -359,35 +347,6 @@ namespace pd::scene
 		// 物理世界
 		create_physics_world(registry_);
 
-		// 相机
-		manager::Event::subscribe<event::camera::Set, &listener::camera::on_set>(registry_);
-		manager::Event::subscribe<event::camera::MoveTo, &listener::camera::on_move_to>(registry_);
-		manager::Event::subscribe<event::camera::Translate, &listener::camera::on_translate>(registry_);
-		manager::Event::subscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
-		// Actor
-		manager::Event::subscribe<event::actor::Hurt, &listener::actor::on_hurt>(registry_);
-		manager::Event::subscribe<event::actor::Dead, &listener::actor::on_dead>(registry_);
-		// 敌人
-		manager::Event::subscribe<event::physics::ContactBegin, &listener::enemy::on_contact_begin>(registry_);
-		manager::Event::subscribe<event::physics::ContactEnd, &listener::enemy::on_contact_end>(registry_);
-		// 玩家
-		manager::Event::subscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
-		manager::Event::subscribe<event::player::Translate, &listener::player::on_translate>(registry_);
-		// 飞弹
-		manager::Event::subscribe<event::physics::ContactBegin, &listener::projectile::on_contact_begin>(registry_);
-		manager::Event::subscribe<event::physics::ContactEnd, &listener::projectile::on_contact_end>(registry_);
-		// 地下城 -- 关卡 -- 房间-- 门
-		manager::Event::subscribe<event::physics::ContactBegin, &listener::door::on_contact_begin>(registry_);
-		manager::Event::subscribe<event::physics::ContactEnd, &listener::door::on_contact_end>(registry_);
-		manager::Event::subscribe<event::physics::SensorBegin, &listener::door::on_sensor_begin>(registry_);
-		manager::Event::subscribe<event::physics::SensorEnd, &listener::door::on_sensor_end>(registry_);
-		manager::Event::subscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
-		manager::Event::subscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
-		// 地下城 -- 关卡-- 房间
-		manager::Event::subscribe<event::actor::Dead, &listener::room::on_dead>(registry_);
-		manager::Event::subscribe<event::room::Leave, &listener::room::on_leave>(registry_);
-		manager::Event::subscribe<event::room::Enter, &listener::room::on_enter>(registry_);
-
 		// 
 	}
 
@@ -410,35 +369,6 @@ namespace pd::scene
 		factory::Level::destroy(registry_);
 		factory::Player::destroy_all(registry_);
 
-		// 相机
-		manager::Event::unsubscribe<event::camera::Set, &listener::camera::on_set>(registry_);
-		manager::Event::unsubscribe<event::camera::MoveTo, &listener::camera::on_move_to>(registry_);
-		manager::Event::unsubscribe<event::camera::Translate, &listener::camera::on_translate>(registry_);
-		manager::Event::unsubscribe<event::camera::Resize, &listener::camera::on_resize>(registry_);
-		// Actor
-		manager::Event::unsubscribe<event::actor::Hurt, &listener::actor::on_hurt>(registry_);
-		manager::Event::unsubscribe<event::actor::Dead, &listener::actor::on_dead>(registry_);
-		// 敌人
-		manager::Event::unsubscribe<event::physics::ContactBegin, &listener::enemy::on_contact_begin>(registry_);
-		manager::Event::unsubscribe<event::physics::ContactEnd, &listener::enemy::on_contact_end>(registry_);
-		// 玩家
-		manager::Event::unsubscribe<event::player::MoveTo, &listener::player::on_move_to>(registry_);
-		manager::Event::unsubscribe<event::player::Translate, &listener::player::on_translate>(registry_);
-		// 飞弹
-		manager::Event::unsubscribe<event::physics::ContactBegin, &listener::projectile::on_contact_begin>(registry_);
-		manager::Event::unsubscribe<event::physics::ContactEnd, &listener::projectile::on_contact_end>(registry_);
-		// 地下城 -- 关卡-- 房间-- 门
-		manager::Event::unsubscribe<event::physics::ContactBegin, &listener::door::on_contact_begin>(registry_);
-		manager::Event::unsubscribe<event::physics::ContactEnd, &listener::door::on_contact_end>(registry_);
-		manager::Event::unsubscribe<event::physics::SensorBegin, &listener::door::on_sensor_begin>(registry_);
-		manager::Event::unsubscribe<event::physics::SensorEnd, &listener::door::on_sensor_end>(registry_);
-		manager::Event::unsubscribe<event::door::RequestOpen, &listener::door::on_request_open>(registry_);
-		manager::Event::unsubscribe<event::door::RequestClose, &listener::door::on_request_close>(registry_);
-		// 地下城 -- 关卡-- 房间
-		manager::Event::unsubscribe<event::actor::Dead, &listener::room::on_dead>(registry_);
-		manager::Event::unsubscribe<event::room::Leave, &listener::room::on_leave>(registry_);
-		manager::Event::unsubscribe<event::room::Enter, &listener::room::on_enter>(registry_);
-
 		// 最后销毁物理世界
 		destroy_physics_world(registry_);
 	}
@@ -460,7 +390,6 @@ namespace pd::scene
 			if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
 			{
 				using sf::Keyboard::Key;
-				namespace player_controller = component::player_controller;
 
 				if (kp->code == Key::Escape)
 				{
@@ -479,27 +408,29 @@ namespace pd::scene
 				// =====================
 				else if (kp->code == Key::A)
 				{
-					registry_.ctx().emplace<player_controller::HorizontalMovement>(player_controller::MovementType::BACKWARD);
+					helper::PlayerController::left(registry_);
 				}
 				else if (kp->code == Key::D)
 				{
-					registry_.ctx().emplace<player_controller::HorizontalMovement>(player_controller::MovementType::FORWARD);
+					helper::PlayerController::right(registry_);
 				}
 				else if (kp->code == Key::W)
 				{
-					registry_.ctx().emplace<player_controller::VerticalMovement>(player_controller::MovementType::BACKWARD);
+					helper::PlayerController::up(registry_);
 				}
 				else if (kp->code == Key::S)
 				{
-					registry_.ctx().emplace<player_controller::VerticalMovement>(player_controller::MovementType::FORWARD);
+					helper::PlayerController::down(registry_);
 				}
 				else if (kp->code == Key::Left or kp->code == Key::Right or kp->code == Key::Up or kp->code == Key::Down)
 				{
 					// TODO: 蓝图持久化?
 					const static auto projectile_blueprint = designer::Projectile::standard();
 
-					if (const auto* target = registry_.ctx().find<const player_controller::Target>())
+					if (helper::PlayerController::online(registry_))
 					{
+						const auto target = helper::PlayerController::target(registry_);
+
 						const auto direction = [&] noexcept -> sf::Vector2f
 						{
 							if (kp->code == Key::Left)
@@ -517,7 +448,7 @@ namespace pd::scene
 							return {0, 1};
 						}();
 
-						factory::Projectile::spawn(registry_, projectile_blueprint, target->entity, direction);
+						factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
 					}
 				}
 				else if (kp->code == Key::Q)
@@ -531,21 +462,12 @@ namespace pd::scene
 					if (kp->control)
 					{
 						// 击杀所有敌人
-
-						for (const auto view = registry_.view<state::InCameraArea, tags::Enemy>();
-						     const auto [entity]: view.each())
-						{
-							manager::Event::enqueue(event::actor::Dead{.attacker = entt::null, .victim = entity});
-						}
+						helper::Cheat::kill_all_enemy(registry_);
 					}
 					else
 					{
 						// 所有敌人生命值减半
-						for (const auto view = registry_.view<state::InCameraArea, tags::Enemy, actor::Health>();
-						     const auto [entity, health]: view.each())
-						{
-							manager::Event::enqueue(event::actor::Hurt{.attacker = entt::null, .victim = entity, .damage = health.health / 2.f});
-						}
+						helper::Cheat::set_all_enemy_hp_percent(registry_, 0.5f);
 					}
 				}
 				// =====================
@@ -553,43 +475,31 @@ namespace pd::scene
 				// =====================
 				else if (kp->code == Key::Z)
 				{
-					manager::Event::enqueue(event::camera::Resize{.width = 1080, .height = 720});
+					helper::Camera::set_size(registry_, {1080, 720});
 				}
 				else if (kp->code == Key::X)
 				{
-					manager::Event::enqueue(event::camera::Resize{.width = 540, .height = 360});
+					helper::Camera::set_size(registry_, {540, 360});
 				}
 				else if (kp->code == Key::C)
 				{
-					manager::Event::enqueue(event::camera::Resize{.width = 270, .height = 180});
-				}
-				// =====================
-				// DUNGEON -- LEVEL -- ROOM -- DOOR
-				// =====================
-				else if (kp->code == Key::O)
-				{
-					manager::Event::enqueue(event::door::RequestOpen{});
-				}
-				else if (kp->code == Key::P)
-				{
-					manager::Event::enqueue(event::door::RequestClose{});
+					helper::Camera::set_size(registry_, {270, 180});
 				}
 			}
 			else if (const auto* kr = event.getIf<sf::Event::KeyReleased>())
 			{
 				using sf::Keyboard::Key;
-				namespace player_controller = component::player_controller;
 
 				// =====================
 				// PLAYER_CONTROLLER
 				// =====================
 				if (kr->code == Key::A or kr->code == Key::D)
 				{
-					registry_.ctx().erase<player_controller::HorizontalMovement>();
+					helper::PlayerController::stop_horizontal(registry_);
 				}
 				else if (kr->code == Key::W or kr->code == Key::S)
 				{
-					registry_.ctx().erase<player_controller::VerticalMovement>();
+					helper::PlayerController::stop_vertical(registry_);
 				}
 			}
 		}
@@ -624,8 +534,8 @@ namespace pd::scene
 			}
 
 			update::physics_world(registry_, delta);
-			update::sync_physics_transform(registry_, delta);
 			update::process_physics_events(registry_, delta);
+			update::sync_physics_transform(registry_, delta);
 
 			update::actor(registry_, delta);
 

@@ -22,7 +22,11 @@ namespace pd::factory::detail
 	) noexcept -> void
 	{
 		registry.emplace<transform::Position>(entity, sf::Vector2f{position.x, position.y});
+		// TODO: 对于有物理刚体组件且会移动的实体,屏幕坐标后续会自动同步,对于其他实体似乎没有好的更新方式?
+		registry.emplace<transform::ScreenPosition>(entity, sf::Vector2i{0, 0});
+
 		// registry.emplace<transform::Scale>(entity, sf::Vector2f{scale.x, scale.y});
+
 		registry.emplace<transform::Rotation>(entity, sf::degrees(rotation.rotation));
 	}
 }

@@ -5,13 +5,11 @@
 
 #include <update/actor.hpp>
 
-#include <manager/event.hpp>
-
-#include <event/actor.hpp>
-
 #include <component/actor.hpp>
-#include <component/state.hpp>
 #include <component/player.hpp>
+
+#include <helper/actor.hpp>
+#include <helper/room.hpp>
 
 #include <entt/entt.hpp>
 
@@ -23,7 +21,7 @@ namespace pd::update
 	{
 		const auto view = registry
 				.view<
-					state::InCameraArea,
+					state::actor::Awake,
 					actor::Health
 				>();
 
@@ -38,14 +36,17 @@ namespace pd::update
 					continue;
 				}
 
-				// actor::Dead事件负责添加标签
-				// TODO: 在这里添加标签也许性能更好?(因为state::Dead可能致使后续的一些逻辑被跳过)
-				// registry.emplace<state::Dead>(entity);
+				// registry.emplace<state::actor::Dying>(entity);
+				// 标记为可被销毁
+				registry.emplace<state::entity::Dead>(entity);
 
+				// TODO: 受伤记录应该如何利用?理论上这可以用于数据统计,但是如果我们将这部分数据保存在实体上,在实体被销毁后数据将不复存在
 				const auto& [damage_history] = registry.get<const actor::DamageHistory>(entity);
 				const auto last_info = damage_history.back();
 				const auto last_attacker = last_info.attacker;
-				manager::Event::enqueue(event::actor::Dead{.attacker = last_attacker, .victim = entity});
+
+				helper::Actor::kill(registry, entity, last_attacker);
+				helper::Room::drop(registry, entity);
 			}
 		}
 	}

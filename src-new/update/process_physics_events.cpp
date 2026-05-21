@@ -7,25 +7,22 @@
 
 #include <utility/physics.hpp>
 
-#include <manager/event.hpp>
+#include <helper/enemy.hpp>
+#include <helper/projectile.hpp>
+#include <helper/door.hpp>
 
-#include <event/physics.hpp>
-
+#include <prometheus/meta/enumeration.hpp>
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
 #include <box2d/box2d.h>
 
 namespace pd::update
 {
+	using namespace prometheus;
+
 	namespace
 	{
-		enum class Type : std::uint8_t
-		{
-			BEGIN,
-			END,
-		};
-
-		template<Type T>
 		auto dispatch_contact(
 			entt::registry& registry,
 			const b2ShapeId a_shape,
@@ -55,49 +52,63 @@ namespace pd::update
 			// }
 			PROMETHEUS_PLATFORM_ASSUME(registry.valid(entity_a) and registry.valid(entity_b));
 
-			if constexpr (T == Type::BEGIN)
+			SPDLOG_INFO(
+				"接触事件: [{}]=0x{:08X}, [{}]=0x{:08X}",
+				meta::name_of(a_shape_type),
+				entt::to_integral(entity_a),
+				meta::name_of(b_shape_type),
+				entt::to_integral(entity_b)
+			);
+
+			// TODO: 接触处理有部分重叠,或者说这之间的判断存在优先级
+			//  例如一发飞弹集中一个敌人,是进入敌人接触分支,还是进入飞弹接触分支?
+
+			if (a_shape_type == blueprint::ShapeType::PROJECTILE or b_shape_type == blueprint::ShapeType::PROJECTILE)
 			{
-				manager::Event::enqueue(event::physics::ContactBegin{.a = entity_a, .b = entity_b, .a_type = a_shape_type, .b_type = b_shape_type});
+				const auto a = a_shape_type == blueprint::ShapeType::PROJECTILE;
+				const auto projectile = a ? entity_a : entity_b;
+				const auto other = a ? entity_b : entity_a;
+
+				helper::Projectile::contact(registry, projectile, other);
+				return;
 			}
-			else
+
+			if (a_shape_type == blueprint::ShapeType::ENEMY or b_shape_type == blueprint::ShapeType::ENEMY)
 			{
-				manager::Event::enqueue(event::physics::ContactEnd{.a = entity_a, .b = entity_b, .a_type = a_shape_type, .b_type = b_shape_type});
+				const auto a = a_shape_type == blueprint::ShapeType::ENEMY;
+				const auto enemy = a ? entity_a : entity_b;
+				const auto other = a ? entity_b : entity_a;
+
+				helper::Enemy::contact(registry, enemy, other);
+				return;
 			}
+
+			if (a_shape_type == blueprint::ShapeType::DOOR or b_shape_type == blueprint::ShapeType::DOOR)
+			{
+				const auto a = a_shape_type == blueprint::ShapeType::DOOR;
+				const auto door = a ? entity_a : entity_b;
+				const auto other = a ? entity_b : entity_a;
+
+				helper::Door::contact(registry, door, other);
+				return;
+			}
+
+			SPDLOG_WARN("未处理的接触事件!");
 		}
 
 		auto process_contact_events(entt::registry& registry, const b2WorldId world_id) noexcept -> void
 		{
 			const auto contact_events = b2World_GetContactEvents(world_id);
 
-			// begin
+			const auto begin_count = contact_events.beginCount;
+			for (int i = 0; i < begin_count; ++i)
 			{
-				const auto begin_count = contact_events.beginCount;
-				for (int i = 0; i < begin_count; ++i)
-				{
-					const auto& event = contact_events.beginEvents[i];
+				const auto& event = contact_events.beginEvents[i];
 
-					dispatch_contact<Type::BEGIN>(registry, event.shapeIdA, event.shapeIdB);
-				}
-			}
-
-			// end
-			{
-				const auto end_count = contact_events.endCount;
-				for (int i = 0; i < end_count; ++i)
-				{
-					const auto& event = contact_events.endEvents[i];
-
-					if (not b2Shape_IsValid(event.shapeIdA) or not b2Shape_IsValid(event.shapeIdB))
-					{
-						continue;
-					}
-
-					dispatch_contact<Type::END>(registry, event.shapeIdA, event.shapeIdB);
-				}
+				dispatch_contact(registry, event.shapeIdA, event.shapeIdB);
 			}
 		}
 
-		template<Type T>
 		auto dispatch_sensor(
 			entt::registry& registry,
 			const b2ShapeId sensor_shape,
@@ -127,45 +138,33 @@ namespace pd::update
 			// }
 			PROMETHEUS_PLATFORM_ASSUME(registry.valid(sensor_entity) and registry.valid(visitor_entity));
 
-			if constexpr (T == Type::BEGIN)
+			SPDLOG_INFO(
+				"感应事件: [{}]=0x{:08X}, [{}]=0x{:08X}",
+				meta::name_of(visitor_shape_type),
+				entt::to_integral(visitor_entity),
+				meta::name_of(visitor_shape_type),
+				entt::to_integral(visitor_entity)
+			);
+
+			if (sensor_shape_type == blueprint::ShapeType::DOOR)
 			{
-				manager::Event::enqueue(event::physics::SensorBegin{.sensor = sensor_entity, .visitor = visitor_entity, .sensor_type = sensor_shape_type, .visitor_type = visitor_shape_type});
+				helper::Door::sense(registry, sensor_entity, visitor_entity);
+				return;
 			}
-			else
-			{
-				manager::Event::enqueue(event::physics::SensorEnd{.sensor = sensor_entity, .visitor = visitor_entity, .sensor_type = sensor_shape_type, .visitor_type = visitor_shape_type});
-			}
+
+			SPDLOG_WARN("未处理的感应事件!");
 		}
 
 		auto process_sensor_events(entt::registry& registry, const b2WorldId world_id) noexcept -> void
 		{
 			const auto sensor_events = b2World_GetSensorEvents(world_id);
 
-			// begin
+			const auto begin_count = sensor_events.beginCount;
+			for (int i = 0; i < begin_count; ++i)
 			{
-				const auto begin_count = sensor_events.beginCount;
-				for (int i = 0; i < begin_count; ++i)
-				{
-					const auto& event = sensor_events.beginEvents[i];
+				const auto& event = sensor_events.beginEvents[i];
 
-					dispatch_sensor<Type::BEGIN>(registry, event.sensorShapeId, event.visitorShapeId);
-				}
-			}
-
-			// end
-			{
-				const auto end_count = sensor_events.endCount;
-				for (int i = 0; i < end_count; ++i)
-				{
-					const auto& event = sensor_events.endEvents[i];
-
-					if (not b2Shape_IsValid(event.sensorShapeId) or not b2Shape_IsValid(event.visitorShapeId))
-					{
-						continue;
-					}
-
-					dispatch_sensor<Type::END>(registry, event.sensorShapeId, event.visitorShapeId);
-				}
+				dispatch_sensor(registry, event.sensorShapeId, event.visitorShapeId);
 			}
 		}
 	}

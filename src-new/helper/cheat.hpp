@@ -5,21 +5,15 @@
 
 #pragma once
 
-namespace pd::event::player
-{
-	// 仅在非玩家控制的移动时才触发该事件
-	class MoveTo final
-	{
-	public:
-		float x;
-		float y;
-	};
+#include <entt/fwd.hpp>
 
-	// 仅在非玩家控制的移动时才触发该事件
-	class Translate final
+namespace pd::helper
+{
+	class Cheat final
 	{
 	public:
-		float x;
-		float y;
+		static auto kill_all_enemy(entt::registry& registry) noexcept -> void;
+
+		static auto set_all_enemy_hp_percent(entt::registry& registry, float percent) noexcept -> void;
 	};
 }

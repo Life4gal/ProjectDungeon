@@ -5,35 +5,41 @@
 
 #pragma once
 
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Rect.hpp>
+
 namespace pd::event::camera
 {
-	class Set final
+	// 相机区域被设置
+	class SetArea final
 	{
 	public:
-		float x;
-		float y;
-		float width;
-		float height;
+		sf::FloatRect previous;
+		sf::FloatRect current;
 	};
 
-	class MoveTo final
+	// 相机被移动
+	class Move final
 	{
 	public:
-		float x;
-		float y;
+		sf::Vector2f previous;
+		sf::Vector2f current;
 	};
 
+	// 相机被平移
 	class Translate final
 	{
 	public:
-		float x;
-		float y;
+		sf::Vector2f previous;
+		sf::Vector2f current;
+		sf::Vector2f distance;
 	};
 
+	// 相机区域被改变
 	class Resize final
 	{
 	public:
-		float width;
-		float height;
+		sf::Vector2f previous;
+		sf::Vector2f current;
 	};
 }

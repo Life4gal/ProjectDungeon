@@ -20,17 +20,11 @@ namespace pd::component::transform
 
 	// 屏幕坐标
 	// 当且仅当目标实体在屏幕(相机?)区域才存在该组件
-	// class ScreenPosition final
-	// {
-	// public:
-	// 	sf::Vector2i position;
-	// };
-
-	// class [[deprecated("这个组件应该用不到了")]] Scale final
-	// {
-	// public:
-	// 	sf::Vector2f scale;
-	// };
+	class ScreenPosition final
+	{
+	public:
+		sf::Vector2i position;
+	};
 
 	// 旋转
 	// 无物理体: Rotation == 实体旋转

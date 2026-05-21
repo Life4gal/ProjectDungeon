@@ -12,10 +12,9 @@
 #include <manager/random.hpp>
 
 #include <component/enemy.hpp>
-#include <component/player.hpp>
 
-// get_player_position
-#include <component/player_controller.hpp>
+#include <helper/physics.hpp>
+#include <helper/player_controller.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
@@ -27,19 +26,6 @@ namespace pd::update
 
 	namespace
 	{
-		// TODO: 把这个接口移动到合理的位置
-		[[nodiscard]] auto get_player_position(entt::registry& registry) noexcept -> sf::Vector2f
-		{
-			const auto* target = registry.ctx().find<player_controller::Target>();
-			if (target == nullptr or not registry.valid(target->entity))
-			{
-				return {0, 0};
-			}
-
-			const auto& [position] = registry.get<const transform::Position>(target->entity);
-			return position;
-		}
-
 		[[nodiscard]] auto is_wall_stuck(const b2Vec2 velocity, const actor::Speed& max_speed) noexcept -> bool
 		{
 			constexpr auto wall_stuck_threshold = 0.1f;
@@ -69,7 +55,7 @@ namespace pd::update
 			{
 				if (direction_timer.remaining > sf::Time::Zero)
 				{
-					if (const auto velocity = b2Body_GetLinearVelocity(body_id.body_id);
+					if (const auto velocity = helper::Physics::get_linear_velocity(body_id.body_id);
 						is_wall_stuck(velocity, max_speed))
 					{
 						direction_timer.remaining = sf::Time::Zero;
@@ -88,7 +74,7 @@ namespace pd::update
 
 				const auto d = b2Vec2{.x = std::cos(direction.angle.asDegrees()), .y = std::sin(direction.angle.asDegrees())};
 				const auto v = d * utility::Physics::to_physics(max_speed.speed);
-				b2Body_SetLinearVelocity(body_id.body_id, v);
+				helper::Physics::set_linear_velocity(body_id.body_id, v);
 			}
 		}
 
@@ -117,7 +103,7 @@ namespace pd::update
 					air_timer.remaining -= delta;
 					if (air_timer.remaining <= sf::Time::Zero)
 					{
-						const auto player_position = get_player_position(registry);
+						const auto player_position = helper::PlayerController::position(registry);
 						const auto direction = player_position - position.position;
 
 						if (direction == sf::Vector2f{0, 0})
@@ -131,12 +117,12 @@ namespace pd::update
 						const auto direction_normalized = direction.normalized();
 						const auto velocity = direction_normalized * physics_jump_speed;
 
-						b2Body_SetLinearVelocity(body_id.body_id, {.x = velocity.x, .y = velocity.y});
+						helper::Physics::set_linear_velocity(body_id.body_id, {.x = velocity.x, .y = velocity.y});
 					}
 				}
 				else if (state == aj::State::JUMPING)
 				{
-					const auto velocity = b2Body_GetLinearVelocity(body_id.body_id);
+					const auto velocity = helper::Physics::get_linear_velocity(body_id.body_id);
 					const auto speed_squared = b2LengthSquared(velocity);
 
 					if (speed_squared > 0.001f)
@@ -144,7 +130,7 @@ namespace pd::update
 						const auto scale = physics_jump_speed / std::sqrt(speed_squared);
 
 						const auto target_velocity = velocity * scale;
-						b2Body_SetLinearVelocity(body_id.body_id, target_velocity);
+						helper::Physics::set_linear_velocity(body_id.body_id, target_velocity);
 					}
 
 					air_timer.remaining -= delta;
@@ -155,7 +141,7 @@ namespace pd::update
 						state = aj::State::IDLE;
 						air_timer.remaining = sf::seconds(next_jump_delay);
 
-						b2Body_SetLinearVelocity(body_id.body_id, b2Vec2_zero);
+						helper::Physics::set_linear_velocity(body_id.body_id, b2Vec2_zero);
 					}
 				}
 				else
@@ -176,7 +162,7 @@ namespace pd::update
 				const physics::BodyId body_id
 			) noexcept -> void
 			{
-				const auto player_position = get_player_position(registry);
+				const auto player_position = helper::PlayerController::position(registry);
 				const auto direction = player_position - position.position;
 
 				if (direction == sf::Vector2f{0, 0})
@@ -186,19 +172,19 @@ namespace pd::update
 
 				const auto direction_normalized = direction.normalized();
 
-				if (const auto velocity = b2Body_GetLinearVelocity(body_id.body_id);
+				if (const auto velocity = helper::Physics::get_linear_velocity(body_id.body_id);
 					is_wall_stuck(velocity, max_speed))
 				{
 					// 尝试垂直方向滑行
 					const auto new_velocity = b2Vec2{.x = -direction_normalized.y, .y = direction_normalized.x} * utility::Physics::to_physics(max_speed.speed);
 
-					b2Body_SetLinearVelocity(body_id.body_id, new_velocity);
+					helper::Physics::set_linear_velocity(body_id.body_id, new_velocity);
 				}
 				else
 				{
 					const auto new_velocity = b2Vec2{.x = direction_normalized.x, .y = direction_normalized.y} * utility::Physics::to_physics(max_speed.speed);
 
-					b2Body_SetLinearVelocity(body_id.body_id, new_velocity);
+					helper::Physics::set_linear_velocity(body_id.body_id, new_velocity);
 				}
 			}
 		}
@@ -215,12 +201,12 @@ namespace pd::update
 		{
 			const auto view = registry
 					.view<
-						state::InCameraArea,
+						state::ai::Awake,
 						ai::wander::Direction,
 						ai::wander::DirectionTimer,
 						const actor::Speed,
 						const physics::BodyId //
-					>(entt::exclude<state::Dead>);
+					>();
 
 			for (const auto [entity, direction, direction_timer, speed, body_id]: view.each())
 			{
@@ -235,12 +221,12 @@ namespace pd::update
 		{
 			const auto view = registry
 					.view<
-						state::InCameraArea,
+						state::ai::Awake,
 						ai::jump::State,
 						ai::jump::AirTimer,
 						const transform::Position,
 						const physics::BodyId //
-					>(entt::exclude<state::Dead>);
+					>();
 
 			for (const auto [entity, state, air_timer, position, body_id]: view.each())
 			{
@@ -255,12 +241,12 @@ namespace pd::update
 		{
 			const auto view = registry
 					.view<
-						state::InCameraArea,
+						state::ai::Awake,
 						ai::chase::Placeholder,
 						const actor::Speed,
 						const transform::Position,
 						const physics::BodyId //
-					>(entt::exclude<state::Dead>);
+					>();
 
 			for (const auto [entity, speed, position, body_id]: view.each())
 			{

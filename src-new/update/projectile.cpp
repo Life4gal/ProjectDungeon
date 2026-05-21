@@ -6,7 +6,6 @@
 #include <update/projectile.hpp>
 
 #include <component/projectile.hpp>
-#include <component/state.hpp>
 
 #include <entt/entt.hpp>
 
@@ -16,21 +15,22 @@ namespace pd::update
 
 	auto projectile(entt::registry& registry, const sf::Time delta) noexcept -> void
 	{
+		// FIXME: 可以检测飞弹的位置,一旦飞出屏幕(相机)区域则立刻销毁
 		const auto view = registry
 				.view<
-					state::InCameraArea,
 					tags::Projectile,
 					const projectile::Type,
 					projectile::Lifetime,
 					transform::Position
-				>(entt::exclude<state::Dead>);
+				>();
 
 		for (const auto [entity, type, lifetime, position]: view.each())
 		{
 			lifetime.remaining -= delta;
 			if (lifetime.remaining <= sf::Time::Zero)
 			{
-				registry.emplace<state::Dead>(entity);
+				// 标记为可被销毁
+				registry.emplace<state::entity::Dead>(entity);
 				continue;
 			}
 

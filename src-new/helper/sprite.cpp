@@ -30,7 +30,7 @@ namespace pd::helper
 		{
 			const auto view = registry
 					.view<
-						state::InCameraArea,
+						state::sprite::Awake,
 						Tag,
 						sprite::Texture,
 						sprite::Position,
@@ -42,7 +42,7 @@ namespace pd::helper
 						sprite_effect::Color,
 						transform::Position,
 						transform::Rotation
-					>(entt::exclude<state::Invisible>);
+					>(entt::exclude<state::sprite::Invisible>);
 
 			for (const auto [
 				     entity,

@@ -66,7 +66,7 @@ namespace pd::designer
 				.animation = std::move(animation),
 				.position = position,
 				.type = blueprint::EnemyType::RAT,
-				.ai = {.move_behavior = blueprint::MoveBehavior::WANDER},
+				.ai = {.move_behavior = blueprint::MoveBehavior::STATIONARY},
 				.actor = actor,
 				.contact_damage = 20,
 				.body_desc = BodyDesc,

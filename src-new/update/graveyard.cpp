@@ -15,7 +15,7 @@ namespace pd::update
 
 	auto graveyard(entt::registry& registry, [[maybe_unused]] const sf::Time delta) noexcept -> void
 	{
-		const auto view = registry.view<state::Dead>();
+		const auto view = registry.view<state::entity::Dead>();
 		registry.destroy(view.begin(), view.end());
 	}
 }

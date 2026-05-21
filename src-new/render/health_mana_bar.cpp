@@ -20,7 +20,7 @@ namespace pd::render
 	{
 		const auto view = registry
 				.view<
-					state::InCameraArea,
+					state::actor::Awake,
 					actor::Health,
 					actor::HealthMax,
 					actor::Mana,
@@ -30,7 +30,7 @@ namespace pd::render
 					actor::ManaBarSize,
 					actor::ManaBarOffset,
 					transform::Position
-				>(entt::exclude<state::Dead>);
+				>();
 		const auto count = view.size_hint();
 
 		// 2个矩形(背景+前景) * 6个顶点(每个矩形2个三角形) = 12

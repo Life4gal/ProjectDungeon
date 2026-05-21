@@ -592,6 +592,7 @@ add_executable(
 
 	# ============================
 	# MANAGER
+	# 管理器
 	# ============================
 
 	# 随机数生成器
@@ -611,6 +612,7 @@ add_executable(
 	
 	# ============================
 	# VAR
+	# 
 	# ============================
 
 	# 窗口
@@ -622,6 +624,7 @@ add_executable(
 
 	# ============================
 	# EVENT
+	# 事件
 	# ============================
 	
 	# 窗口
@@ -637,14 +640,6 @@ add_executable(
 	
 	# Actor
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/actor.hpp
-	
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/enemy.hpp
-	# 玩家
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/player.hpp
-
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/projectile.hpp
 
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/door.hpp
@@ -653,6 +648,7 @@ add_executable(
 
 	# ============================
 	# BLUEPRINT
+	# 蓝图
 	# ============================
 	
 	# 变换
@@ -689,6 +685,7 @@ add_executable(
 			
 	# ============================
 	# DESIGNER
+	# 生成蓝图
 	# ============================
 	
 	# 地下城 -- 关卡 -- 房间 -- 地板
@@ -720,6 +717,7 @@ add_executable(
 
 	# ============================
 	# COMPONENT
+	# 实体的组件
 	# ============================
 	
 	# 状态
@@ -768,6 +766,7 @@ add_executable(
 	
 	# ============================
 	# SYSTEM -- FACTORY
+	# 蓝图 --> 实体 + 组件
 	# ============================
 
 	# 变换
@@ -818,8 +817,12 @@ add_executable(
 
 	# ============================
 	# SYSTEM -- HELPER
+	# 辅助读写组件(避免直接访问registry)
 	# ============================
 	
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/transform.cpp
 	# 精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite.cpp
@@ -829,39 +832,56 @@ add_executable(
 	# 精灵动画特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.cpp
-
-	# ============================
-	# SYSTEM -- LISTENER
-	# ============================
-
-	# 相机
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/camera.cpp
-
+	# 物理体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/physics.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/physics.cpp
 	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/actor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/actor.cpp
-	
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/actor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/actor.cpp
+	# AI
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/ai.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/ai.cpp
+
+	# 相机(可视区域)
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/camera.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/camera.cpp
+	# 屏幕
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/screen.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/screen.cpp
+
+	# 地下城 -- 关卡 -- 房间 -- 地板
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/floor.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/floor.cpp
+	# 地下城 -- 关卡 -- 房间 -- 墙壁
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/wall.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/wall.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.cpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.cpp
+
 	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/enemy.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/enemy.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.cpp
 	# 玩家
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/player.cpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player.cpp
+	# 玩家控制器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.cpp
 
 	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/projectile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/projectile.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.cpp
 
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/door.cpp
-	# 地下城 -- 关卡 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/listener/room.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.cpp
 
 	# ============================
 	# SYSTEM -- UPDATE
+	# 帧更新系统
 	# ============================
 	
 	# 墓地
@@ -903,6 +923,7 @@ add_executable(
 
 	# ============================
 	# SYSTEM -- RENDER
+	# 帧渲染系统
 	# ============================
 	
 	# 相机
@@ -936,6 +957,7 @@ add_executable(
 
 	# ============================
 	# MENU
+	# 菜单(各个场景用到的菜单界面的封装)
 	# ============================
 
 	# 菜单基类(其实这个基类没啥必要)
@@ -952,6 +974,7 @@ add_executable(
 
 	# ============================
 	# SCENE
+	# 场景
 	# ============================
 
 	# 场景类型

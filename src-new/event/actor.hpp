@@ -9,21 +9,20 @@
 
 namespace pd::event::actor
 {
-	// 受到伤害
-	class Hurt final
+	// 被伤害
+	class Damaged final
 	{
 	public:
-		entt::entity attacker;
 		entt::entity victim;
-
+		entt::entity attacker;
 		float damage;
 	};
 
-	// 死亡
-	class Dead final
+	// 被杀死
+	class Slayed final
 	{
 	public:
-		entt::entity attacker;
 		entt::entity victim;
+		entt::entity attacker;
 	};
 }

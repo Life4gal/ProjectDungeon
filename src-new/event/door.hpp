@@ -9,15 +9,32 @@
 
 namespace pd::event::door
 {
-	// 请求开启指定门
-	class RequestOpen final
+	// 门被接触
+	class Contacted final
+	{
+	public:
+		entt::entity door;
+		entt::entity other;
+	};
+
+	// 门传感器激活
+	class Sensed final
+	{
+	public:
+		entt::entity door;
+		// 仅运行玩家激活门传感器
+		entt::entity player;
+	};
+
+	// 门被开启
+	class Opened final
 	{
 	public:
 		entt::entity door;
 	};
 
-	// 请求关闭指定门
-	class RequestClose final
+	// 门被关闭
+	class Closed final
 	{
 	public:
 		entt::entity door;

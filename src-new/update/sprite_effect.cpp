@@ -10,7 +10,6 @@
 #include <manager/random.hpp>
 
 #include <component/sprite_effect.hpp>
-#include <component/state.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
@@ -253,7 +252,7 @@ namespace pd::update
 			{
 				const Invoker invoker{.registry = std::ref(registry), .delta = delta};
 
-				for (const auto view = registry.view<state::InCameraArea, sep::Effect, se::Position>();
+				for (const auto view = registry.view<sep::Effect, se::Position>();
 				     const auto [entity, effect, position]: view.each())
 				{
 					std::visit(
@@ -524,7 +523,7 @@ namespace pd::update
 			{
 				const Invoker invoker{.registry = std::ref(registry), .delta = delta};
 
-				for (const auto view = registry.view<state::InCameraArea, ses::Effect, se::Scale>();
+				for (const auto view = registry.view<ses::Effect, se::Scale>();
 				     const auto [entity, effect, scale]: view.each())
 				{
 					std::visit(
@@ -803,7 +802,7 @@ namespace pd::update
 			{
 				const Invoker invoker{.registry = std::ref(registry), .delta = delta};
 
-				for (const auto view = registry.view<state::InCameraArea, sec::Effect, se::Color>();
+				for (const auto view = registry.view<sec::Effect, se::Color>();
 				     const auto [entity, effect, color]: view.each())
 				{
 					std::visit(
