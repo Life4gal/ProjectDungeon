@@ -651,6 +651,39 @@ add_executable(
 	# 蓝图
 	# ============================
 	
+	# 方向
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/direction.hpp
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/transform.hpp
+	# 渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/render.hpp
+	# 碰撞体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/collision.hpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/property.hpp
+	# AI
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/ai.hpp
+
+	# 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/tile.hpp
+
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/projectile.hpp
+
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/enemy.hpp
+	# NPC
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/npc.hpp
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/player.hpp
+
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/room.hpp
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/level.hpp
+
+	# =============================================== #
+
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
 	# 精灵
