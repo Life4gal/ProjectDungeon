@@ -9,24 +9,12 @@
 
 #include <blueprint/room.hpp>
 
-namespace pd::blueprint
-{
-	class RoomPosition final
-	{
-	public:
-		using size_type = std::uint32_t;
-
-		size_type x;
-		size_type y;
-
-		[[nodiscard]] constexpr auto operator==(const RoomPosition& other) const noexcept -> bool = default;
-	};
-}
-
 template<>
-struct std::hash<pd::blueprint::RoomPosition>
+struct std::hash<pd::blueprint::LayoutPosition>
 {
-	[[nodiscard]] static auto operator()(const pd::blueprint::RoomPosition& position) noexcept -> std::size_t
+	static_assert(sizeof(std::size_t) >= 8);
+
+	[[nodiscard]] static auto operator()(const pd::blueprint::LayoutPosition& position) noexcept -> std::size_t
 	{
 		return static_cast<std::size_t>(position.x) << 32 | static_cast<std::size_t>(position.y);
 	}
@@ -34,14 +22,18 @@ struct std::hash<pd::blueprint::RoomPosition>
 
 namespace pd::blueprint
 {
+	[[nodiscard]] constexpr auto operator==(const LayoutPosition& lhs, const LayoutPosition& rhs) noexcept -> bool
+	{
+		return lhs.x == rhs.x and lhs.y == rhs.y;
+	}
+
+	// 关卡
 	class Level final
 	{
 	public:
-		using rooms_type = std::unordered_map<RoomPosition, Room>;
+		std::unordered_map<LayoutPosition, Room> rooms;
 
-		// 所有房间
-		rooms_type rooms;
-		// 起始房间位置
-		RoomPosition start_position;
+		// 起始房间位置(避免遍历rooms查找RoomType::START)
+		LayoutPosition start_position;
 	};
 }

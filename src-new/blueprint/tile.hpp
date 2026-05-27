@@ -5,23 +5,24 @@
 
 #pragma once
 
-#include <blueprint/detail/sprite.hpp>
-#include <blueprint/detail/physics.hpp>
+#include <optional>
+
+#include <blueprint/detail/render.hpp>
+#include <blueprint/detail/collision.hpp>
 
 namespace pd::blueprint
 {
-	class Wall final
+	// 瓦片
+	class Tile final
 	{
 	public:
-		// 精灵
-		Sprite sprite;
-
-		// 生成位置
+		// 瓦片的位置
 		Position position;
 
-		// 矩形物理体
-		BodyDesc body_desc;
-		ShapeDesc shape_desc;
-		ShapeCategory::Box shape;
+		// 渲染
+		Sprite sprite;
+
+		// 碰撞体
+		std::optional<Collision> collision;
 	};
 }

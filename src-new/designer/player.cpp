@@ -9,29 +9,14 @@
 
 namespace pd::designer
 {
-	namespace
-	{
-		constexpr blueprint::BodyDesc BodyDesc
-		{
-				.type = blueprint::BodyType::DYNAMIC,
-				.fixed_rotation = true,
-				.is_bullet = false,
-		};
-		constexpr blueprint::ShapeDesc ShapeDesc
-		{
-				.material = {.friction = 0.3f, .restitution = 0},
-				.density = 1,
-				.category = blueprint::ShapeType::PLAYER,
-				.category_mask = blueprint::CollisionMask::player,
-				.is_sensor = false,
-				.enable_sensor_events = true,
-				.enable_contact_events = true,
-		};
-	}
-
 	auto Player::test_character() noexcept -> blueprint::Player
 	{
-		blueprint::SpriteAnimation animation
+		constexpr blueprint::Position position
+		{
+				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
+		};
+		blueprint::DynamicSprite sprite
 		{
 				.frames =
 				{
@@ -50,25 +35,46 @@ namespace pd::designer
 				.looping = true,
 				.reversed = false,
 		};
-		constexpr blueprint::Position position
+		blueprint::Collision collision
 		{
-				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
-		};
-		constexpr blueprint::Actor actor{.health = 50, .mana = 20, .speed = 120};
-		constexpr blueprint::ShapeCategory::Circle shape
-		{
-				.radius = 32,
+				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.shapes =
+				{
+						// 圆形碰撞体
+						{
+								blueprint::CollisionShape::circle
+								{
+										.center = {.x = 0, .y = 0},
+										.radius = 32,
+								},
+								blueprint::CollisionShapeDef
+								{
+										.material = {.friction = 0.3f, .restitution = 0},
+										.density = 1,
+										.category = blueprint::CollisionCategory::PLAYER,
+										.mask = blueprint::CollisionMask::PLAYER,
+										.is_sensor = false,
+										.enable_sensor_events = false,
+										.enable_contact_events = true,
+								},
+						},
+						//
+				},
 		};
 
 		return
 		{
-				.animation = std::move(animation),
 				.position = position,
-				.actor = actor,
-				.body_desc = BodyDesc,
-				.shape_desc = ShapeDesc,
-				.shape = shape,
+				.sprite = std::move(sprite),
+				.collision = std::move(collision),
+				.property =
+				{
+						.health = 50,
+						.mana = 20,
+						.invincible = false,
+						.infinity_mana = false,
+				},
+				.speed = 120,
 		};
 	}
 }

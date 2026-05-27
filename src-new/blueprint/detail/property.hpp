@@ -5,7 +5,7 @@
 
 #pragma once
 
-namespace pd::bp
+namespace pd::blueprint
 {
 	class Property final
 	{

@@ -5,40 +5,58 @@
 
 #pragma once
 
-// #include <blueprint/detail/position.hpp>
-#include <blueprint/detail/sprite_animation.hpp>
-#include <blueprint/detail/physics.hpp>
+#include <blueprint/detail/render.hpp>
+#include <blueprint/detail/collision.hpp>
 
 namespace pd::blueprint
 {
-	// 飞弹类型
-	enum class ProjectileType : std::uint8_t
+	namespace projectile_detail
 	{
-		STANDARD = 0,
+		// 飞行弹道
+		class Trajectory final
+		{
+		public:
+			// 直线弹道
+			class Straight final
+			{
+			public:
+				// 飞行速度
+				// 飞行速度(velocity: Vec2)取决于发射方向
+				float speed;
+			};
+		};
+	}
+
+	// 飞行弹道
+	class Trajectory final : public std::variant<
+				projectile_detail::Trajectory::Straight
+			>
+	{
+	public:
+		using straight = projectile_detail::Trajectory::Straight;
+
+		using variant::variant;
 	};
 
+	// 飞弹
 	class Projectile final
 	{
 	public:
-		// 精灵动画
-		SpriteAnimation animation;
+		// 初始位置取决于发射者
 
-		// 生成位置
-		// 生成位置取决于发射位置
-		// Position position;
+		// 渲染(必须是动态精灵)
+		DynamicSprite sprite;
 
-		// 攻击伤害
-		float damage;
-		// 最大飞行时长
+		// 碰撞体
+		Collision collision;
+
+		// 飞行弹道
+		Trajectory trajectory;
+		// 最大飞行时间
 		float lifetime;
-		// 飞行速度
-		float speed;
-		// 飞弹类型
-		ProjectileType type;
 
-		// 圆形物理体
-		BodyDesc body_desc;
-		ShapeDesc shape_desc;
-		ShapeCategory::Circle shape;
+		// 命中伤害
+		// TODO: AOE? DOT?
+		float damage;
 	};
 }

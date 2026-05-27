@@ -651,85 +651,51 @@ add_executable(
 	# 蓝图
 	# ============================
 	
-	# 方向
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/direction.hpp
-	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/transform.hpp
-	# 渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/render.hpp
-	# 碰撞体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/collision.hpp
-	# 属性
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/property.hpp
-	# AI
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/detail/ai.hpp
-
-	# 瓦片
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/tile.hpp
-
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/projectile.hpp
-
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/enemy.hpp
-	# NPC
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/npc.hpp
-	# 玩家
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/player.hpp
-
-	# 地下城 -- 关卡 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/room.hpp
-	# 地下城 -- 关卡
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/bp/level.hpp
-
-	# =============================================== #
-
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
-	# 精灵
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite.hpp
-	# 精灵动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/sprite_animation.hpp
-	# 物理体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/physics.hpp
-	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/actor.hpp
+	# 渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/render.hpp
+	# 碰撞体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/collision.hpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/property.hpp
 	# AI
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/ai.hpp
 
-	# 地下城 -- 关卡 -- 房间 -- 地板
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/floor.hpp
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/wall.hpp
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/door.hpp
+	# (枚举)定义
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def.hpp
+	# 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/tile.hpp
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/projectile.hpp
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/enemy.hpp
+	# NPC
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/npc.hpp
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/level.hpp
-	
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/enemy.hpp
-	# 玩家
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
 
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/projectile.hpp
-			
 	# ============================
 	# DESIGNER
 	# 生成蓝图
 	# ============================
 	
-	# 地下城 -- 关卡 -- 房间 -- 地板
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/floor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/floor.cpp
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/wall.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/wall.cpp
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/door.cpp
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.cpp
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.cpp
+	# NPC
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/npc.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/npc.cpp
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.cpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.cpp
@@ -737,17 +703,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.cpp
 	
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.cpp
-	# 玩家
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.cpp
-
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.cpp
-
 	# ============================
 	# COMPONENT
 	# 实体的组件

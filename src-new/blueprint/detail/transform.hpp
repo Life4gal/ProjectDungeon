@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace pd::blueprint
 {
+	// 世界坐标
 	class Position final
 	{
 	public:
@@ -14,6 +17,17 @@ namespace pd::blueprint
 		float y;
 	};
 
+	// 布局坐标
+	class LayoutPosition final
+	{
+	public:
+		using size_type = std::uint32_t;
+
+		size_type x;
+		size_type y;
+	};
+
+	// 缩放
 	class Scale final
 	{
 	public:
@@ -21,6 +35,7 @@ namespace pd::blueprint
 		float y;
 	};
 
+	// 旋转
 	class Rotation final
 	{
 	public:
@@ -28,7 +43,7 @@ namespace pd::blueprint
 		float rotation;
 	};
 
-	// 暂时没有合适的地方,先放这吧 :)
+	// 大小
 	class Size final
 	{
 	public:

@@ -7,29 +7,9 @@
 
 namespace pd::designer
 {
-	namespace
-	{
-		constexpr blueprint::BodyDesc BodyDesc
-		{
-				.type = blueprint::BodyType::DYNAMIC,
-				.fixed_rotation = true,
-				.is_bullet = true,
-		};
-		constexpr blueprint::ShapeDesc ShapeDesc
-		{
-				.material = {.friction = 0.3f, .restitution = 0},
-				.density = 1,
-				.category = blueprint::ShapeType::PROJECTILE,
-				.category_mask = blueprint::CollisionMask::projectile,
-				.is_sensor = false,
-				.enable_sensor_events = true,
-				.enable_contact_events = true,
-		};
-	}
-
 	auto Projectile::standard() noexcept -> blueprint::Projectile
 	{
-		blueprint::SpriteAnimation animation
+		blueprint::DynamicSprite sprite
 		{
 				.frames =
 				{
@@ -48,21 +28,47 @@ namespace pd::designer
 				.looping = true,
 				.reversed = false,
 		};
-		constexpr blueprint::ShapeCategory::Circle shape
+		blueprint::Collision collision
 		{
-				.radius = 16,
+				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.shapes =
+				{
+						// 圆形碰撞体
+						{
+								blueprint::CollisionShape::circle
+								{
+										.center = {.x = 0, .y = 0},
+										.radius = 16,
+								},
+								blueprint::CollisionShapeDef
+								{
+										.material = {.friction = 0.3f, .restitution = 0},
+										.density = 1,
+										.category = blueprint::CollisionCategory::PROJECTILE,
+										.mask = blueprint::CollisionMask::PROJECTILE,
+										.is_sensor = false,
+										.enable_sensor_events = true,
+										.enable_contact_events = true,
+								},
+						},
+						//
+				},
+		};
+		constexpr blueprint::Trajectory trajectory
+		{
+				blueprint::Trajectory::straight
+				{
+						.speed = 200,
+				},
 		};
 
 		return
 		{
-				.animation = std::move(animation),
-				.damage = 10,
+				.sprite = std::move(sprite),
+				.collision = std::move(collision),
+				.trajectory = trajectory,
 				.lifetime = 3,
-				.speed = 200,
-				.type = blueprint::ProjectileType::STANDARD,
-				.body_desc = BodyDesc,
-				.shape_desc = ShapeDesc,
-				.shape = shape,
+				.damage = 10,
 		};
 	}
 }

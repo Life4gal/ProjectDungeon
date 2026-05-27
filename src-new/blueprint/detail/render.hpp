@@ -9,33 +9,11 @@
 #include <vector>
 #include <variant>
 
-#include <bp/detail/transform.hpp>
+#include <blueprint/detail/transform.hpp>
+#include <blueprint/def.hpp>
 
-namespace pd::bp
+namespace pd::blueprint
 {
-	// 渲染层(渲染顺序)
-	enum class RenderLayer : std::uint32_t
-	{
-		// [0~7]
-
-		FLOOR = 1uz << 0,
-		WALL = 1uz << 1,
-		DOOR = 1uz << 2,
-
-		// [8~15]
-
-		ENEMY = 1uz << 8,
-		PLAYER = 1uz << 9,
-
-		// [16~23]
-
-		CLAW = 1uz << 16,
-		PROJECTILE = 1 << 17,
-
-		// [24~31]
-		//
-	};
-
 	// 静态精灵
 	class StaticSprite final
 	{
@@ -88,5 +66,11 @@ namespace pd::bp
 	{
 	public:
 		RenderLayer render_layer;
+
+		template<typename T>
+		constexpr Sprite(T&& object, const RenderLayer render_layer) noexcept //
+			requires requires { variant{std::forward<T>(object)}; }
+			: variant{std::forward<T>(object)},
+			  render_layer{render_layer} {}
 	};
 }

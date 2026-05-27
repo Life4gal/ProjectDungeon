@@ -9,29 +9,14 @@
 
 namespace pd::designer
 {
-	namespace
-	{
-		constexpr blueprint::BodyDesc BodyDesc
-		{
-				.type = blueprint::BodyType::DYNAMIC,
-				.fixed_rotation = true,
-				.is_bullet = false,
-		};
-		constexpr blueprint::ShapeDesc ShapeDesc
-		{
-				.material = {.friction = 0.3f, .restitution = 0},
-				.density = 1,
-				.category = blueprint::ShapeType::ENEMY,
-				.category_mask = blueprint::CollisionMask::enemy,
-				.is_sensor = false,
-				.enable_sensor_events = false,
-				.enable_contact_events = true,
-		};
-	}
-
 	auto Enemy::rat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
 	{
-		blueprint::SpriteAnimation animation
+		const blueprint::Position position
+		{
+				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
+		};
+		blueprint::DynamicSprite sprite
 		{
 				.frames =
 				{
@@ -50,34 +35,69 @@ namespace pd::designer
 				.looping = true,
 				.reversed = false,
 		};
-		const blueprint::Position position
+		blueprint::Collision collision
 		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
+				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.shapes =
+				{
+						// 矩形碰撞体
+						{
+								blueprint::CollisionShape::box
+								{
+										.size = {.width = 64, .height = 64},
+								},
+								blueprint::CollisionShapeDef
+								{
+										.material = {.friction = 0.3f, .restitution = 0},
+										.density = 1,
+										.category = blueprint::CollisionCategory::ENEMY,
+										.mask = blueprint::CollisionMask::ENEMY,
+										.is_sensor = false,
+										.enable_sensor_events = false,
+										.enable_contact_events = true,
+								},
+						},
+						// 
+				},
 		};
-		constexpr blueprint::Actor actor{.health = 60, .mana = 0, .speed = 60};
-		constexpr blueprint::ShapeCategory::Box shape
+		constexpr blueprint::Property property
 		{
-				.size = {.width = 64, .height = 64},
+				.health = 60,
+				.mana = 0,
+				.invincible = false,
+				.infinity_mana = false,
+		};
+		constexpr blueprint::Ai ai
+		{
+				.move_behavior =
+				blueprint::MoveBehavior::wander
+				{
+						.speed = 60,
+						.next_turn_min_time = 1.5f,
+						.next_turn_max_timer = 4.0f,
+				},
 		};
 
 		return
 		{
-				.animation = std::move(animation),
 				.position = position,
+				.sprite = std::move(sprite),
+				.collision = std::move(collision),
 				.type = blueprint::EnemyType::RAT,
-				.ai = {.move_behavior = blueprint::MoveBehavior::STATIONARY},
-				.actor = actor,
+				.property = property,
+				.ai = ai,
 				.contact_damage = 20,
-				.body_desc = BodyDesc,
-				.shape_desc = ShapeDesc,
-				.shape = {shape},
 		};
 	}
 
 	auto Enemy::slime(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
 	{
-		blueprint::SpriteAnimation animation
+		const blueprint::Position position
+		{
+				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
+		};
+		blueprint::DynamicSprite sprite
 		{
 				.frames =
 				{
@@ -96,34 +116,71 @@ namespace pd::designer
 				.looping = true,
 				.reversed = false,
 		};
-		const blueprint::Position position
+		blueprint::Collision collision
 		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
+				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.shapes =
+				{
+						// 圆形碰撞体
+						{
+								blueprint::CollisionShape::circle
+								{
+										.center = {.x = 0, .y = 0},
+										.radius = 32,
+								},
+								blueprint::CollisionShapeDef
+								{
+										.material = {.friction = 0.3f, .restitution = 0},
+										.density = 1,
+										.category = blueprint::CollisionCategory::ENEMY,
+										.mask = blueprint::CollisionMask::ENEMY,
+										.is_sensor = false,
+										.enable_sensor_events = false,
+										.enable_contact_events = true,
+								},
+						},
+						//
+				},
 		};
-		constexpr blueprint::Actor actor{.health = 80, .mana = 0, .speed = 40};
-		constexpr blueprint::ShapeCategory::Circle shape
+		constexpr blueprint::Property property
 		{
-				.radius = 32,
+				.health = 80,
+				.mana = 0,
+				.invincible = false,
+				.infinity_mana = false,
+		};
+		constexpr blueprint::Ai ai
+		{
+				.move_behavior =
+				blueprint::MoveBehavior::chase_jump
+				{
+						.speed = 200,
+						.duration = 0.6f,
+						.next_jump_min_time = 0.8f,
+						.next_jump_max_time = 1.6f,
+				},
 		};
 
 		return
 		{
-				.animation = std::move(animation),
 				.position = position,
+				.sprite = std::move(sprite),
+				.collision = std::move(collision),
 				.type = blueprint::EnemyType::SLIME,
-				.ai = {.move_behavior = blueprint::MoveBehavior::JUMP},
-				.actor = actor,
+				.property = property,
+				.ai = ai,
 				.contact_damage = 15,
-				.body_desc = BodyDesc,
-				.shape_desc = ShapeDesc,
-				.shape = {shape},
 		};
 	}
 
 	auto Enemy::bat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
 	{
-		blueprint::SpriteAnimation animation
+		const blueprint::Position position
+		{
+				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
+				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
+		};
+		blueprint::DynamicSprite sprite
 		{
 				.frames =
 				{
@@ -142,28 +199,57 @@ namespace pd::designer
 				.looping = true,
 				.reversed = false,
 		};
-		const blueprint::Position position
+		blueprint::Collision collision
 		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
+				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.shapes =
+				{
+						// 圆形碰撞体
+						{
+								blueprint::CollisionShape::circle
+								{
+										.center = {.x = 0, .y = 0},
+										.radius = 32,
+								},
+								blueprint::CollisionShapeDef
+								{
+										.material = {.friction = 0.3f, .restitution = 0},
+										.density = 1,
+										.category = blueprint::CollisionCategory::ENEMY,
+										.mask = blueprint::CollisionMask::ENEMY,
+										.is_sensor = false,
+										.enable_sensor_events = false,
+										.enable_contact_events = true,
+								},
+						},
+						//
+				},
 		};
-		constexpr blueprint::Actor actor{.health = 35, .mana = 0, .speed = 80};
-		constexpr blueprint::ShapeCategory::Circle shape
+		constexpr blueprint::Property property
 		{
-				.radius = 32,
+				.health = 35,
+				.mana = 0,
+				.invincible = false,
+				.infinity_mana = false,
+		};
+		constexpr blueprint::Ai ai
+		{
+				.move_behavior =
+				blueprint::MoveBehavior::chase
+				{
+						.speed = 80,
+				},
 		};
 
 		return
 		{
-				.animation = std::move(animation),
 				.position = position,
+				.sprite = std::move(sprite),
+				.collision = std::move(collision),
 				.type = blueprint::EnemyType::BAT,
-				.ai = {.move_behavior = blueprint::MoveBehavior::CHASE},
-				.actor = actor,
+				.property = property,
+				.ai = ai,
 				.contact_damage = 10,
-				.body_desc = BodyDesc,
-				.shape_desc = ShapeDesc,
-				.shape = {shape},
 		};
 	}
 }

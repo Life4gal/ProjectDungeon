@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <blueprint/detail/sprite_animation.hpp>
-#include <blueprint/detail/physics.hpp>
-#include <blueprint/detail/actor.hpp>
+#include <blueprint/detail/render.hpp>
+#include <blueprint/detail/collision.hpp>
+#include <blueprint/detail/property.hpp>
 #include <blueprint/detail/ai.hpp>
 
 namespace pd::blueprint
@@ -15,34 +15,38 @@ namespace pd::blueprint
 	// 敌人类型
 	enum class EnemyType : std::uint8_t
 	{
+		// 老鼠
 		RAT = 0,
+		// 史莱姆
 		SLIME,
+		// 蝙蝠
 		BAT,
 	};
 
-	class Enemy
+	// 敌人
+	class Enemy final
 	{
 	public:
-		// 精灵动画
-		SpriteAnimation animation;
-
-		// 生成位置
+		// 敌人的初始位置
 		Position position;
+
+		// 渲染(必须是动态精灵)
+		DynamicSprite sprite;
+
+		// 碰撞体
+		Collision collision;
 
 		// 敌人类型
 		EnemyType type;
-		// AI
+		// 敌人属性
+		Property property;
+		// 敌人AI
 		Ai ai;
-		// Actor
-		Actor actor;
 
 		// 接触伤害
+		// TODO: 安装CLAW,使用CLAW攻击造成伤害,而不是基于接触造成伤害
 		float contact_damage;
 
-		// 任意形状物理体
-		// TODO: 如果敌人存在多个碰撞体时如何处理?
-		BodyDesc body_desc;
-		ShapeDesc shape_desc;
-		ShapeCategory::Any shape;
+		//
 	};
 }

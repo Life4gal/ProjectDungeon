@@ -5,24 +5,54 @@
 
 #pragma once
 
-#include <variant>
-#include <vector>
+#include <utility>
 
-#include <bp/detail/transform.hpp>
-
-namespace pd::bp
+namespace pd::blueprint
 {
-	// 碰撞体刚体类型
-	enum class CollisionBodyType : std::uint8_t
+	enum class Direction : std::uint8_t
 	{
-		// b2_staticBody
-		STATIC = 0,
+		NORTH = 0b00,
+		SOUTH = 0b01,
+		WEST = 0b10,
+		EAST = 0b11,
+	};
 
-		// b2_kinematicBody
-		KINEMATIC,
+	enum class DirectionMask : std::uint8_t
+	{
+		NONE = 0,
 
-		// b2_dynamicBody
-		DYNAMIC,
+		NORTH = 0b0001,
+		SOUTH = 0b0010,
+		WEST = 0b0100,
+		EAST = 0b1000
+	};
+
+	// [[nodiscard]] constexpr auto operator-(const Direction direction) noexcept -> Direction
+	// {
+	// 	return static_cast<Direction>(std::to_underlying(direction) ^ 0b01);
+	// }
+
+	// 渲染层(渲染顺序)
+	enum class RenderLayer : std::uint32_t
+	{
+		// [0~7]
+
+		FLOOR = 1uz << 0,
+		WALL = 1uz << 1,
+		DOOR = 1uz << 2,
+
+		// [8~15]
+
+		ENEMY = 1uz << 8,
+		PLAYER = 1uz << 9,
+
+		// [16~23]
+
+		CLAW = 1uz << 16,
+		PROJECTILE = 1 << 17,
+
+		// [24~31]
+		//
 	};
 
 	// 碰撞体类型
@@ -99,107 +129,5 @@ namespace pd::bp
 		std::to_underlying(CollisionCategory::PLAYER) | //
 		std::to_underlying(CollisionCategory::ENEMY) //
 		,
-	};
-
-	// 圆形形状
-	// b2Circle
-	class CollisionCircleShape final
-	{
-	public:
-		// 圆心
-		Position center;
-		// 半径
-		float radius;
-	};
-
-	// 胶囊形状
-	// b2Capsule
-	class CollisionCapsuleShape final
-	{
-	public:
-		// 原点1
-		Position center1;
-		// 原点2
-		Position center2;
-		// 半径
-		float radius;
-	};
-
-	// 矩形形状
-	// b2Polygon
-	class CollisionBoxShape final
-	{
-	public:
-		// 大小
-		Size size;
-	};
-
-	// 线段形状
-	// b2Segment
-	class CollisionSegmentShape final
-	{
-	public:
-		// 点1
-		Position point1;
-		// 点2
-		Position point2;
-	};
-
-	// 形状定义
-	// b2ShapeDef
-	class CollisionShapeDef final
-	{
-	public:
-		class Material final
-		{
-		public:
-			// b2SurfaceMaterial::friction
-			float friction;
-
-			// b2SurfaceMaterial::restitution
-			float restitution;
-		};
-
-		// b2ShapeDef::material
-		Material material;
-
-		// b2ShapeDef::density
-		float density;
-
-		// b2ShapeDef::filter
-		CollisionCategory category;
-		CollisionMask mask;
-
-		// b2ShapeDef::isSensor
-		bool is_sensor;
-
-		// b2ShapeDef::enableContactEvents
-		bool enable_sensor_events;
-
-		// b2ShapeDef::enableContactEvents
-		bool enable_contact_events;
-	};
-
-	// 碰撞体形状
-	class CollisionShape final : std::variant<
-				CollisionCircleShape,
-				CollisionCapsuleShape,
-				CollisionBoxShape,
-				CollisionSegmentShape
-			>
-	{
-	public:
-		CollisionShapeDef def;
-	};
-
-	// 碰撞体
-	class Collision final
-	{
-	public:
-		// 刚体类型
-		CollisionBodyType type;
-
-		// 形状
-		std::vector<CollisionShape> shapes;
 	};
 }

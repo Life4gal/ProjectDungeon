@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include <bp/detail/render.hpp>
-#include <bp/detail/collision.hpp>
-#include <bp/detail/property.hpp>
-#include <bp/detail/ai.hpp>
+#include <blueprint/detail/render.hpp>
+#include <blueprint/detail/collision.hpp>
+#include <blueprint/detail/property.hpp>
+#include <blueprint/detail/ai.hpp>
 
-namespace pd::bp
+namespace pd::blueprint
 {
 	// NPC 类型
 	enum class NpcType : std::uint8_t
