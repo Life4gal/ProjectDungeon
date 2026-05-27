@@ -265,28 +265,29 @@ namespace pd::designer
 						.position = {.x = 0, .y = 0},
 						.sprite =
 						{
-								blueprint::StaticSprite
+								.sprite = blueprint::StaticSprite
 								{
 										.texture = "./assets/tileset/wall.png",
 										.position = {.x = 0, .y = 0},
 										.size = {.width = tile_width, .height = tile_height},
 										.origin = {.x = tile_origin_x, .y = tile_origin_y},
 								},
-								blueprint::RenderLayer::FLOOR,
+								.render_layer = blueprint::RenderLayer::FLOOR,
 						},
 						.collision =
 						blueprint::Collision
 						{
-								.type = blueprint::CollisionBodyType::STATIC,
+								.def =
+								{
+										.type = blueprint::CollisionBodyType::STATIC,
+										.fixed_rotation = true,
+										.is_bullet = false,
+								},
 								.shapes =
 								{
 										// 矩形碰撞体
 										{
-												blueprint::CollisionShape::box
-												{
-														.size = {.width = tile_width, .height = tile_height},
-												},
-												blueprint::CollisionShapeDef
+												.def =
 												{
 														.material = {.friction = 0.6f, .restitution = 0},
 														.density = 0,
@@ -295,6 +296,11 @@ namespace pd::designer
 														.is_sensor = false,
 														.enable_sensor_events = false,
 														.enable_contact_events = false,
+												},
+												.shape =
+												blueprint::CollisionShape::box
+												{
+														.size = {.width = tile_width, .height = tile_height},
 												},
 										},
 										//
@@ -364,28 +370,28 @@ namespace pd::designer
 						.sprite =
 						{
 								// TODO: 理论上门应该是动态精灵(只不过起始为暂停状态)
-								blueprint::StaticSprite
+								.sprite = blueprint::StaticSprite
 								{
 										.texture = "./assets/tileset/door.png",
 										.position = {.x = 0, .y = 0},
 										.size = {.width = tile_width, .height = tile_height},
 										.origin = {.x = tile_origin_x, .y = tile_origin_y},
 								},
-								blueprint::RenderLayer::DOOR,
+								.render_layer = blueprint::RenderLayer::DOOR,
 						},
 						.collision =
 						blueprint::Collision
 						{
-								.type = blueprint::CollisionBodyType::STATIC,
+								.def =
+								{
+										.type = blueprint::CollisionBodyType::STATIC,
+										.fixed_rotation = false,
+										.is_bullet = false,
+								},
 								.shapes = {
 										// 矩形碰撞体
 										{
-												// 大小懒得算,直接和感应区重叠也无所谓 :)
-												blueprint::CollisionShape::box
-												{
-														.size = {.width = tile_width, .height = tile_height},
-												},
-												blueprint::CollisionShapeDef
+												.def =
 												{
 														.material = {.friction = 0.6f, .restitution = 0},
 														.density = 0,
@@ -395,6 +401,12 @@ namespace pd::designer
 														.enable_sensor_events = false,
 														// 允许接触事件
 														.enable_contact_events = true,
+												},
+												// 大小懒得算,直接和感应区重叠也无所谓 :)
+												.shape =
+												blueprint::CollisionShape::box
+												{
+														.size = {.width = tile_width, .height = tile_height},
 												},
 										},
 										//

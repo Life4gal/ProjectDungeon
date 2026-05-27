@@ -37,16 +37,17 @@ namespace pd::designer
 		};
 		blueprint::Collision collision
 		{
-				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.def =
+				{
+						.type = blueprint::CollisionBodyType::DYNAMIC,
+						.fixed_rotation = true,
+						.is_bullet = false,
+				},
 				.shapes =
 				{
 						// 矩形碰撞体
 						{
-								blueprint::CollisionShape::box
-								{
-										.size = {.width = 64, .height = 64},
-								},
-								blueprint::CollisionShapeDef
+								.def =
 								{
 										.material = {.friction = 0.3f, .restitution = 0},
 										.density = 1,
@@ -55,6 +56,11 @@ namespace pd::designer
 										.is_sensor = false,
 										.enable_sensor_events = false,
 										.enable_contact_events = true,
+								},
+								.shape =
+								blueprint::CollisionShape::box
+								{
+										.size = {.width = 64, .height = 64},
 								},
 						},
 						// 
@@ -67,14 +73,42 @@ namespace pd::designer
 				.invincible = false,
 				.infinity_mana = false,
 		};
+		const blueprint::PropertyState property_state = [&] noexcept -> blueprint::PropertyState
+		{
+			// 生命值条|魔法值条与精灵的最小偏移
+			const auto base_offset_x = sprite.origin.x;
+			const auto base_offset_y = sprite.origin.y + 5.f;
+
+			// 生命值条|魔法值条的宽度&高度
+			const auto bar_width = sprite.size.width * 1.2f;
+			const auto bar_height = sprite.size.height / 4;
+
+			// 偏移1(上面那根)
+			const auto offset_x_1 = -(base_offset_x + (bar_width - sprite.size.width) / 2);
+			const auto offset_y_1 = -(base_offset_y + bar_height * 2);
+			// 偏移2(下面那根)
+			const auto offset_x_2 = offset_x_1;
+			const auto offset_y_2 = -(base_offset_y + bar_height * 1);
+
+			return
+			{
+					.health_bar_offset = {.x = offset_x_1, .y = offset_y_1},
+					.health_bar_size = {.width = bar_width, .height = bar_height},
+					.mana_bar_offset = {.x = offset_x_2, .y = offset_y_2},
+					.mana_bar_size = {.width = bar_width, .height = bar_height},
+			};
+		}();
 		constexpr blueprint::Ai ai
 		{
 				.move_behavior =
-				blueprint::MoveBehavior::wander
 				{
-						.speed = 60,
-						.next_turn_min_time = 1.5f,
-						.next_turn_max_timer = 4.0f,
+						.behavior =
+						blueprint::MoveBehavior::wander
+						{
+								.speed = 60,
+								.next_turn_min_time = 1.5f,
+								.next_turn_max_timer = 4.0f,
+						},
 				},
 		};
 
@@ -85,6 +119,7 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::RAT,
 				.property = property,
+				.property_state = property_state,
 				.ai = ai,
 				.contact_damage = 20,
 		};
@@ -118,17 +153,17 @@ namespace pd::designer
 		};
 		blueprint::Collision collision
 		{
-				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.def =
+				{
+						.type = blueprint::CollisionBodyType::DYNAMIC,
+						.fixed_rotation = true,
+						.is_bullet = false,
+				},
 				.shapes =
 				{
 						// 圆形碰撞体
 						{
-								blueprint::CollisionShape::circle
-								{
-										.center = {.x = 0, .y = 0},
-										.radius = 32,
-								},
-								blueprint::CollisionShapeDef
+								.def =
 								{
 										.material = {.friction = 0.3f, .restitution = 0},
 										.density = 1,
@@ -137,6 +172,12 @@ namespace pd::designer
 										.is_sensor = false,
 										.enable_sensor_events = false,
 										.enable_contact_events = true,
+								},
+								.shape =
+								blueprint::CollisionShape::circle
+								{
+										.center = {.x = 0, .y = 0},
+										.radius = 32,
 								},
 						},
 						//
@@ -149,15 +190,43 @@ namespace pd::designer
 				.invincible = false,
 				.infinity_mana = false,
 		};
+		const blueprint::PropertyState property_state = [&] noexcept -> blueprint::PropertyState
+		{
+			// 生命值条|魔法值条与精灵的最小偏移
+			const auto base_offset_x = sprite.origin.x;
+			const auto base_offset_y = sprite.origin.y + 5.f;
+
+			// 生命值条|魔法值条的宽度&高度
+			const auto bar_width = sprite.size.width * 1.2f;
+			const auto bar_height = sprite.size.height / 4;
+
+			// 偏移1(上面那根)
+			const auto offset_x_1 = -(base_offset_x + (bar_width - sprite.size.width) / 2);
+			const auto offset_y_1 = -(base_offset_y + bar_height * 2);
+			// 偏移2(下面那根)
+			const auto offset_x_2 = offset_x_1;
+			const auto offset_y_2 = -(base_offset_y + bar_height * 1);
+
+			return
+			{
+					.health_bar_offset = {.x = offset_x_1, .y = offset_y_1},
+					.health_bar_size = {.width = bar_width, .height = bar_height},
+					.mana_bar_offset = {.x = offset_x_2, .y = offset_y_2},
+					.mana_bar_size = {.width = bar_width, .height = bar_height},
+			};
+		}();
 		constexpr blueprint::Ai ai
 		{
 				.move_behavior =
-				blueprint::MoveBehavior::chase_jump
 				{
-						.speed = 200,
-						.duration = 0.6f,
-						.next_jump_min_time = 0.8f,
-						.next_jump_max_time = 1.6f,
+						.behavior =
+						blueprint::MoveBehavior::chase_jump
+						{
+								.speed = 200,
+								.duration = 0.6f,
+								.next_jump_min_time = 0.8f,
+								.next_jump_max_time = 1.6f,
+						},
 				},
 		};
 
@@ -168,6 +237,7 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::SLIME,
 				.property = property,
+				.property_state = property_state,
 				.ai = ai,
 				.contact_damage = 15,
 		};
@@ -201,17 +271,17 @@ namespace pd::designer
 		};
 		blueprint::Collision collision
 		{
-				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.def =
+				{
+						.type = blueprint::CollisionBodyType::DYNAMIC,
+						.fixed_rotation = true,
+						.is_bullet = false,
+				},
 				.shapes =
 				{
 						// 圆形碰撞体
 						{
-								blueprint::CollisionShape::circle
-								{
-										.center = {.x = 0, .y = 0},
-										.radius = 32,
-								},
-								blueprint::CollisionShapeDef
+								.def =
 								{
 										.material = {.friction = 0.3f, .restitution = 0},
 										.density = 1,
@@ -220,6 +290,12 @@ namespace pd::designer
 										.is_sensor = false,
 										.enable_sensor_events = false,
 										.enable_contact_events = true,
+								},
+								.shape =
+								blueprint::CollisionShape::circle
+								{
+										.center = {.x = 0, .y = 0},
+										.radius = 32,
 								},
 						},
 						//
@@ -232,12 +308,40 @@ namespace pd::designer
 				.invincible = false,
 				.infinity_mana = false,
 		};
+		const blueprint::PropertyState property_state = [&] noexcept -> blueprint::PropertyState
+		{
+			// 生命值条|魔法值条与精灵的最小偏移
+			const auto base_offset_x = sprite.origin.x;
+			const auto base_offset_y = sprite.origin.y + 5.f;
+
+			// 生命值条|魔法值条的宽度&高度
+			const auto bar_width = sprite.size.width * 1.2f;
+			const auto bar_height = sprite.size.height / 4;
+
+			// 偏移1(上面那根)
+			const auto offset_x_1 = -(base_offset_x + (bar_width - sprite.size.width) / 2);
+			const auto offset_y_1 = -(base_offset_y + bar_height * 2);
+			// 偏移2(下面那根)
+			const auto offset_x_2 = offset_x_1;
+			const auto offset_y_2 = -(base_offset_y + bar_height * 1);
+
+			return
+			{
+					.health_bar_offset = {.x = offset_x_1, .y = offset_y_1},
+					.health_bar_size = {.width = bar_width, .height = bar_height},
+					.mana_bar_offset = {.x = offset_x_2, .y = offset_y_2},
+					.mana_bar_size = {.width = bar_width, .height = bar_height},
+			};
+		}();
 		constexpr blueprint::Ai ai
 		{
 				.move_behavior =
-				blueprint::MoveBehavior::chase
 				{
-						.speed = 80,
+						.behavior =
+						blueprint::MoveBehavior::chase
+						{
+								.speed = 80,
+						},
 				},
 		};
 
@@ -248,6 +352,7 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::BAT,
 				.property = property,
+				.property_state = property_state,
 				.ai = ai,
 				.contact_damage = 10,
 		};

@@ -81,15 +81,7 @@ namespace pd::blueprint
 	}
 
 	// 移动行为
-	class MoveBehavior final : public std::variant<
-				ai_detail::MoveBehavior::Stationary,
-				ai_detail::MoveBehavior::Wander,
-				ai_detail::MoveBehavior::Patrol,
-				ai_detail::MoveBehavior::Chase,
-				ai_detail::MoveBehavior::Jump,
-				ai_detail::MoveBehavior::ChaseJump,
-				ai_detail::MoveBehavior::Teleport
-			>
+	class MoveBehavior final
 	{
 	public:
 		using stationary = ai_detail::MoveBehavior::Stationary;
@@ -100,7 +92,17 @@ namespace pd::blueprint
 		using chase_jump = ai_detail::MoveBehavior::ChaseJump;
 		using teleport = ai_detail::MoveBehavior::Teleport;
 
-		using variant::variant;
+		using behavior_type = std::variant<
+			ai_detail::MoveBehavior::Stationary,
+			ai_detail::MoveBehavior::Wander,
+			ai_detail::MoveBehavior::Patrol,
+			ai_detail::MoveBehavior::Chase,
+			ai_detail::MoveBehavior::Jump,
+			ai_detail::MoveBehavior::ChaseJump,
+			ai_detail::MoveBehavior::Teleport
+		>;
+
+		behavior_type behavior;
 	};
 
 	class Ai final

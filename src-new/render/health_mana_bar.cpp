@@ -5,7 +5,8 @@
 
 #include <render/health_mana_bar.hpp>
 
-#include <component/actor.hpp>
+#include <component/property.hpp>
+#include <component/property_state.hpp>
 #include <component/state.hpp>
 #include <component/transform.hpp>
 
@@ -21,14 +22,14 @@ namespace pd::render
 		const auto view = registry
 				.view<
 					state::actor::Awake,
-					actor::Health,
-					actor::HealthMax,
-					actor::Mana,
-					actor::ManaMax,
-					actor::HealthBarSize,
-					actor::HealthBarOffset,
-					actor::ManaBarSize,
-					actor::ManaBarOffset,
+					property::Health,
+					property::HealthMax,
+					property::Mana,
+					property::ManaMax,
+					property_state::HealthBarSize,
+					property_state::HealthBarOffset,
+					property_state::ManaBarSize,
+					property_state::ManaBarOffset,
 					transform::Position
 				>();
 		const auto count = view.size_hint();

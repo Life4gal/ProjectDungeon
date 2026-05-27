@@ -60,17 +60,16 @@ namespace pd::blueprint
 		bool looping;
 		// 是否反向播放
 		bool reversed;
+		// 是否暂停
+		bool pause;
 	};
 
-	class Sprite final : public std::variant<StaticSprite, DynamicSprite>
+	class Sprite final
 	{
 	public:
-		RenderLayer render_layer;
+		using sprite_type = std::variant<StaticSprite, DynamicSprite>;
 
-		template<typename T>
-		constexpr Sprite(T&& object, const RenderLayer render_layer) noexcept //
-			requires requires { variant{std::forward<T>(object)}; }
-			: variant{std::forward<T>(object)},
-			  render_layer{render_layer} {}
+		sprite_type sprite;
+		RenderLayer render_layer;
 	};
 }

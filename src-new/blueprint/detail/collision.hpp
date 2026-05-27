@@ -26,6 +26,21 @@ namespace pd::blueprint
 		DYNAMIC,
 	};
 
+	class CollisionBodyDef final
+	{
+	public:
+		// 刚体类型
+		CollisionBodyType type;
+		// 是否允许旋转
+		// b2BodyDef::fixedRotation
+		bool fixed_rotation;
+		// 是否是子弹
+		// b2BodyDef::isBullet
+		bool is_bullet;
+
+		// TODO: 其他需要的信息?
+	};
+
 	namespace collision_detail
 	{
 		class CollisionShape final
@@ -74,6 +89,8 @@ namespace pd::blueprint
 				Position center;
 				// 大小
 				Size size;
+				// 旋转
+				Rotation rotation;
 			};
 
 			// 线段形状
@@ -125,13 +142,7 @@ namespace pd::blueprint
 	};
 
 	// 碰撞体形状
-	class CollisionShape final : std::variant<
-				collision_detail::CollisionShape::Circle,
-				collision_detail::CollisionShape::Capsule,
-				collision_detail::CollisionShape::Box,
-				collision_detail::CollisionShape::OffsetBox,
-				collision_detail::CollisionShape::Segment
-			>
+	class CollisionShape final
 	{
 	public:
 		using circle = collision_detail::CollisionShape::Circle;
@@ -140,21 +151,23 @@ namespace pd::blueprint
 		using offset_box = collision_detail::CollisionShape::OffsetBox;
 		using segment = collision_detail::CollisionShape::Segment;
 
-		CollisionShapeDef def;
+		using shape_type = std::variant<
+			collision_detail::CollisionShape::Circle,
+			collision_detail::CollisionShape::Capsule,
+			collision_detail::CollisionShape::Box,
+			collision_detail::CollisionShape::OffsetBox,
+			collision_detail::CollisionShape::Segment
+		>;
 
-		template<typename T>
-		constexpr CollisionShape(T&& object, const CollisionShapeDef def) noexcept //
-			requires requires { variant{std::forward<T>(object)}; }
-			: variant{std::forward<T>(object)},
-			  def{def} {}
+		CollisionShapeDef def;
+		shape_type shape;
 	};
 
 	// 碰撞体
 	class Collision final
 	{
 	public:
-		// 刚体类型
-		CollisionBodyType type;
+		CollisionBodyDef def;
 
 		// 形状
 		std::vector<CollisionShape> shapes;

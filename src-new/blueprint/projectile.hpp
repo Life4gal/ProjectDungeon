@@ -28,14 +28,16 @@ namespace pd::blueprint
 	}
 
 	// 飞行弹道
-	class Trajectory final : public std::variant<
-				projectile_detail::Trajectory::Straight
-			>
+	class Trajectory final
 	{
 	public:
 		using straight = projectile_detail::Trajectory::Straight;
 
-		using variant::variant;
+		using trajectory_type = std::variant<
+			projectile_detail::Trajectory::Straight
+		>;
+
+		trajectory_type trajectory;
 	};
 
 	// 飞弹

@@ -12,7 +12,7 @@ namespace pd::designer
 	class Level final
 	{
 	public:
-		using position_type = blueprint::RoomPosition;
+		using position_type = blueprint::LayoutPosition;
 		using size_type = position_type::size_type;
 
 		// 关卡横向房间的最小数量

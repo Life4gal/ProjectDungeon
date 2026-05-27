@@ -8,9 +8,9 @@
 #include <component/enemy.hpp>
 
 #include <factory/detail/transform.hpp>
-#include <factory/detail/sprite_animation.hpp>
-#include <factory/detail/physics.hpp>
-#include <factory/detail/actor.hpp>
+#include <factory/detail/render.hpp>
+#include <factory/detail/collision.hpp>
+#include <factory/detail/property.hpp>
 #include <factory/detail/ai.hpp>
 
 #include <entt/entt.hpp>
@@ -25,24 +25,34 @@ namespace pd::factory
 
 		// transform
 		detail::attach(registry, entity, enemy.position);
-		// sprite_animation
-		detail::attach(registry, entity, enemy.animation);
-		// physics
+		// render
+		detail::attach(registry, entity, enemy.sprite, blueprint::RenderLayer::ENEMY);
+		// collision & ShapeIds
 		{
-			const auto body_id = detail::create_attach(registry, entity, enemy.body_desc, enemy.position);
+			const auto& [def, shapes] = enemy.collision;
 
-			const auto shape_id = std::visit(detail::creator(body_id, enemy.shape_desc), enemy.shape);
-			registry.emplace<enemy::PhysicsShape>(entity, shape_id);
+			const auto body_id = detail::create_attach(registry, entity, def, enemy.position);
+
+			auto& [shape_ids] = registry.emplace<enemy::ShapeIds>(entity);
+			shape_ids.reserve(shapes.size());
+
+			for (const auto& shape: shapes)
+			{
+				const auto shape_id = detail::create(body_id, shape);
+
+				shape_ids.push_back(shape_id);
+			}
 		}
-		// type
-		registry.emplace<enemy::Type>(entity, static_cast<enemy::Type>(enemy.type));
+		// property & property_state
+		detail::attach(registry, entity, enemy.property);
+		detail::attach(registry, entity, enemy.property_state);
 		// ai
 		detail::attach(registry, entity, enemy.ai);
-		// actor
-		detail::attach(registry, entity, enemy.actor, enemy.animation);
 		// contact_damage
 		registry.emplace<enemy::ContactDamage>(entity, enemy.contact_damage);
-
+		// type
+		registry.emplace<enemy::EnemyType>(entity, enemy.type);
+		// tags
 		registry.emplace<tags::Enemy>(entity);
 
 		return entity;

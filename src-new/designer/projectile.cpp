@@ -30,17 +30,17 @@ namespace pd::designer
 		};
 		blueprint::Collision collision
 		{
-				.type = blueprint::CollisionBodyType::DYNAMIC,
+				.def =
+				{
+						.type = blueprint::CollisionBodyType::DYNAMIC,
+						.fixed_rotation = true,
+						.is_bullet = true,
+				},
 				.shapes =
 				{
 						// 圆形碰撞体
 						{
-								blueprint::CollisionShape::circle
-								{
-										.center = {.x = 0, .y = 0},
-										.radius = 16,
-								},
-								blueprint::CollisionShapeDef
+								.def =
 								{
 										.material = {.friction = 0.3f, .restitution = 0},
 										.density = 1,
@@ -49,6 +49,12 @@ namespace pd::designer
 										.is_sensor = false,
 										.enable_sensor_events = true,
 										.enable_contact_events = true,
+								},
+								.shape =
+								blueprint::CollisionShape::circle
+								{
+										.center = {.x = 0, .y = 0},
+										.radius = 16,
 								},
 						},
 						//

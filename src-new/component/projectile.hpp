@@ -6,8 +6,8 @@
 #pragma once
 
 #include <component/transform.hpp>
-#include <component/sprite_animation.hpp>
-#include <component/physics.hpp>
+#include <component/render.hpp>
+#include <component/collision.hpp>
 #include <component/tags.hpp>
 
 #include <SFML/System/Time.hpp>
@@ -15,23 +15,9 @@
 namespace pd::component::projectile
 {
 	// transform --> 飞弹变换
-	// sprite_animation --> 飞弹精灵动画
-	// physics --> 飞弹物理体
+	// render --> 飞弹渲染
+	// collision --> 飞弹碰撞体
 	// tags --> 飞弹标签
-
-	// 物理碰撞体
-	class PhysicsShape final
-	{
-	public:
-		b2ShapeId shape;
-	};
-
-	// 飞弹类型
-	// 必须等价于blueprint::ProjectileType
-	enum class Type : std::uint8_t
-	{
-		STANDARD = 0,
-	};
 
 	// 飞弹所有者
 	class Owner final
@@ -40,11 +26,11 @@ namespace pd::component::projectile
 		entt::entity owner;
 	};
 
-	// 飞弹伤害
-	class Damage final
+	// 飞弹飞行速度(实际速度取决于物理体)
+	class Speed final
 	{
 	public:
-		float damage;
+		float speed;
 	};
 
 	// 飞弹飞行生命周期
@@ -54,10 +40,10 @@ namespace pd::component::projectile
 		sf::Time remaining;
 	};
 
-	// 飞弹飞行速度(实际速度取决于物理体)
-	class Speed final
+	// 飞弹伤害
+	class Damage final
 	{
 	public:
-		float speed;
+		float damage;
 	};
 }

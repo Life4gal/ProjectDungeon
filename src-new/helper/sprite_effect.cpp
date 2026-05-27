@@ -12,8 +12,7 @@
 
 namespace pd::helper
 {
-	using namespace component::sprite_effect;
-
+	using namespace component::render_effect::sprite;
 
 	auto SpriteEffect::Position::linear(
 		entt::registry& registry,

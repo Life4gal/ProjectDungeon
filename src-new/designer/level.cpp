@@ -115,7 +115,7 @@ namespace pd::designer
 				return all_neighbors;
 			}
 
-			[[nodiscard]] auto has_placed_neighbor(const position_type position, const blueprint::RoomConnection neighbor) const noexcept -> bool
+			[[nodiscard]] auto has_placed_neighbor(const position_type position, const blueprint::Direction neighbor) const noexcept -> bool
 			{
 				const auto direction = RoomNavigation::direction_of(neighbor);
 				const position_type next_position{.x = position.x + direction.x, .y = position.y + direction.y};
@@ -151,28 +151,28 @@ namespace pd::designer
 				return count;
 			}
 
-			[[nodiscard]] auto get_placed_neighbors_mask(const position_type position) const noexcept -> std::underlying_type_t<blueprint::RoomConnection>
+			[[nodiscard]] auto get_placed_neighbors_mask(const position_type position) const noexcept -> blueprint::DirectionMask
 			{
-				std::underlying_type_t<blueprint::RoomConnection> mask = std::to_underlying(blueprint::RoomConnection::NONE);
+				std::underlying_type_t<blueprint::DirectionMask> mask = std::to_underlying(blueprint::DirectionMask::NONE);
 
-				if (has_placed_neighbor(position, blueprint::RoomConnection::NORTH))
+				if (has_placed_neighbor(position, blueprint::Direction::NORTH))
 				{
-					mask |= std::to_underlying(blueprint::RoomConnection::NORTH);
+					mask |= std::to_underlying(blueprint::DirectionMask::NORTH);
 				}
-				if (has_placed_neighbor(position, blueprint::RoomConnection::SOUTH))
+				if (has_placed_neighbor(position, blueprint::Direction::SOUTH))
 				{
-					mask |= std::to_underlying(blueprint::RoomConnection::SOUTH);
+					mask |= std::to_underlying(blueprint::DirectionMask::SOUTH);
 				}
-				if (has_placed_neighbor(position, blueprint::RoomConnection::WEST))
+				if (has_placed_neighbor(position, blueprint::Direction::WEST))
 				{
-					mask |= std::to_underlying(blueprint::RoomConnection::WEST);
+					mask |= std::to_underlying(blueprint::DirectionMask::WEST);
 				}
-				if (has_placed_neighbor(position, blueprint::RoomConnection::EAST))
+				if (has_placed_neighbor(position, blueprint::Direction::EAST))
 				{
-					mask |= std::to_underlying(blueprint::RoomConnection::EAST);
+					mask |= std::to_underlying(blueprint::DirectionMask::EAST);
 				}
 
-				return mask;
+				return static_cast<blueprint::DirectionMask>(mask);
 			}
 
 			[[nodiscard]] static auto generate(

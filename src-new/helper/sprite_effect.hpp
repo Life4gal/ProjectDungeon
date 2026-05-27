@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include <component/sprite_effect.hpp>
+#include <component/render_effect.hpp>
 
 #include <entt/fwd.hpp>
 

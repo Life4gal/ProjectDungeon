@@ -7,19 +7,10 @@
 
 #include <manager/event.hpp>
 
-#include <blueprint/door.hpp>
-
-#include <designer/room.hpp>
-
 #include <event/door.hpp>
 
-#include <component/door.hpp>
+#include <component/room.hpp>
 
-#include <helper/room.hpp>
-#include <helper/camera.hpp>
-#include <helper/player_controller.hpp>
-
-#include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 #include <spdlog/spdlog.h>
@@ -27,20 +18,7 @@
 namespace pd::helper
 {
 	using namespace component;
-
-	namespace
-	{
-		constexpr auto RoomWidth = static_cast<float>(designer::Room::width);
-		constexpr auto RoomHeight = static_cast<float>(designer::Room::height);
-		constexpr auto TileWidth = static_cast<float>(designer::Room::tile_width);
-		constexpr auto TileHeight = static_cast<float>(designer::Room::tile_height);
-
-		constexpr auto CameraOffsetX = RoomWidth;
-		constexpr auto CameraOffsetY = RoomHeight;
-		constexpr auto PlayerOffsetX = 2.25f * TileWidth;
-		constexpr auto PlayerOffsetY = 2.25f * TileHeight;
-	}
-
+	
 	auto Door::contact([[maybe_unused]] entt::registry& registry, const entt::entity door, const entt::entity other) noexcept -> void
 	{
 		SPDLOG_INFO(
@@ -50,59 +28,6 @@ namespace pd::helper
 		);
 
 		manager::Event::enqueue(event::door::Contacted{.door = door, .other = other});
-	}
-
-	auto Door::sense(entt::registry& registry, const entt::entity door, const entt::entity other) noexcept -> void
-	{
-		// 无视非玩家实体
-		if (not registry.all_of<tags::Player>(other))
-		{
-			return;
-		}
-
-		const auto door_direction = registry.get<const door::Direction>(door);
-		const auto [room] = registry.get<const door::Room>(door);
-		const auto [target_room] = registry.get<const door::TargetRoom>(door);
-
-		Room::leave(registry, room);
-
-		switch (door_direction)
-		{
-			case door::Direction::NORTH:
-			{
-				PlayerController::translate(registry, {0, -PlayerOffsetY});
-				Camera::translate(registry, {0, -CameraOffsetY});
-
-				break;
-			}
-			case door::Direction::SOUTH:
-			{
-				PlayerController::translate(registry, {0, PlayerOffsetY});
-				Camera::translate(registry, {0, CameraOffsetY});
-
-				break;
-			}
-			case door::Direction::WEST:
-			{
-				PlayerController::translate(registry, {-PlayerOffsetX, 0});
-				Camera::translate(registry, {-CameraOffsetX, 0});
-
-				break;
-			}
-			case door::Direction::EAST:
-			{
-				PlayerController::translate(registry, {PlayerOffsetX, 0});
-				Camera::translate(registry, {CameraOffsetX, 0});
-
-				break;
-			}
-			default: // NOLINT(clang-diagnostic-covered-switch-default)
-			{
-				PROMETHEUS_PLATFORM_UNREACHABLE();
-			}
-		}
-
-		Room::enter(registry, target_room);
 	}
 
 	auto Door::try_open(entt::registry& registry, const entt::entity door) noexcept -> void

@@ -7,7 +7,7 @@
 
 #include <designer/room.hpp>
 
-#include <component/door.hpp>
+#include <component/door_sensor.hpp>
 
 #include <factory/room.hpp>
 
@@ -17,7 +17,7 @@
 #include <spdlog/spdlog.h>
 
 template<>
-struct prometheus::meta::user_defined::enum_name_policy<pd::component::door::Direction>
+struct prometheus::meta::user_defined::enum_name_policy<pd::blueprint::Direction>
 {
 	constexpr static auto value = EnumNamePolicy::VALUE_ONLY;
 };
@@ -26,7 +26,7 @@ namespace pd::factory
 {
 	auto Level::create(entt::registry& registry, const blueprint::Level& level) noexcept -> void
 	{
-		using position_type = blueprint::RoomPosition;
+		using position_type = blueprint::LayoutPosition;
 
 		// 房间实体与位置的映射
 		std::unordered_map<entt::entity, position_type> entity_to_positions{};
@@ -45,7 +45,7 @@ namespace pd::factory
 		}
 		// 创建位置与房间邻居的映射
 		{
-			const auto find_neighbor = [&position_to_entities](const position_type position, const blueprint::RoomConnection neighbor) noexcept -> entt::entity
+			const auto find_neighbor = [&position_to_entities](const position_type position, const blueprint::Direction neighbor) noexcept -> entt::entity
 			{
 				const auto [x, y] = designer::RoomNavigation::direction_of(neighbor);
 				const position_type next_position{.x = position.x + x, .y = position.y + y};
@@ -64,26 +64,26 @@ namespace pd::factory
 				auto& neighbors = position_to_neighbors[position];
 
 				// NORTH
-				neighbors[0] = find_neighbor(position, blueprint::RoomConnection::NORTH);
+				neighbors[0] = find_neighbor(position, blueprint::Direction::NORTH);
 				// SOUTH
-				neighbors[1] = find_neighbor(position, blueprint::RoomConnection::SOUTH);
+				neighbors[1] = find_neighbor(position, blueprint::Direction::SOUTH);
 				// WEST
-				neighbors[2] = find_neighbor(position, blueprint::RoomConnection::WEST);
+				neighbors[2] = find_neighbor(position, blueprint::Direction::WEST);
 				// EAST
-				neighbors[3] = find_neighbor(position, blueprint::RoomConnection::EAST);
+				neighbors[3] = find_neighbor(position, blueprint::Direction::EAST);
 			}
 		}
 
-		// 给所有门实体设置目标房间
+		// 给所有门感应器实体设置目标房间
 		{
 			using namespace component;
 
 			const auto do_set = [&](
-				door::TargetRoom& target_room,
+				door_sensor::TargetRoom& target_room,
 				const entt::entity room,
 				const position_type room_position,
 				const entt::entity door,
-				const door::Direction door_direction,
+				const door_sensor::Direction door_direction,
 				const entt::entity neighbor_room
 			) noexcept -> void
 			{
@@ -101,19 +101,19 @@ namespace pd::factory
 					neighbor_room_position.y
 				);
 
-				target_room.target_room = neighbor_room;
+				target_room.room = neighbor_room;
 			};
 
-			for (const auto view = registry.view<tags::Door, door::Direction, door::TargetRoom>();
+			for (const auto view = registry.view<tags::DoorSensor, door_sensor::Direction, door_sensor::TargetRoom>();
 			     const auto [entity, direction, target_room]: view.each())
 			{
 				// target_room一开始设置为door所属房间
-				const auto room_entity = target_room.target_room;
+				const auto room_entity = target_room.room;
 
 				const auto it_room_position = entity_to_positions.find(room_entity);
 				if (it_room_position == entity_to_positions.end())
 				{
-					SPDLOG_WARN("门(0x{:08X})所属房间(0x{:08X})实体不存在!", entt::to_integral(entity), entt::to_integral(room_entity));
+					SPDLOG_WARN("门感应器(0x{:08X})所属房间(0x{:08X})实体不存在!", entt::to_integral(entity), entt::to_integral(room_entity));
 					continue;
 				}
 				const auto room_position = it_room_position->second;
@@ -128,22 +128,22 @@ namespace pd::factory
 
 				const auto neighbor_entity = [&] noexcept -> entt::entity
 				{
-					if (direction == door::Direction::NORTH)
+					if (direction == door_sensor::Direction::NORTH)
 					{
 						return room_neighbors[0];
 					}
 
-					if (direction == door::Direction::SOUTH)
+					if (direction == door_sensor::Direction::SOUTH)
 					{
 						return room_neighbors[1];
 					}
 
-					if (direction == door::Direction::WEST)
+					if (direction == door_sensor::Direction::WEST)
 					{
 						return room_neighbors[2];
 					}
 
-					if (direction == door::Direction::EAST)
+					if (direction == door_sensor::Direction::EAST)
 					{
 						return room_neighbors[3];
 					}

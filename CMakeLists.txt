@@ -674,6 +674,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/npc.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/door.hpp
+	# 地下城 -- 关卡 -- 房间 -- 边界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/bounding.hpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
 	# 地下城 -- 关卡
@@ -715,43 +719,45 @@ add_executable(
 
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
-	# 精灵
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite.hpp
-	# 精灵动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_animation.hpp
-	# 精灵动画特效
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/sprite_effect.hpp
-	# 物理体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/physics.hpp
-	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/actor.hpp
+	# 渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/render.hpp
+	# 渲染特效
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/render_effect.hpp
+	# 渲染器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/renderer.hpp
+	# 碰撞体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/collision.hpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/property.hpp
+	# 属性状态
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/property_state.hpp
+	# AI移动行为
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/move_behavior.hpp
 	# AI
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
+
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/projectile.hpp
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/enemy.hpp
+	# NPC
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/npc.hpp
+	# 玩家
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
+	# 地下城 -- 关卡 -- 房间 -- 门感应器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door_sensor.hpp
+	# 地下城 -- 关卡 -- 房间 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tile.hpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
 
 	# 相机(可视区域)
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp
 	# 屏幕
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/screen.hpp
-
-	# 地下城 -- 关卡 -- 房间 -- 地板
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/floor.hpp
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/wall.hpp
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door.hpp
-	# 地下城 -- 关卡 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
-
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/enemy.hpp
-	# 玩家
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player_controller.hpp
 
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/projectile.hpp
-	
 	# ============================
 	# SYSTEM -- FACTORY
 	# 蓝图 --> 实体 + 组件
@@ -760,48 +766,40 @@ add_executable(
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.cpp
-	# 精灵
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite.cpp
-	# 精灵动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite_animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/sprite_animation.cpp
-	# 物理体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/physics.cpp
-	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/actor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/actor.cpp
+	# 渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render.cpp
+	# 碰撞体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/collision.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/collision.cpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/property.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/property.cpp
 	# AI
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.cpp
 
-	# 地下城 -- 关卡 -- 房间 -- 地板
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/floor.cpp
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/wall.cpp
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.cpp
-	# 地下城 -- 关卡 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.cpp
-	# 地下城 -- 关卡
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.cpp
-
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.cpp
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/enemy.cpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.cpp
-
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门感应器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door_sensor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door_sensor.cpp
+	# 地下城 -- 关卡 -- 房间 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.cpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.cpp
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.cpp
 
 	# ============================
 	# SYSTEM -- HELPER
@@ -811,21 +809,18 @@ add_executable(
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/transform.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/transform.cpp
-	# 精灵
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite.cpp
-	# 精灵动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_animation.cpp
-	# 精灵动画特效
+	# 动态精灵
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.cpp
+	# 精灵特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.cpp
-	# 物理体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/physics.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/physics.cpp
-	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/actor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/actor.cpp
+	# 碰撞体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/collision.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/collision.cpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/property.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/property.cpp
 	# AI
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/ai.hpp
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/ai.cpp
@@ -836,36 +831,31 @@ add_executable(
 	# 屏幕
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/screen.hpp
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/screen.cpp
+	# 玩家控制器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.cpp
+	# 作弊器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.cpp
 
-	# 地下城 -- 关卡 -- 房间 -- 地板
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/floor.hpp
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/floor.cpp
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/wall.hpp
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/wall.cpp
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.cpp
-	# 地下城 -- 关卡 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.cpp
-
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.cpp
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.cpp
 	# 玩家
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player.hpp
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player.cpp
-	# 玩家控制器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.cpp
-
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门感应器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door_sensor.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door_sensor.cpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.cpp
 
 	# ============================
 	# SYSTEM -- UPDATE
@@ -879,10 +869,6 @@ add_executable(
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.cpp
-	
-	# AI
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/ai.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/ai.cpp
 
 	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
@@ -893,10 +879,6 @@ add_executable(
 	# 处理物理世界事件
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.cpp
-	
-	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/actor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/actor.cpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.hpp
@@ -918,30 +900,13 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.cpp
 
-	# 地下城 -- 关卡 -- 房间 -- 地板
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/floor.cpp
-	# 地下城 -- 关卡 -- 房间 -- 墙壁
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/wall.cpp
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/door.cpp
+	# (实体)渲染
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.cpp
 
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/enemy.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/enemy.cpp
-	# 玩家
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player.cpp
-	
 	# 生命值&魔法值条
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.cpp
-	
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/projectile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/projectile.cpp
 
 	# ============================
 	# MENU

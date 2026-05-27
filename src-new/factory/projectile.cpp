@@ -10,9 +10,11 @@
 #include <component/projectile.hpp>
 
 #include <factory/detail/transform.hpp>
-#include <factory/detail/sprite_animation.hpp>
-#include <factory/detail/physics.hpp>
+#include <factory/detail/render.hpp>
+#include <factory/detail/collision.hpp>
 
+#include <prometheus/functional/functor.hpp>
+#include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 
@@ -33,20 +35,26 @@ namespace pd::factory
 
 		// transform
 		detail::attach(registry, entity, position);
-		// sprite_animation
-		detail::attach(registry, entity, projectile.animation);
-		// physics_body & physics_shape & velocity
+		// render
+		detail::attach(registry, entity, projectile.sprite, blueprint::RenderLayer::PROJECTILE);
+		// collision
+		detail::attach(registry, entity, projectile.collision, position);
 		{
-			const auto body_id = detail::create_attach(registry, entity, projectile.body_desc, position);
-
-			const auto shape_id = detail::create(body_id, projectile.shape_desc, projectile.shape);
-			registry.emplace<projectile::PhysicsShape>(entity, shape_id);
+			// collision
+		}
+		// owner
+		registry.emplace<projectile::Owner>(entity, owner);
+		// speed & velocity
+		{
+			const auto [body_id] = registry.get<collision::BodyId>(entity);
+			const auto& [shape_ids] = registry.get<collision::ShapeIds>(entity);
 
 			// TODO: 要解决飞弹刚发射就碰撞到自己有两种简易解决方案(不考虑在碰撞时判断)
 			//  1.控制飞弹的初始位置
 			//  2.控制飞弹的碰撞掩码
 			//  
 			// 第二种方式最简单,但是如果后续我们想开发一种可以通过发射者碰撞而改变轨迹的飞弹时要怎么办?如果允许飞弹命中友军怎么办?
+			for (const auto shape_id: shape_ids)
 			{
 				const auto filter = [&] noexcept -> b2Filter
 				{
@@ -55,11 +63,11 @@ namespace pd::factory
 					if (const auto player = registry.all_of<tags::Player>(owner);
 						player)
 					{
-						f.maskBits &= ~static_cast<std::uint64_t>(std::to_underlying(blueprint::ShapeType::PLAYER));
+						f.maskBits &= ~std::to_underlying(blueprint::CollisionCategory::PLAYER);
 					}
 					else
 					{
-						f.maskBits &= ~static_cast<std::uint64_t>(std::to_underlying(blueprint::ShapeType::ENEMY));
+						f.maskBits &= ~std::to_underlying(blueprint::CollisionCategory::ENEMY);
 					}
 
 					return f;
@@ -67,21 +75,31 @@ namespace pd::factory
 				b2Shape_SetFilter(shape_id, filter);
 			}
 
-			const auto pixels_velocity = direction * projectile.speed;
-			const auto physics_velocity = utility::Physics::to_physics(pixels_velocity);
-			b2Body_SetLinearVelocity(body_id, physics_velocity);
+			const auto visitor = prometheus::functional::overloaded
+			{
+					[&](const blueprint::Trajectory::straight& straight) noexcept -> void
+					{
+						// velocity
+						const auto pixels_velocity = direction * straight.speed;
+						const auto physics_velocity = utility::Physics::to_physics(pixels_velocity);
+						b2Body_SetLinearVelocity(body_id, physics_velocity);
+
+						// speed
+						registry.emplace<projectile::Speed>(entity, straight.speed);
+					},
+					[&]([[maybe_unused]] const auto& unhandled) noexcept -> void
+					{
+						PROMETHEUS_PLATFORM_UNREACHABLE();
+					}
+			};
+
+			std::visit(visitor, projectile.trajectory.trajectory);
 		}
-		// type
-		registry.emplace<projectile::Type>(entity, static_cast<projectile::Type>(projectile.type));
-		// owner
-		registry.emplace<projectile::Owner>(entity, owner);
-		// damage
-		registry.emplace<projectile::Damage>(entity, projectile.damage);
 		// lifetime
 		registry.emplace<projectile::Lifetime>(entity, sf::seconds(projectile.lifetime));
-		// speed
-		registry.emplace<projectile::Speed>(entity, projectile.speed);
-
+		// damage
+		registry.emplace<projectile::Damage>(entity, projectile.damage);
+		// tags
 		registry.emplace<tags::Projectile>(entity);
 
 		return entity;

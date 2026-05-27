@@ -12,17 +12,6 @@
 
 namespace pd::blueprint
 {
-	// 敌人类型
-	enum class EnemyType : std::uint8_t
-	{
-		// 老鼠
-		RAT = 0,
-		// 史莱姆
-		SLIME,
-		// 蝙蝠
-		BAT,
-	};
-
 	// 敌人
 	class Enemy final
 	{
@@ -40,6 +29,8 @@ namespace pd::blueprint
 		EnemyType type;
 		// 敌人属性
 		Property property;
+		// 敌人属性状态
+		PropertyState property_state;
 		// 敌人AI
 		Ai ai;
 

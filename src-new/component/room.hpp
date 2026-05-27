@@ -5,20 +5,30 @@
 
 #pragma once
 
+#include <array>
 #include <vector>
 
-#include <component/tags.hpp>
-
-#include <entt/entity/fwd.hpp>
+#include <component/door_sensor.hpp>
 
 #include <SFML/System/Vector2.hpp>
 
 namespace pd::component::room
 {
+	// collision --> 房间碰撞体(用于房间边界)
 	// tags --> 房间标签
 
+	// ============================================
+	// 位置 + 大小
+	// ============================================
+
+	// 房间位置(布局位置)
+	class LayoutPosition final
+	{
+	public:
+		sf::Vector2u position;
+	};
+
 	// 房间位置(绝对位置)
-	// 这里不使用position组件
 	// 理论上每个房间的绝对位置是确定的(取决于蓝图),且其屏幕位置一定为(0,0)
 	class Position final
 	{
@@ -35,14 +45,40 @@ namespace pd::component::room
 	};
 
 	// ============================================
+	// 门感应区
+	// ============================================
 
-	// 当前房间的门实体
-	// 由factory::Room创建门时设置
-	class Doors final
+	class DoorSensors final
 	{
 	public:
-		std::vector<entt::entity> doors;
+		// 如有有 -> valid entity
+		// 如果没有 -> null
+		std::array<entt::entity, 4> sensors;
 	};
+
+	// ============================================
+	// 房间边界
+	// ============================================
+
+	class Bounding final
+	{
+	public:
+		std::vector<b2ShapeId> shapes;
+	};
+
+	// ============================================
+	// 瓦片
+	// ============================================
+
+	class Tiles final
+	{
+	public:
+		std::vector<entt::entity> tiles;
+	};
+
+	// ============================================
+	// 敌人
+	// ============================================
 
 	// 当前房间的敌人实体
 	// 由factory::Room创建敌人时设置

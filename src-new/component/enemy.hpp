@@ -5,27 +5,31 @@
 
 #pragma once
 
+#include <blueprint/def.hpp>
+
 #include <component/transform.hpp>
-#include <component/sprite_animation.hpp>
-#include <component/physics.hpp>
-#include <component/tags.hpp>
-#include <component/actor.hpp>
+#include <component/render.hpp>
+#include <component/collision.hpp>
+#include <component/property.hpp>
+#include <component/property_state.hpp>
 #include <component/ai.hpp>
+#include <component/tags.hpp>
 
 namespace pd::component::enemy
 {
 	// transform --> 敌人变换
-	// sprite_animation --> 敌人精灵动画
-	// physics --> 敌人物理体
+	// render --> 敌人渲染
+	// collision --> 敌人碰撞体
+	// property --> 敌人属性
+	// property_state --> 敌人属性状态
+	// AI --> 敌人AI
 	// tags --> 敌人标签
-	// actor --> 敌人Actor属性
-	// AI --> 敌人AI属性
 
-	// 物理碰撞体
-	class PhysicsShape final
+	// 形状ID
+	class ShapeIds final
 	{
 	public:
-		b2ShapeId shape;
+		std::vector<b2ShapeId> shapes;
 	};
 
 	// 接触伤害
@@ -36,13 +40,7 @@ namespace pd::component::enemy
 	};
 
 	// 敌人类型
-	// 必须等价于blueprint::EnemyType
-	enum class Type : std::uint8_t
-	{
-		RAT = 0,
-		SLIME,
-		BAT,
-	};
+	using blueprint::EnemyType;
 
 	// ============================================
 

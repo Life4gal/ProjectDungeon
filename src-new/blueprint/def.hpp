@@ -130,4 +130,15 @@ namespace pd::blueprint
 		std::to_underlying(CollisionCategory::ENEMY) //
 		,
 	};
+
+	// 敌人类型
+	enum class EnemyType : std::uint8_t
+	{
+		// 老鼠
+		RAT = 0,
+		// 史莱姆
+		SLIME,
+		// 蝙蝠
+		BAT,
+	};
 }

@@ -8,7 +8,7 @@
 // std::bit_cast
 #include <bit>
 
-#include <blueprint/detail/physics.hpp>
+#include <blueprint/def.hpp>
 
 #include <entt/entity/entity.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -45,14 +45,14 @@ namespace pd::utility
 		// PhysicsShapeType <-> USER DATA
 		// ========================
 
-		[[nodiscard]] constexpr static auto to_user_data(const blueprint::ShapeType type) noexcept -> void*
+		[[nodiscard]] constexpr static auto to_user_data(const blueprint::CollisionCategory category) noexcept -> void*
 		{
-			return std::bit_cast<void*>(static_cast<std::uintptr_t>(type));
+			return std::bit_cast<void*>(static_cast<std::uintptr_t>(category));
 		}
 
-		[[nodiscard]] constexpr static auto to_shape_type(const void* user_data) noexcept -> blueprint::ShapeType
+		[[nodiscard]] constexpr static auto to_collision_category(const void* user_data) noexcept -> blueprint::CollisionCategory
 		{
-			return static_cast<blueprint::ShapeType>(std::bit_cast<std::uintptr_t>(user_data));
+			return static_cast<blueprint::CollisionCategory>(std::bit_cast<std::uintptr_t>(user_data));
 		}
 
 		// ========================

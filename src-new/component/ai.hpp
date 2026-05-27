@@ -5,64 +5,9 @@
 
 #pragma once
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Time.hpp>
+#include <component/move_behavior.hpp>
 
 namespace pd::component::ai
 {
-	// =========================================
-	// WANDER
-	// =========================================
-
-	namespace wander
-	{
-		// 当前移动方向
-		class Direction final
-		{
-		public:
-			sf::Angle angle;
-		};
-
-		// 朝当前移动方向继续移动的剩余时间
-		class DirectionTimer final
-		{
-		public:
-			sf::Time remaining;
-		};
-	}
-
-	// =========================================
-	// JUMP
-	// =========================================
-
-	namespace jump
-	{
-		// 当前状态
-		enum class State : std::uint8_t
-		{
-			IDLE,
-			JUMPING
-		};
-
-		// 滞空计时器
-		class AirTimer final
-		{
-		public:
-			sf::Time remaining;
-		};
-	}
-
-	// =========================================
-	// CHASE
-	// =========================================
-
-	namespace chase
-	{
-		class Placeholder final {};
-	}
-
-	// =========================================
-	// 
-	// =========================================
+	// move_behavior --> AI移动行为
 }

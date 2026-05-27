@@ -19,7 +19,7 @@
 // 物理世界特别处理
 
 #include <utility/physics.hpp>
-#include <component/physics.hpp>
+#include <component/collision.hpp>
 #include <box2d/box2d.h>
 
 // =========
@@ -54,13 +54,8 @@
 // 渲染
 
 #include <render/camera.hpp>
-#include <render/floor.hpp>
-#include <render/wall.hpp>
-#include <render/door.hpp>
-#include <render/enemy.hpp>
-#include <render/player.hpp>
+#include <render/render.hpp>
 #include <render/health_mana_bar.hpp>
-#include <render/projectile.hpp>
 
 // =========
 // 依赖
@@ -81,7 +76,7 @@ namespace pd::scene
 
 		auto on_destroy_physics_body(entt::registry& registry, const entt::entity entity) noexcept -> void
 		{
-			const auto [body_id] = registry.get<const component::physics::BodyId>(entity);
+			const auto [body_id] = registry.get<const component::collision::BodyId>(entity);
 			b2DestroyBody(body_id);
 		}
 
@@ -99,7 +94,7 @@ namespace pd::scene
 
 			// 订阅组件销毁事件,以便在组件销毁时销毁物理刚体
 			// 如此便不需要在销毁实体前手动调用deattach函数销毁物理刚体组件
-			registry.on_destroy<component::physics::BodyId>().connect<&on_destroy_physics_body>();
+			registry.on_destroy<component::collision::BodyId>().connect<&on_destroy_physics_body>();
 		}
 
 		// 销毁物理世界
@@ -109,7 +104,7 @@ namespace pd::scene
 
 			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NON_NULL(world_id), "物理世界未创建");
 
-			registry.on_destroy<component::physics::BodyId>().disconnect<&on_destroy_physics_body>();
+			registry.on_destroy<component::collision::BodyId>().disconnect<&on_destroy_physics_body>();
 
 			b2DestroyWorld(world_id);
 			world_id = b2_nullWorldId;
@@ -457,8 +452,6 @@ namespace pd::scene
 				}
 				else if (kp->code == Key::E)
 				{
-					using namespace component;
-
 					if (kp->control)
 					{
 						// 击杀所有敌人
@@ -548,17 +541,13 @@ namespace pd::scene
 
 	auto Game::render(sf::RenderWindow& window) noexcept -> void
 	{
+		// 调整相机
 		render::camera(registry_, window);
 
-		render::floor(registry_, window);
-		render::wall(registry_, window);
-		render::door(registry_, window);
-
-		render::enemy(registry_, window);
-		render::player(registry_, window);
+		// 渲染实体
+		render::render(registry_, window);
+		// 渲染生命值条&魔法值条
 		render::health_mana_bar(registry_, window);
-
-		render::projectile(registry_, window);
 
 		if (g_physics_world_draw_on)
 		{

@@ -33,8 +33,8 @@ namespace pd::update
 			const auto* b_shape_user_data = b2Shape_GetUserData(b_shape);
 			PROMETHEUS_PLATFORM_ASSUME(a_shape_user_data != nullptr and b_shape_user_data != nullptr);
 
-			const auto a_shape_type = utility::Physics::to_shape_type(a_shape_user_data);
-			const auto b_shape_type = utility::Physics::to_shape_type(b_shape_user_data);
+			const auto a_shape_type = utility::Physics::to_collision_category(a_shape_user_data);
+			const auto b_shape_type = utility::Physics::to_collision_category(b_shape_user_data);
 
 			const auto body_a = b2Shape_GetBody(a_shape);
 			const auto body_b = b2Shape_GetBody(b_shape);
@@ -63,9 +63,9 @@ namespace pd::update
 			// TODO: 接触处理有部分重叠,或者说这之间的判断存在优先级
 			//  例如一发飞弹集中一个敌人,是进入敌人接触分支,还是进入飞弹接触分支?
 
-			if (a_shape_type == blueprint::ShapeType::PROJECTILE or b_shape_type == blueprint::ShapeType::PROJECTILE)
+			if (a_shape_type == blueprint::CollisionCategory::PROJECTILE or b_shape_type == blueprint::CollisionCategory::PROJECTILE)
 			{
-				const auto a = a_shape_type == blueprint::ShapeType::PROJECTILE;
+				const auto a = a_shape_type == blueprint::CollisionCategory::PROJECTILE;
 				const auto projectile = a ? entity_a : entity_b;
 				const auto other = a ? entity_b : entity_a;
 
@@ -73,9 +73,9 @@ namespace pd::update
 				return;
 			}
 
-			if (a_shape_type == blueprint::ShapeType::ENEMY or b_shape_type == blueprint::ShapeType::ENEMY)
+			if (a_shape_type == blueprint::CollisionCategory::ENEMY or b_shape_type == blueprint::CollisionCategory::ENEMY)
 			{
-				const auto a = a_shape_type == blueprint::ShapeType::ENEMY;
+				const auto a = a_shape_type == blueprint::CollisionCategory::ENEMY;
 				const auto enemy = a ? entity_a : entity_b;
 				const auto other = a ? entity_b : entity_a;
 
@@ -83,9 +83,9 @@ namespace pd::update
 				return;
 			}
 
-			if (a_shape_type == blueprint::ShapeType::DOOR or b_shape_type == blueprint::ShapeType::DOOR)
+			if (a_shape_type == blueprint::CollisionCategory::DOOR or b_shape_type == blueprint::CollisionCategory::DOOR)
 			{
-				const auto a = a_shape_type == blueprint::ShapeType::DOOR;
+				const auto a = a_shape_type == blueprint::CollisionCategory::DOOR;
 				const auto door = a ? entity_a : entity_b;
 				const auto other = a ? entity_b : entity_a;
 
@@ -119,8 +119,8 @@ namespace pd::update
 			const auto* visitor_shape_user_data = b2Shape_GetUserData(visitor_shape);
 			PROMETHEUS_PLATFORM_ASSUME(sensor_shape_user_data != nullptr and visitor_shape_user_data != nullptr);
 
-			const auto sensor_shape_type = utility::Physics::to_shape_type(sensor_shape_user_data);
-			const auto visitor_shape_type = utility::Physics::to_shape_type(visitor_shape_user_data);
+			const auto sensor_shape_type = utility::Physics::to_collision_category(sensor_shape_user_data);
+			const auto visitor_shape_type = utility::Physics::to_collision_category(visitor_shape_user_data);
 
 			const auto sensor_body = b2Shape_GetBody(sensor_shape);
 			const auto visitor_body = b2Shape_GetBody(visitor_shape);
@@ -146,7 +146,7 @@ namespace pd::update
 				entt::to_integral(visitor_entity)
 			);
 
-			if (sensor_shape_type == blueprint::ShapeType::DOOR)
+			if (sensor_shape_type == blueprint::CollisionCategory::DOOR)
 			{
 				helper::Door::sense(registry, sensor_entity, visitor_entity);
 				return;

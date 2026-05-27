@@ -18,15 +18,6 @@ namespace pd::helper
 		//  event::door::Contacted
 		static auto contact(entt::registry& registry, entt::entity door, entt::entity other) noexcept -> void;
 
-		// 感应其他实体
-		//
-		// Event:
-		//  event::door::Sensed
-		//  event::room::Leave (Room::leave)
-		//  event::room::Enter (Room::enter)
-		//  event::camera::Translate (Camera::translate)
-		static auto sense(entt::registry& registry, entt::entity door, entt::entity other) noexcept -> void;
-
 		// 尝试开启指定的门
 		//
 		// Event:
