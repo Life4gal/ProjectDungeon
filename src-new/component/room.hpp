@@ -8,13 +8,13 @@
 #include <array>
 #include <vector>
 
-#include <component/door_sensor.hpp>
-
-#include <SFML/System/Vector2.hpp>
+#include <component/door.hpp>
+#include <component/bounding.hpp>
+#include <component/tile.hpp>
+#include <component/enemy.hpp>
 
 namespace pd::component::room
 {
-	// collision --> 房间碰撞体(用于房间边界)
 	// tags --> 房间标签
 
 	// ============================================
@@ -45,15 +45,15 @@ namespace pd::component::room
 	};
 
 	// ============================================
-	// 门感应区
+	// 门
 	// ============================================
 
-	class DoorSensors final
+	class Doors final
 	{
 	public:
 		// 如有有 -> valid entity
 		// 如果没有 -> null
-		std::array<entt::entity, 4> sensors;
+		std::array<entt::entity, 4> doors;
 	};
 
 	// ============================================
@@ -63,7 +63,7 @@ namespace pd::component::room
 	class Bounding final
 	{
 	public:
-		std::vector<b2ShapeId> shapes;
+		entt::entity bounding;
 	};
 
 	// ============================================

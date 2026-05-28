@@ -7,7 +7,7 @@
 
 #include <component/enemy.hpp>
 
-#include <helper/actor.hpp>
+#include <helper/property.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -33,7 +33,7 @@ namespace pd::helper
 
 		const auto [contact_damage] = registry.get<const enemy::ContactDamage>(enemy);
 
-		Actor::hurt(registry, other, enemy, contact_damage);
+		Property::hurt(registry, other, enemy, contact_damage);
 
 		// TODO: 玩家受击动画?
 	}

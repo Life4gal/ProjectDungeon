@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto sprite_animation(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto move_behavior(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

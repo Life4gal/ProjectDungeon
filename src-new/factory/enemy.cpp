@@ -27,22 +27,8 @@ namespace pd::factory
 		detail::attach(registry, entity, enemy.position);
 		// render
 		detail::attach(registry, entity, enemy.sprite, blueprint::RenderLayer::ENEMY);
-		// collision & ShapeIds
-		{
-			const auto& [def, shapes] = enemy.collision;
-
-			const auto body_id = detail::create_attach(registry, entity, def, enemy.position);
-
-			auto& [shape_ids] = registry.emplace<enemy::ShapeIds>(entity);
-			shape_ids.reserve(shapes.size());
-
-			for (const auto& shape: shapes)
-			{
-				const auto shape_id = detail::create(body_id, shape);
-
-				shape_ids.push_back(shape_id);
-			}
-		}
+		// collision
+		detail::attach(registry, entity, enemy.collision, enemy.position);
 		// property & property_state
 		detail::attach(registry, entity, enemy.property);
 		detail::attach(registry, entity, enemy.property_state);

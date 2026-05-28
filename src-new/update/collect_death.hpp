@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto actor(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto collect_death(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

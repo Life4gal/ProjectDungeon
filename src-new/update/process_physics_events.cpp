@@ -7,11 +7,12 @@
 
 #include <utility/physics.hpp>
 
+#include <blueprint/def_name.hpp>
+
 #include <helper/enemy.hpp>
 #include <helper/projectile.hpp>
 #include <helper/door.hpp>
 
-#include <prometheus/meta/enumeration.hpp>
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>

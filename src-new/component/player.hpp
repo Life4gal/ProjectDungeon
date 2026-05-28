@@ -6,22 +6,27 @@
 #pragma once
 
 #include <component/transform.hpp>
-#include <component/sprite_animation.hpp>
-#include <component/physics.hpp>
+#include <component/render.hpp>
+#include <component/collision.hpp>
+#include <component/property.hpp>
+#include <component/property_state.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::player
 {
 	// transform --> 玩家变换
-	// sprite_animation --> 玩家精灵动画
-	// physics --> 玩家物理体
+	// render --> 玩家渲染
+	// collision --> 玩家碰撞体
+	// property --> 玩家属性
+	// property_state --> 玩家属性状态
 	// tags --> 玩家标签
 
-	// 物理碰撞体
-	class PhysicsShape final
+	// 移动速度
+	// FIXME(OPT): 将它移动到合适的地方
+	class Speed final
 	{
 	public:
-		b2ShapeId shape;
+		float speed;
 	};
 
 	// TODO: 其他组件

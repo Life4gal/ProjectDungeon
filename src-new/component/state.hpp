@@ -43,10 +43,10 @@ namespace pd::component::state
 	}
 
 	// ====================================
-	// ACTOR
+	// PROPERTY
 	// ====================================
 
-	namespace actor
+	namespace property
 	{
 		// 由InCameraArea拆分而来
 		// O -> 参与更新

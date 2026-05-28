@@ -47,8 +47,8 @@ namespace pd::render
 			{
 				// SPRITE
 				registry.emplace_or_replace<state::sprite::Awake>(entity);
-				// ACTOR
-				registry.emplace_or_replace<state::actor::Awake>(entity);
+				// PROPERTY
+				registry.emplace_or_replace<state::property::Awake>(entity);
 				// AI
 				registry.emplace_or_replace<state::ai::Awake>(entity);
 			}
@@ -56,8 +56,8 @@ namespace pd::render
 			{
 				// SPRITE
 				registry.remove<state::sprite::Awake>(entity);
-				// ACTOR
-				registry.remove<state::actor::Awake>(entity);
+				// PROPERTY
+				registry.remove<state::property::Awake>(entity);
 				// AI
 				registry.remove<state::ai::Awake>(entity);
 			}

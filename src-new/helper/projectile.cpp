@@ -7,7 +7,7 @@
 
 #include <component/projectile.hpp>
 
-#include <helper/actor.hpp>
+#include <helper/property.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -29,7 +29,7 @@ namespace pd::helper
 			const auto [owner] = registry.get<const projectile::Owner>(projectile);
 			const auto [damage] = registry.get<const projectile::Damage>(projectile);
 
-			Actor::hurt(registry, other, owner, damage);
+			Property::hurt(registry, other, owner, damage);
 		}
 
 		// TODO: 何时销毁飞弹?

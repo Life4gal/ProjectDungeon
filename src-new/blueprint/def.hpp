@@ -61,17 +61,28 @@ namespace pd::blueprint
 	{
 		// [0~7]
 
+		// 墙壁
 		WALL = 1u << 0,
+
+		// 门
 		DOOR = 1u << 1,
+		// 门传感器
+		DOOR_SENSOR = 1u << 2,
 
 		// [8~15]
 
+		// 玩家
 		PLAYER = 1u << 8,
+
+		// 敌人
 		ENEMY = 1u << 9,
 
 		// [16~23]
 
+		// 爪(近战武器)
 		CLAW = 1u << 16,
+
+		// 飞弹(远程武器)
 		PROJECTILE = 1u << 17,
 
 		// [24~31]
@@ -82,33 +93,46 @@ namespace pd::blueprint
 	// b2ShapeDef::filter -> maskBits
 	enum class CollisionMask : std::underlying_type_t<CollisionCategory> // NOLINT(performance-enum-size)
 	{
+		// 不与任何物体发生碰撞
 		NONE = 0,
 
+		// 墙壁
 		WALL = //
 		std::to_underlying(CollisionCategory::PLAYER) | //
 		std::to_underlying(CollisionCategory::ENEMY) | //
 		std::to_underlying(CollisionCategory::PROJECTILE) //
 		,
 
+		// 关闭的门
 		DOOR = //
-		std::to_underlying(CollisionCategory::PLAYER) | //
-		std::to_underlying(CollisionCategory::ENEMY) | //
-		std::to_underlying(CollisionCategory::PROJECTILE) //
-		,
-
-		DOOR_SENSOR = //
-		std::to_underlying(CollisionCategory::PLAYER) //
-		,
-
-		PLAYER = //
-		std::to_underlying(CollisionCategory::WALL) | //
-		std::to_underlying(CollisionCategory::DOOR) | //
 		std::to_underlying(CollisionCategory::PLAYER) | //
 		std::to_underlying(CollisionCategory::ENEMY) | //
 		std::to_underlying(CollisionCategory::CLAW) | //
 		std::to_underlying(CollisionCategory::PROJECTILE) //
 		,
 
+		// 开启的门
+		DOOR_OPENED = //
+		NONE //
+		,
+
+		// 门传感器
+		DOOR_SENSOR = //
+		std::to_underlying(CollisionCategory::PLAYER) //
+		,
+
+		// 玩家
+		PLAYER = //
+		std::to_underlying(CollisionCategory::WALL) | //
+		std::to_underlying(CollisionCategory::DOOR) | //
+		std::to_underlying(CollisionCategory::DOOR_SENSOR) | //
+		std::to_underlying(CollisionCategory::PLAYER) | //
+		std::to_underlying(CollisionCategory::ENEMY) | //
+		std::to_underlying(CollisionCategory::CLAW) | //
+		std::to_underlying(CollisionCategory::PROJECTILE) //
+		,
+
+		// 敌人
 		ENEMY = //
 		std::to_underlying(CollisionCategory::WALL) | //
 		std::to_underlying(CollisionCategory::DOOR) | //
@@ -118,11 +142,14 @@ namespace pd::blueprint
 		std::to_underlying(CollisionCategory::PROJECTILE) //
 		,
 
+		// 爪(近战武器)
 		CLAW = //
+		std::to_underlying(CollisionCategory::DOOR) | //
 		std::to_underlying(CollisionCategory::PLAYER) | //
 		std::to_underlying(CollisionCategory::ENEMY) //
 		,
 
+		// 飞弹(远程武器)
 		PROJECTILE = //
 		std::to_underlying(CollisionCategory::WALL) | //
 		std::to_underlying(CollisionCategory::DOOR) | //

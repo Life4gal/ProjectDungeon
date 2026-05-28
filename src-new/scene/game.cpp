@@ -41,13 +41,13 @@
 
 #include <update/graveyard.hpp>
 #include <update/player_controller.hpp>
-#include <update/ai.hpp>
+#include <update/move_behavior.hpp>
 #include <update/physics_world.hpp>
 #include <update/sync_physics_transform.hpp>
 #include <update/process_physics_events.hpp>
-#include <update/actor.hpp>
+#include <update/collect_death.hpp>
 #include <update/projectile.hpp>
-#include <update/sprite_animation.hpp>
+#include <update/dynamic_sprite.hpp>
 #include <update/sprite_effect.hpp>
 
 // =========
@@ -63,6 +63,7 @@
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
+#include <spdlog/spdlog.h>
 #include <imgui.h>
 
 namespace pd::scene
@@ -281,8 +282,6 @@ namespace pd::scene
 			return draw;
 		}();
 		auto g_physics_world_draw_on = false;
-
-		auto g_stop_ai = false;
 	}
 
 	auto Game::start_game() noexcept -> bool
@@ -304,7 +303,9 @@ namespace pd::scene
 		helper::PlayerController::set_target(registry_, player_entity);
 
 		// 相机
+		// TODO: 是设置相机来进入目标房间,还是进入目标房间后设置相机?
 		helper::Camera::initialize(registry_, {{start_room.position.x, start_room.position.y}, sf::Vector2f{1080, 720}});
+		SPDLOG_INFO("进入房间[{}:{}]", start_room.layout_position.x, start_room.layout_position.y);
 
 		return true;
 	}
@@ -446,10 +447,6 @@ namespace pd::scene
 						factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
 					}
 				}
-				else if (kp->code == Key::Q)
-				{
-					g_stop_ai = not g_stop_ai;
-				}
 				else if (kp->code == Key::E)
 				{
 					if (kp->control)
@@ -521,20 +518,17 @@ namespace pd::scene
 
 			update::player_controller(registry_, delta);
 
-			if (not g_stop_ai)
-			{
-				update::ai(registry_, delta);
-			}
+			update::move_behavior(registry_, delta);
 
 			update::physics_world(registry_, delta);
 			update::process_physics_events(registry_, delta);
 			update::sync_physics_transform(registry_, delta);
 
-			update::actor(registry_, delta);
+			update::collect_death(registry_, delta);
 
 			update::projectile(registry_, delta);
 
-			update::sprite_animation(registry_, delta);
+			update::dynamic_sprite(registry_, delta);
 			update::sprite_effect(registry_, delta);
 		}
 	}

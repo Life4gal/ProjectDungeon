@@ -12,8 +12,11 @@
 
 namespace pd::component::tags
 {
-	// 地下城-- 关卡 -- 房间 -- 门感应器
-	class DoorSensor final {};
+	// 地下城-- 关卡 -- 房间 -- 门
+	class Door final {};
+
+	// 地下城-- 关卡 -- 房间 -- 房间边界
+	class Bounding final {};
 
 	// 地下城-- 关卡 -- 房间 -- 瓦片
 	class Tile final {};
@@ -22,9 +25,6 @@ namespace pd::component::tags
 
 	// 地下城 -- 关卡 -- 房间 -- 地板
 	class Floor final {};
-
-	// 地下城-- 关卡 -- 房间 -- 门
-	class Door final {};
 
 	// 地下城 -- 关卡 -- 房间 -- 墙壁
 	class Wall final {};

@@ -10,8 +10,7 @@
 #include <utility/physics.hpp>
 
 #include <component/player_controller.hpp>
-#include <component/actor.hpp>
-#include <component/physics.hpp>
+#include <component/player.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -49,7 +48,7 @@ namespace pd::update
 		}();
 
 		// 如果含有物理刚体组件
-		if (const auto* body_id = registry.try_get<physics::BodyId>(target->entity))
+		if (const auto* body_id = registry.try_get<collision::BodyId>(target->entity))
 		{
 			if (direction == sf::Vector2f{0, 0})
 			{
@@ -58,10 +57,13 @@ namespace pd::update
 			}
 			else
 			{
+				// TODO: 我们将速度从单独组件移动到move_behavior相关组件中了
+				//  现在只有玩家实体还保有相关组件
+				//  这意味着当前控制器只能控制玩家实体(这难道不是预期行为吗?)
 				constexpr auto responsiveness = 10.f;
 				const auto pixels_max_speed = [&] noexcept -> float
 				{
-					if (const auto* speed = registry.try_get<actor::Speed>(target->entity);
+					if (const auto* speed = registry.try_get<player::Speed>(target->entity);
 						speed)
 					{
 						return speed->speed;

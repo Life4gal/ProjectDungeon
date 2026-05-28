@@ -19,12 +19,11 @@ namespace pd::update
 		const auto view = registry
 				.view<
 					tags::Projectile,
-					const projectile::Type,
 					projectile::Lifetime,
 					transform::Position
 				>();
 
-		for (const auto [entity, type, lifetime, position]: view.each())
+		for (const auto [entity, lifetime, position]: view.each())
 		{
 			lifetime.remaining -= delta;
 			if (lifetime.remaining <= sf::Time::Zero)

@@ -5,22 +5,17 @@
 
 #include <factory/level.hpp>
 
+#include <blueprint/def_name.hpp>
+
 #include <designer/room.hpp>
 
-#include <component/door_sensor.hpp>
+#include <component/door.hpp>
 
 #include <factory/room.hpp>
 
-#include <prometheus/meta/enumeration.hpp>
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
-
-template<>
-struct prometheus::meta::user_defined::enum_name_policy<pd::blueprint::Direction>
-{
-	constexpr static auto value = EnumNamePolicy::VALUE_ONLY;
-};
 
 namespace pd::factory
 {
@@ -79,11 +74,11 @@ namespace pd::factory
 			using namespace component;
 
 			const auto do_set = [&](
-				door_sensor::TargetRoom& target_room,
+				door::TargetRoom& target_room,
 				const entt::entity room,
 				const position_type room_position,
 				const entt::entity door,
-				const door_sensor::Direction door_direction,
+				const door::Direction door_direction,
 				const entt::entity neighbor_room
 			) noexcept -> void
 			{
@@ -104,7 +99,7 @@ namespace pd::factory
 				target_room.room = neighbor_room;
 			};
 
-			for (const auto view = registry.view<tags::DoorSensor, door_sensor::Direction, door_sensor::TargetRoom>();
+			for (const auto view = registry.view<tags::Door, door::Direction, door::TargetRoom>();
 			     const auto [entity, direction, target_room]: view.each())
 			{
 				// target_room一开始设置为door所属房间
@@ -128,22 +123,22 @@ namespace pd::factory
 
 				const auto neighbor_entity = [&] noexcept -> entt::entity
 				{
-					if (direction == door_sensor::Direction::NORTH)
+					if (direction == door::Direction::NORTH)
 					{
 						return room_neighbors[0];
 					}
 
-					if (direction == door_sensor::Direction::SOUTH)
+					if (direction == door::Direction::SOUTH)
 					{
 						return room_neighbors[1];
 					}
 
-					if (direction == door_sensor::Direction::WEST)
+					if (direction == door::Direction::WEST)
 					{
 						return room_neighbors[2];
 					}
 
-					if (direction == door_sensor::Direction::EAST)
+					if (direction == door::Direction::EAST)
 					{
 						return room_neighbors[3];
 					}

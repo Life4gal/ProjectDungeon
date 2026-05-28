@@ -53,162 +53,298 @@ namespace pd::designer
 		constexpr blueprint::Size size{.width = width, .height = height};
 
 		// ===========================
-		// 门感应区 + 房间边界
+		// 门 + 房间边界
 		// ===========================
 
-		std::array<blueprint::Room::DoorSensor, 4> door_sensors{};
-		std::vector<blueprint::Room::Bounding> bounding{};
+		std::array<blueprint::Door, 4> doors{};
+		blueprint::Bounding bounding{};
 
+		bounding.position = position;
+		// 边界没有邻居 --> 一条线段
+		// 边界有邻居 --> 四条线段
+		bounding.segments.reserve(4 + 3 * neighbors_count);
 		{
 			using blueprint::Position;
 
-			// 边界没有邻居 --> 一条线段
-			// 边界有邻居 --> 四条线段
-			bounding.reserve(4 + 3 * neighbors_count);
+			const blueprint::DynamicSprite sprite
+			{
+					.frames =
+					{
+							// 第一帧
+							{.texture = "./assets/tileset/door.png", .position = {.x = 0, .y = 0}},
+							// 第二帧
+							{.texture = "./assets/tileset/door.png", .position = {.x = 64, .y = 0}},
+							// 第三帧
+							{.texture = "./assets/tileset/door.png", .position = {.x = 128, .y = 0}},
+							// 第四帧
+							{.texture = "./assets/tileset/door.png", .position = {.x = 192, .y = 0}},
+					},
+					.size = {.width = 64, .height = 64},
+					.origin = {.x = 32, .y = 32},
+					.duration_ms = 100,
+					.looping = false,
+					.reversed = false,
+					.pause = true,
+			};
 
 			if (neighbors_value & std::to_underlying(blueprint::DirectionMask::NORTH))
 			{
 				constexpr auto x = (horizontal_count / 2) * tile_width;
 
-				// 感应区
-				auto& sensor = door_sensors[std::to_underlying(blueprint::Direction::NORTH)];
-				sensor =
-				{
-						.shape = {.size = {.width = tile_width, .height = SensorAreaHeight}},
-						.position = {.x = static_cast<float>(x), .y = 0},
-				};
+				auto& door = doors[std::to_underlying(blueprint::Direction::NORTH)];
+
+				// 门位置
+				door.position.x = static_cast<float>(x) + sprite.origin.x;
+				door.position.y = 0 + sprite.origin.y;
+
+				// 门感应区位置
+				door.sensor_position.x = 0;
+				door.sensor_position.y = -sprite.origin.y + SensorAreaHeight / 2;
+
+				// 门大小
+				door.size.width = tile_width;
+				door.size.height = tile_height;
+
+				// 门感应区大小
+				door.sensor_size.width = tile_width;
+				door.sensor_size.height = SensorAreaHeight;
+
+				// 门渲染
+				door.sprite = sprite;
 
 				// 边界
+				//
+				//         p3 >    < p4
+				//                |门|
+				//      -------     -------
+				//     ^       ^   ^       ^
+				//     p1     p2  p5     p6
+
 				constexpr Position p1{.x = tile_width, .y = tile_height};
-				const Position p2{.x = sensor.position.x, .y = tile_height};
-				const Position p3{.x = sensor.position.x, .y = 0};
-
-				bounding.push_back({p1, p2});
-				bounding.push_back({p2, p3});
-
-				const Position p4{.x = sensor.position.x + sensor.shape.size.width, .y = 0};
-				const Position p5{.x = sensor.position.x + sensor.shape.size.width, .y = tile_height};
+				constexpr Position p2{.x = static_cast<float>(x), .y = tile_height};
+				constexpr Position p3{.x = static_cast<float>(x), .y = 0};
+				constexpr Position p4{.x = static_cast<float>(x) + tile_width, .y = 0};
+				constexpr Position p5{.x = static_cast<float>(x) + tile_width, .y = tile_height};
 				constexpr Position p6{.x = width - tile_width, .y = tile_height};
 
-				bounding.push_back({p4, p5});
-				bounding.push_back({p5, p6});
+				bounding.segments.emplace_back(p1, p2);
+				bounding.segments.emplace_back(p2, p3);
+				bounding.segments.emplace_back(p4, p5);
+				bounding.segments.emplace_back(p5, p6);
 			}
 			else
 			{
 				// 边界
+				//
+				//      -----------------
+				//     ^                     ^
+				//     p1                   p2
+
 				constexpr Position p1{.x = tile_width, .y = tile_height};
 				constexpr Position p2{.x = width - tile_width, .y = height - tile_height};
 
-				bounding.push_back({p1, p2});
+				bounding.segments.emplace_back(p1, p2);
 			}
 
 			if (neighbors_value & std::to_underlying(blueprint::DirectionMask::SOUTH))
 			{
 				constexpr auto x = (horizontal_count / 2) * tile_width;
 
-				// 感应区
-				auto& sensor = door_sensors[std::to_underlying(blueprint::Direction::SOUTH)];
-				sensor =
-				{
-						.shape = {.size = {.width = tile_width, .height = SensorAreaHeight}},
-						.position = {.x = static_cast<float>(x), .y = height - SensorAreaHeight},
-				};
+				auto& door = doors[std::to_underlying(blueprint::Direction::SOUTH)];
+
+				// 门位置
+				door.position.x = static_cast<float>(x) + sprite.origin.x;
+				door.position.y = height - tile_height + sprite.origin.y;
+
+				// 门感应区位置
+				door.sensor_position.x = 0;
+				door.sensor_position.y = sprite.origin.y - SensorAreaHeight / 2;
+
+				// 门大小
+				door.size.width = tile_width;
+				door.size.height = tile_height;
+
+				// 门感应区大小
+				door.sensor_size.width = tile_width;
+				door.sensor_size.height = SensorAreaHeight;
+
+				// 门渲染
+				door.sprite = sprite;
 
 				// 边界
+				//
+				//      p1    p2  p5     p6
+				//      v       v    v       v
+				//      -------     -------
+				//                |门|
+				//        p3 >     < p4
+
 				constexpr Position p1{.x = tile_width, .y = height - tile_height};
-				const Position p2{.x = sensor.position.x, .y = height - tile_height};
-				const Position p3{.x = sensor.position.x, .y = height};
-
-				bounding.push_back({p1, p2});
-				bounding.push_back({p2, p3});
-
-				const Position p4{.x = sensor.position.x + sensor.shape.size.width, .y = height};
-				const Position p5{.x = sensor.position.x + sensor.shape.size.width, .y = height - tile_height};
+				constexpr Position p2{.x = static_cast<float>(x), .y = height - tile_height};
+				constexpr Position p3{.x = static_cast<float>(x), .y = height};
+				constexpr Position p4{.x = static_cast<float>(x) + tile_width, .y = height};
+				constexpr Position p5{.x = static_cast<float>(x) + tile_width, .y = height - tile_height};
 				constexpr Position p6{.x = width - tile_width, .y = height - tile_height};
 
-				bounding.push_back({p4, p5});
-				bounding.push_back({p5, p6});
+				bounding.segments.emplace_back(p1, p2);
+				bounding.segments.emplace_back(p2, p3);
+				bounding.segments.emplace_back(p4, p5);
+				bounding.segments.emplace_back(p5, p6);
 			}
 			else
 			{
 				// 边界
+				//
+				//     p1                    p2
+				//     v                       v
+				//      -----------------
+
 				constexpr Position p1{.x = tile_width, .y = height - tile_height};
 				constexpr Position p2{.x = width - tile_width, .y = height - tile_height};
 
-				bounding.push_back({p1, p2});
+				bounding.segments.emplace_back(p1, p2);
 			}
 
 			if (neighbors_value & std::to_underlying(blueprint::DirectionMask::WEST))
 			{
 				constexpr auto y = (vertical_count / 2) * tile_height;
 
-				// 感应区
-				auto& sensor = door_sensors[std::to_underlying(blueprint::Direction::WEST)];
-				sensor =
-				{
-						.shape = {.size = {.width = SensorAreaWidth, .height = tile_height}},
-						.position = {.x = 0, .y = static_cast<float>(y)},
-				};
+				auto& door = doors[std::to_underlying(blueprint::Direction::WEST)];
+
+				// 门位置
+				door.position.x = 0 + sprite.origin.x;
+				door.position.y = static_cast<float>(y) + sprite.origin.y;
+
+				// 门感应区位置
+				door.sensor_position.x = -sprite.origin.x + SensorAreaWidth / 2;
+				door.sensor_position.y = 0;
+
+				// 门大小
+				door.size.width = tile_width;
+				door.size.height = tile_height;
+
+				// 门感应区大小
+				door.sensor_size.width = SensorAreaWidth;
+				door.sensor_size.height = tile_height;
+
+				// 门渲染
+				door.sprite = sprite;
 
 				// 边界
+				//  
+				//         < p1
+				//         |
+				//  p3   |
+				//  v     |
+				//   ---  < p2
+				//   门
+				//   ---  < p5
+				// ^     |
+				// p4    |
+				//         |
+				//          < p6
+
 				constexpr Position p1{.x = tile_width, .y = tile_height};
-				const Position p2{.x = tile_width, .y = sensor.position.y};
-				const Position p3{.x = 0, .y = sensor.position.y};
-
-				bounding.push_back({p1, p2});
-				bounding.push_back({p2, p3});
-
-				const Position p4{.x = 0, .y = sensor.position.y + sensor.shape.size.height};
-				const Position p5{.x = tile_width, .y = sensor.position.y + sensor.shape.size.height};
+				constexpr Position p2{.x = tile_width, .y = static_cast<float>(y)};
+				constexpr Position p3{.x = 0, .y = static_cast<float>(y)};
+				constexpr Position p4{.x = 0, .y = static_cast<float>(y) + tile_height};
+				constexpr Position p5{.x = tile_width, .y = static_cast<float>(y) + tile_height};
 				constexpr Position p6{.x = tile_width, .y = height - tile_height};
 
-				bounding.push_back({p4, p5});
-				bounding.push_back({p5, p6});
+				bounding.segments.emplace_back(p1, p2);
+				bounding.segments.emplace_back(p2, p3);
+				bounding.segments.emplace_back(p4, p5);
+				bounding.segments.emplace_back(p5, p6);
 			}
 			else
 			{
 				// 边界
+				//
+				//  < p1
+				// |
+				// |
+				// |
+				// |
+				// |
+				// |
+				// |
+				//  < p2
+
 				constexpr Position p1{.x = tile_width, .y = tile_height};
 				constexpr Position p2{.x = tile_width, .y = height - tile_height};
 
-				bounding.push_back({p1, p2});
+				bounding.segments.emplace_back(p1, p2);
 			}
 
 			if (neighbors_value & std::to_underlying(blueprint::DirectionMask::EAST))
 			{
-				constexpr auto x = width - SensorAreaWidth;
 				constexpr auto y = (vertical_count / 2) * tile_height;
 
-				// 感应区
-				auto& sensor = door_sensors[std::to_underlying(blueprint::Direction::EAST)];
-				sensor =
-				{
-						.shape = {.size = {.width = SensorAreaWidth, .height = tile_height}},
-						.position = {.x = x, .y = static_cast<float>(y)},
-				};
+				auto& door = doors[std::to_underlying(blueprint::Direction::EAST)];
+
+				// 门位置
+				door.position.x = width - tile_width + sprite.origin.x;
+				door.position.y = static_cast<float>(y) + sprite.origin.y;
+
+				// 门感应区位置
+				door.sensor_position.x = sprite.origin.x - SensorAreaWidth / 2;
+				door.sensor_position.y = 0;
+
+				// 门大小
+				door.size.width = tile_width;
+				door.size.height = tile_height;
+
+				// 门感应区大小
+				door.sensor_size.width = SensorAreaWidth;
+				door.sensor_size.height = tile_height;
+
+				// 门渲染
+				door.sprite = sprite;
 
 				// 边界
+				//  
+				//   p1 >
+				//         |  
+				//         |     p3
+				//         |     v
+				// p2 > ---
+				//          门
+				// p5 > ---
+				//         |    ^
+				//         |    p4
+				//         |
+				//  p6 >
+
 				constexpr Position p1{.x = width - tile_width, .y = tile_height};
-				const Position p2{.x = width - tile_width, .y = sensor.position.y};
-				const Position p3{.x = width, .y = sensor.position.y};
-
-				bounding.push_back({p1, p2});
-				bounding.push_back({p2, p3});
-
-				const Position p4{.x = width, .y = sensor.position.y + sensor.shape.size.height};
-				const Position p5{.x = width - tile_width, .y = sensor.position.y + sensor.shape.size.height};
+				constexpr Position p2{.x = width - tile_width, .y = static_cast<float>(y)};
+				constexpr Position p3{.x = width, .y = static_cast<float>(y)};
+				constexpr Position p4{.x = width, .y = static_cast<float>(y) + tile_height};
+				constexpr Position p5{.x = width - tile_width, .y = static_cast<float>(y) + tile_height};
 				constexpr Position p6{.x = width - tile_width, .y = height - tile_height};
 
-				bounding.push_back({p4, p5});
-				bounding.push_back({p5, p6});
+				bounding.segments.emplace_back(p1, p2);
+				bounding.segments.emplace_back(p2, p3);
+				bounding.segments.emplace_back(p4, p5);
+				bounding.segments.emplace_back(p5, p6);
 			}
 			else
 			{
 				// 边界
+				//
+				// p1 >
+				//        |
+				//        |
+				//        |
+				//        |
+				//        |
+				//        |
+				//        |
+				// p2 >
+
 				constexpr Position p1{.x = width - tile_width, .y = tile_height};
 				constexpr Position p2{.x = width - tile_width, .y = height - tile_height};
 
-				bounding.push_back({p1, p2});
+				bounding.segments.emplace_back(p1, p2);
 			}
 		}
 
@@ -220,6 +356,7 @@ namespace pd::designer
 
 		{
 			// 目前共有horizontal_count * vertical_count个瓦片(不考虑重叠)
+			// 实际上没有那么多,尤其是我们将门单独处理后
 			constexpr auto total_tiles = horizontal_count * vertical_count;
 			tiles.reserve(total_tiles);
 
@@ -232,14 +369,14 @@ namespace pd::designer
 						.position = {.x = 0, .y = 0},
 						.sprite =
 						{
-								blueprint::StaticSprite
+								.sprite = blueprint::StaticSprite
 								{
 										.texture = "./assets/tileset/floor.png",
 										.position = {.x = 0, .y = 0},
 										.size = {.width = tile_width, .height = tile_height},
 										.origin = {.x = tile_origin_x, .y = tile_origin_y},
 								},
-								blueprint::RenderLayer::FLOOR,
+								.render_layer = blueprint::RenderLayer::FLOOR,
 						},
 						.collision = std::nullopt,
 				};
@@ -275,37 +412,40 @@ namespace pd::designer
 								.render_layer = blueprint::RenderLayer::FLOOR,
 						},
 						.collision =
-						blueprint::Collision
-						{
-								.def =
-								{
-										.type = blueprint::CollisionBodyType::STATIC,
-										.fixed_rotation = true,
-										.is_bullet = false,
-								},
-								.shapes =
-								{
-										// 矩形碰撞体
-										{
-												.def =
-												{
-														.material = {.friction = 0.6f, .restitution = 0},
-														.density = 0,
-														.category = blueprint::CollisionCategory::WALL,
-														.mask = blueprint::CollisionMask::WALL,
-														.is_sensor = false,
-														.enable_sensor_events = false,
-														.enable_contact_events = false,
-												},
-												.shape =
-												blueprint::CollisionShape::box
-												{
-														.size = {.width = tile_width, .height = tile_height},
-												},
-										},
-										//
-								},
-						},
+						// 墙壁的阻挡作用已被房间边界取代
+						// 除非是位于房间内的墙壁?
+						std::nullopt,
+						// blueprint::Collision
+						// {
+						// 		.def =
+						// 		{
+						// 				.type = blueprint::CollisionBodyType::STATIC,
+						// 				.fixed_rotation = true,
+						// 				.is_bullet = false,
+						// 		},
+						// 		.shapes =
+						// 		{
+						// 				// 矩形碰撞体
+						// 				{
+						// 						.def =
+						// 						{
+						// 								.material = {.friction = 0.6f, .restitution = 0},
+						// 								.density = 0,
+						// 								.category = blueprint::CollisionCategory::WALL,
+						// 								.mask = blueprint::CollisionMask::WALL,
+						// 								.is_sensor = false,
+						// 								.enable_sensor_events = false,
+						// 								.enable_contact_events = false,
+						// 						},
+						// 						.shape =
+						// 						blueprint::CollisionShape::box
+						// 						{
+						// 								.size = {.width = tile_width, .height = tile_height},
+						// 						},
+						// 				},
+						// 				//
+						// 		},
+						// },
 				};
 
 				// 上面/下面
@@ -359,101 +499,6 @@ namespace pd::designer
 					}
 				}
 			}
-
-			// ============
-			// 门
-			// ============
-			{
-				blueprint::Tile tile
-				{
-						.position = {.x = 0, .y = 0},
-						.sprite =
-						{
-								// TODO: 理论上门应该是动态精灵(只不过起始为暂停状态)
-								.sprite = blueprint::StaticSprite
-								{
-										.texture = "./assets/tileset/door.png",
-										.position = {.x = 0, .y = 0},
-										.size = {.width = tile_width, .height = tile_height},
-										.origin = {.x = tile_origin_x, .y = tile_origin_y},
-								},
-								.render_layer = blueprint::RenderLayer::DOOR,
-						},
-						.collision =
-						blueprint::Collision
-						{
-								.def =
-								{
-										.type = blueprint::CollisionBodyType::STATIC,
-										.fixed_rotation = false,
-										.is_bullet = false,
-								},
-								.shapes = {
-										// 矩形碰撞体
-										{
-												.def =
-												{
-														.material = {.friction = 0.6f, .restitution = 0},
-														.density = 0,
-														.category = blueprint::CollisionCategory::DOOR,
-														.mask = blueprint::CollisionMask::DOOR,
-														.is_sensor = false,
-														.enable_sensor_events = false,
-														// 允许接触事件
-														.enable_contact_events = true,
-												},
-												// 大小懒得算,直接和感应区重叠也无所谓 :)
-												.shape =
-												blueprint::CollisionShape::box
-												{
-														.size = {.width = tile_width, .height = tile_height},
-												},
-										},
-										//
-								},
-						},
-				};
-
-				if (neighbors_value & std::to_underlying(blueprint::DirectionMask::NORTH))
-				{
-					constexpr auto x = tile_origin_x + (horizontal_count / 2) * tile_width;
-					constexpr auto y = tile_origin_y + 0 * tile_height;
-
-					tile.position = {.x = static_cast<float>(x), .y = static_cast<float>(y)};
-
-					tiles.push_back(tile);
-				}
-
-				if (neighbors_value & std::to_underlying(blueprint::DirectionMask::SOUTH))
-				{
-					constexpr auto x = tile_origin_x + (horizontal_count / 2) * tile_width;
-					constexpr auto y = tile_origin_y + (vertical_count - 1) * tile_height;
-
-					tile.position = {.x = static_cast<float>(x), .y = static_cast<float>(y)};
-
-					tiles.push_back(tile);
-				}
-
-				if (neighbors_value & std::to_underlying(blueprint::DirectionMask::WEST))
-				{
-					constexpr auto x = tile_origin_x + 0 * tile_width;
-					constexpr auto y = tile_origin_y + (vertical_count / 2) * tile_height;
-
-					tile.position = {.x = static_cast<float>(x), .y = static_cast<float>(y)};
-
-					tiles.push_back(tile);
-				}
-
-				if (neighbors_value & std::to_underlying(blueprint::DirectionMask::EAST))
-				{
-					constexpr auto x = tile_origin_x + (horizontal_count - 1) * tile_width;
-					constexpr auto y = tile_origin_y + (vertical_count / 2) * tile_height;
-
-					tile.position = {.x = static_cast<float>(x), .y = static_cast<float>(y)};
-
-					tiles.push_back(tile);
-				}
-			}
 		}
 
 		// ===========================
@@ -463,11 +508,16 @@ namespace pd::designer
 		std::vector<blueprint::Enemy> enemies{};
 
 		{
-			enemies.reserve(3);
+			// enemies.reserve(3);
+			//
+			// enemies.push_back(Enemy::rat(2, 2));
+			// enemies.push_back(Enemy::slime(3, 3));
+			// enemies.push_back(Enemy::bat(4, 4));
 
-			enemies.push_back(Enemy::rat(2, 2));
-			enemies.push_back(Enemy::slime(3, 3));
-			enemies.push_back(Enemy::bat(4, 4));
+			// TODO: 测试用
+			auto rat = Enemy::rat(2, 2);
+			rat.ai.move_behavior.behavior = blueprint::MoveBehavior::stationary{};
+			enemies.push_back(std::move(rat));
 		}
 
 		// ===========================
@@ -491,7 +541,7 @@ namespace pd::designer
 		};
 
 		// 门感应区
-		std::ranges::for_each(door_sensors, process_offset, &blueprint::Room::DoorSensor::position);
+		std::ranges::for_each(doors, process_offset, &blueprint::Door::position);
 		// 瓦片
 		std::ranges::for_each(tiles, process_offset, &blueprint::Tile::position);
 		// 敌人
@@ -506,7 +556,7 @@ namespace pd::designer
 				.layout_position = layout_position,
 				.position = position,
 				.size = size,
-				.door_sensors = door_sensors,
+				.doors = std::move(doors),
 				.bounding = std::move(bounding),
 				.tiles = std::move(tiles),
 				.enemies = std::move(enemies),

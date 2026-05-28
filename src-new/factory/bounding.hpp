@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include <blueprint/room.hpp>
+#include <blueprint/bounding.hpp>
 
 #include <entt/entity/fwd.hpp>
 
 namespace pd::factory
 {
-	class DoorSensor final
+	class Bounding final
 	{
 	public:
-		static auto spawn(entt::registry& registry, const blueprint::Room::DoorSensor& door_sensor, blueprint::Direction direction) noexcept -> entt::entity;
+		static auto spawn(entt::registry& registry, const blueprint::Bounding& bounding) noexcept -> entt::entity;
 
 		static auto destroy_all(entt::registry& registry) noexcept -> void;
 	};

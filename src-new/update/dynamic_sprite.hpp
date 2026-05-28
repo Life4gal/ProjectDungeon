@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto ai(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto dynamic_sprite(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

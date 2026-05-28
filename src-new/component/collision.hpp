@@ -19,7 +19,7 @@ namespace pd::component::collision
 	};
 
 	// 碰撞体的形状ID
-	// 其实也可以不保存
+	// 当且仅当基于blueprint::Collision实体化时才存在该组件(额外的复杂度,容易出错?不过理论上我们可能用不到该组件?)
 	class ShapeIds final
 	{
 	public:

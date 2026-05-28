@@ -73,6 +73,11 @@ namespace pd::helper
 		const auto [doors] = registry.get<const room::Doors>(room);
 		for (const auto door: doors)
 		{
+			if (not registry.valid(door))
+			{
+				continue;
+			}
+
 			Door::try_open(registry, door);
 		}
 	}
@@ -85,6 +90,11 @@ namespace pd::helper
 		const auto [doors] = registry.get<const room::Doors>(room);
 		for (const auto door: doors)
 		{
+			if (not registry.valid(door))
+			{
+				continue;
+			}
+
 			Door::try_close(registry, door);
 		}
 	}

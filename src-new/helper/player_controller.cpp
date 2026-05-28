@@ -8,8 +8,8 @@
 #include <component/player_controller.hpp>
 #include <component/player.hpp>
 
-#include <helper/physics.hpp>
 #include <helper/transform.hpp>
+#include <helper/collision.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -81,9 +81,9 @@ namespace pd::helper
 			new_position.y - old_position.y
 		);
 
-		if (registry.all_of<physics::BodyId>(e))
+		if (registry.all_of<collision::BodyId>(e))
 		{
-			Physics::set_pixel_position(registry, e, new_position);
+			Collision::set_pixel_position(registry, e, new_position);
 		}
 		else
 		{
@@ -110,9 +110,9 @@ namespace pd::helper
 			new_position.y - old_position.y
 		);
 
-		if (registry.all_of<physics::BodyId>(e))
+		if (registry.all_of<collision::BodyId>(e))
 		{
-			Physics::set_screen_position(registry, e, new_position);
+			Collision::set_screen_position(registry, e, new_position);
 		}
 		else
 		{
@@ -140,10 +140,10 @@ namespace pd::helper
 			new_position.y - old_position.y
 		);
 
-		if (registry.all_of<physics::BodyId>(e))
+		if (registry.all_of<collision::BodyId>(e))
 		{
-			// Physics::translate_pixel(registry, e, distance);
-			Physics::set_pixel_position(registry, e, new_position);
+			// Collision::translate_pixel(registry, e, distance);
+			Collision::set_pixel_position(registry, e, new_position);
 		}
 		// TODO: PlayerController::translate只会设置物理刚体的位置(如果当前控制的实体存在物理刚体组件)
 		//  但是Transform的位置需要在下一帧的sync_physics_transform中同步,而render::camera在计算视野内的实体时使用的是Transform的位置

@@ -54,6 +54,8 @@ namespace pd::factory
 			//  2.控制飞弹的碰撞掩码
 			//  
 			// 第二种方式最简单,但是如果后续我们想开发一种可以通过发射者碰撞而改变轨迹的飞弹时要怎么办?如果允许飞弹命中友军怎么办?
+			// 
+			// TODO: 也许b2Filter::groupIndex能解决这个问题?待研究!
 			for (const auto shape_id: shape_ids)
 			{
 				const auto filter = [&] noexcept -> b2Filter

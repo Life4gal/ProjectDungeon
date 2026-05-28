@@ -25,13 +25,6 @@ namespace pd::component::enemy
 	// AI --> 敌人AI
 	// tags --> 敌人标签
 
-	// 形状ID
-	class ShapeIds final
-	{
-	public:
-		std::vector<b2ShapeId> shapes;
-	};
-
 	// 接触伤害
 	class ContactDamage final
 	{

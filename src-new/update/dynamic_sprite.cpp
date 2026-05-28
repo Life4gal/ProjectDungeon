@@ -3,11 +3,11 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <update/sprite_animation.hpp>
+#include <update/dynamic_sprite.hpp>
 
-#include <component/sprite_animation.hpp>
+#include <component/render.hpp>
 
-#include <helper/sprite_animation.hpp>
+#include <helper/dynamic_sprite.hpp>
 
 #include <entt/entt.hpp>
 
@@ -15,22 +15,25 @@ namespace pd::update
 {
 	using namespace component;
 
-	auto sprite_animation(entt::registry& registry, const sf::Time delta) noexcept -> void
+	auto dynamic_sprite(entt::registry& registry, const sf::Time delta) noexcept -> void
 	{
+		namespace rss = render::static_sprite;
+		namespace rds = render::dynamic_sprite;
+
 		const auto view = registry
 				.view<
-					const sprite_animation::Frames,
-					const sprite_animation::FramesCount,
-					const sprite_animation::Duration,
-					sprite_animation::Timer,
-					sprite_animation::Index,
-					const sprite_animation::Mode,
-					const sprite_animation::Direction>(
+					const rds::Frames,
+					const rds::FramesCount,
+					const rds::Duration,
+					rds::Timer,
+					rds::Index,
+					const rds::Mode,
+					const rds::Direction>(
 					entt::exclude<
 						// 如果动画暂停则无需更新动画
-						sprite_animation::Paused,
+						rds::Paused,
 						// 如果动画已经结束(例如非循环动画播完了最后一帧)则无需更新动画
-						sprite_animation::Ended
+						rds::Ended
 					>
 				);
 
@@ -46,14 +49,14 @@ namespace pd::update
 			// 帧计时并不重置为0,而是减去当前帧的持续时间
 			timer.elapsed -= duration.duration;
 
-			using helper::SpriteAnimation;
+			using helper::DynamicSprite;
 
 			// 跳转到下一帧
-			if (const auto next_frame_index = SpriteAnimation::jump_to_next_frame(frames_count, index, mode, direction);
-				next_frame_index == SpriteAnimation::animation_ended)
+			if (const auto next_frame_index = DynamicSprite::jump_to_next_frame(frames_count, index, mode, direction);
+				next_frame_index == DynamicSprite::animation_ended)
 			{
 				// 如果动画已结束则标记为已结束
-				SpriteAnimation::end(registry, entity);
+				DynamicSprite::end(registry, entity);
 			}
 			else
 			{
@@ -63,8 +66,8 @@ namespace pd::update
 				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position会比较浪费性能
 				// 在动画帧切换时才获取&更新这些组件
 				// Size&Origin无需更新,因为SpriteAnimation要求所有帧必须相同
-				registry.replace<sprite::Texture>(entity, texture);
-				registry.replace<sprite::Position>(entity, position);
+				registry.replace<rss::Texture>(entity, texture);
+				registry.replace<rss::Position>(entity, position);
 			}
 		}
 	}

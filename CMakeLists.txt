@@ -664,6 +664,7 @@ add_executable(
 
 	# (枚举)定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def_name.hpp
 	# 瓦片
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/tile.hpp
 	# 飞弹
@@ -744,8 +745,10 @@ add_executable(
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/npc.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
-	# 地下城 -- 关卡 -- 房间 -- 门感应器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door_sensor.hpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door.hpp
+	# 地下城 -- 关卡 -- 房间 -- 房间边界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/bounding.hpp
 	# 地下城 -- 关卡 -- 房间 -- 瓦片
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tile.hpp
 	# 地下城 -- 关卡 -- 房间
@@ -788,9 +791,12 @@ add_executable(
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.cpp
-	# 地下城 -- 关卡 -- 房间 -- 门感应器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door_sensor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door_sensor.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.cpp
+	# 地下城 -- 关卡 -- 房间 -- 房间边界
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/bounding.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/bounding.cpp
 	# 地下城 -- 关卡 -- 房间 -- 瓦片
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.cpp
@@ -850,9 +856,6 @@ add_executable(
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.cpp
-	# 地下城 -- 关卡 -- 房间 -- 门感应器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door_sensor.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door_sensor.cpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.cpp
@@ -870,6 +873,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.cpp
 
+	# (AI)移动行为
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/move_behavior.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/move_behavior.cpp
+
 	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.cpp
@@ -879,14 +886,18 @@ add_executable(
 	# 处理物理世界事件
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.cpp
+	
+	# 收集(标记)所有死亡的实体(带property组件的实体)
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/collect_death.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/collect_death.cpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.cpp
 
-	# 精灵动画
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_animation.cpp
+	# 动态精灵
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/dynamic_sprite.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/dynamic_sprite.cpp
 	# 精灵动画特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.cpp

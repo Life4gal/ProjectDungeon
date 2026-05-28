@@ -8,9 +8,9 @@
 #include <component/player.hpp>
 
 #include <factory/detail/transform.hpp>
-#include <factory/detail/sprite_animation.hpp>
-#include <factory/detail/physics.hpp>
-#include <factory/detail/actor.hpp>
+#include <factory/detail/render.hpp>
+#include <factory/detail/collision.hpp>
+#include <factory/detail/property.hpp>
 
 #include <entt/entt.hpp>
 
@@ -24,18 +24,16 @@ namespace pd::factory
 
 		// transform
 		detail::attach(registry, entity, player.position);
-		// sprite_animation
-		detail::attach(registry, entity, player.animation);
-		// physics
-		{
-			const auto body_id = detail::create_attach(registry, entity, player.body_desc, player.position);
-
-			const auto shape_id = detail::create(body_id, player.shape_desc, player.shape);
-			registry.emplace<player::PhysicsShape>(entity, shape_id);
-		}
-		// actor
-		detail::attach(registry, entity, player.actor, player.animation);
-
+		// render
+		detail::attach(registry, entity, player.sprite, blueprint::RenderLayer::PLAYER);
+		// collision
+		detail::attach(registry, entity, player.collision, player.position);
+		// property & property_state
+		detail::attach(registry, entity, player.property);
+		detail::attach(registry, entity, player.property_state);
+		// speed
+		registry.emplace<player::Speed>(entity, player.speed);
+		// tags
 		registry.emplace<tags::Player>(entity);
 
 		return entity;

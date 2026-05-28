@@ -21,7 +21,7 @@ namespace pd::render
 	{
 		const auto view = registry
 				.view<
-					state::actor::Awake,
+					state::property::Awake,
 					property::Health,
 					property::HealthMax,
 					property::Mana,

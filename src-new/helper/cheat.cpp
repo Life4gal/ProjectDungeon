@@ -7,7 +7,7 @@
 
 #include <component/enemy.hpp>
 
-#include <helper/actor.hpp>
+#include <helper/property.hpp>
 
 #include <entt/entt.hpp>
 
@@ -17,24 +17,24 @@ namespace pd::helper
 
 	auto Cheat::kill_all_enemy(entt::registry& registry) noexcept -> void
 	{
-		for (const auto view = registry.view<state::actor::Awake, tags::Enemy>();
+		for (const auto view = registry.view<state::property::Awake, tags::Enemy>();
 		     const auto [entity]: view.each())
 		{
-			Actor::kill(registry, entity, entt::null);
+			Property::kill(registry, entity, entt::null);
 		}
 	}
 
 	auto Cheat::set_all_enemy_hp_percent(entt::registry& registry, const float percent) noexcept -> void
 	{
-		for (const auto view = registry.view<state::actor::Awake, tags::Enemy>();
+		for (const auto view = registry.view<state::property::Awake, tags::Enemy>();
 		     const auto [entity]: view.each())
 		{
-			if (const auto max_health = Actor::get_max_health(registry, entity);
+			if (const auto max_health = Property::get_max_health(registry, entity);
 				max_health >= 0)
 			{
 				const auto health = max_health * percent;
 
-				Actor::set_health(registry, entity, health);
+				Property::set_health(registry, entity, health);
 			}
 		}
 	}

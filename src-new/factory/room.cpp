@@ -5,40 +5,22 @@
 
 #include <factory/room.hpp>
 
+#include <blueprint/def_name.hpp>
+
 #include <component/room.hpp>
 #include <component/enemy.hpp>
 
-#include <factory/detail/transform.hpp>
-#include <factory/detail/collision.hpp>
-#include <factory/door_sensor.hpp>
+#include <factory/door.hpp>
+#include <factory/bounding.hpp>
 #include <factory/tile.hpp>
 #include <factory/enemy.hpp>
 
 #include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
 
 namespace pd::factory
 {
 	using namespace component;
-
-	namespace
-	{
-		constexpr blueprint::CollisionBodyDef BodyDef
-		{
-				.type = blueprint::CollisionBodyType::STATIC,
-				.fixed_rotation = true,
-				.is_bullet = false,
-		};
-		constexpr blueprint::CollisionShapeDef BoundingShapeDef
-		{
-				.material = {.friction = 0.3f, .restitution = 0},
-				.density = 0,
-				.category = blueprint::CollisionCategory::WALL,
-				.mask = blueprint::CollisionMask::WALL,
-				.is_sensor = true,
-				.enable_sensor_events = false,
-				.enable_contact_events = false,
-		};
-	}
 
 	auto Room::spawn(entt::registry& registry, const blueprint::Room& room) noexcept -> entt::entity
 	{
@@ -56,30 +38,38 @@ namespace pd::factory
 		registry.emplace<room::Size>(entity, sf::Vector2f{room.size.width, room.size.height});
 
 		// ============================================
-		// 门感应区
+		// 门
 		// ============================================
 
 		{
 			const auto neighbors_value = std::to_underlying(room.neighbors);
 			// const auto neighbors_count = std::popcount(neighbors_value);
 
-			auto& [sensors] = registry.emplace<room::DoorSensors>(entity);
-			sensors.fill(entt::null);
+			auto& [doors] = registry.emplace<room::Doors>(entity);
+			doors.fill(entt::null);
 
 			const auto do_create = [&](const blueprint::DirectionMask mask, const blueprint::Direction direction) noexcept -> void
 			{
 				if (neighbors_value & std::to_underlying(mask))
 				{
-					const auto& def = room.door_sensors[std::to_underlying(direction)];
-					auto& sensor = sensors[std::to_underlying(direction)];
+					SPDLOG_INFO(
+						"创建房间(0x{:08X})[{}:{}]位于({})的门",
+						entt::to_integral(entity),
+						room.layout_position.x,
+						room.layout_position.y,
+						prometheus::meta::name_of(direction)
+					);
 
-					sensor = DoorSensor::spawn(registry, def, direction);
+					const auto& def = room.doors[std::to_underlying(direction)];
+					auto& door = doors[std::to_underlying(direction)];
 
-					// 设置门感应器所属房间实体
-					registry.emplace<door_sensor::Room>(sensor, entity); // NOLINT(readability-suspicious-call-argument)
-					// 先将门感应器的目标房间设置为当前房间
-					// 如此在factory::Level我们便可以确定遍历到的门感应器实体属于哪个房间
-					registry.emplace<door_sensor::TargetRoom>(sensor, entity); // NOLINT(readability-suspicious-call-argument)
+					door = Door::spawn(registry, def, direction);
+
+					// 设置门所属房间实体
+					registry.emplace<door::Room>(door, entity); // NOLINT(readability-suspicious-call-argument)
+					// 先将门的目标房间设置为当前房间
+					// 如此在factory::Level我们便可以确定遍历到的门实体属于哪个房间
+					registry.emplace<door::TargetRoom>(door, entity); // NOLINT(readability-suspicious-call-argument)
 				}
 			};
 
@@ -90,21 +80,16 @@ namespace pd::factory
 		}
 
 		// ============================================
-		// collision & 房间边界
+		// 房间边界
 		// ============================================
 
 		{
-			const auto body_id = detail::create_attach(registry, entity, BodyDef, room.position);
+			const auto bounding_entity = Bounding::spawn(registry, room.bounding);
 
-			auto& [bounding] = registry.emplace<room::Bounding>(entity);
-			bounding.reserve(room.bounding.size());
+			// 设置房间边界所属房间
+			registry.emplace<bounding::Room>(bounding_entity, entity); // NOLINT(readability-suspicious-call-argument)
 
-			for (const auto& [shape]: room.bounding)
-			{
-				const auto shape_id = detail::create(body_id, BoundingShapeDef, shape);
-
-				bounding.emplace_back(shape_id);
-			}
+			registry.emplace<room::Bounding>(entity, bounding_entity);
 		}
 
 		// ============================================
@@ -117,9 +102,9 @@ namespace pd::factory
 
 			for (const auto& tile: room.tiles)
 			{
-				const auto e = Tile::spawn(registry, tile);
+				const auto tile_entity = Tile::spawn(registry, tile);
 
-				tiles.emplace_back(e);
+				tiles.emplace_back(tile_entity);
 			}
 		}
 
@@ -150,8 +135,10 @@ namespace pd::factory
 
 	auto Room::destroy_all(entt::registry& registry) noexcept -> void
 	{
-		// 门感应区
-		DoorSensor::destroy_all(registry);
+		// 门
+		Door::destroy_all(registry);
+		// 房间边界
+		Bounding::destroy_all(registry);
 		// 瓦片
 		Tile::destroy_all(registry);
 		// 敌人
