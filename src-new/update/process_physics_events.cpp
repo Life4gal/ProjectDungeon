@@ -141,13 +141,13 @@ namespace pd::update
 
 			SPDLOG_INFO(
 				"感应事件: [{}]=0x{:08X}, [{}]=0x{:08X}",
-				meta::name_of(visitor_shape_type),
-				entt::to_integral(visitor_entity),
+				meta::name_of(sensor_shape_type),
+				entt::to_integral(sensor_entity),
 				meta::name_of(visitor_shape_type),
 				entt::to_integral(visitor_entity)
 			);
 
-			if (sensor_shape_type == blueprint::CollisionCategory::DOOR)
+			if (sensor_shape_type == blueprint::CollisionCategory::DOOR_SENSOR)
 			{
 				helper::Door::sense(registry, sensor_entity, visitor_entity);
 				return;

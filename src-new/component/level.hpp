@@ -5,13 +5,16 @@
 
 #pragma once
 
-namespace pd::component::renderer
+#include <entt/entity/fwd.hpp>
+
+namespace pd::component::level
 {
-	// 标记渲染视图需要进行排序
-	// 这会在创建/改动RenderLayer组件时设置
-	// factory/render.cpp
-	// update/render.cpp
+	// 起始房间实体
 	//
 	// [CTX]
-	class SortRequired final {};
+	class StartRoom final
+	{
+	public:
+		entt::entity room;
+	};
 }

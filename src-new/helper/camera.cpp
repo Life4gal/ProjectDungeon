@@ -51,6 +51,14 @@ namespace pd::helper
 
 		registry.ctx().insert_or_assign(camera::Position{.position = area.position});
 		registry.ctx().insert_or_assign(camera::Size{.size = area.size});
+
+		SPDLOG_INFO(
+			"设置相机区域: [X]={}, [Y]={}, [Width]={}, [Height]={}",
+			area.position.x,
+			area.position.y,
+			area.position.x,
+			area.position.y
+		);
 	}
 
 	auto Camera::get_area(entt::registry& registry) noexcept -> sf::FloatRect
@@ -69,11 +77,15 @@ namespace pd::helper
 		[[maybe_unused]] const auto old_size = do_set_size(registry, new_area.size);
 
 		SPDLOG_INFO(
-			"设置相机区域: [X]={}, [Y]={}, [Width]={}, [Height]={}",
+			"重设相机区域: ([X]={}, [Y]={}, [Width]={}, [Height]={}) ==> ([X]={}, [Y]={}, [Width]={}, [Height]={})",
+			old_position.x,
+			old_position.y,
+			old_size.x,
+			old_size.y,
 			new_area.position.x,
 			new_area.position.y,
-			new_area.position.x,
-			new_area.position.y
+			new_area.size.x,
+			new_area.size.y
 		);
 
 		manager::Event::enqueue(event::camera::SetArea{.previous = {old_position, old_size}, .current = new_area});

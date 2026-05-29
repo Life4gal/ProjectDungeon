@@ -9,6 +9,7 @@
 
 #include <designer/room.hpp>
 
+#include <component/level.hpp>
 #include <component/door.hpp>
 
 #include <factory/room.hpp>
@@ -19,8 +20,13 @@
 
 namespace pd::factory
 {
+	using namespace component;
+
 	auto Level::create(entt::registry& registry, const blueprint::Level& level) noexcept -> void
 	{
+		// 有且仅有一个起始房间
+		PROMETHEUS_PLATFORM_ASSUME(std::ranges::contains(level.rooms | std::views::values, blueprint::RoomType::START, &blueprint::Room::type) == 1);
+
 		using position_type = blueprint::LayoutPosition;
 
 		// 房间实体与位置的映射
@@ -34,6 +40,12 @@ namespace pd::factory
 		for (const auto& [position, room]: level.rooms)
 		{
 			const auto room_entity = Room::spawn(registry, room);
+
+			// 如果是起始房间,注册到上下文中
+			if (room.type == blueprint::RoomType::START)
+			{
+				registry.ctx().emplace<level::StartRoom>(room_entity);
+			}
 
 			entity_to_positions.emplace(room_entity, position);
 			position_to_entities.emplace(position, room_entity);
@@ -69,10 +81,8 @@ namespace pd::factory
 			}
 		}
 
-		// 给所有门感应器实体设置目标房间
+		// 给所有门实体设置目标房间
 		{
-			using namespace component;
-
 			const auto do_set = [&](
 				door::TargetRoom& target_room,
 				const entt::entity room,

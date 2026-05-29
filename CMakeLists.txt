@@ -753,6 +753,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tile.hpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/level.hpp
 
 	# 相机(可视区域)
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp

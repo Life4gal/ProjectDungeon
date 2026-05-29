@@ -32,7 +32,10 @@
 #include <factory/player.hpp>
 #include <factory/projectile.hpp>
 
+#include <component/level.hpp>
+
 #include <helper/camera.hpp>
+#include <helper/room.hpp>
 #include <helper/player_controller.hpp>
 #include <helper/cheat.hpp>
 
@@ -295,17 +298,14 @@ namespace pd::scene
 		factory::Level::create(registry_, level);
 
 		// 玩家
-		const auto& start_room = level.rooms.at(level.start_position);
-		auto player = designer::Player::test_character();
-		player.position.x += start_room.position.x;
-		player.position.y += start_room.position.y;
+		const auto player = designer::Player::test_character();
 		const auto player_entity = factory::Player::spawn(registry_, player);
 		helper::PlayerController::set_target(registry_, player_entity);
 
-		// 相机
-		// TODO: 是设置相机来进入目标房间,还是进入目标房间后设置相机?
-		helper::Camera::initialize(registry_, {{start_room.position.x, start_room.position.y}, sf::Vector2f{1080, 720}});
-		SPDLOG_INFO("进入房间[{}:{}]", start_room.layout_position.x, start_room.layout_position.y);
+		// 进入起始房间
+		// TODO: 要不要保存"起始房间"上下文?还是说factory::Level::create返回起始房间实体更好一些?(毕竟我们不保存level蓝图,这也意味着整个关卡不可重现)
+		const auto [start_room] = registry_.ctx().get<component::level::StartRoom>();
+		helper::Room::enter(registry_, start_room);
 
 		return true;
 	}

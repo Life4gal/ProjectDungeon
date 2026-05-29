@@ -27,6 +27,15 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// ============================================
+		// 类型 + 邻居
+		// ============================================
+
+		// type
+		registry.emplace<room::RoomType>(entity, room.type);
+		// neighbors
+		registry.emplace<room::DirectionMask>(entity, room.neighbors);
+
+		// ============================================
 		// 位置 + 大小
 		// ============================================
 

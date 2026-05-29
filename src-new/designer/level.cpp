@@ -538,7 +538,9 @@ namespace pd::designer
 						case blueprint::RoomType::START:
 						{
 							// TODO
-							return Room::standard(x, y, mask);
+							auto r = Room::standard(x, y, mask);
+							r.type = blueprint::RoomType::START;
+							return r;
 						}
 						case blueprint::RoomType::STANDARD:
 						{
@@ -547,27 +549,37 @@ namespace pd::designer
 						case blueprint::RoomType::BOSS:
 						{
 							// TODO
-							return Room::standard(x, y, mask);
+							auto r = Room::standard(x, y, mask);
+							r.type = blueprint::RoomType::BOSS;
+							return r;
 						}
 						case blueprint::RoomType::KEY:
 						{
 							// TODO
-							return Room::standard(x, y, mask);
+							auto r = Room::standard(x, y, mask);
+							r.type = blueprint::RoomType::KEY;
+							return r;
 						}
 						case blueprint::RoomType::MERCHANT:
 						{
 							// TODO
-							return Room::standard(x, y, mask);
+							auto r = Room::standard(x, y, mask);
+							r.type = blueprint::RoomType::MERCHANT;
+							return r;
 						}
 						case blueprint::RoomType::BONUS:
 						{
 							// TODO
-							return Room::standard(x, y, mask);
+							auto r = Room::standard(x, y, mask);
+							r.type = blueprint::RoomType::BONUS;
+							return r;
 						}
 						case blueprint::RoomType::EXIT:
 						{
 							// TODO
-							return Room::standard(x, y, mask);
+							auto r = Room::standard(x, y, mask);
+							r.type = blueprint::RoomType::EXIT;
+							return r;
 						}
 						default: // NOLINT(clang-diagnostic-covered-switch-default)
 						{
