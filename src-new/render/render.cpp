@@ -51,12 +51,8 @@ namespace pd::render
 		// 检查是否需要排序
 		if (registry.ctx().contains<renderer::SortRequired>())
 		{
-			// group.sort<component::render::RenderLayer>(
-			// 	[](const render::RenderLayer lhs, const render::RenderLayer rhs) noexcept -> bool
-			// 	{
-			// 		return std::to_underlying(lhs) < std::to_underlying(rhs);
-			// 	}
-			// );
+			// TODO: 需不需要加入Z-ORDER?
+			//  position::y越小的先渲染
 			group.sort<component::render::RenderLayer, component::render::SpawnTime>(
 				[](
 			const std::tuple<component::render::RenderLayer&, component::render::SpawnTime&>& lhs,
