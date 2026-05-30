@@ -36,6 +36,15 @@ namespace pd::component::door
 	// 门所在方向
 	using blueprint::Direction;
 
+	// 门状态
+	enum class State : std::uint8_t
+	{
+		// 已关闭
+		CLOSED,
+		// 已开启
+		OPENED,
+	};
+
 	// ============================================
 
 	// 门所属房间实体

@@ -30,8 +30,8 @@ namespace pd::blueprint
 
 		// 渲染(必须是动态精灵)
 		// 初始为暂停状态
-		// 正放 -> 关门
-		// 倒放 -> 开门
+		// 正放 -> 开门
+		// 倒放 -> 关门
 		DynamicSprite sprite;
 	};
 }

@@ -79,6 +79,8 @@ namespace pd::factory
 		}
 		// direction
 		registry.emplace<door::Direction>(entity, direction);
+		// state
+		registry.emplace<door::State>(entity, door::State::CLOSED);
 		// door::Room由factory::Room附加
 		// door::TargetRoom由factory::Level附加
 		// tags

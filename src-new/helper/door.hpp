@@ -16,6 +16,7 @@ namespace pd::helper
 		//
 		// Event:
 		//  event::door::Contacted
+		//  event::door::Opened
 		static auto contact(entt::registry& registry, entt::entity door, entt::entity other) noexcept -> void;
 
 		// 感应其他实体
