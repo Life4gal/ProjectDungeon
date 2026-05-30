@@ -86,6 +86,11 @@ namespace pd::factory::detail
 		registry.emplace<rds::Mode>(entity, dynamic_sprite.looping ? rds::Mode::LOOP : rds::Mode::ONE_SHOT);
 		// direction
 		registry.emplace<rds::Direction>(entity, dynamic_sprite.reversed ? rds::Direction::BACKWARD : rds::Direction::FORWARD);
+		// paused
+		if (dynamic_sprite.pause)
+		{
+			registry.emplace<rds::Paused>(entity);
+		}
 
 		// static sprite
 		const auto& [texture, position] = dynamic_sprite.frames[begin_frame_index];

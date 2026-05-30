@@ -29,18 +29,6 @@ namespace pd::helper
 		return next_frame_index;
 	}
 
-	auto DynamicSprite::get_next_frame_index(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
-	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount,Index,Mode, Direction>(entity_with_animation)));
-
-		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
-		const auto& index = registry.get<const Index>(entity_with_animation);
-		const auto& mode = registry.get<const Mode>(entity_with_animation);
-		const auto& direction = registry.get<const Direction>(entity_with_animation);
-
-		return get_next_frame_index(frames_count, index, mode, direction);
-	}
-
 	auto DynamicSprite::set_next_frame(const FramesCount& frames_count, Timer& timer, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
 	{
 		// 获取下一帧索引
@@ -54,6 +42,63 @@ namespace pd::helper
 
 		// 设置为指定帧
 		return set_frame(next_frame_index, frames_count, timer, index);
+	}
+
+	auto DynamicSprite::jump_to_next_frame(const FramesCount& frames_count, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
+	{
+		// 获取下一帧索引
+		const auto next_frame_index = get_next_frame_index(frames_count, index, mode, direction);
+
+		// 如果动画已结束则什么也不做
+		if (next_frame_index == animation_ended)
+		{
+			return animation_ended;
+		}
+
+		// 跳转到指定帧
+		return jump_to_frame(next_frame_index, frames_count, index);
+	}
+
+	auto DynamicSprite::set_frame(index_type frame_index, const FramesCount& frames_count, Timer& timer, Index& index) noexcept -> index_type
+	{
+		// 跳转到指定帧
+		frame_index = jump_to_frame(frame_index, frames_count, index);
+
+		// 设置帧计时器
+		timer.elapsed = sf::Time::Zero;
+
+		return frame_index;
+	}
+
+	auto DynamicSprite::jump_to_frame(index_type frame_index, const FramesCount& frames_count, Index& index) noexcept -> index_type
+	{
+		// 确保帧数不会超出总量
+		frame_index %= frames_count.frames_count;
+
+		// 设置当前帧索引
+		index.index = frame_index;
+		return frame_index;
+	}
+
+	auto DynamicSprite::get_frame_count(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
+	{
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount>(entity_with_animation)));
+
+		const auto& [frames_count] = registry.get<const FramesCount>(entity_with_animation);
+
+		return frames_count;
+	}
+
+	auto DynamicSprite::get_next_frame_index(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
+	{
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount,Index,Mode, Direction>(entity_with_animation)));
+
+		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
+		const auto& index = registry.get<const Index>(entity_with_animation);
+		const auto& mode = registry.get<const Mode>(entity_with_animation);
+		const auto& direction = registry.get<const Direction>(entity_with_animation);
+
+		return get_next_frame_index(frames_count, index, mode, direction);
 	}
 
 	auto DynamicSprite::set_next_frame(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
@@ -75,21 +120,6 @@ namespace pd::helper
 		return next_frame_index;
 	}
 
-	auto DynamicSprite::jump_to_next_frame(const FramesCount& frames_count, Index& index, const Mode& mode, const Direction& direction) noexcept -> index_type
-	{
-		// 获取下一帧索引
-		const auto next_frame_index = get_next_frame_index(frames_count, index, mode, direction);
-
-		// 如果动画已结束则什么也不做
-		if (next_frame_index == animation_ended)
-		{
-			return animation_ended;
-		}
-
-		// 跳转到指定帧
-		return jump_to_frame(next_frame_index, frames_count, index);
-	}
-
 	auto DynamicSprite::jump_to_next_frame(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
 		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
@@ -108,17 +138,6 @@ namespace pd::helper
 		return next_frame_index;
 	}
 
-	auto DynamicSprite::set_frame(index_type frame_index, const FramesCount& frames_count, Timer& timer, Index& index) noexcept -> index_type
-	{
-		// 跳转到指定帧
-		frame_index = jump_to_frame(frame_index, frames_count, index);
-
-		// 设置帧计时器
-		timer.elapsed = sf::Time::Zero;
-
-		return frame_index;
-	}
-
 	auto DynamicSprite::set_frame(entt::registry& registry, const entt::entity entity_with_animation, const index_type frame_index) noexcept -> index_type
 	{
 		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount, Timer, Index>(entity_with_animation)));
@@ -128,16 +147,6 @@ namespace pd::helper
 		auto& index = registry.get<Index>(entity_with_animation);
 
 		return set_frame(frame_index, frames_count, timer, index);
-	}
-
-	auto DynamicSprite::jump_to_frame(index_type frame_index, const FramesCount& frames_count, Index& index) noexcept -> index_type
-	{
-		// 确保帧数不会超出总量
-		frame_index %= frames_count.frames_count;
-
-		// 设置当前帧索引
-		index.index = frame_index;
-		return frame_index;
 	}
 
 	auto DynamicSprite::jump_to_frame(entt::registry& registry, const entt::entity entity_with_animation, const index_type frame_index) noexcept -> index_type
@@ -150,50 +159,97 @@ namespace pd::helper
 		return jump_to_frame(frame_index, frames_count, index);
 	}
 
-	auto DynamicSprite::looping(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	auto DynamicSprite::set_mode(
+		entt::registry& registry,
+		const entt::entity entity_with_animation,
+		const Mode mode
+	) noexcept -> void
 	{
-		registry.emplace_or_replace<Mode>(entity_with_animation, Mode::LOOP);
-
-		// 如果非循环动画之前已经播放完毕,则需要移除已结束的标记
-		registry.remove<Ended>(entity_with_animation);
+		registry.emplace_or_replace<Mode>(entity_with_animation, mode);
 	}
 
-	auto DynamicSprite::unlooping(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
-	{
-		registry.emplace_or_replace<Mode>(entity_with_animation, Mode::ONE_SHOT);
-	}
-
-	auto DynamicSprite::is_looping(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
+	auto DynamicSprite::get_mode(
+		const entt::registry& registry,
+		const entt::entity entity_with_animation
+	) noexcept -> Mode
 	{
 		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Mode>(entity_with_animation)));
 
 		const auto& mode = registry.get<const Mode>(entity_with_animation);
 
-		return mode == Mode::ONE_SHOT;
+		return mode;
 	}
 
-	auto DynamicSprite::reverse(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	auto DynamicSprite::set_mode_loop(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		registry.emplace_or_replace<Direction>(entity_with_animation, Direction::BACKWARD);
+		set_mode(registry, entity_with_animation, Mode::LOOP);
 	}
 
-	auto DynamicSprite::is_reversed(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
+	auto DynamicSprite::set_mode_one_shot(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	{
+		set_mode(registry, entity_with_animation, Mode::ONE_SHOT);
+	}
+
+	auto DynamicSprite::is_loop_mode(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
+	{
+		return get_mode(registry, entity_with_animation) == Mode::LOOP;
+	}
+
+	auto DynamicSprite::is_one_shot_mode(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
+	{
+		return get_mode(registry, entity_with_animation) == Mode::ONE_SHOT;
+	}
+
+	auto DynamicSprite::set_direction(
+		entt::registry& registry,
+		const entt::entity entity_with_animation,
+		const Direction direction
+	) noexcept -> void
+	{
+		registry.emplace_or_replace<Direction>(entity_with_animation, direction);
+	}
+
+	auto DynamicSprite::get_direction(
+		const entt::registry& registry,
+		const entt::entity entity_with_animation
+	) noexcept -> Direction
 	{
 		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Direction>(entity_with_animation)));
 
 		const auto& direction = registry.get<const Direction>(entity_with_animation);
 
-		return direction == Direction::BACKWARD;
+		return direction;
 	}
 
-	auto DynamicSprite::pause(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	auto DynamicSprite::set_direction_forward(
+		entt::registry& registry,
+		const entt::entity entity_with_animation
+	) noexcept -> void
 	{
-		registry.emplace_or_replace<Paused>(entity_with_animation);
+		set_direction(registry, entity_with_animation, Direction::FORWARD);
 	}
 
-	auto DynamicSprite::unpause(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	auto DynamicSprite::set_direction_backward(
+		entt::registry& registry,
+		const entt::entity entity_with_animation
+	) noexcept -> void
 	{
-		registry.remove<Paused>(entity_with_animation);
+		set_direction(registry, entity_with_animation, Direction::BACKWARD);
+	}
+
+	auto DynamicSprite::is_forward_direction(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
+	{
+		return get_direction(registry, entity_with_animation) == Direction::FORWARD;
+	}
+
+	auto DynamicSprite::is_backward_direction(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
+	{
+		return get_direction(registry, entity_with_animation) == Direction::BACKWARD;
+	}
+
+	auto DynamicSprite::is_playing(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
+	{
+		return not registry.any_of<Paused, Ended>(entity_with_animation);
 	}
 
 	auto DynamicSprite::is_paused(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
@@ -201,13 +257,39 @@ namespace pd::helper
 		return registry.all_of<Paused>(entity_with_animation);
 	}
 
-	auto DynamicSprite::end(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	auto DynamicSprite::pause(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
 	{
-		registry.emplace_or_replace<Ended>(entity_with_animation);
+		registry.emplace_or_replace<Paused>(entity_with_animation);
+	}
+
+	auto DynamicSprite::resume(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	{
+		registry.remove<Paused>(entity_with_animation);
 	}
 
 	auto DynamicSprite::is_ended(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> bool
 	{
 		return registry.all_of<Ended>(entity_with_animation);
+	}
+
+	auto DynamicSprite::end(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	{
+		registry.emplace_or_replace<Ended>(entity_with_animation);
+	}
+
+	auto DynamicSprite::replay(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> void
+	{
+		registry.remove<Paused>(entity_with_animation);
+		registry.remove<Ended>(entity_with_animation);
+
+		if (is_forward_direction(registry, entity_with_animation))
+		{
+			set_frame(registry, entity_with_animation, 0);
+		}
+		else
+		{
+			const auto count = get_frame_count(registry, entity_with_animation);
+			set_frame(registry, entity_with_animation, count - 1);
+		}
 	}
 }
