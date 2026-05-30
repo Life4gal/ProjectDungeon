@@ -234,35 +234,36 @@ namespace pd::helper
 		// 进入房间事件
 		manager::Event::enqueue(event::room::Enter{.room = room});
 
-		// 移动 玩家+相机
+		// 移动 相机+玩家
+		// 注意要先移动相机再移动玩家,否则玩家的transform::ScreenPosition不准确
 		switch (const auto door_direction = registry.get<const door::Direction>(door);
 			door_direction)
 		{
 			case door::Direction::NORTH:
 			{
-				PlayerController::translate(registry, {0, -PlayerOffsetY});
 				Camera::translate(registry, {0, -CameraOffsetY});
+				PlayerController::translate(registry, {0, -PlayerOffsetY});
 
 				break;
 			}
 			case door::Direction::SOUTH:
 			{
-				PlayerController::translate(registry, {0, PlayerOffsetY});
 				Camera::translate(registry, {0, CameraOffsetY});
+				PlayerController::translate(registry, {0, PlayerOffsetY});
 
 				break;
 			}
 			case door::Direction::WEST:
 			{
-				PlayerController::translate(registry, {-PlayerOffsetX, 0});
 				Camera::translate(registry, {-CameraOffsetX, 0});
+				PlayerController::translate(registry, {-PlayerOffsetX, 0});
 
 				break;
 			}
 			case door::Direction::EAST:
 			{
-				PlayerController::translate(registry, {PlayerOffsetX, 0});
 				Camera::translate(registry, {CameraOffsetX, 0});
+				PlayerController::translate(registry, {PlayerOffsetX, 0});
 
 				break;
 			}

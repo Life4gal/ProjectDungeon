@@ -524,8 +524,12 @@ namespace pd::scene
 			update::move_behavior(registry_, delta);
 
 			update::physics_world(registry_, delta);
-			update::process_physics_events(registry_, delta);
+			// b2World_GetBodyEvents -> b2BodyMoveEvent 的数据是该次b2World_Step的*旧*数据
+			// 如果我们在 b2World_GetContactEvents/b2World_GetSensorEvents 可能直接修改物理体的 b2Transform 数据
+			// 则*必须*先处理 b2World_GetBodyEvents 再处理 Contact/Sensor 相关事件
+			// 否则处理 Contact/Sensor 时更新的 b2Transform(及其同步地数据) 将被*旧*数据覆盖 
 			update::sync_physics_transform(registry_, delta);
+			update::process_physics_events(registry_, delta);
 
 			update::collect_death(registry_, delta);
 

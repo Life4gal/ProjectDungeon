@@ -134,25 +134,21 @@ namespace pd::helper
 			"玩家位置移动: [X]={} -> {}({}), [Y]={} -> {}({})",
 			old_position.x,
 			new_position.x,
-			new_position.x - old_position.x,
+			distance.x,
 			old_position.y,
 			new_position.y,
-			new_position.y - old_position.y
+			distance.y
 		);
 
+		// Collision::set_pixel_position 仅更新物理体的位置
+		// 在下一帧的sync_physics_transform中才会同步Transform的位置
+		// 但是我们会在该帧的render::camera中计算视野内的实体,如果Transform的位置没有被同步,则可能导致玩家控制的实体在该帧内不在视野内
+		// 我们必须手动同步Transform的位置,以保证玩家控制的实体在该帧内仍然在视野内
 		if (registry.all_of<collision::BodyId>(e))
 		{
-			// Collision::translate_pixel(registry, e, distance);
 			Collision::set_pixel_position(registry, e, new_position);
 		}
-		// TODO: PlayerController::translate只会设置物理刚体的位置(如果当前控制的实体存在物理刚体组件)
-		//  但是Transform的位置需要在下一帧的sync_physics_transform中同步,而render::camera在计算视野内的实体时使用的是Transform的位置
-		//  这意味着如果我们要么延迟一帧更新Camera,要么手动进行同步
-		// else
-		{
-			// Transform::translate(registry, e, distance);
-			Transform::set_position(registry, e, new_position);
-		}
+		Transform::set_position(registry, e, new_position);
 	}
 
 	auto PlayerController::left(entt::registry& registry) noexcept -> void

@@ -21,14 +21,6 @@ namespace pd::component::tags
 	// 地下城-- 关卡 -- 房间 -- 瓦片
 	class Tile final {};
 
-	// =========
-
-	// 地下城 -- 关卡 -- 房间 -- 地板
-	class Floor final {};
-
-	// 地下城 -- 关卡 -- 房间 -- 墙壁
-	class Wall final {};
-
 	// 地下城-- 关卡 -- 房间
 	class Room final {};
 

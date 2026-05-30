@@ -6,7 +6,7 @@
 #include <render/camera.hpp>
 
 #include <component/camera.hpp>
-#include <component/state.hpp>
+#include <component/tags.hpp>
 #include <component/transform.hpp>
 
 #include <helper/camera.hpp>
