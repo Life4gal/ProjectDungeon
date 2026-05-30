@@ -33,6 +33,7 @@
 #include <factory/projectile.hpp>
 
 #include <component/level.hpp>
+#include <component/projectile.hpp>
 
 #include <helper/camera.hpp>
 #include <helper/room.hpp>
@@ -444,7 +445,11 @@ namespace pd::scene
 							return {0, 1};
 						}();
 
-						factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
+						const auto entity = factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
+						// TODO: 飞弹生成并不会引发相机更新,这也意味着该飞弹实体并没有需要的state标签(state::sprite::Awake)
+						//  这意味着该飞弹不会被渲染
+						//  我们应该有一种更好的(更自动化的)机制来处理这个问题
+						registry_.emplace<component::state::sprite::Awake>(entity);
 					}
 				}
 				else if (kp->code == Key::E)

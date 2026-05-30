@@ -39,9 +39,6 @@ namespace pd::factory
 		detail::attach(registry, entity, projectile.sprite, blueprint::RenderLayer::PROJECTILE);
 		// collision
 		detail::attach(registry, entity, projectile.collision, position);
-		{
-			// collision
-		}
 		// owner
 		registry.emplace<projectile::Owner>(entity, owner);
 		// speed & velocity
