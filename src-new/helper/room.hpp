@@ -54,6 +54,16 @@ namespace pd::helper
 		//  event::door::Closed (Door::try_close)
 		static auto enter(entt::registry& registry, entt::entity room) noexcept -> void;
 
+		// 进入指定房间(仅在初次进入房间时使用)
+		// x: 目标房间在关卡布局中的X坐标
+		// y: 目标房间在关卡布局中的Y坐标
+		//
+		// Event:
+		//  event::room::Enter
+		//  event::camera::Translate (Camera::translate)
+		//  event::door::Closed (Door::try_close)
+		static auto enter(entt::registry& registry, unsigned x, unsigned y) noexcept -> void;
+
 		// 进入指定房间
 		// room: 目标房间(其实也可以只传入门实体?)
 		// door: 从哪个门进入

@@ -304,9 +304,7 @@ namespace pd::scene
 		helper::PlayerController::set_target(registry_, player_entity);
 
 		// 进入起始房间
-		// TODO: 要不要保存"起始房间"上下文?还是说factory::Level::create返回起始房间实体更好一些?(毕竟我们不保存level蓝图,这也意味着整个关卡不可重现)
-		const auto [start_room] = registry_.ctx().get<component::level::StartRoom>();
-		helper::Room::enter(registry_, start_room);
+		helper::Room::enter(registry_, level.start_position.x, level.start_position.y);
 
 		return true;
 	}

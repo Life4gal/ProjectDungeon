@@ -14,6 +14,7 @@
 
 #include <event/room.hpp>
 
+#include <component/level.hpp>
 #include <component/room.hpp>
 #include <component/enemy.hpp>
 
@@ -191,6 +192,23 @@ namespace pd::helper
 
 		// 关门
 		close_doors(registry, room);
+	}
+
+	auto Room::enter(entt::registry& registry, const unsigned x, const unsigned y) noexcept -> void
+	{
+		const auto& [position_to_entity] = registry.ctx().get<level::PositionToEntity>();
+		const auto position = blueprint::LayoutPosition{.x = x, .y = y};
+
+		const auto it = position_to_entity.find(position);
+		if (it == position_to_entity.end())
+		{
+			// TODO: 如何处理?
+			SPDLOG_ERROR("没有房间位于[{}:{}],无法进入房间", x, y);
+			return;
+		}
+
+		const auto room = it->second;
+		enter(registry, room);
 	}
 
 	auto Room::enter(entt::registry& registry, const entt::entity room, const entt::entity door) noexcept -> void
