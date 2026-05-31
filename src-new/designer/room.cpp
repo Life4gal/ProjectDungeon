@@ -129,6 +129,7 @@ namespace pd::designer
 
 				bounding.segments.emplace_back(p1, p2);
 				bounding.segments.emplace_back(p2, p3);
+
 				bounding.segments.emplace_back(p4, p5);
 				bounding.segments.emplace_back(p5, p6);
 			}
@@ -141,7 +142,7 @@ namespace pd::designer
 				//     p1                   p2
 
 				constexpr Position p1{.x = tile_width, .y = tile_height};
-				constexpr Position p2{.x = width - tile_width, .y = height - tile_height};
+				constexpr Position p2{.x = width - tile_width, .y = tile_height};
 
 				bounding.segments.emplace_back(p1, p2);
 			}
@@ -188,6 +189,7 @@ namespace pd::designer
 
 				bounding.segments.emplace_back(p1, p2);
 				bounding.segments.emplace_back(p2, p3);
+
 				bounding.segments.emplace_back(p4, p5);
 				bounding.segments.emplace_back(p5, p6);
 			}
@@ -253,6 +255,7 @@ namespace pd::designer
 
 				bounding.segments.emplace_back(p1, p2);
 				bounding.segments.emplace_back(p2, p3);
+
 				bounding.segments.emplace_back(p4, p5);
 				bounding.segments.emplace_back(p5, p6);
 			}
@@ -303,7 +306,7 @@ namespace pd::designer
 
 				// 边界
 				//  
-				//   p1 >
+				//  p1 >
 				//         |  
 				//         |     p3
 				//         |     v
@@ -324,6 +327,7 @@ namespace pd::designer
 
 				bounding.segments.emplace_back(p1, p2);
 				bounding.segments.emplace_back(p2, p3);
+
 				bounding.segments.emplace_back(p4, p5);
 				bounding.segments.emplace_back(p5, p6);
 			}
