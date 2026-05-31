@@ -79,10 +79,11 @@ namespace pd::factory::detail
 		const blueprint::CollisionShape::circle& circle
 	) noexcept -> b2ShapeId
 	{
+		const auto center = Physics::to_physics({circle.center.x, circle.center.y});
 		const auto radius = Physics::to_physics(circle.radius);
 
 		const auto def = make_shape_def(shape_def);
-		const b2Circle shape{.center = {.x = circle.center.x, .y = circle.center.y}, .radius = radius};
+		const b2Circle shape{.center = center, .radius = radius};
 
 		return b2CreateCircleShape(body_id, &def, &shape);
 	}
