@@ -15,16 +15,15 @@ namespace pd::blueprint
 	{
 	public:
 		// 门的位置
-		// 绝对位置(刚体位置)
 		Position position;
 
-		// 感应区位置
-		// 相对位置(OffsetBox::center,相对于刚体的偏移)
-		Position sensor_position;
+		// 门碰撞体偏移
+		Position door_offset;
+		// 门碰撞体大小
+		Size door_size;
 
-		// 门大小
-		Size size;
-
+		// 感应区偏移
+		Position sensor_offset;
 		// 感应区大小
 		Size sensor_size;
 

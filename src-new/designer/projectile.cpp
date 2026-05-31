@@ -9,23 +9,25 @@ namespace pd::designer
 {
 	auto Projectile::standard() noexcept -> blueprint::Projectile
 	{
+		// 渲染(必须是动态精灵)
 		blueprint::DynamicSprite sprite
 		{
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/wall.png", .position = {.x = 16, .y = 16}, .size = {.width = 32, .height = 32}, .origin = {.x = 16, .y = 16}, .duration_ms = 100},
+						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 16, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
 						// 第二帧
-						{.texture = "./assets/tileset/wall.png", .position = {.x = 80, .y = 16}, .size = {.width = 32, .height = 32}, .origin = {.x = 16, .y = 16}, .duration_ms = 100},
+						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 80, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
 						// 第三帧
-						{.texture = "./assets/tileset/wall.png", .position = {.x = 144, .y = 16}, .size = {.width = 32, .height = 32}, .origin = {.x = 16, .y = 16}, .duration_ms = 100},
+						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 144, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
 						// 第四帧
-						{.texture = "./assets/tileset/wall.png", .position = {.x = 208, .y = 16}, .size = {.width = 32, .height = 32}, .origin = {.x = 16, .y = 16}, .duration_ms = 100},
+						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 208, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
 				},
 				.looping = true,
 				.reversed = false,
 				.pause = false,
 		};
+		// 碰撞体
 		blueprint::Collision collision
 		{
 				.def =
@@ -58,6 +60,7 @@ namespace pd::designer
 						//
 				},
 		};
+		// 弹道
 		constexpr blueprint::Trajectory trajectory
 		{
 				blueprint::Trajectory::straight

@@ -11,28 +11,31 @@ namespace pd::designer
 {
 	auto Player::test_character() noexcept -> blueprint::Player
 	{
+		// 初始位置
 		constexpr blueprint::Position position
 		{
 				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
 				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
 		};
+		// 渲染(必须是动态精灵)
 		blueprint::DynamicSprite sprite
 		{
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 0, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
+						{.texture = "./assets/tileset/player.png", .uv_position = {.x = 0, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 250},
 						// 第二帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 64, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
+						{.texture = "./assets/tileset/player.png", .uv_position = {.x = 64, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 250},
 						// 第三帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 128, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
+						{.texture = "./assets/tileset/player.png", .uv_position = {.x = 128, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 250},
 						// 第四帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 192, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
+						{.texture = "./assets/tileset/player.png", .uv_position = {.x = 192, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 250},
 				},
 				.looping = true,
 				.reversed = false,
 				.pause = false,
 		};
+		// 碰撞体
 		blueprint::Collision collision
 		{
 				.def =

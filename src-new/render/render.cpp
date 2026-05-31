@@ -35,9 +35,9 @@ namespace pd::render
 			entt::get<
 				state::sprite::Awake,
 				rss::Texture,
-				rss::Position,
-				rss::Size,
-				rss::Origin,
+				rss::UvPosition,
+				rss::UvSize,
+				rss::Pivot,
 				res::Position,
 				res::Scale,
 				res::Rotation,
@@ -86,7 +86,7 @@ namespace pd::render
 			     texture,
 			     texture_position,
 			     texture_size,
-			     texture_origin,
+			     texture_pivot,
 			     effect_position,
 			     effect_scale,
 			     effect_rotation,
@@ -99,7 +99,7 @@ namespace pd::render
 			const auto render_scale = effect_scale.extra;
 			const auto render_rotation = rotation.rotation + effect_rotation.extra;
 			const auto render_color = effect_color.color;
-			const auto render_origin = texture_origin.origin;
+			const auto render_pivot = texture_pivot.pivot;
 
 			if (texture.texture == manager::InvalidHandler)
 			{
@@ -142,7 +142,7 @@ namespace pd::render
 				       .translate(render_position)
 				       .rotate(render_rotation)
 				       .scale(render_scale)
-				       .translate(-render_origin);
+				       .translate(-render_pivot);
 			}();
 
 			window.draw(vertices.data(), vertices.size(), sf::PrimitiveType::TriangleStrip, g_shared_states);

@@ -20,15 +20,14 @@ namespace pd::blueprint
 	public:
 		// 纹理路径
 		std::string texture;
-
 		// 纹理坐标
-		Position position;
-
+		Position uv_position;
 		// 纹理大小
-		Size size;
+		Size uv_size;
 
-		// 纹理原点(一般为size/2)
-		Position origin;
+		// 锚点
+		// render-position = entity-position - pivot
+		Position pivot;
 	};
 
 	// 动态精灵
@@ -41,15 +40,14 @@ namespace pd::blueprint
 		public:
 			// 纹理路径
 			std::string texture;
-
 			// 纹理坐标
-			Position position;
-
+			Position uv_position;
 			// 纹理大小
-			Size size;
+			Size uv_size;
 
-			// 纹理原点(一般为size/2)
-			Position origin;
+			// 锚点
+			// render-position = entity-position - pivot
+			Position pivot;
 
 			// 持续时间(毫秒)
 			int duration_ms;

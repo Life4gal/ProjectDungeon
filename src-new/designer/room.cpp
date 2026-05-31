@@ -9,6 +9,8 @@
 // std::popcount
 #include <bit>
 
+#include <manager/random.hpp>
+
 #include <designer/enemy.hpp>
 
 #include <prometheus/platform/os.hpp>
@@ -71,13 +73,13 @@ namespace pd::designer
 					.frames =
 					{
 							// 第一帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 0, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
+							{.texture = "./assets/tileset/door.png", .uv_position = {.x = 0, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 100},
 							// 第二帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 64, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
+							{.texture = "./assets/tileset/door.png", .uv_position = {.x = 64, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 100},
 							// 第三帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 128, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
+							{.texture = "./assets/tileset/door.png", .uv_position = {.x = 128, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 100},
 							// 第四帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 192, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
+							{.texture = "./assets/tileset/door.png", .uv_position = {.x = 192, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 100},
 					},
 					.looping = false,
 					.reversed = false,
@@ -94,15 +96,17 @@ namespace pd::designer
 				door.position.x = static_cast<float>(x) + static_cast<float>(tile_width) / 2;
 				door.position.y = 0 + static_cast<float>(tile_height) / 2;
 
-				// 门感应区位置
-				door.sensor_position.x = 0;
-				door.sensor_position.y = -static_cast<float>(tile_height) / 2 + SensorAreaHeight / 2;
+				// 门碰撞体偏移
+				door.door_offset.x = 0;
+				door.door_offset.y = 0;
+				// 门碰撞体大小
+				door.door_size.width = tile_width;
+				door.door_size.height = tile_height;
 
-				// 门大小
-				door.size.width = tile_width;
-				door.size.height = tile_height;
-
-				// 门感应区大小
+				// 感应区偏移
+				door.sensor_offset.x = 0;
+				door.sensor_offset.y = -static_cast<float>(tile_height) / 2 + SensorAreaHeight / 2;
+				// 感应区大小
 				door.sensor_size.width = tile_width;
 				door.sensor_size.height = SensorAreaHeight;
 
@@ -154,15 +158,17 @@ namespace pd::designer
 				door.position.x = static_cast<float>(x) + static_cast<float>(tile_width) / 2;
 				door.position.y = height - static_cast<float>(tile_height) + static_cast<float>(tile_height) / 2;
 
-				// 门感应区位置
-				door.sensor_position.x = 0;
-				door.sensor_position.y = static_cast<float>(tile_height) / 2 - SensorAreaHeight / 2;
+				// 门碰撞体偏移
+				door.door_offset.x = 0;
+				door.door_offset.y = 0;
+				// 门碰撞体大小
+				door.door_size.width = tile_width;
+				door.door_size.height = tile_height;
 
-				// 门大小
-				door.size.width = tile_width;
-				door.size.height = tile_height;
-
-				// 门感应区大小
+				// 感应区偏移
+				door.sensor_offset.x = 0;
+				door.sensor_offset.y = static_cast<float>(tile_height) / 2 - SensorAreaHeight / 2;
+				// 感应区大小
 				door.sensor_size.width = tile_width;
 				door.sensor_size.height = SensorAreaHeight;
 
@@ -214,15 +220,17 @@ namespace pd::designer
 				door.position.x = 0 + static_cast<float>(tile_width) / 2;
 				door.position.y = static_cast<float>(y) + static_cast<float>(tile_height) / 2;
 
-				// 门感应区位置
-				door.sensor_position.x = -static_cast<float>(tile_width) / 2 + SensorAreaWidth / 2;
-				door.sensor_position.y = 0;
+				// 门碰撞体偏移
+				door.door_offset.x = 0;
+				door.door_offset.y = 0;
+				// 门碰撞体大小
+				door.door_size.width = tile_width;
+				door.door_size.height = tile_height;
 
-				// 门大小
-				door.size.width = tile_width;
-				door.size.height = tile_height;
-
-				// 门感应区大小
+				// 感应区偏移
+				door.sensor_offset.x = -static_cast<float>(tile_width) / 2 + SensorAreaWidth / 2;
+				door.sensor_offset.y = 0;
+				// 感应区大小
 				door.sensor_size.width = SensorAreaWidth;
 				door.sensor_size.height = tile_height;
 
@@ -286,15 +294,17 @@ namespace pd::designer
 				door.position.x = width - tile_width + static_cast<float>(tile_width) / 2;
 				door.position.y = static_cast<float>(y) + static_cast<float>(tile_height) / 2;
 
-				// 门感应区位置
-				door.sensor_position.x = static_cast<float>(tile_width) / 2 - SensorAreaWidth / 2;
-				door.sensor_position.y = 0;
+				// 门碰撞体偏移
+				door.door_offset.x = 0;
+				door.door_offset.y = 0;
+				// 门碰撞体大小
+				door.door_size.width = tile_width;
+				door.door_size.height = tile_height;
 
-				// 门大小
-				door.size.width = tile_width;
-				door.size.height = tile_height;
-
-				// 门感应区大小
+				// 感应区偏移
+				door.sensor_offset.x = static_cast<float>(tile_width) / 2 - SensorAreaWidth / 2;
+				door.sensor_offset.y = 0;
+				// 感应区大小
 				door.sensor_size.width = SensorAreaWidth;
 				door.sensor_size.height = tile_height;
 
@@ -372,10 +382,10 @@ namespace pd::designer
 						{
 								.sprite = blueprint::StaticSprite
 								{
-										.texture = "./assets/tileset/floor.png",
-										.position = {.x = 0, .y = 0},
-										.size = {.width = tile_width, .height = tile_height},
-										.origin = {.x = tile_origin_x, .y = tile_origin_y},
+										.texture = "./assets/wall+floor.png",
+										.uv_position = {.x = 576, .y = 256},
+										.uv_size = {.width = 64, .height = 64},
+										.pivot = {.x = 32, .y = 32},
 								},
 								.render_layer = blueprint::RenderLayer::FLOOR,
 						},
@@ -405,12 +415,12 @@ namespace pd::designer
 						{
 								.sprite = blueprint::StaticSprite
 								{
-										.texture = "./assets/tileset/wall.png",
-										.position = {.x = 0, .y = 0},
-										.size = {.width = tile_width, .height = tile_height},
-										.origin = {.x = tile_origin_x, .y = tile_origin_y},
+										.texture = "./assets/wall+floor.png",
+										.uv_position = {.x = 0, .y = 64},
+										.uv_size = {.width = 64, .height = 64},
+										.pivot = {.x = 32, .y = 32},
 								},
-								.render_layer = blueprint::RenderLayer::FLOOR,
+								.render_layer = blueprint::RenderLayer::WALL,
 						},
 						.collision =
 						// 墙壁的阻挡作用已被房间边界取代
@@ -471,6 +481,9 @@ namespace pd::designer
 						tile.position.x = static_cast<float>(tile_origin_x + x * tile_width);
 						tile.position.y = static_cast<float>(tile_origin_y + y * tile_height);
 
+						const auto style = manager::Random::int_inclusive(0, 8);
+						std::get<0>(tile.sprite.sprite).uv_position.x = static_cast<float>(style * 64);
+
 						tiles.push_back(tile);
 					}
 				}
@@ -496,6 +509,9 @@ namespace pd::designer
 						tile.position.x = static_cast<float>(tile_origin_x + x * tile_width);
 						tile.position.y = static_cast<float>(tile_origin_y + y * tile_height);
 
+						const auto style = manager::Random::int_inclusive(0, 8);
+						std::get<0>(tile.sprite.sprite).uv_position.x = static_cast<float>(style * 64);
+
 						tiles.push_back(tile);
 					}
 				}
@@ -509,16 +525,11 @@ namespace pd::designer
 		std::vector<blueprint::Enemy> enemies{};
 
 		{
-			// enemies.reserve(3);
-			//
-			// enemies.push_back(Enemy::rat(2, 2));
-			// enemies.push_back(Enemy::slime(3, 3));
-			// enemies.push_back(Enemy::bat(4, 4));
+			enemies.reserve(3);
 
-			// TODO: 测试用
-			auto rat = Enemy::rat(2, 2);
-			rat.ai.move_behavior.behavior = blueprint::MoveBehavior::stationary{};
-			enemies.push_back(std::move(rat));
+			enemies.push_back(Enemy::rat(2, 2));
+			enemies.push_back(Enemy::slime(3, 3));
+			enemies.push_back(Enemy::bat(4, 4));
 		}
 
 		// ===========================

@@ -40,9 +40,9 @@ namespace pd::component::render
 			manager::texture_handler texture;
 		};
 
-		// 纹理位置
+		// 纹理的坐标
 		// 如果使用整张纹理渲染则为{0,0}
-		class Position final
+		class UvPosition final
 		{
 		public:
 			sf::Vector2f position;
@@ -50,17 +50,17 @@ namespace pd::component::render
 
 		// 纹理的大小
 		// 如果使用整张纹理渲染则为整张纹理的大小
-		class Size final
+		class UvSize final
 		{
 		public:
 			sf::Vector2f size;
 		};
 
-		// 纹理的原点(一般是TextureSize/2)
-		class Origin final
+		// 锚点
+		class Pivot final
 		{
 		public:
-			sf::Vector2f origin;
+			sf::Vector2f pivot;
 		};
 	}
 
@@ -82,8 +82,8 @@ namespace pd::component::render
 				sf::Vector2f position;
 				// static_sprite::Size
 				sf::Vector2f size;
-				// static_sprite::Origin
-				sf::Vector2f origin;
+				// static_sprite::Pivot
+				sf::Vector2f pivot;
 				// 持续时间
 				sf::Time duration;
 			};

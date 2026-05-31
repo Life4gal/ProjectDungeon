@@ -61,7 +61,16 @@ namespace pd::factory
 			const auto body_id = detail::create_attach(registry, entity, BodyDef, door.position);
 
 			// 门
-			const auto door_shape_id = detail::create(body_id, DoorShapeDef, blueprint::CollisionShape::box{.size = door.size});
+			const auto door_shape_id = detail::create(
+				body_id,
+				DoorShapeDef,
+				blueprint::CollisionShape::offset_box
+				{
+						.center = {.x = door.door_offset.x, .y = door.door_offset.y},
+						.size = door.door_size,
+						.rotation = {.rotation = 0},
+				}
+			);
 			registry.emplace<door::DoorShapeId>(entity, door_shape_id);
 
 			// 感应区
@@ -70,9 +79,9 @@ namespace pd::factory
 				SensorShapeDef,
 				blueprint::CollisionShape::offset_box
 				{
-						.center = {.x = door.sensor_position.x, .y = door.sensor_position.y},
+						.center = {.x = door.sensor_offset.x, .y = door.sensor_offset.y},
 						.size = door.sensor_size,
-						.rotation = {.rotation = 0}
+						.rotation = {.rotation = 0},
 				}
 			);
 			registry.emplace<door::SensorShapeId>(entity, sensor_shape_id);

@@ -62,14 +62,14 @@ namespace pd::update
 			else
 			{
 				// 切换sprite
-				const auto& [texture, position, size, origin, duration] = frames.frames[next_frame_index];
+				const auto& [texture, position, size, pivot, duration] = frames.frames[next_frame_index];
 
-				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position&Size&Origin会比较浪费性能
+				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position&Size&Pivot会比较浪费性能
 				// 在动画帧切换时才获取&更新这些组件
 				registry.replace<rss::Texture>(entity, texture);
-				registry.replace<rss::Position>(entity, position);
-				registry.replace<rss::Size>(entity, size);
-				registry.replace<rss::Origin>(entity, origin);
+				registry.replace<rss::UvPosition>(entity, position);
+				registry.replace<rss::UvSize>(entity, size);
+				registry.replace<rss::Pivot>(entity, pivot);
 			}
 		}
 	}

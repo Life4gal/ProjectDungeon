@@ -43,9 +43,9 @@ namespace pd::factory::detail
 			auto texture = manager::Texture::load(std::filesystem::path{static_sprite.texture});
 
 			registry.emplace<rss::Texture>(entity, std::move(texture));
-			registry.emplace<rss::Position>(entity, sf::Vector2f{static_sprite.position.x, static_sprite.position.y});
-			registry.emplace<rss::Size>(entity, sf::Vector2f{static_sprite.size.width, static_sprite.size.height});
-			registry.emplace<rss::Origin>(entity, sf::Vector2f{static_sprite.origin.x, static_sprite.origin.y});
+			registry.emplace<rss::UvPosition>(entity, sf::Vector2f{static_sprite.uv_position.x, static_sprite.uv_position.y});
+			registry.emplace<rss::UvSize>(entity, sf::Vector2f{static_sprite.uv_size.width, static_sprite.uv_size.height});
+			registry.emplace<rss::Pivot>(entity, sf::Vector2f{static_sprite.pivot.x, static_sprite.pivot.y});
 
 			// ====================
 			// EFFECT
@@ -74,7 +74,7 @@ namespace pd::factory::detail
 			auto& [frames] = registry.emplace<rds::Frames>(entity);
 			frames.reserve(dynamic_sprite.frames.size());
 
-			for (const auto& [texture, position, size, origin, duration_ms]: dynamic_sprite.frames)
+			for (const auto& [texture, position, size, pivot, duration_ms]: dynamic_sprite.frames)
 			{
 				auto texture_handler = manager::Texture::load(std::string_view{texture});
 
@@ -83,7 +83,7 @@ namespace pd::factory::detail
 						.texture = std::move(texture_handler),
 						.position = {position.x, position.y},
 						.size = {size.width, size.height},
-						.origin = {origin.x, origin.y},
+						.pivot = {pivot.x, pivot.y},
 						.duration = sf::milliseconds(duration_ms),
 				};
 
