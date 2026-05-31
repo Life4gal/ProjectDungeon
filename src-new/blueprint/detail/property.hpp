@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <blueprint/detail/transform.hpp>
-
 namespace pd::blueprint
 {
 	class Property final
@@ -23,18 +21,5 @@ namespace pd::blueprint
 		// 是否无限魔法值(魔法值永远不会减少)
 		bool infinity_mana;
 		//
-	};
-
-	class PropertyState final
-	{
-	public:
-		// 生命值条与实体位置的偏移
-		Position health_bar_offset;
-		// 生命值条的大小
-		Size health_bar_size;
-		// 魔法值条与实体位置的偏移
-		Position mana_bar_offset;
-		// 魔法值条的大小
-		Size mana_bar_size;
 	};
 }

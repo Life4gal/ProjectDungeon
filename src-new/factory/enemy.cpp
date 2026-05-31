@@ -29,9 +29,8 @@ namespace pd::factory
 		detail::attach(registry, entity, enemy.sprite, blueprint::RenderLayer::ENEMY);
 		// collision
 		detail::attach(registry, entity, enemy.collision, enemy.position);
-		// property & property_state
+		// property
 		detail::attach(registry, entity, enemy.property);
-		detail::attach(registry, entity, enemy.property_state);
 		// ai
 		detail::attach(registry, entity, enemy.ai);
 		// contact_damage

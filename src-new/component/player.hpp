@@ -9,7 +9,6 @@
 #include <component/render.hpp>
 #include <component/collision.hpp>
 #include <component/property.hpp>
-#include <component/property_state.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::player
@@ -18,7 +17,6 @@ namespace pd::component::player
 	// render --> 玩家渲染
 	// collision --> 玩家碰撞体
 	// property --> 玩家属性
-	// property_state --> 玩家属性状态
 	// tags --> 玩家标签
 
 	// 移动速度

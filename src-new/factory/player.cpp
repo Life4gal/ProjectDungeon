@@ -28,9 +28,8 @@ namespace pd::factory
 		detail::attach(registry, entity, player.sprite, blueprint::RenderLayer::PLAYER);
 		// collision
 		detail::attach(registry, entity, player.collision, player.position);
-		// property & property_state
+		// property
 		detail::attach(registry, entity, player.property);
-		detail::attach(registry, entity, player.property_state);
 		// speed
 		registry.emplace<player::Speed>(entity, player.speed);
 		// tags

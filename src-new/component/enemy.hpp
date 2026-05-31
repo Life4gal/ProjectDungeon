@@ -11,7 +11,6 @@
 #include <component/render.hpp>
 #include <component/collision.hpp>
 #include <component/property.hpp>
-#include <component/property_state.hpp>
 #include <component/ai.hpp>
 #include <component/tags.hpp>
 
@@ -21,7 +20,6 @@ namespace pd::component::enemy
 	// render --> 敌人渲染
 	// collision --> 敌人碰撞体
 	// property --> 敌人属性
-	// property_state --> 敌人属性状态
 	// AI --> 敌人AI
 	// tags --> 敌人标签
 

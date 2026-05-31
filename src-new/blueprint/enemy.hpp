@@ -29,8 +29,6 @@ namespace pd::blueprint
 		EnemyType type;
 		// 敌人属性
 		Property property;
-		// 敌人属性状态
-		PropertyState property_state;
 		// 敌人AI
 		Ai ai;
 

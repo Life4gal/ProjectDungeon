@@ -20,20 +20,46 @@ namespace pd::designer
 		{
 				.frames =
 				{
+						// 下 60*136
 						// 第一帧
-						{.texture = "./assets/tileset/rat.png", .position = {.x = 0, .y = 0}},
+						{.texture = "./assets/rat.png", .position = {.x = 30, .y = 16}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
 						// 第二帧
-						{.texture = "./assets/tileset/rat.png", .position = {.x = 64, .y = 0}},
+						{.texture = "./assets/rat.png", .position = {.x = 286, .y = 16}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
 						// 第三帧
-						{.texture = "./assets/tileset/rat.png", .position = {.x = 128, .y = 0}},
+						{.texture = "./assets/rat.png", .position = {.x = 540, .y = 16}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
 						// 第四帧
-						{.texture = "./assets/tileset/rat.png", .position = {.x = 192, .y = 0}},
+						{.texture = "./assets/rat.png", .position = {.x = 800, .y = 16}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
+						// 上 60*136
+						// 第一帧
+						{.texture = "./assets/rat.png", .position = {.x = 30, .y = 270}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
+						// 第二帧
+						{.texture = "./assets/rat.png", .position = {.x = 286, .y = 270}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
+						// 第三帧
+						{.texture = "./assets/rat.png", .position = {.x = 540, .y = 270}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
+						// 第四帧
+						{.texture = "./assets/rat.png", .position = {.x = 800, .y = 270}, .size = {.width = 60, .height = 136}, .origin = {.x = 30, .y = 78}, .duration_ms = 350},
+						// 左 140*116
+						// 第一帧
+						{.texture = "./assets/rat.png", .position = {.x = 6, .y = 524}, .size = {.width = 140, .height = 116}, .origin = {.x = 50, .y = 60}, .duration_ms = 350},
+						// 第二帧
+						{.texture = "./assets/rat.png", .position = {.x = 262, .y = 524}, .size = {.width = 140, .height = 116}, .origin = {.x = 50, .y = 60}, .duration_ms = 350},
+						// 第三帧
+						{.texture = "./assets/rat.png", .position = {.x = 520, .y = 524}, .size = {.width = 140, .height = 116}, .origin = {.x = 50, .y = 60}, .duration_ms = 350},
+						// 第四帧
+						{.texture = "./assets/rat.png", .position = {.x = 774, .y = 524}, .size = {.width = 140, .height = 116}, .origin = {.x = 50, .y = 60}, .duration_ms = 350},
+						// 右 140*116
+						// 第一帧
+						{.texture = "./assets/rat.png", .position = {.x = 44, .y = 780}, .size = {.width = 140, .height = 116}, .origin = {.x = 90, .y = 60}, .duration_ms = 350},
+						// 第二帧
+						{.texture = "./assets/rat.png", .position = {.x = 282, .y = 780}, .size = {.width = 140, .height = 116}, .origin = {.x = 90, .y = 60}, .duration_ms = 350},
+						// 第三帧
+						{.texture = "./assets/rat.png", .position = {.x = 556, .y = 780}, .size = {.width = 140, .height = 116}, .origin = {.x = 90, .y = 60}, .duration_ms = 350},
+						// 第四帧
+						{.texture = "./assets/rat.png", .position = {.x = 808, .y = 780}, .size = {.width = 140, .height = 116}, .origin = {.x = 90, .y = 60}, .duration_ms = 350},
 				},
-				.size = {.width = 64, .height = 64},
-				.origin = {.x = 32, .y = 32},
-				.duration_ms = 350,
 				.looping = true,
 				.reversed = false,
+				.pause = false,
 		};
 		blueprint::Collision collision
 		{
@@ -73,31 +99,6 @@ namespace pd::designer
 				.invincible = false,
 				.infinity_mana = false,
 		};
-		const blueprint::PropertyState property_state = [&] noexcept -> blueprint::PropertyState
-		{
-			// 生命值条|魔法值条与精灵的最小偏移
-			const auto base_offset_x = sprite.origin.x;
-			const auto base_offset_y = sprite.origin.y + 5.f;
-
-			// 生命值条|魔法值条的宽度&高度
-			const auto bar_width = sprite.size.width * 1.2f;
-			const auto bar_height = sprite.size.height / 4;
-
-			// 偏移1(上面那根)
-			const auto offset_x_1 = -(base_offset_x + (bar_width - sprite.size.width) / 2);
-			const auto offset_y_1 = -(base_offset_y + bar_height * 2);
-			// 偏移2(下面那根)
-			const auto offset_x_2 = offset_x_1;
-			const auto offset_y_2 = -(base_offset_y + bar_height * 1);
-
-			return
-			{
-					.health_bar_offset = {.x = offset_x_1, .y = offset_y_1},
-					.health_bar_size = {.width = bar_width, .height = bar_height},
-					.mana_bar_offset = {.x = offset_x_2, .y = offset_y_2},
-					.mana_bar_size = {.width = bar_width, .height = bar_height},
-			};
-		}();
 		constexpr blueprint::Ai ai
 		{
 				.move_behavior =
@@ -119,7 +120,6 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::RAT,
 				.property = property,
-				.property_state = property_state,
 				.ai = ai,
 				.contact_damage = 20,
 		};
@@ -137,19 +137,17 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/slime.png", .position = {.x = 0, .y = 0}},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 0, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 200},
 						// 第二帧
-						{.texture = "./assets/tileset/slime.png", .position = {.x = 64, .y = 0}},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 64, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 200},
 						// 第三帧
-						{.texture = "./assets/tileset/slime.png", .position = {.x = 128, .y = 0}},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 128, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 200},
 						// 第四帧
-						{.texture = "./assets/tileset/slime.png", .position = {.x = 192, .y = 0}},
+						{.texture = "./assets/tileset/slime.png", .position = {.x = 192, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 200},
 				},
-				.size = {.width = 64, .height = 64},
-				.origin = {.x = 32, .y = 32},
-				.duration_ms = 200,
 				.looping = true,
 				.reversed = false,
+				.pause = false,
 		};
 		blueprint::Collision collision
 		{
@@ -190,31 +188,6 @@ namespace pd::designer
 				.invincible = false,
 				.infinity_mana = false,
 		};
-		const blueprint::PropertyState property_state = [&] noexcept -> blueprint::PropertyState
-		{
-			// 生命值条|魔法值条与精灵的最小偏移
-			const auto base_offset_x = sprite.origin.x;
-			const auto base_offset_y = sprite.origin.y + 5.f;
-
-			// 生命值条|魔法值条的宽度&高度
-			const auto bar_width = sprite.size.width * 1.2f;
-			const auto bar_height = sprite.size.height / 4;
-
-			// 偏移1(上面那根)
-			const auto offset_x_1 = -(base_offset_x + (bar_width - sprite.size.width) / 2);
-			const auto offset_y_1 = -(base_offset_y + bar_height * 2);
-			// 偏移2(下面那根)
-			const auto offset_x_2 = offset_x_1;
-			const auto offset_y_2 = -(base_offset_y + bar_height * 1);
-
-			return
-			{
-					.health_bar_offset = {.x = offset_x_1, .y = offset_y_1},
-					.health_bar_size = {.width = bar_width, .height = bar_height},
-					.mana_bar_offset = {.x = offset_x_2, .y = offset_y_2},
-					.mana_bar_size = {.width = bar_width, .height = bar_height},
-			};
-		}();
 		constexpr blueprint::Ai ai
 		{
 				.move_behavior =
@@ -237,7 +210,6 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::SLIME,
 				.property = property,
-				.property_state = property_state,
 				.ai = ai,
 				.contact_damage = 15,
 		};
@@ -255,19 +227,17 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/bat.png", .position = {.x = 0, .y = 0}},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 0, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 300},
 						// 第二帧
-						{.texture = "./assets/tileset/bat.png", .position = {.x = 64, .y = 0}},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 64, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 300},
 						// 第三帧
-						{.texture = "./assets/tileset/bat.png", .position = {.x = 128, .y = 0}},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 128, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 300},
 						// 第四帧
-						{.texture = "./assets/tileset/bat.png", .position = {.x = 192, .y = 0}},
+						{.texture = "./assets/tileset/bat.png", .position = {.x = 192, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 300},
 				},
-				.size = {.width = 64, .height = 64},
-				.origin = {.x = 32, .y = 32},
-				.duration_ms = 300,
 				.looping = true,
 				.reversed = false,
+				.pause = false,
 		};
 		blueprint::Collision collision
 		{
@@ -308,31 +278,6 @@ namespace pd::designer
 				.invincible = false,
 				.infinity_mana = false,
 		};
-		const blueprint::PropertyState property_state = [&] noexcept -> blueprint::PropertyState
-		{
-			// 生命值条|魔法值条与精灵的最小偏移
-			const auto base_offset_x = sprite.origin.x;
-			const auto base_offset_y = sprite.origin.y + 5.f;
-
-			// 生命值条|魔法值条的宽度&高度
-			const auto bar_width = sprite.size.width * 1.2f;
-			const auto bar_height = sprite.size.height / 4;
-
-			// 偏移1(上面那根)
-			const auto offset_x_1 = -(base_offset_x + (bar_width - sprite.size.width) / 2);
-			const auto offset_y_1 = -(base_offset_y + bar_height * 2);
-			// 偏移2(下面那根)
-			const auto offset_x_2 = offset_x_1;
-			const auto offset_y_2 = -(base_offset_y + bar_height * 1);
-
-			return
-			{
-					.health_bar_offset = {.x = offset_x_1, .y = offset_y_1},
-					.health_bar_size = {.width = bar_width, .height = bar_height},
-					.mana_bar_offset = {.x = offset_x_2, .y = offset_y_2},
-					.mana_bar_size = {.width = bar_width, .height = bar_height},
-			};
-		}();
 		constexpr blueprint::Ai ai
 		{
 				.move_behavior =
@@ -352,7 +297,6 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::BAT,
 				.property = property,
-				.property_state = property_state,
 				.ai = ai,
 				.contact_damage = 10,
 		};

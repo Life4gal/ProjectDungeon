@@ -5,6 +5,10 @@
 
 #pragma once
 
+#include <vector>
+
+#include <entt/entity/fwd.hpp>
+
 namespace pd::component::property
 {
 	// 当前生命值
@@ -33,5 +37,21 @@ namespace pd::component::property
 	{
 	public:
 		float mana;
+	};
+
+	// =====================================
+
+	// 受伤记录
+	class DamageHistory
+	{
+	public:
+		class Info final
+		{
+		public:
+			entt::entity attacker;
+			float damage;
+		};
+
+		std::vector<Info> damage_history;
 	};
 }

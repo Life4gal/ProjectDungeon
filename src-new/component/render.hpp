@@ -80,6 +80,12 @@ namespace pd::component::render
 				manager::texture_handler texture;
 				// static_sprite::Position
 				sf::Vector2f position;
+				// static_sprite::Size
+				sf::Vector2f size;
+				// static_sprite::Origin
+				sf::Vector2f origin;
+				// 持续时间
+				sf::Time duration;
 			};
 
 			std::vector<Frame> frames;
@@ -91,13 +97,6 @@ namespace pd::component::render
 		public:
 			// Frames::frames.size()
 			std::size_t frames_count;
-		};
-
-		// 每一帧的持续时间
-		class Duration final
-		{
-		public:
-			sf::Time duration;
 		};
 
 		// 帧计时器

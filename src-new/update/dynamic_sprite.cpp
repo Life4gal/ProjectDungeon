@@ -24,7 +24,6 @@ namespace pd::update
 				.view<
 					const rds::Frames,
 					const rds::FramesCount,
-					const rds::Duration,
 					rds::Timer,
 					rds::Index,
 					const rds::Mode,
@@ -37,17 +36,19 @@ namespace pd::update
 					>
 				);
 
-		for (const auto [entity, frames, frames_count, duration, timer, index, mode, direction]: view.each())
+		for (const auto [entity, frames, frames_count, timer, index, mode, direction]: view.each())
 		{
+			const auto& this_frame = frames.frames[index.index];
+
 			timer.elapsed += delta;
 			// 如果此帧未结束,无需更新
-			if (timer.elapsed < duration.duration)
+			if (timer.elapsed < this_frame.duration)
 			{
 				continue;
 			}
 
 			// 帧计时并不重置为0,而是减去当前帧的持续时间
-			timer.elapsed -= duration.duration;
+			timer.elapsed -= this_frame.duration;
 
 			using helper::DynamicSprite;
 
@@ -61,13 +62,14 @@ namespace pd::update
 			else
 			{
 				// 切换sprite
-				const auto& [texture, position] = frames.frames[next_frame_index];
+				const auto& [texture, position, size, origin, duration] = frames.frames[next_frame_index];
 
-				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position会比较浪费性能
+				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position&Size&Origin会比较浪费性能
 				// 在动画帧切换时才获取&更新这些组件
-				// Size&Origin无需更新,因为SpriteAnimation要求所有帧必须相同
 				registry.replace<rss::Texture>(entity, texture);
 				registry.replace<rss::Position>(entity, position);
+				registry.replace<rss::Size>(entity, size);
+				registry.replace<rss::Origin>(entity, origin);
 			}
 		}
 	}

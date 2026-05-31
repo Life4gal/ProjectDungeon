@@ -36,8 +36,6 @@ namespace pd::blueprint
 		NpcType type;
 		// NPC属性
 		Property property;
-		// NPC属性状态
-		PropertyState property_state;
 		// NPC AI
 		Ai ai;
 

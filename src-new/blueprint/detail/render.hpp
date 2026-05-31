@@ -32,6 +32,7 @@ namespace pd::blueprint
 	};
 
 	// 动态精灵
+	// TODO: 一个实体一个动态精灵+根据行为更新下标 / 一个实体多个动态精灵+根据行为切换动画
 	class DynamicSprite final
 	{
 	public:
@@ -43,17 +44,19 @@ namespace pd::blueprint
 
 			// 纹理坐标
 			Position position;
+
+			// 纹理大小
+			Size size;
+
+			// 纹理原点(一般为size/2)
+			Position origin;
+
+			// 持续时间(毫秒)
+			int duration_ms;
 		};
 
 		// 所有帧
 		std::vector<Frame> frames;
-		// 每一帧纹理大小
-		Size size;
-		// 每一帧纹理原点
-		Position origin;
-
-		// 每一帧持续时间(毫秒)
-		int duration_ms;
 
 		// 是否循环播放
 		// 如果不循环则播放到最后一帧时不再从头播放

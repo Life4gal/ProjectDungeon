@@ -59,7 +59,6 @@
 
 #include <render/camera.hpp>
 #include <render/render.hpp>
-#include <render/health_mana_bar.hpp>
 
 // =========
 // 依赖
@@ -547,8 +546,6 @@ namespace pd::scene
 
 		// 渲染实体
 		render::render(registry_, window);
-		// 渲染生命值条&魔法值条
-		render::health_mana_bar(registry_, window);
 
 		if (g_physics_world_draw_on)
 		{

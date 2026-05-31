@@ -44,7 +44,7 @@ namespace pd::update
 					registry.emplace<state::entity::Dead>(entity);
 
 					// TODO: 受伤记录应该如何利用?理论上这可以用于数据统计,但是如果我们将这部分数据保存在实体上,在实体被销毁后数据将不复存在
-					const auto& [damage_history] = registry.get<const property_state::DamageHistory>(entity);
+					const auto& [damage_history] = registry.get<const property::DamageHistory>(entity);
 					const auto last_info = damage_history.back();
 					const auto last_attacker = last_info.attacker;
 

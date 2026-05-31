@@ -21,19 +21,17 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 0, .y = 0}},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 0, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
 						// 第二帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 64, .y = 0}},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 64, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
 						// 第三帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 128, .y = 0}},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 128, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
 						// 第四帧
-						{.texture = "./assets/tileset/player.png", .position = {.x = 192, .y = 0}},
+						{.texture = "./assets/tileset/player.png", .position = {.x = 192, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 250},
 				},
-				.size = {.width = 64, .height = 64},
-				.origin = {.x = 32, .y = 32},
-				.duration_ms = 250,
 				.looping = true,
 				.reversed = false,
+				.pause = false,
 		};
 		blueprint::Collision collision
 		{

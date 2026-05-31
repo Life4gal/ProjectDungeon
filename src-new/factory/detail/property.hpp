@@ -12,6 +12,4 @@
 namespace pd::factory::detail
 {
 	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Property& property) noexcept -> void;
-
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::PropertyState& property_state) noexcept -> void;
 }

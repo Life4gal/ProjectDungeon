@@ -71,17 +71,14 @@ namespace pd::designer
 					.frames =
 					{
 							// 第一帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 0, .y = 0}},
+							{.texture = "./assets/tileset/door.png", .position = {.x = 0, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
 							// 第二帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 64, .y = 0}},
+							{.texture = "./assets/tileset/door.png", .position = {.x = 64, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
 							// 第三帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 128, .y = 0}},
+							{.texture = "./assets/tileset/door.png", .position = {.x = 128, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
 							// 第四帧
-							{.texture = "./assets/tileset/door.png", .position = {.x = 192, .y = 0}},
+							{.texture = "./assets/tileset/door.png", .position = {.x = 192, .y = 0}, .size = {.width = 64, .height = 64}, .origin = {.x = 32, .y = 32}, .duration_ms = 100},
 					},
-					.size = {.width = 64, .height = 64},
-					.origin = {.x = 32, .y = 32},
-					.duration_ms = 100,
 					.looping = false,
 					.reversed = false,
 					.pause = true,
@@ -94,12 +91,12 @@ namespace pd::designer
 				auto& door = doors[std::to_underlying(blueprint::Direction::NORTH)];
 
 				// 门位置
-				door.position.x = static_cast<float>(x) + sprite.origin.x;
-				door.position.y = 0 + sprite.origin.y;
+				door.position.x = static_cast<float>(x) + static_cast<float>(tile_width) / 2;
+				door.position.y = 0 + static_cast<float>(tile_height) / 2;
 
 				// 门感应区位置
 				door.sensor_position.x = 0;
-				door.sensor_position.y = -sprite.origin.y + SensorAreaHeight / 2;
+				door.sensor_position.y = -static_cast<float>(tile_height) / 2 + SensorAreaHeight / 2;
 
 				// 门大小
 				door.size.width = tile_width;
@@ -154,12 +151,12 @@ namespace pd::designer
 				auto& door = doors[std::to_underlying(blueprint::Direction::SOUTH)];
 
 				// 门位置
-				door.position.x = static_cast<float>(x) + sprite.origin.x;
-				door.position.y = height - tile_height + sprite.origin.y;
+				door.position.x = static_cast<float>(x) + static_cast<float>(tile_width) / 2;
+				door.position.y = height - static_cast<float>(tile_height) + static_cast<float>(tile_height) / 2;
 
 				// 门感应区位置
 				door.sensor_position.x = 0;
-				door.sensor_position.y = sprite.origin.y - SensorAreaHeight / 2;
+				door.sensor_position.y = static_cast<float>(tile_height) / 2 - SensorAreaHeight / 2;
 
 				// 门大小
 				door.size.width = tile_width;
@@ -214,11 +211,11 @@ namespace pd::designer
 				auto& door = doors[std::to_underlying(blueprint::Direction::WEST)];
 
 				// 门位置
-				door.position.x = 0 + sprite.origin.x;
-				door.position.y = static_cast<float>(y) + sprite.origin.y;
+				door.position.x = 0 + static_cast<float>(tile_width) / 2;
+				door.position.y = static_cast<float>(y) + static_cast<float>(tile_height) / 2;
 
 				// 门感应区位置
-				door.sensor_position.x = -sprite.origin.x + SensorAreaWidth / 2;
+				door.sensor_position.x = -static_cast<float>(tile_width) / 2 + SensorAreaWidth / 2;
 				door.sensor_position.y = 0;
 
 				// 门大小
@@ -286,11 +283,11 @@ namespace pd::designer
 				auto& door = doors[std::to_underlying(blueprint::Direction::EAST)];
 
 				// 门位置
-				door.position.x = width - tile_width + sprite.origin.x;
-				door.position.y = static_cast<float>(y) + sprite.origin.y;
+				door.position.x = width - tile_width + static_cast<float>(tile_width) / 2;
+				door.position.y = static_cast<float>(y) + static_cast<float>(tile_height) / 2;
 
 				// 门感应区位置
-				door.sensor_position.x = sprite.origin.x - SensorAreaWidth / 2;
+				door.sensor_position.x = static_cast<float>(tile_width) / 2 - SensorAreaWidth / 2;
 				door.sensor_position.y = 0;
 
 				// 门大小

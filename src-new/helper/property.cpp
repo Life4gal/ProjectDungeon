@@ -10,7 +10,6 @@
 #include <event/actor.hpp>
 
 #include <component/property.hpp>
-#include <component/property_state.hpp>
 #include <component/state.hpp>
 
 #include <entt/entt.hpp>
@@ -111,7 +110,7 @@ namespace pd::helper
 	auto Property::hurt(entt::registry& registry, const entt::entity victim, const entt::entity attacker, const float damage) noexcept -> void
 	{
 		auto* health = registry.try_get<property::Health>(victim);
-		auto* damage_history = registry.try_get<property_state::DamageHistory>(victim);
+		auto* damage_history = registry.try_get<property::DamageHistory>(victim);
 
 		if (health == nullptr or damage_history == nullptr)
 		{

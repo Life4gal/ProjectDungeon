@@ -256,8 +256,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/collision.hpp
 	# 属性
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/property.hpp
-	# 属性状态
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/property_state.hpp
 	# AI移动行为
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/move_behavior.hpp
 	# AI
@@ -442,10 +440,6 @@ add_executable(
 	# (实体)渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.cpp
-
-	# 生命值&魔法值条
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/health_mana_bar.cpp
 
 	# ============================
 	# MENU

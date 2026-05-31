@@ -26,8 +26,6 @@ namespace pd::blueprint
 
 		// 玩家属性
 		Property property;
-		// 玩家属性状态
-		PropertyState property_state;
 
 		// 移动速度
 		// FIXME(OPT): 将它移动到合适的地方
