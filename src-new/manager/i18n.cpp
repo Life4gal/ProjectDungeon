@@ -23,11 +23,26 @@ namespace pd::manager
 				{"MENU.MAIN.START", "开始新游戏"},
 				{"MENU.MAIN.OPTION", "选项"},
 				{"MENU.MAIN.QUIT", "退出"},
+
 				// 游戏 -- 暂停菜单
 				{"MENU.PAUSE.RESUME", "继续"},
 				{"MENU.PAUSE.OPTION", "选项"},
 				{"MENU.PAUSE.TO_MAIN_MENU", "返回主菜单"},
 				{"MENU.PAUSE.TO_DESKTOP", "退出游戏"},
+
+				// 游戏 -- 名称
+				// 玩家
+				{"NAME.PLAYER.DEFAULT", "冒险者"},
+				// 敌人
+				{"NAME.ENEMY.RAT", "老鼠"},
+				{"NAME.ENEMY.SLIME", "史莱姆"},
+				{"NAME.ENEMY.BAT", "蝙蝠"},
+				// NPC
+				{"NAME.NPC.MERCHANT", "商人"},
+				// 物品
+				{"NAME.ITEM.HEALTH_POTION", "生命药水"},
+
+				//
 		};
 	}
 

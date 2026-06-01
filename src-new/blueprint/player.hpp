@@ -8,6 +8,7 @@
 #include <blueprint/detail/render.hpp>
 #include <blueprint/detail/collision.hpp>
 #include <blueprint/detail/property.hpp>
+#include <blueprint/detail/name.hpp>
 
 namespace pd::blueprint
 {
@@ -26,6 +27,8 @@ namespace pd::blueprint
 
 		// 玩家属性
 		Property property;
+		// 玩家名称
+		Name name;
 
 		// 移动速度
 		// FIXME(OPT): 将它移动到合适的地方

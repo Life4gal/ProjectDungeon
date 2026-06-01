@@ -12,6 +12,7 @@
 #include <factory/detail/collision.hpp>
 #include <factory/detail/property.hpp>
 #include <factory/detail/ai.hpp>
+#include <factory/detail/name.hpp>
 
 #include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
@@ -34,6 +35,8 @@ namespace pd::factory
 		detail::attach(registry, entity, enemy.property);
 		// ai
 		detail::attach(registry, entity, enemy.ai);
+		// name
+		detail::attach(registry, entity, enemy.name);
 		// contact_damage
 		registry.emplace<enemy::ContactDamage>(entity, enemy.contact_damage);
 		// type

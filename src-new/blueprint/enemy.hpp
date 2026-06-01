@@ -9,6 +9,7 @@
 #include <blueprint/detail/collision.hpp>
 #include <blueprint/detail/property.hpp>
 #include <blueprint/detail/ai.hpp>
+#include <blueprint/detail/name.hpp>
 
 namespace pd::blueprint
 {
@@ -31,6 +32,8 @@ namespace pd::blueprint
 		Property property;
 		// 敌人AI
 		Ai ai;
+		// 敌人名称
+		Name name;
 
 		// 接触伤害
 		// TODO: 安装CLAW,使用CLAW攻击造成伤害,而不是基于接触造成伤害

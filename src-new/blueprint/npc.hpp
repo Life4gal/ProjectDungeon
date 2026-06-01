@@ -9,6 +9,7 @@
 #include <blueprint/detail/collision.hpp>
 #include <blueprint/detail/property.hpp>
 #include <blueprint/detail/ai.hpp>
+#include <blueprint/detail/name.hpp>
 
 namespace pd::blueprint
 {
@@ -31,6 +32,8 @@ namespace pd::blueprint
 		Property property;
 		// NPC AI
 		Ai ai;
+		// NPC名称
+		Name name;
 
 		//
 	};

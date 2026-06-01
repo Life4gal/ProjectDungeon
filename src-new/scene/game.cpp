@@ -32,7 +32,6 @@
 #include <factory/player.hpp>
 #include <factory/projectile.hpp>
 
-#include <component/level.hpp>
 #include <component/projectile.hpp>
 
 #include <helper/camera.hpp>
@@ -59,6 +58,7 @@
 
 #include <render/camera.hpp>
 #include <render/render.hpp>
+#include <render/player_status.hpp>
 
 // =========
 // 依赖
@@ -546,6 +546,9 @@ namespace pd::scene
 
 		// 渲染实体
 		render::render(registry_, window);
+
+		// 玩家状态
+		render::player_status(registry_, window);
 
 		if (g_physics_world_draw_on)
 		{

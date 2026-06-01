@@ -11,6 +11,7 @@
 #include <factory/detail/render.hpp>
 #include <factory/detail/collision.hpp>
 #include <factory/detail/property.hpp>
+#include <factory/detail/name.hpp>
 
 #include <entt/entt.hpp>
 
@@ -30,6 +31,8 @@ namespace pd::factory
 		detail::attach(registry, entity, player.collision, player.position);
 		// property
 		detail::attach(registry, entity, player.property);
+		// name
+		detail::attach(registry, entity, player.name);
 		// speed
 		registry.emplace<player::Speed>(entity, player.speed);
 		// tags

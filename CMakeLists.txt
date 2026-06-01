@@ -187,6 +187,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/property.hpp
 	# AI
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/ai.hpp
+	# 名称
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/name.hpp
 
 	# (枚举)定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def.hpp
@@ -260,6 +262,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/move_behavior.hpp
 	# AI
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
+	# 名称
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/name.hpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/projectile.hpp
@@ -307,6 +311,9 @@ add_executable(
 	# AI
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.cpp
+	# 名称
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.cpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.hpp
@@ -440,6 +447,10 @@ add_executable(
 	# (实体)渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.cpp
+
+	# 玩家目标状态
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.cpp
 
 	# ============================
 	# MENU

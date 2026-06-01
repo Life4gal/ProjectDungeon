@@ -126,6 +126,7 @@ namespace pd::designer
 				.type = blueprint::EnemyType::RAT,
 				.property = property,
 				.ai = ai,
+				.name = {.type = blueprint::NameType::ENEMY_RAT},
 				.contact_damage = 20,
 		};
 	}
@@ -249,6 +250,7 @@ namespace pd::designer
 				.type = blueprint::EnemyType::SLIME,
 				.property = property,
 				.ai = ai,
+				.name = {.type = blueprint::NameType::ENEMY_SLIME},
 				.contact_damage = 15,
 		};
 	}
@@ -370,6 +372,7 @@ namespace pd::designer
 				.type = blueprint::EnemyType::BAT,
 				.property = property,
 				.ai = ai,
+				.name = {.type = blueprint::NameType::ENEMY_BAT},
 				.contact_damage = 10,
 		};
 	}

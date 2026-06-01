@@ -81,6 +81,7 @@ namespace pd::designer
 						.invincible = false,
 						.infinity_mana = false,
 				},
+				.name = {.type = blueprint::NameType::PLAYER_DEFAULT},
 				.speed = 120,
 		};
 	}
