@@ -452,6 +452,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.cpp
 
+	# 玩家状态
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.cpp
+
 	# ============================
 	# MENU
 	# 菜单(各个场景用到的菜单界面的封装)
