@@ -11,11 +11,19 @@
 
 namespace prometheus::meta::user_defined
 {
+	// ==============
+	// DIRECTION
+	// ==============
+
 	template<>
 	struct enum_name_policy<pd::blueprint::Direction>
 	{
 		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
 	};
+
+	// ==============
+	// DIRECTION MASK
+	// ==============
 
 	template<>
 	struct enum_name_policy<pd::blueprint::DirectionMask>
@@ -24,10 +32,24 @@ namespace prometheus::meta::user_defined
 	};
 
 	template<>
+	struct enum_is_flag<pd::blueprint::DirectionMask> : std::true_type {};
+
+	// ==============
+	// RENDER LAYER
+	// ==============
+
+	template<>
 	struct enum_name_policy<pd::blueprint::RenderLayer>
 	{
 		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
 	};
+
+	template<>
+	struct enum_is_flag<pd::blueprint::RenderLayer> : std::true_type {};
+
+	// ==============
+	// COLLISION CATEGORY
+	// ==============
 
 	template<>
 	struct enum_name_policy<pd::blueprint::CollisionCategory>
@@ -36,14 +58,62 @@ namespace prometheus::meta::user_defined
 	};
 
 	template<>
+	struct enum_is_flag<pd::blueprint::CollisionCategory> : std::true_type {};
+
+	// ==============
+	// COLLISION MASK
+	// ==============
+
+	template<>
 	struct enum_name_policy<pd::blueprint::CollisionMask>
 	{
 		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
 	};
 
 	template<>
+	struct enum_is_flag<pd::blueprint::CollisionMask> : std::true_type {};
+
+	// ==============
+	// ENEMY TYPE
+	// ==============
+
+	template<>
 	struct enum_name_policy<pd::blueprint::EnemyType>
 	{
 		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
 	};
+
+	// ==============
+	// NPC TYPE
+	// ==============
+
+	template<>
+	struct enum_name_policy<pd::blueprint::NpcType>
+	{
+		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
+	};
+
+	// ==============
+	// NAME TYPE
+	// ==============
+
+	template<>
+	struct enum_name_policy<pd::blueprint::NameType>
+	{
+		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
+	};
+
+	// ==============
+	// ROOM TYPE
+	// ==============
+
+	template<>
+	struct enum_name_policy<pd::blueprint::RoomType>
+	{
+		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
+	};
+
+	// ==============
+	// 
+	// ==============
 }

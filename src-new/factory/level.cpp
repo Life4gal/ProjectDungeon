@@ -27,6 +27,15 @@ namespace pd::factory
 		// 有且仅有一个起始房间
 		PROMETHEUS_PLATFORM_ASSUME(std::ranges::contains(level.rooms | std::views::values, blueprint::RoomType::START, &blueprint::Room::type) == 1);
 
+		SPDLOG_INFO(
+			"\n====================================================================="
+			"\n正在创建关卡,本关卡共有{}个房间,起始房间位于({}:{})"
+			"\n=====================================================================",
+			level.rooms.size(),
+			level.start_position.x,
+			level.start_position.y
+		);
+
 		// 创建上下文
 		auto& [entity_to_position] = registry.ctx().emplace<level::EntityToPosition>();
 		auto& [position_to_entity] = registry.ctx().emplace<level::PositionToEntity>();
@@ -130,6 +139,12 @@ namespace pd::factory
 				do_set(target_room, room_entity, room_position, entity, direction, neighbor_entity);
 			}
 		}
+
+		SPDLOG_INFO(
+			"\n====================================================================="
+			"\n关卡创建完成"
+			"\n====================================================================="
+		);
 	}
 
 	auto Level::destroy(entt::registry& registry) noexcept -> void

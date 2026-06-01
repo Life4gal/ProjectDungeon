@@ -26,6 +26,16 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
+		SPDLOG_INFO(
+			"\n================ 正在创建[{}]房间(Entity: 0x{:08X}, LayoutPosition: ({}:{}), Position: ({:.1f}:{:.1f})) ================",
+			prometheus::meta::name_of(room.type),
+			entt::to_integral(entity),
+			room.layout_position.x,
+			room.layout_position.y,
+			room.position.x,
+			room.position.y
+		);
+
 		// ============================================
 		// 类型 + 邻居
 		// ============================================
@@ -52,7 +62,9 @@ namespace pd::factory
 
 		{
 			const auto neighbors_value = std::to_underlying(room.neighbors);
-			// const auto neighbors_count = std::popcount(neighbors_value);
+			const auto neighbors_count = std::popcount(neighbors_value);
+
+			SPDLOG_INFO("开始创建门,共有{}个邻居房间...", neighbors_count);
 
 			auto& [doors] = registry.emplace<room::Doors>(entity);
 			doors.fill(entt::null);
@@ -62,10 +74,7 @@ namespace pd::factory
 				if (neighbors_value & std::to_underlying(mask))
 				{
 					SPDLOG_INFO(
-						"创建房间(0x{:08X})[{}:{}]位于({})的门",
-						entt::to_integral(entity),
-						room.layout_position.x,
-						room.layout_position.y,
+						"正在创建位于({})的门...",
 						prometheus::meta::name_of(direction)
 					);
 
@@ -86,6 +95,8 @@ namespace pd::factory
 			do_create(blueprint::DirectionMask::SOUTH, blueprint::Direction::SOUTH);
 			do_create(blueprint::DirectionMask::WEST, blueprint::Direction::WEST);
 			do_create(blueprint::DirectionMask::EAST, blueprint::Direction::EAST);
+
+			SPDLOG_INFO("门创建完成");
 		}
 
 		// ============================================
@@ -93,12 +104,16 @@ namespace pd::factory
 		// ============================================
 
 		{
+			SPDLOG_INFO("开始创建房间边界...");
+
 			const auto bounding_entity = Bounding::spawn(registry, room.bounding);
 
 			// 设置房间边界所属房间
 			registry.emplace<bounding::Room>(bounding_entity, entity); // NOLINT(readability-suspicious-call-argument)
-
+			// 记录该实体(应该用不到?)
 			registry.emplace<room::Bounding>(entity, bounding_entity);
+
+			SPDLOG_INFO("房间边界创建完成");
 		}
 
 		// ============================================
@@ -106,6 +121,8 @@ namespace pd::factory
 		// ============================================
 
 		{
+			SPDLOG_INFO("开始创建瓦片,共有{}个瓦片...", room.tiles.size());
+
 			auto& [tiles] = registry.emplace<room::Tiles>(entity);
 			tiles.reserve(room.tiles.size());
 
@@ -115,6 +132,8 @@ namespace pd::factory
 
 				tiles.emplace_back(tile_entity);
 			}
+
+			SPDLOG_INFO("瓦片创建完成");
 		}
 
 		// ============================================
@@ -122,6 +141,8 @@ namespace pd::factory
 		// ============================================
 
 		{
+			SPDLOG_INFO("开始创建敌人,共有{}个敌人...", room.enemies.size());
+
 			auto& [enemies] = registry.emplace<room::Enemies>(entity);
 			enemies.reserve(room.enemies.size());
 
@@ -134,10 +155,13 @@ namespace pd::factory
 
 				enemies.push_back(enemy_entity);
 			}
+
+			SPDLOG_INFO("敌人创建完成");
 		}
 
 		// tags
 		registry.emplace<tags::Room>(entity);
+		SPDLOG_INFO("\n================ 房间创建完成 ================");
 
 		return entity;
 	}
@@ -153,7 +177,11 @@ namespace pd::factory
 		// 敌人
 		Enemy::destroy_all(registry);
 
+		SPDLOG_INFO("正在销毁所有房间...");
+
 		const auto view = registry.view<tags::Room>();
 		registry.destroy(view.begin(), view.end());
+
+		SPDLOG_INFO("已销毁{}个房间", view.size());
 	}
 }

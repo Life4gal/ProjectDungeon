@@ -12,6 +12,7 @@
 #include <factory/detail/collision.hpp>
 
 #include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
 
 namespace pd::factory
 {
@@ -100,7 +101,11 @@ namespace pd::factory
 
 	auto Door::destroy_all(entt::registry& registry) noexcept -> void
 	{
+		SPDLOG_INFO("正在销毁所有门...");
+
 		const auto view = registry.view<tags::Door>();
 		registry.destroy(view.begin(), view.end());
+
+		SPDLOG_INFO("已销毁{}个门", view.size());
 	}
 }

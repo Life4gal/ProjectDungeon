@@ -12,13 +12,6 @@
 
 namespace pd::blueprint
 {
-	// NPC 类型
-	enum class NpcType : std::uint8_t
-	{
-		// 商人
-		MERCHANT,
-	};
-
 	// NPC
 	class Npc final
 	{

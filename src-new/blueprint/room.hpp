@@ -15,25 +15,6 @@
 
 namespace pd::blueprint
 {
-	// 房间类型
-	enum class RoomType : std::uint8_t
-	{
-		// 起始房间
-		START,
-		// 标准房间
-		STANDARD,
-		// BOSS房间
-		BOSS,
-		// BOSS房间门钥匙房间
-		KEY,
-		// 商人房间
-		MERCHANT,
-		// 奖励房间
-		BONUS,
-		// 出口房间
-		EXIT,
-	};
-
 	class Room final
 	{
 	public:

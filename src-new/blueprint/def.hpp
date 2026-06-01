@@ -168,4 +168,48 @@ namespace pd::blueprint
 		// 蝙蝠
 		BAT,
 	};
+
+	// NPC 类型
+	enum class NpcType : std::uint8_t
+	{
+		// 商人
+		MERCHANT,
+	};
+
+	// 名称类型
+	enum class NameType : std::uint8_t
+	{
+		// 玩家
+		PLAYER_DEFAULT = 0,
+
+		// 敌人
+		ENEMY_RAT,
+		ENEMY_SLIME,
+		ENEMY_BAT,
+
+		// NPC
+		NPC_MERCHANT,
+
+		// 物品
+		ITEM_HEALTH_POTION,
+	};
+
+	// 房间类型
+	enum class RoomType : std::uint8_t
+	{
+		// 起始房间
+		START,
+		// 标准房间
+		STANDARD,
+		// BOSS房间
+		BOSS,
+		// BOSS房间门钥匙房间
+		KEY,
+		// 商人房间
+		MERCHANT,
+		// 奖励房间
+		BONUS,
+		// 出口房间
+		EXIT,
+	};
 }

@@ -13,6 +13,7 @@
 #include <factory/detail/property.hpp>
 #include <factory/detail/ai.hpp>
 
+#include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
 
 namespace pd::factory
@@ -45,7 +46,11 @@ namespace pd::factory
 
 	auto Enemy::destroy_all(entt::registry& registry) noexcept -> void
 	{
+		SPDLOG_INFO("正在销毁所有敌人...");
+
 		const auto view = registry.view<tags::Enemy>();
 		registry.destroy(view.begin(), view.end());
+
+		SPDLOG_INFO("已销毁{}个敌人", view.size());
 	}
 }

@@ -9,6 +9,7 @@
 
 #include <factory/detail/collision.hpp>
 
+#include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
 
 namespace pd::factory
@@ -62,7 +63,11 @@ namespace pd::factory
 
 	auto Bounding::destroy_all(entt::registry& registry) noexcept -> void
 	{
+		SPDLOG_INFO("正在销毁所有房间边界...");
+
 		const auto view = registry.view<tags::Bounding>();
 		registry.destroy(view.begin(), view.end());
+
+		SPDLOG_INFO("已销毁{}个房间边界", view.size());
 	}
 }

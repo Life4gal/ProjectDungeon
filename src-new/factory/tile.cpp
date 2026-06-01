@@ -11,6 +11,7 @@
 #include <factory/detail/render.hpp>
 #include <factory/detail/collision.hpp>
 
+#include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
 
 namespace pd::factory
@@ -50,7 +51,11 @@ namespace pd::factory
 
 	auto Tile::destroy_all(entt::registry& registry) noexcept -> void
 	{
+		SPDLOG_INFO("正在销毁所有瓦片...");
+
 		const auto view = registry.view<tags::Tile>();
 		registry.destroy(view.begin(), view.end());
+
+		SPDLOG_INFO("已销毁{}个瓦片", view.size());
 	}
 }
