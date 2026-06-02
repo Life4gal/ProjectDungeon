@@ -81,14 +81,15 @@ namespace pd::helper
 			new_position.y - old_position.y
 		);
 
+		// Collision::set_pixel_position 仅更新物理体的位置
+		// 在下一帧的sync_physics_transform中才会同步Transform的位置
+		// 但是我们会在该帧的render::camera中计算视野内的实体,如果Transform的位置没有被同步,则可能导致玩家控制的实体在该帧内不在视野内
+		// 我们必须手动同步Transform的位置,以保证玩家控制的实体在该帧内仍然在视野内
 		if (registry.all_of<collision::BodyId>(e))
 		{
 			Collision::set_pixel_position(registry, e, new_position);
 		}
-		else
-		{
-			Transform::set_position(registry, e, new_position);
-		}
+		Transform::set_position(registry, e, new_position);
 	}
 
 	auto PlayerController::move_to_screen(entt::registry& registry, const sf::Vector2i new_position) noexcept -> void
@@ -110,14 +111,15 @@ namespace pd::helper
 			new_position.y - old_position.y
 		);
 
+		// Collision::set_pixel_position 仅更新物理体的位置
+		// 在下一帧的sync_physics_transform中才会同步Transform的位置
+		// 但是我们会在该帧的render::camera中计算视野内的实体,如果Transform的位置没有被同步,则可能导致玩家控制的实体在该帧内不在视野内
+		// 我们必须手动同步Transform的位置,以保证玩家控制的实体在该帧内仍然在视野内
 		if (registry.all_of<collision::BodyId>(e))
 		{
 			Collision::set_screen_position(registry, e, new_position);
 		}
-		else
-		{
-			Transform::set_screen_position(registry, e, new_position);
-		}
+		Transform::set_screen_position(registry, e, new_position);
 	}
 
 	auto PlayerController::translate(entt::registry& registry, const sf::Vector2f distance) noexcept -> void
