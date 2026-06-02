@@ -451,8 +451,10 @@ namespace pd::scene
 				{
 					if (kp->control)
 					{
+						const auto target = helper::PlayerController::target(registry_);
+
 						// 击杀所有敌人
-						helper::Cheat::kill_all_enemy(registry_);
+						helper::Cheat::kill_all_enemy(registry_, target);
 					}
 					else
 					{

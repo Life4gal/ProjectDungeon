@@ -15,13 +15,26 @@ namespace pd::helper
 {
 	using namespace component;
 
-	auto Cheat::kill_all_enemy(entt::registry& registry) noexcept -> void
+	auto Cheat::kill_enemy(entt::registry& registry, const entt::entity attacker, const entt::entity enemy) noexcept -> void
+	{
+		Property::kill(registry, enemy, attacker);
+	}
+
+	auto Cheat::kill_all_enemy(entt::registry& registry, const entt::entity attacker) noexcept -> void
 	{
 		for (const auto view = registry.view<tags::Enemy, state::InCameraArea>();
 		     const auto [entity]: view.each())
 		{
-			Property::kill(registry, entity, entt::null);
+			Property::kill(registry, entity, attacker);
 		}
+	}
+
+	auto Cheat::kill_all_enemy(entt::registry& registry) noexcept -> void
+	{
+		// TODO: 世界?控制台?
+		constexpr entt::entity attacker = entt::null;
+
+		kill_all_enemy(registry, attacker);
 	}
 
 	auto Cheat::set_all_enemy_hp_percent(entt::registry& registry, const float percent) noexcept -> void
