@@ -6,6 +6,7 @@
 #include <factory/detail/render.hpp>
 
 #include <manager/resource.hpp>
+#include <manager/clock.hpp>
 
 #include <component/render.hpp>
 #include <component/renderer.hpp>
@@ -19,8 +20,6 @@ namespace pd::factory::detail
 
 	namespace
 	{
-		sf::Clock g_clock;
-
 		template<typename StaticSpriteLike>
 			requires(std::is_same_v<StaticSpriteLike, blueprint::StaticSprite> or std::is_same_v<StaticSpriteLike, blueprint::DynamicSprite::Frame>)
 		auto do_attach(entt::registry& registry, const entt::entity entity, const StaticSpriteLike& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
@@ -31,7 +30,7 @@ namespace pd::factory::detail
 			// 渲染层
 			registry.emplace<render::RenderLayer>(entity, render_layer);
 			// 生成时间
-			registry.emplace<render::SpawnTime>(entity, g_clock.getElapsedTime());
+			registry.emplace<render::SpawnTime>(entity, manager::Clock::now());
 
 			// 需要重新排序
 			registry.ctx().emplace<renderer::SortRequired>();

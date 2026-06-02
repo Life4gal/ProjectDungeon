@@ -135,6 +135,9 @@ add_executable(
 	# 
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/i18n.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/i18n.cpp
+	# (全局)计时器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/clock.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/manager/clock.cpp
 	
 	# ============================
 	# VAR
