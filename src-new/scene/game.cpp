@@ -385,7 +385,24 @@ namespace pd::scene
 		}
 		else
 		{
-			if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
+			if (const auto* mbp = event.getIf<sf::Event::MouseButtonPressed>())
+			{
+				if (mbp->button == sf::Mouse::Button::Left)
+				{
+					// TODO: 蓝图持久化?
+					const static auto projectile_blueprint = designer::Projectile::standard();
+
+					if (helper::PlayerController::online(registry_))
+					{
+						const auto target = helper::PlayerController::target(registry_);
+						const auto target_position = helper::PlayerController::screen_position(registry_);
+						const auto direction = mbp->position - target_position;
+
+						factory::Projectile::spawn(registry_, projectile_blueprint, target, sf::Vector2f{direction});
+					}
+				}
+			}
+			else if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
 			{
 				using sf::Keyboard::Key;
 
@@ -463,21 +480,6 @@ namespace pd::scene
 						// 所有敌人生命值减半
 						helper::Cheat::set_all_enemy_hp_percent(registry_, 0.5f);
 					}
-				}
-				// =====================
-				// CAMERA
-				// =====================
-				else if (kp->code == Key::Z)
-				{
-					helper::Camera::set_size(registry_, {1080, 720});
-				}
-				else if (kp->code == Key::X)
-				{
-					helper::Camera::set_size(registry_, {540, 360});
-				}
-				else if (kp->code == Key::C)
-				{
-					helper::Camera::set_size(registry_, {270, 180});
 				}
 			}
 			else if (const auto* kr = event.getIf<sf::Event::KeyReleased>())
