@@ -22,21 +22,21 @@ namespace pd::render
 	namespace
 	{
 		// HUD开始位置
-		constexpr float HudBeginX = 20.f;
-		constexpr float HubBeginY = 20.f;
+		constexpr float HudBeginX = 20.0f;
+		constexpr float HudBeginY = 20.0f;
 		// HUD字体
 		constexpr std::string_view HudFont = R"(C:\Windows\Fonts\msyh.ttc)";
 		// HUD字体大小
 		constexpr int HudFontSize = 30;
 		// 生命值条&魔法值条位置
 		constexpr float HudStatusBarX = HudBeginX;
-		constexpr float HudStatusBarY = HubBeginY + HudFontSize + 5;
+		constexpr float HudStatusBarY = HudBeginY + HudFontSize + 5;
 		// 生命值条&魔法值条大小
 		constexpr float HudStatusBarWidth = 80;
 		constexpr float HudStatusBarHeight = 20;
 
-		constexpr sf::Vector2f HudStatusBarPosition1{HudStatusBarX, HudStatusBarY};
-		constexpr sf::Vector2f HudStatusBarPosition2{HudStatusBarX, HudStatusBarY + HudStatusBarHeight + 3};
+		constexpr sf::Vector2f HudStatusBarPosition1{HudStatusBarX, HudStatusBarY + HudFontSize};
+		constexpr sf::Vector2f HudStatusBarPosition2{HudStatusBarX, HudStatusBarPosition1.y + HudStatusBarHeight + 3};
 		constexpr sf::Vector2f HudStatusBarSize{HudStatusBarWidth, HudStatusBarHeight};
 	}
 
@@ -65,7 +65,7 @@ namespace pd::render
 		text.setFillColor(sf::Color::Red);
 		text.setOutlineColor(sf::Color::Black);
 		text.setOutlineThickness(1);
-		text.setPosition({HudBeginX, HubBeginY});
+		text.setPosition({HudBeginX, HudBeginY});
 		window.draw(text);
 
 		// 生命值条&魔法值条
@@ -77,7 +77,7 @@ namespace pd::render
 
 			// 2个矩形(背景+前景) * 6个顶点(每个矩形2个三角形) = 12
 			// 生命值条+魔法值条 = 2
-			sf::VertexArray triangles{sf::PrimitiveType::Triangles, 12uz * (1 + has_mana ? 1 : 0)};
+			sf::VertexArray triangles{sf::PrimitiveType::Triangles, 12uz * (1 + (has_mana ? 1 : 0))};
 
 			// 生命值条
 			{
