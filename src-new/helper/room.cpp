@@ -191,6 +191,9 @@ namespace pd::helper
 			PlayerController::move_to(registry, start_position);
 		}
 
+		// 标记房间切换
+		registry.ctx().emplace<level::RoomChanged>();
+
 		// 关门
 		close_doors(registry, room);
 	}
@@ -273,6 +276,9 @@ namespace pd::helper
 				PROMETHEUS_PLATFORM_UNREACHABLE();
 			}
 		}
+
+		// 标记房间切换
+		registry.ctx().emplace<level::RoomChanged>();
 
 		if (const auto* enemies = registry.try_get<room::Enemies>(room);
 			enemies != nullptr)

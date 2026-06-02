@@ -10,9 +10,13 @@
 namespace pd::component::camera
 {
 	// 相机区域位置/大小有变化,需要更新视野内实体
+	//
+	// [CTX]
 	class Dirty final {};
 
 	// 相机区域位置
+	//
+	// [CTX]
 	class Position final
 	{
 	public:
@@ -21,6 +25,8 @@ namespace pd::component::camera
 
 	// 相机区域大小
 	// NOTE: 相机区域大小一般*不*等于屏幕大小,理论上相机区域仅表示*游戏区域*大小,不包含HUD区域大小(如果我们有的话)
+	//
+	// [CTX]
 	class Size final
 	{
 	public:

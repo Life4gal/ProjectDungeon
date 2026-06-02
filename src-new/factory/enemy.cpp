@@ -44,6 +44,9 @@ namespace pd::factory
 		// tags
 		registry.emplace<tags::Enemy>(entity);
 
+		// 新生成
+		registry.emplace<state::EntityNew>(entity);
+
 		return entity;
 	}
 

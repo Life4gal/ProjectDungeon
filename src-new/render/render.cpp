@@ -7,10 +7,10 @@
 
 #include <manager/resource.hpp>
 
+#include <component/tags.hpp>
 #include <component/render.hpp>
 #include <component/renderer.hpp>
 #include <component/transform.hpp>
-#include <component/state.hpp>
 
 #include <prometheus/meta/meta.hpp>
 #include <entt/entt.hpp>
@@ -33,7 +33,7 @@ namespace pd::render
 
 		const auto group = registry.group<component::render::RenderLayer, component::render::SpawnTime>(
 			entt::get<
-				state::sprite::Awake,
+				state::InCameraArea,
 				rss::Texture,
 				rss::UvPosition,
 				rss::UvSize,
@@ -45,7 +45,7 @@ namespace pd::render
 				transform::Position,
 				transform::Rotation
 			>,
-			entt::exclude<state::sprite::Invisible>
+			entt::exclude<state::DisableRender>
 		);
 
 		// 检查是否需要排序

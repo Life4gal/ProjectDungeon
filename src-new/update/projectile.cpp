@@ -29,7 +29,7 @@ namespace pd::update
 			if (lifetime.remaining <= sf::Time::Zero)
 			{
 				// 标记为可被销毁
-				registry.emplace<state::entity::Dead>(entity);
+				registry.emplace<state::EntityDead>(entity);
 				continue;
 			}
 

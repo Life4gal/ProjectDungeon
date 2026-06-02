@@ -5,31 +5,58 @@
 
 #pragma once
 
-// tags和state没有依赖关系
-// 但是考虑到用到tags的地方基本都会用到state
-// 不如直接引入其作为依赖 :)
-#include <component/state.hpp>
-
-namespace pd::component::tags
+namespace pd::component
 {
-	// 地下城-- 关卡 -- 房间 -- 门
-	class Door final {};
+	// ======================================
+	// 身份
+	// ======================================
 
-	// 地下城-- 关卡 -- 房间 -- 房间边界
-	class Bounding final {};
+	namespace tags
+	{
+		// 地下城-- 关卡 -- 房间 -- 门
+		class Door final {};
 
-	// 地下城-- 关卡 -- 房间 -- 瓦片
-	class Tile final {};
+		// 地下城-- 关卡 -- 房间 -- 房间边界
+		class Bounding final {};
 
-	// 地下城-- 关卡 -- 房间
-	class Room final {};
+		// 地下城-- 关卡 -- 房间 -- 瓦片
+		class Tile final {};
 
-	// 敌人
-	class Enemy final {};
+		// 地下城-- 关卡 -- 房间
+		class Room final {};
 
-	// 玩家
-	class Player final {};
+		// 敌人
+		class Enemy final {};
 
-	// 飞弹
-	class Projectile final {};
+		// 玩家
+		class Player final {};
+
+		// 飞弹
+		class Projectile final {};
+	}
+
+	// ======================================
+	// 状态
+	// ======================================
+
+	namespace state
+	{
+		// 实体已死亡
+		// 任何含有该标记的实体将在该帧update的末尾(或者说下一帧update的开始)被销毁
+		class EntityDead final {};
+
+		// 实体刚刚(上一帧)被创建
+		// 该标记理论上只存在一帧
+		class EntityNew final {};
+
+		// 实体处于相机(可视)区域内
+		// 只有含义该标记的实体才会被更新和渲染
+		class InCameraArea final {};
+
+		// 实体禁用渲染
+		class DisableRender final {};
+
+		// 实体禁用AI
+		class DisableAi final {};
+	}
 }

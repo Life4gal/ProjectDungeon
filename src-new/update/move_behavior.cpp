@@ -57,12 +57,12 @@ namespace pd::update
 		{
 			const auto view = registry
 					.view<
-						state::ai::Awake,
 						const mbw::Config,
+						state::InCameraArea,
 						mbw::Direction,
 						mbw::DirectionTimer,
 						const collision::BodyId //
-					>();
+					>(entt::exclude<state::DisableAi>);
 
 			for (const auto [entity, config, direction, direction_timer, body_id]: view.each())
 			{
@@ -105,11 +105,11 @@ namespace pd::update
 
 		{
 			const auto view = registry.view<
-				state::ai::Awake,
 				const mbc::Config,
+				state::InCameraArea,
 				const transform::Position,
 				const collision::BodyId //
-			>();
+			>(entt::exclude<state::DisableAi>);
 
 			for (const auto [entity, config, position, body_id]: view.each())
 			{
@@ -156,13 +156,13 @@ namespace pd::update
 
 		{
 			const auto view = registry.view<
-				state::ai::Awake,
 				const mbcj::Config,
+				state::InCameraArea,
 				mbcj::State,
 				mbcj::AirTimer,
 				const transform::Position,
 				const collision::BodyId //
-			>();
+			>(entt::exclude<state::DisableAi>);
 
 			for (const auto [entity, config, state, air_timer, position, body_id]: view.each())
 			{

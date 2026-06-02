@@ -5,7 +5,7 @@
 
 #include <update/graveyard.hpp>
 
-#include <component/state.hpp>
+#include <component/tags.hpp>
 
 #include <entt/entt.hpp>
 
@@ -15,7 +15,7 @@ namespace pd::update
 
 	auto graveyard(entt::registry& registry, [[maybe_unused]] const sf::Time delta) noexcept -> void
 	{
-		const auto view = registry.view<state::entity::Dead>();
+		const auto view = registry.view<state::EntityDead>();
 		registry.destroy(view.begin(), view.end());
 	}
 }

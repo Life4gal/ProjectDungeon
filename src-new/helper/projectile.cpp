@@ -44,6 +44,6 @@ namespace pd::helper
 		// registry.destroy(projectile);
 		// 这里应该使用emplace_or_replace,而不是emplace,因为飞弹可能同时接触到多个物理体,也就是一帧内处理多个接触事件
 		// TODO: 但是这也意味着一发飞弹可以同时命中多个敌人,造成多次伤害,这是我们预期的行为吗?
-		registry.emplace_or_replace<state::entity::Dead>(projectile);
+		registry.emplace_or_replace<state::EntityDead>(projectile);
 	}
 }

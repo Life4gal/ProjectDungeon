@@ -43,6 +43,8 @@
 // 更新
 
 #include <update/graveyard.hpp>
+#include <update/room_guardian.hpp>
+#include <update/new_entity_tag.hpp>
 #include <update/player_controller.hpp>
 #include <update/move_behavior.hpp>
 #include <update/physics_world.hpp>
@@ -442,11 +444,7 @@ namespace pd::scene
 							return {0, 1};
 						}();
 
-						const auto entity = factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
-						// TODO: 飞弹生成并不会引发相机更新,这也意味着该飞弹实体并没有需要的state标签(state::sprite::Awake)
-						//  这意味着该飞弹不会被渲染
-						//  我们应该有一种更好的(更自动化的)机制来处理这个问题
-						registry_.emplace<component::state::sprite::Awake>(entity);
+						factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
 					}
 				}
 				else if (kp->code == Key::E)
@@ -517,6 +515,11 @@ namespace pd::scene
 			// 如此便能够保证那些压入事件中的实体在被监听器处理时依然有效
 			// TODO: 这会引入一个新的问题,被标记死亡的实体并没有被立刻销毁,如果其存在物理刚体,那这一帧内该物理刚体依然会起效果(且该效果并非我们本意)
 			update::graveyard(registry_, delta);
+
+			// 监控那些处于/不处于当前房间(相机区域)的实体
+			update::room_guardian(registry_, delta);
+			// 检测新生成的实体是否处于当前房间(相机区域)
+			update::new_entity_tag(registry_, delta);
 
 			update::player_controller(registry_, delta);
 

@@ -38,6 +38,9 @@ namespace pd::factory
 		// tags
 		registry.emplace<tags::Player>(entity);
 
+		// 新生成
+		registry.emplace<state::EntityNew>(entity);
+
 		return entity;
 	}
 

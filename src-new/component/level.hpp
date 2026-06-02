@@ -11,6 +11,12 @@
 
 namespace pd::component::level
 {
+	// 与camera::Dirty类似
+	// 当房间切换时添加该标记
+	//
+	// [CTX]
+	class RoomChanged {};
+
 	// 房间实体与位置的映射
 	// 房间实体本身也保有其所在位置的组件,所以该组件应该用不到(只在factory::Level::create中用到)
 	//

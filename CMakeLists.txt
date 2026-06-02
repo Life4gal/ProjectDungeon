@@ -241,8 +241,6 @@ add_executable(
 	# 实体的组件
 	# ============================
 	
-	# 状态
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/state.hpp
 	# 标签
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tags.hpp
 
@@ -401,6 +399,14 @@ add_executable(
 	# 墓地
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/graveyard.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/graveyard.cpp
+
+	# 房间(相机)监控
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/room_guardian.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/room_guardian.cpp
+
+	# 新实体标记
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/new_entity_tag.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/new_entity_tag.cpp
 
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/player_controller.hpp

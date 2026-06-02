@@ -17,7 +17,7 @@ namespace pd::helper
 
 	auto Cheat::kill_all_enemy(entt::registry& registry) noexcept -> void
 	{
-		for (const auto view = registry.view<state::property::Awake, tags::Enemy>();
+		for (const auto view = registry.view<tags::Enemy, state::InCameraArea>();
 		     const auto [entity]: view.each())
 		{
 			Property::kill(registry, entity, entt::null);
@@ -26,7 +26,7 @@ namespace pd::helper
 
 	auto Cheat::set_all_enemy_hp_percent(entt::registry& registry, const float percent) noexcept -> void
 	{
-		for (const auto view = registry.view<state::property::Awake, tags::Enemy>();
+		for (const auto view = registry.view<tags::Enemy, state::InCameraArea>();
 		     const auto [entity]: view.each())
 		{
 			if (const auto max_health = Property::get_max_health(registry, entity);
