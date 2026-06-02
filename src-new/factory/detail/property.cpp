@@ -6,6 +6,7 @@
 #include <factory/detail/property.hpp>
 
 #include <component/property.hpp>
+#include <component/damage_statistics.hpp>
 
 #include <entt/entt.hpp>
 
@@ -15,6 +16,10 @@ namespace pd::factory::detail
 
 	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Property& property) noexcept -> void
 	{
+		// =====================
+		// PROPERTY
+		// =====================
+
 		// 生命值
 		registry.emplace<property::Health>(entity, property.health);
 		registry.emplace<property::HealthMax>(entity, property.health);
@@ -24,7 +29,11 @@ namespace pd::factory::detail
 
 		// TODO: 其他字段如何使用?
 
-		// 受伤记录
-		registry.emplace<property::DamageHistory>(entity);
+		// =====================
+		// DAMAGE STATISTICS
+		// =====================
+
+		registry.emplace<damage_statistics::AttackRecords>(entity);
+		registry.emplace<damage_statistics::InjuryRecords>(entity);
 	}
 }

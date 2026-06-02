@@ -259,6 +259,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/collision.hpp
 	# 属性
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/property.hpp
+	# 伤害统计
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/damage_statistics.hpp
 	# AI移动行为
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/move_behavior.hpp
 	# AI

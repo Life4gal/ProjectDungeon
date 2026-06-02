@@ -11,6 +11,7 @@
 #include <component/render.hpp>
 #include <component/collision.hpp>
 #include <component/property.hpp>
+#include <component/damage_statistics.hpp>
 #include <component/ai.hpp>
 #include <component/name.hpp>
 #include <component/tags.hpp>
@@ -21,6 +22,7 @@ namespace pd::component::enemy
 	// render --> 敌人渲染
 	// collision --> 敌人碰撞体
 	// property --> 敌人属性
+	// damage statistics --> 敌人伤害统计
 	// AI --> 敌人AI
 	// name --> 敌人名称
 	// tags --> 敌人标签

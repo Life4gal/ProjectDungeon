@@ -6,10 +6,13 @@
 #include <helper/Property.hpp>
 
 #include <manager/event.hpp>
+#include <manager/clock.hpp>
 
 #include <event/actor.hpp>
 
 #include <component/property.hpp>
+#include <component/damage_statistics.hpp>
+#include <component/transform.hpp>
 #include <component/name.hpp>
 #include <component/tags.hpp>
 
@@ -111,15 +114,43 @@ namespace pd::helper
 	auto Property::hurt(entt::registry& registry, const entt::entity victim, const entt::entity attacker, const float damage) noexcept -> void
 	{
 		auto* health = registry.try_get<property::Health>(victim);
-		auto* damage_history = registry.try_get<property::DamageHistory>(victim);
-
-		if (health == nullptr or damage_history == nullptr)
+		if (health == nullptr)
 		{
 			return;
 		}
 
+		// 添加统计信息
+		if (auto* attack_records = registry.try_get<damage_statistics::AttackRecords>(attacker);
+			attack_records != nullptr)
+		{
+			const auto [victim_position] = registry.get<const transform::Position>(victim);
+			const auto [attacker_position] = registry.get<const transform::Position>(attacker);
+			const auto attack_index = attack_records->records.size();
+
+			attack_records->records.push_back(
+				{
+						.victim = victim,
+						.time = manager::Clock::now(),
+						.attacker_position = attacker_position,
+						.victim_position = victim_position,
+						.victim_health = health->health,
+						.damage = damage,
+				}
+			);
+
+			if (auto* injury_records = registry.try_get<damage_statistics::InjuryRecords>(victim);
+				injury_records != nullptr)
+			{
+				injury_records->records.push_back(
+					{
+							.attacker = attacker,
+							.attack_index = attack_index
+					}
+				);
+			}
+		}
+
 		health->health -= damage;
-		damage_history->damage_history.emplace_back(attacker, damage);
 
 		const auto* victim_name = registry.try_get<name::Name>(victim);
 		const auto* attacher_name = registry.try_get<name::Name>(attacker);

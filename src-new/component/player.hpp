@@ -9,6 +9,7 @@
 #include <component/render.hpp>
 #include <component/collision.hpp>
 #include <component/property.hpp>
+#include <component/damage_statistics.hpp>
 #include <component/name.hpp>
 #include <component/tags.hpp>
 
@@ -18,6 +19,7 @@ namespace pd::component::player
 	// render --> 玩家渲染
 	// collision --> 玩家碰撞体
 	// property --> 玩家属性
+	// damage statistics --> 玩家伤害统计
 	// name --> 玩家名称
 	// tags --> 玩家标签
 

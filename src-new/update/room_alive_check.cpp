@@ -83,12 +83,11 @@ namespace pd::update
 						);
 					}
 
-					// TODO: 受伤记录应该如何利用?理论上这可以用于数据统计,但是如果我们将这部分数据保存在实体上,在实体被销毁后数据将不复存在
-					const auto& [damage_history] = registry.get<const property::DamageHistory>(entity);
-					const auto last_info = damage_history.back();
-					const auto last_attacker = last_info.attacker;
+					// FIXME: 有没有可能最后的攻击者失效了?不过目前的实现,攻击者失效与否不重要 :)
+					const auto& [records] = registry.get<const damage_statistics::InjuryRecords>(entity);
+					const auto& last_record = records.back();
 
-					helper::Property::kill(registry, entity, last_attacker);
+					helper::Property::kill(registry, entity, last_record.attacker);
 				}
 			}
 		}
