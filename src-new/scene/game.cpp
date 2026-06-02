@@ -61,6 +61,7 @@
 #include <render/camera.hpp>
 #include <render/render.hpp>
 #include <render/player_status.hpp>
+#include <render/player_target_status.hpp>
 
 // =========
 // 依赖
@@ -555,6 +556,8 @@ namespace pd::scene
 
 		// 玩家状态
 		render::player_status(registry_, window);
+		// 玩家目标状态
+		render::player_target_status(registry_, window);
 
 		if (g_physics_world_draw_on)
 		{
