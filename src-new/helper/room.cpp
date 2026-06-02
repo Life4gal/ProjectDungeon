@@ -181,13 +181,14 @@ namespace pd::helper
 		manager::Event::enqueue(event::room::Enter{.room = room});
 
 		// 移动 玩家+相机
+		// 注意要先移动相机再移动玩家,否则玩家的transform::ScreenPosition不准确
 		{
 			// 房间中心点
 			const auto start_position = position + size / 2.0f;
 
-			PlayerController::move_to(registry, start_position);
 			// TODO: 可视(相机)区域大小?
 			Camera::initialize(registry, {position, size});
+			PlayerController::move_to(registry, start_position);
 		}
 
 		// 关门
