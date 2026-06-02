@@ -16,7 +16,6 @@
 
 #include <component/level.hpp>
 #include <component/room.hpp>
-#include <component/enemy.hpp>
 
 #include <helper/door.hpp>
 #include <helper/camera.hpp>
@@ -43,45 +42,45 @@ namespace pd::helper
 		constexpr auto PlayerOffsetY = 2.25f * TileHeight;
 	}
 
-	auto Room::drop(entt::registry& registry, const entt::entity enemy) noexcept -> void
+	auto Room::check(entt::registry& registry, const entt::entity room) noexcept -> bool
 	{
-		PROMETHEUS_PLATFORM_ASSUME(registry.all_of<tags::Enemy>(enemy));
-
-		const auto* room_entity = registry.try_get<enemy::Room>(enemy);
-		if (room_entity == nullptr)
+		auto* room_enemies = registry.try_get<room::Enemies>(room);
+		// 不存在该组件无需再检查
+		if (room_enemies == nullptr)
 		{
-			SPDLOG_WARN("尝试将实体(0x{:08X})从房间的敌人列表中移除,但是其不存在房间实体组件!也许不是敌人类型?", entt::to_integral(enemy));
-			return;
+			return true;
 		}
 
-		auto& [room_enemies] = registry.get<room::Enemies>(room_entity->room);
+		bool has_valid = false;
 
-		if (const auto it = std::ranges::find(room_enemies, enemy);
-			it == room_enemies.end())
-		{
-			SPDLOG_WARN("尝试将实体(0x{:08X})从房间的敌人列表移除,但是其似乎不属于其记录的房间?", entt::to_integral(enemy));
-		}
-		else
-		{
-			// 设置为null
-			*it = entt::null;
-		}
-
-		// 检查房间是否已清空
-		if (std::ranges::all_of(
-			room_enemies,
-			[](const entt::entity entity) noexcept -> bool
+		// 将已失效的实体设置为null
+		std::ranges::for_each(
+			room_enemies->enemies,
+			[&](entt::entity& enemy) noexcept -> void
 			{
-				return entity == entt::null;
+				if (enemy != entt::null)
+				{
+					if (registry.valid(enemy))
+					{
+						has_valid = true;
+					}
+					else
+					{
+						enemy = entt::null;
+					}
+				}
 			}
-		))
+		);
+
+		// 检查是否所有敌人实体均已无效
+		if (not has_valid)
 		{
-			const auto [layout_position] = registry.get<const room::LayoutPosition>(room_entity->room);
-			const auto [position] = registry.get<const room::Position>(room_entity->room);
-			const auto [size] = registry.get<const room::Size>(room_entity->room);
+			const auto [layout_position] = registry.get<const room::LayoutPosition>(room);
+			const auto [position] = registry.get<const room::Position>(room);
+			const auto [size] = registry.get<const room::Size>(room);
 			SPDLOG_INFO(
-				"清理房间(0x{:08X}),位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f})",
-				entt::to_integral(room_entity->room),
+				"检测到房间(实体: 0x{:08X}, 位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f}))已被清理",
+				entt::to_integral(room),
 				position.x,
 				position.y,
 				layout_position.x,
@@ -90,11 +89,17 @@ namespace pd::helper
 				size.y
 			);
 
+			// 移除敌人列表
+			registry.remove<room::Enemies>(room);
+
 			// 房间已清理
-			manager::Event::enqueue(event::room::Cleared{.room = room_entity->room});
+			manager::Event::enqueue(event::room::Cleared{.room = room});
+
 			// 开门
-			open_doors(registry, room_entity->room);
+			open_doors(registry, room);
 		}
+
+		return not has_valid;
 	}
 
 	auto Room::open_doors(entt::registry& registry, const entt::entity room) noexcept -> void
@@ -141,7 +146,7 @@ namespace pd::helper
 		const auto [position] = registry.get<const room::Position>(room);
 		const auto [size] = registry.get<const room::Size>(room);
 		SPDLOG_INFO(
-			"离开房间(0x{:08X}),位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f})",
+			"离开房间(实体: 0x{:08X}, 位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f}))",
 			entt::to_integral(room),
 			position.x,
 			position.y,
@@ -154,9 +159,11 @@ namespace pd::helper
 		// 离开房间事件
 		manager::Event::enqueue(event::room::Leave{.room = room});
 
-		// 离开房间时有什么值得做的吗?
-		// 理论上房间应该已经被清理,需要做什么检查吗?
-		registry.remove<room::Enemies>(room);
+		// 上下文
+		{
+			// 设置上一个房间
+			registry.ctx().insert_or_assign(level::LastRoom{.room = room});
+		}
 	}
 
 	auto Room::enter(entt::registry& registry, const entt::entity room) noexcept -> void
@@ -167,7 +174,7 @@ namespace pd::helper
 		const auto [position] = registry.get<const room::Position>(room);
 		const auto [size] = registry.get<const room::Size>(room);
 		SPDLOG_INFO(
-			"进入房间(0x{:08X}),位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f})",
+			"进入房间(实体: 0x{:08X}, 位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f}))",
 			entt::to_integral(room),
 			position.x,
 			position.y,
@@ -191,11 +198,26 @@ namespace pd::helper
 			PlayerController::move_to(registry, start_position);
 		}
 
-		// 标记房间切换
-		registry.ctx().emplace<level::RoomChanged>();
+		// 上下文
+		{
+			// 记录路线
+			auto& [path] = registry.ctx().get<level::Path>();
+			path.push_back(room);
 
-		// 关门
-		close_doors(registry, room);
+			// 设置当前房间
+			// 上一个房间由leave设置
+			registry.ctx().insert_or_assign(level::Room{.room = room});
+
+			// 标记房间切换
+			registry.ctx().emplace<level::RoomChanged>();
+		}
+
+		if (const auto* enemies = registry.try_get<room::Enemies>(room);
+			enemies != nullptr)
+		{
+			// 房间未清理,关门
+			close_doors(registry, room);
+		}
 	}
 
 	auto Room::enter(entt::registry& registry, const unsigned x, const unsigned y) noexcept -> void
@@ -225,7 +247,7 @@ namespace pd::helper
 		const auto [position] = registry.get<const room::Position>(room);
 		const auto [size] = registry.get<const room::Size>(room);
 		SPDLOG_INFO(
-			"进入房间(0x{:08X}),位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f})",
+			"进入房间(实体: 0x{:08X}, 位置: ({:.0f}:{:.0f})[{}:{}], 大小: ({:.0f}:{:.0f}))",
 			entt::to_integral(room),
 			position.x,
 			position.y,
@@ -277,8 +299,19 @@ namespace pd::helper
 			}
 		}
 
-		// 标记房间切换
-		registry.ctx().emplace<level::RoomChanged>();
+		// 上下文
+		{
+			// 记录路线
+			auto& [path] = registry.ctx().get<level::Path>();
+			path.push_back(room);
+
+			// 设置当前房间
+			// 上一个房间由leave设置
+			registry.ctx().insert_or_assign(level::Room{.room = room});
+
+			// 标记房间切换
+			registry.ctx().emplace<level::RoomChanged>();
+		}
 
 		if (const auto* enemies = registry.try_get<room::Enemies>(room);
 			enemies != nullptr)

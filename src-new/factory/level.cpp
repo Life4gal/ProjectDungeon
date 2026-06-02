@@ -37,6 +37,7 @@ namespace pd::factory
 		);
 
 		// 创建上下文
+		registry.ctx().emplace<level::Path>();
 		auto& [entity_to_position] = registry.ctx().emplace<level::EntityToPosition>();
 		auto& [position_to_entity] = registry.ctx().emplace<level::PositionToEntity>();
 		auto& [position_to_neighbor] = registry.ctx().emplace<level::PositionToNeighbor>();
@@ -151,6 +152,10 @@ namespace pd::factory
 	{
 		Room::destroy_all(registry);
 
+		registry.ctx().erase<level::Path>();
+		registry.ctx().erase<level::RoomChanged>();
+		registry.ctx().erase<level::LastRoom>();
+		registry.ctx().erase<level::Room>();
 		registry.ctx().erase<level::EntityToPosition>();
 		registry.ctx().erase<level::PositionToEntity>();
 		registry.ctx().erase<level::PositionToNeighbor>();

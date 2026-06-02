@@ -12,16 +12,15 @@ namespace pd::helper
 	class Room final
 	{
 	public:
-		// 将一个敌人实体从房间的敌人列表中移除(仅此而已,并不会销毁实体)
-		// 如果房间的敌人列表被清空则打开房间所有门
-		// enemy: 敌人实体
+		// 检测目标房间是否已清理(即房间内没有敌人了),如果已清理则打开房间所有门
+		// 返回房间是否已清理
 		//
 		// Event:
 		//  event::room::Cleared
 		//  event::door::Opened (Door::try_open)
 		//
 		// TODO: 当前的房间缺少一种机制,允许我们在房间被清理(且门已打开)后,(触发某个机关)往房间中再次投放敌人(且关闭房门)
-		static auto drop(entt::registry& registry, entt::entity enemy) noexcept -> void;
+		static auto check(entt::registry& registry, entt::entity room) noexcept -> bool;
 
 		// 开启房间所有门
 		// room: 目标房间

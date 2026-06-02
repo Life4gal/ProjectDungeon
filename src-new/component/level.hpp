@@ -11,11 +11,35 @@
 
 namespace pd::component::level
 {
+	// 玩家路线(进入各个房间的路线)
+	// 按顺序,存在重复(如果重复进入房间的话)
+	class Path final
+	{
+	public:
+		std::vector<entt::entity> path;
+	};
+
 	// 与camera::Dirty类似
 	// 当房间切换时添加该标记
 	//
 	// [CTX]
 	class RoomChanged {};
+
+	// 上一个房间实体
+	class LastRoom final
+	{
+	public:
+		entt::entity room;
+	};
+
+	// 当前房间实体
+	//
+	// [CTX]
+	class Room final
+	{
+	public:
+		entt::entity room;
+	};
 
 	// 房间实体与位置的映射
 	// 房间实体本身也保有其所在位置的组件,所以该组件应该用不到(只在factory::Level::create中用到)

@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto collect_death(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto room_alive_check(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

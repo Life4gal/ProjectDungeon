@@ -50,7 +50,7 @@
 #include <update/physics_world.hpp>
 #include <update/sync_physics_transform.hpp>
 #include <update/process_physics_events.hpp>
-#include <update/collect_death.hpp>
+#include <update/room_alive_check.hpp>
 #include <update/projectile.hpp>
 #include <update/dynamic_sprite.hpp>
 #include <update/sprite_effect.hpp>
@@ -533,7 +533,8 @@ namespace pd::scene
 			update::sync_physics_transform(registry_, delta);
 			update::process_physics_events(registry_, delta);
 
-			update::collect_death(registry_, delta);
+			// 如果房间内敌人全部死亡则打开门
+			update::room_alive_check(registry_, delta);
 
 			update::projectile(registry_, delta);
 

@@ -426,9 +426,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/process_physics_events.cpp
 	
-	# 收集(标记)所有死亡的实体(带property组件的实体)
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/collect_death.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/collect_death.cpp
+	# 检测房间内存活的敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/room_alive_check.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/room_alive_check.cpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.hpp
