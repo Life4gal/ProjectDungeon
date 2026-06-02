@@ -36,7 +36,9 @@ namespace pd::update
 			if (const auto in_area = camera_area.contains(position.position);
 				in_area)
 			{
-				registry.emplace<state::InCameraArea>(entity);
+				// 这里理论上可以使用emplace,但是有一个例外
+				// 那就是玩家操纵的实体,其在上一个房间被标记为InCameraArea,在进入新房间时仍然会被标记为InCameraArea
+				registry.emplace_or_replace<state::InCameraArea>(entity);
 			}
 			else
 			{
