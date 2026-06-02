@@ -8,6 +8,7 @@
 #include <utility/physics.hpp>
 
 #include <component/projectile.hpp>
+#include <component/name.hpp>
 
 #include <factory/detail/transform.hpp>
 #include <factory/detail/render.hpp>
@@ -16,6 +17,7 @@
 #include <prometheus/functional/functor.hpp>
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
 #include <box2d/box2d.h>
 
 namespace pd::factory
@@ -32,6 +34,18 @@ namespace pd::factory
 		const auto position = blueprint::Position{.x = owner_position.x + position_offset.x, .y = owner_position.y + position_offset.y};
 
 		const auto entity = registry.create();
+
+		const auto* owner_name = registry.try_get<name::Name>(owner);
+		SPDLOG_INFO(
+			"{}(0x{:08X})发射飞弹(Entity: 0x{:08X}, Position: ({:.1f}:{:.1f}), Direction: ({:.3f}:{:.3f}))",
+			owner_name ? owner_name->name : "实体",
+			entt::to_integral(owner),
+			entt::to_integral(entity),
+			position.x,
+			position.y,
+			direction.x,
+			direction.y
+		);
 
 		// transform
 		detail::attach(registry, entity, position);

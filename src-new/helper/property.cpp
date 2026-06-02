@@ -10,7 +10,8 @@
 #include <event/actor.hpp>
 
 #include <component/property.hpp>
-#include <component/state.hpp>
+#include <component/name.hpp>
+#include <component/tags.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -120,9 +121,14 @@ namespace pd::helper
 		health->health -= damage;
 		damage_history->damage_history.emplace_back(attacker, damage);
 
+		const auto* victim_name = registry.try_get<name::Name>(victim);
+		const auto* attacher_name = registry.try_get<name::Name>(attacker);
+
 		SPDLOG_INFO(
-			"实体(0x{:08X})受到来自实体(0x{:08X})的{:.1f}点伤害,剩余{:.1f}点生命值",
+			"{}(0x{:08X})受到来自{}(0x{:08X})的{:.1f}点伤害,剩余{:.1f}点生命值",
+			victim_name ? victim_name->name : "实体",
 			entt::to_integral(victim),
+			attacher_name ? attacher_name->name : "实体",
 			entt::to_integral(attacker),
 			damage,
 			health->health
@@ -134,11 +140,16 @@ namespace pd::helper
 	auto Property::kill([[maybe_unused]] entt::registry& registry, const entt::entity victim, const entt::entity attacker) noexcept -> void
 	{
 		// TODO: 需要做什么?
-		registry.emplace_or_replace<state::entity::Dead>(victim);
+		registry.emplace_or_replace<state::EntityDead>(victim);
+
+		const auto* victim_name = registry.try_get<name::Name>(victim);
+		const auto* attacher_name = registry.try_get<name::Name>(attacker);
 
 		SPDLOG_INFO(
-			"实体(0x{:08X})被实体(0x{:08X})击杀",
+			"{}(0x{:08X})被{}(0x{:08X})击杀",
+			victim_name ? victim_name->name : "实体",
 			entt::to_integral(victim),
+			attacher_name ? attacher_name->name : "实体",
 			entt::to_integral(attacker)
 		);
 

@@ -25,9 +25,14 @@ namespace pd::helper
 			return;
 		}
 
+		const auto* enemy_name = registry.try_get<name::Name>(enemy);
+		const auto* other_name = registry.try_get<name::Name>(other);
+
 		SPDLOG_INFO(
-			"敌人实体(0x{:08X})与玩家实体(0x{:08X})接触!",
+			"{}(0x{:08X})与{}(0x{:08X})接触!",
+			enemy_name ? enemy_name->name : "敌人实体",
 			entt::to_integral(enemy),
+			other_name ? other_name->name : "玩家实体",
 			entt::to_integral(other)
 		);
 

@@ -12,6 +12,7 @@
 #include <component/collision.hpp>
 #include <component/property.hpp>
 #include <component/ai.hpp>
+#include <component/name.hpp>
 #include <component/tags.hpp>
 
 namespace pd::component::enemy
@@ -21,6 +22,7 @@ namespace pd::component::enemy
 	// collision --> 敌人碰撞体
 	// property --> 敌人属性
 	// AI --> 敌人AI
+	// name --> 敌人名称
 	// tags --> 敌人标签
 
 	// 接触伤害

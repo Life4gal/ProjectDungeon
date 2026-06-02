@@ -6,6 +6,7 @@
 #include <helper/projectile.hpp>
 
 #include <component/projectile.hpp>
+#include <component/name.hpp>
 
 #include <helper/property.hpp>
 
@@ -18,15 +19,22 @@ namespace pd::helper
 
 	auto Projectile::contact(entt::registry& registry, const entt::entity projectile, const entt::entity other) noexcept -> void
 	{
+		const auto [owner] = registry.get<const projectile::Owner>(projectile);
+
+		const auto* owner_name = registry.try_get<name::Name>(owner);
+		const auto* other_name = registry.try_get<name::Name>(other);
+
 		SPDLOG_INFO(
-			"飞弹实体(0x{:08X})命中实体(0x{:08X})!",
+			"{}(0x{:08X})的飞弹实体(0x{:08X})命中{}(0x{:08X})!",
+			owner_name ? owner_name->name : "实体",
+			entt::to_integral(owner),
 			entt::to_integral(projectile),
+			other_name ? other_name->name : "实体",
 			entt::to_integral(other)
 		);
 
 		if (registry.any_of<tags::Player, tags::Enemy>(other))
 		{
-			const auto [owner] = registry.get<const projectile::Owner>(projectile);
 			const auto [damage] = registry.get<const projectile::Damage>(projectile);
 
 			Property::hurt(registry, other, owner, damage);
