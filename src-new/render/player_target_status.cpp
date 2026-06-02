@@ -5,8 +5,6 @@
 
 #include <render/player_target_status.hpp>
 
-#include <ranges>
-
 #include <manager/resource.hpp>
 #include <manager/clock.hpp>
 
@@ -29,26 +27,25 @@ namespace pd::render
 	{
 		// 默认名称
 		constexpr std::string_view HudDefaultName = "???";
+
 		// HUD开始位置
 		// X取决于状态条宽度和屏幕大小
-		// constexpr float HudBeginX = 0
-		constexpr float HudBeginY = 20.f;
+		// constexpr float HudBeginX = 10;
+		constexpr float HudBeginY = 10;
 		// HUD字体
 		constexpr std::string_view HudFont = R"(C:\Windows\Fonts\msyh.ttc)";
 		// HUD字体大小
 		constexpr int HudFontSize = 30;
 		// 生命值条&魔法值条位置
 		// X取决于状态条宽度和屏幕大小
-		// constexpr float HudStatusBarX = HudBeginX;
+		// constexpr float HudStatusBarBeginX = HudBeginX;
 		// Y取决于第几个元素
-		// constexpr float HudStatusBarY = HudBeginY + HudFontSize + 5;
+		// constexpr float HudStatusBarBeginY = HudBeginY + 5;
 		// 生命值条&魔法值条大小
-		constexpr float HudStatusBarWidth = 80;
+		constexpr float HudStatusBarWidth = 120;
 		constexpr float HudStatusBarHeight = 20;
 
 		// X取决于状态条宽度和屏幕大小
-		// constexpr sf::Vector2f HudStatusBarPosition1{0, HudStatusBarY};
-		// constexpr sf::Vector2f HudStatusBarPosition2{0, HudStatusBarY + HudStatusBarHeight + 3};
 		constexpr sf::Vector2f HudStatusBarSize{HudStatusBarWidth, HudStatusBarHeight};
 	}
 
@@ -71,61 +68,62 @@ namespace pd::render
 			return;
 		}
 
-		// 仅考虑最近5秒的记录
-		const auto now = manager::Clock::now();
-		auto less_than_5_seconds =
-				records->records | //
-				std::views::reverse | //
-				std::views::take_while(
-					[now](const damage_statistics::AttackRecords::Record& record) noexcept -> bool
+		const auto victims = [&] noexcept -> std::unordered_set<entt::entity>
+		{
+			// 仅考虑最近5秒的记录
+			constexpr auto max_interval = sf::seconds(5);
+			const auto now = manager::Clock::now();
+			// 最多3个元素
+			constexpr auto max_element = 3;
+			// 去重
+			std::unordered_set<entt::entity> result{};
+			result.reserve(max_element);
+
+			for (const auto& record: records->records | std::views::reverse)
+			{
+				if (now - record.time > max_interval)
+				{
+					// 直接结束
+					break;
+				}
+
+				if (not registry.valid(record.victim))
+				{
+					// 无效的跳过
+					continue;
+				}
+
+				if (const auto [it, inserted] = result.emplace(record.victim);
+					inserted)
+				{
+					if (result.size() >= max_element)
 					{
-						return now - record.time <= sf::seconds(5);
+						// 数量达标直接结束
+						break;
 					}
-				);
-		// 低于五秒
-		const auto less_than_5_seconds_count = std::ranges::distance(less_than_5_seconds);
-		if (less_than_5_seconds_count == 0)
+				}
+			}
+
+			return result;
+		}();
+
+		if (victims.empty())
 		{
 			return;
 		}
 
-		// 去除重复
-		std::unordered_set<entt::entity> used_victims{};
-		auto unique =
-				less_than_5_seconds | //
-				std::views::filter(
-					[&used_victims](const damage_statistics::AttackRecords::Record& record) noexcept -> bool
-					{
-						return used_victims.insert(record.victim).second;
-					}
-				);
-
-		// 最多3个元素
-		auto last_3_elements =
-				unique | //
-				std::views::take(3);
-		const auto last_3_elements_count = std::ranges::distance(last_3_elements);
-
 		// 2个矩形(背景+前景) * 6个顶点(每个矩形2个三角形) = 12
 		// 生命值条+魔法值条 = 2
-		sf::VertexArray triangles{sf::PrimitiveType::Triangles, 12uz * 2 * last_3_elements_count};
+		sf::VertexArray triangles{sf::PrimitiveType::Triangles, 12uz * 2 * victims.size()};
 
 		// 起始X/Y
 		const auto hud_begin_x = static_cast<float>(var::window_width) - HudStatusBarWidth - 20.f;
 		float current_y = HudBeginY;
 
-		for (const auto& record: last_3_elements)
+		for (const auto victim: victims)
 		{
-			if (not registry.valid(record.victim))
-			{
-				continue;
-			}
-
-			const sf::Vector2f hud_status_bar_position1{hud_begin_x, current_y};
-			const sf::Vector2f hud_status_bar_position2{hud_begin_x, current_y + HudStatusBarHeight + 3};
-
 			// 名字
-			const auto* name = registry.try_get<name::Name>(record.victim);
+			const auto* name = registry.try_get<name::Name>(victim);
 			const auto font = manager::Font::load(HudFont);
 			sf::Text text
 			{
@@ -136,13 +134,22 @@ namespace pd::render
 			text.setFillColor(sf::Color::Red);
 			text.setOutlineColor(sf::Color::Black);
 			text.setOutlineThickness(1);
-			text.setPosition({hud_begin_x, current_y + HudFontSize});
+			text.setPosition({hud_begin_x, current_y});
 			window.draw(text);
 
+			current_y += HudFontSize + 5;
+
 			// 生命值条&魔法值条
-			if (const auto [health, health_max] = registry.try_get<property::Health, property::HealthMax>(record.victim);
+			if (const auto [health, health_max] = registry.try_get<property::Health, property::HealthMax>(victim);
 				health != nullptr and health_max != nullptr)
 			{
+				const sf::Vector2f hud_status_bar_position_health{hud_begin_x, current_y};
+				const sf::Vector2f hud_status_bar_position_mana{hud_begin_x, hud_status_bar_position_health.y + HudStatusBarHeight + 3};
+
+				// 有生命值条
+				// 增加Y轴
+				current_y += HudStatusBarHeight;
+
 				// 生命值条
 				{
 					constexpr auto health_bar_background_color = sf::Color::Red;
@@ -152,29 +159,29 @@ namespace pd::render
 					const auto health_size = sf::Vector2f{HudStatusBarWidth * health_ratio, HudStatusBarHeight};
 
 					// background
-					triangles.append({.position = hud_status_bar_position1, .color = health_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + sf::Vector2f{HudStatusBarWidth, 0}, .color = health_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1, .color = health_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + sf::Vector2f{0, HudStatusBarHeight}, .color = health_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health, .color = health_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + sf::Vector2f{HudStatusBarWidth, 0}, .color = health_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health, .color = health_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + sf::Vector2f{0, HudStatusBarHeight}, .color = health_bar_background_color, .texCoords = {}});
 
 					// health
-					triangles.append({.position = hud_status_bar_position1, .color = health_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + sf::Vector2f{health_size.x, 0}, .color = health_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + health_size, .color = health_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1, .color = health_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + health_size, .color = health_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position1 + sf::Vector2f{0, health_size.y}, .color = health_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health, .color = health_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + sf::Vector2f{health_size.x, 0}, .color = health_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + health_size, .color = health_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health, .color = health_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + health_size, .color = health_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_health + sf::Vector2f{0, health_size.y}, .color = health_color, .texCoords = {}});
 				}
 
-				current_y += HudStatusBarHeight;
-
 				// 魔法值条
-				if (const auto [mana, mana_max] = registry.try_get<property::Mana, property::ManaMax>(record.victim);
-					mana != nullptr and mana_max != nullptr)
+				if (const auto [mana, mana_max] = registry.try_get<property::Mana, property::ManaMax>(victim);
+					mana != nullptr and mana_max != nullptr and mana->mana > 0)
 				{
-					current_y += 3;
+					// 有魔法值条
+					// 增加Y轴
+					current_y += 3 + HudStatusBarHeight;
 
 					constexpr auto mana_bar_background_color = sf::Color::Black;
 
@@ -183,25 +190,24 @@ namespace pd::render
 					const auto mana_size = sf::Vector2f{HudStatusBarWidth * mana_ratio, HudStatusBarHeight};
 
 					// background
-					triangles.append({.position = hud_status_bar_position2, .color = mana_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + sf::Vector2f{HudStatusBarWidth, 0}, .color = mana_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2, .color = mana_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + sf::Vector2f{0, HudStatusBarHeight}, .color = mana_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana, .color = mana_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + sf::Vector2f{HudStatusBarWidth, 0}, .color = mana_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana, .color = mana_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + sf::Vector2f{0, HudStatusBarHeight}, .color = mana_bar_background_color, .texCoords = {}});
 
 					// mana
-					triangles.append({.position = hud_status_bar_position2, .color = mana_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + sf::Vector2f{mana_size.x, 0}, .color = mana_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + mana_size, .color = mana_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2, .color = mana_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + mana_size, .color = mana_color, .texCoords = {}});
-					triangles.append({.position = hud_status_bar_position2 + sf::Vector2f{0, mana_size.y}, .color = mana_color, .texCoords = {}});
-
-					current_y += HudStatusBarHeight;
+					triangles.append({.position = hud_status_bar_position_mana, .color = mana_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + sf::Vector2f{mana_size.x, 0}, .color = mana_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + mana_size, .color = mana_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana, .color = mana_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + mana_size, .color = mana_color, .texCoords = {}});
+					triangles.append({.position = hud_status_bar_position_mana + sf::Vector2f{0, mana_size.y}, .color = mana_color, .texCoords = {}});
 				}
 			}
 
+			// 增加间隔
 			current_y += 5;
 		}
 

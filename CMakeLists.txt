@@ -451,10 +451,6 @@ add_executable(
 	# 帧渲染系统
 	# ============================
 	
-	# 相机
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/camera.cpp
-
 	# (实体)渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.cpp

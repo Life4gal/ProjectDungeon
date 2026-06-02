@@ -22,21 +22,21 @@ namespace pd::render
 	namespace
 	{
 		// HUD开始位置
-		constexpr float HudBeginX = 20.0f;
-		constexpr float HudBeginY = 20.0f;
+		constexpr float HudBeginX = 10;
+		constexpr float HudBeginY = 10;
 		// HUD字体
 		constexpr std::string_view HudFont = R"(C:\Windows\Fonts\msyh.ttc)";
 		// HUD字体大小
 		constexpr int HudFontSize = 30;
 		// 生命值条&魔法值条位置
-		constexpr float HudStatusBarX = HudBeginX;
-		constexpr float HudStatusBarY = HudBeginY + HudFontSize + 5;
+		constexpr float HudStatusBarBeginX = HudBeginX;
+		constexpr float HudStatusBarBeginY = HudBeginY + 5;
 		// 生命值条&魔法值条大小
-		constexpr float HudStatusBarWidth = 80;
+		constexpr float HudStatusBarWidth = 120;
 		constexpr float HudStatusBarHeight = 20;
 
-		constexpr sf::Vector2f HudStatusBarPosition1{HudStatusBarX, HudStatusBarY + HudFontSize};
-		constexpr sf::Vector2f HudStatusBarPosition2{HudStatusBarX, HudStatusBarPosition1.y + HudStatusBarHeight + 3};
+		constexpr sf::Vector2f HudStatusBarPositionHealth{HudStatusBarBeginX, HudStatusBarBeginY + HudFontSize};
+		constexpr sf::Vector2f HudStatusBarPositionMana{HudStatusBarBeginX, HudStatusBarPositionHealth.y + HudStatusBarHeight + 3};
 		constexpr sf::Vector2f HudStatusBarSize{HudStatusBarWidth, HudStatusBarHeight};
 	}
 
@@ -88,20 +88,20 @@ namespace pd::render
 				const auto health_size = sf::Vector2f{HudStatusBarWidth * health_ratio, HudStatusBarHeight};
 
 				// background
-				triangles.append({.position = HudStatusBarPosition1, .color = health_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + sf::Vector2f{HudStatusBarWidth, 0}, .color = health_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1, .color = health_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + sf::Vector2f{0, HudStatusBarHeight}, .color = health_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth, .color = health_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + sf::Vector2f{HudStatusBarWidth, 0}, .color = health_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth, .color = health_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + HudStatusBarSize, .color = health_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + sf::Vector2f{0, HudStatusBarHeight}, .color = health_bar_background_color, .texCoords = {}});
 
 				// health
-				triangles.append({.position = HudStatusBarPosition1, .color = health_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + sf::Vector2f{health_size.x, 0}, .color = health_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + health_size, .color = health_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1, .color = health_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + health_size, .color = health_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition1 + sf::Vector2f{0, health_size.y}, .color = health_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth, .color = health_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + sf::Vector2f{health_size.x, 0}, .color = health_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + health_size, .color = health_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth, .color = health_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + health_size, .color = health_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionHealth + sf::Vector2f{0, health_size.y}, .color = health_color, .texCoords = {}});
 			}
 
 			// 魔法值条
@@ -114,20 +114,20 @@ namespace pd::render
 				const auto mana_size = sf::Vector2f{HudStatusBarWidth * mana_ratio, HudStatusBarHeight};
 
 				// background
-				triangles.append({.position = HudStatusBarPosition2, .color = mana_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + sf::Vector2f{HudStatusBarWidth, 0}, .color = mana_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2, .color = mana_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + sf::Vector2f{0, HudStatusBarHeight}, .color = mana_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana, .color = mana_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + sf::Vector2f{HudStatusBarWidth, 0}, .color = mana_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana, .color = mana_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + HudStatusBarSize, .color = mana_bar_background_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + sf::Vector2f{0, HudStatusBarHeight}, .color = mana_bar_background_color, .texCoords = {}});
 
 				// mana
-				triangles.append({.position = HudStatusBarPosition2, .color = mana_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + sf::Vector2f{mana_size.x, 0}, .color = mana_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + mana_size, .color = mana_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2, .color = mana_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + mana_size, .color = mana_color, .texCoords = {}});
-				triangles.append({.position = HudStatusBarPosition2 + sf::Vector2f{0, mana_size.y}, .color = mana_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana, .color = mana_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + sf::Vector2f{mana_size.x, 0}, .color = mana_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + mana_size, .color = mana_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana, .color = mana_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + mana_size, .color = mana_color, .texCoords = {}});
+				triangles.append({.position = HudStatusBarPositionMana + sf::Vector2f{0, mana_size.y}, .color = mana_color, .texCoords = {}});
 			}
 
 			window.draw(triangles);

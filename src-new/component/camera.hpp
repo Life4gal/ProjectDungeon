@@ -9,11 +9,6 @@
 
 namespace pd::component::camera
 {
-	// 相机区域位置/大小有变化,需要更新视野内实体
-	//
-	// [CTX]
-	class Dirty final {};
-
 	// 相机区域位置
 	//
 	// [CTX]

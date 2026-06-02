@@ -19,8 +19,8 @@ namespace pd::component::level
 		std::vector<entt::entity> path;
 	};
 
-	// 与camera::Dirty类似
 	// 当房间切换时添加该标记
+	// 当且仅当房间切换时才检查哪些实体处于相机区域内
 	//
 	// [CTX]
 	class RoomChanged {};

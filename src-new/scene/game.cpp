@@ -58,7 +58,8 @@
 // =========
 // 渲染
 
-#include <render/camera.hpp>
+#include <helper/camera.hpp>
+
 #include <render/render.hpp>
 #include <render/player_status.hpp>
 #include <render/player_target_status.hpp>
@@ -548,22 +549,35 @@ namespace pd::scene
 
 	auto Game::render(sf::RenderWindow& window) noexcept -> void
 	{
-		// 调整相机
-		render::camera(registry_, window);
+		// ================
+		// 绘制实体
+		// 相机视图
+		// ================
+
+		const auto camera_area = helper::Camera::get_area(registry_);
+		window.setView(sf::View{camera_area});
 
 		// 渲染实体
 		render::render(registry_, window);
 
-		// 玩家状态
-		render::player_status(registry_, window);
-		// 玩家目标状态
-		render::player_target_status(registry_, window);
-
+		// 物理调试绘制
 		if (g_physics_world_draw_on)
 		{
 			g_physics_world_draw.context = &window;
 			b2World_Draw(utility::Physics::world_id, &g_physics_world_draw);
 		}
+
+		// ================
+		// 绘制HUD
+		// 窗口视图
+		// ================
+
+		window.setView(window.getDefaultView());
+
+		// 玩家状态
+		render::player_status(registry_, window);
+		// 玩家目标状态
+		render::player_target_status(registry_, window);
 
 		if (is_paused_)
 		{

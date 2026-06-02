@@ -35,20 +35,8 @@ namespace pd::helper
 		}
 	}
 
-	auto Camera::dirty(entt::registry& registry) noexcept -> bool
-	{
-		return registry.ctx().contains<camera::Dirty>();
-	}
-
-	auto Camera::clean(entt::registry& registry) noexcept -> void
-	{
-		registry.ctx().erase<camera::Dirty>();
-	}
-
 	auto Camera::initialize(entt::registry& registry, const sf::FloatRect area) noexcept -> void
 	{
-		registry.ctx().emplace<camera::Dirty>();
-
 		registry.ctx().insert_or_assign(camera::Position{.position = area.position});
 		registry.ctx().insert_or_assign(camera::Size{.size = area.size});
 
@@ -71,8 +59,6 @@ namespace pd::helper
 
 	auto Camera::set_area(entt::registry& registry, const sf::FloatRect new_area) noexcept -> void
 	{
-		registry.ctx().emplace<camera::Dirty>();
-
 		[[maybe_unused]] const auto old_position = do_set_position(registry, new_area.position);
 		[[maybe_unused]] const auto old_size = do_set_size(registry, new_area.size);
 
@@ -100,8 +86,6 @@ namespace pd::helper
 
 	auto Camera::set_position(entt::registry& registry, const sf::Vector2f new_position) noexcept -> void
 	{
-		registry.ctx().emplace<camera::Dirty>();
-
 		const auto old_position = do_set_position(registry, new_position);
 
 		SPDLOG_INFO(
@@ -119,8 +103,6 @@ namespace pd::helper
 
 	auto Camera::translate(entt::registry& registry, const sf::Vector2f distance) noexcept -> void
 	{
-		registry.ctx().emplace<camera::Dirty>();
-
 		const auto old_position = get_position(registry);
 		const auto new_position = old_position + distance;
 		[[maybe_unused]] const auto should_be_old_position = do_set_position(registry, new_position);
@@ -147,8 +129,6 @@ namespace pd::helper
 
 	auto Camera::set_size(entt::registry& registry, const sf::Vector2f new_size) noexcept -> void
 	{
-		registry.ctx().emplace<camera::Dirty>();
-
 		const auto old_size = do_set_size(registry, new_size);
 
 		SPDLOG_INFO(
