@@ -13,6 +13,7 @@ namespace sf
 	class Texture;
 	class SoundBuffer;
 	class Music;
+	class Shader;
 }
 
 namespace pd::manager
@@ -43,6 +44,8 @@ namespace pd::manager
 	using sound_handler = entt::resource</*const*/ sf::SoundBuffer>;
 	// music需要暂停,所以不是const
 	using music_handler = entt::resource<sf::Music>;
+	// shader需要设置uniform,所有不是const
+	using shader_handler = entt::resource<sf::Shader>;
 
 	constexpr resource_detail::InvalidHandler InvalidHandler{};
 }

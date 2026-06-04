@@ -178,6 +178,21 @@ namespace pd::manager
 			[[nodiscard]] auto operator()(std::string_view path) const noexcept -> entt::resource<element_type>;
 			[[nodiscard]] auto operator()(const std::filesystem::path& path) const noexcept -> entt::resource<element_type>;
 		};
+
+		class ShaderLoader final
+		{
+		public:
+			// ResourceManager内部entt::resource_cache保存的类型
+			using element_type = std::remove_const_t<shader_handler::element_type>;
+			// ResourceManager返回给用户的类型
+			using result_type = shader_handler;
+
+			// vertex_shader_path = path + .vert
+			// fragment_shader_path = path + .frag
+
+			[[nodiscard]] auto operator()(std::string_view path) const noexcept -> entt::resource<element_type>;
+			[[nodiscard]] auto operator()(const std::filesystem::path& path) const noexcept -> entt::resource<element_type>;
+		};
 	}
 
 	class Font final : public resource_detail::ResourceManager<resource_detail::FontLoader> {};
@@ -187,4 +202,6 @@ namespace pd::manager
 	class Sound final : public resource_detail::ResourceManager<resource_detail::SoundLoader> {};
 
 	class Music final : public resource_detail::ResourceManager<resource_detail::MusicLoader> {};
+
+	class Shader final : public resource_detail::ResourceManager<resource_detail::ShaderLoader> {};
 }

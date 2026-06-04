@@ -10,6 +10,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Audio/Music.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 namespace pd::manager::resource_detail
 {
@@ -141,6 +142,39 @@ namespace pd::manager::resource_detail
 		catch (const std::system_error& e)
 		{
 			SPDLOG_ERROR("载入音乐[{:<20}]失败: {}", path.string(), e.what());
+			return entt::resource<element_type>{};
+		}
+	}
+
+	auto ShaderLoader::operator()(const std::string_view path) const noexcept -> entt::resource<element_type>
+	{
+		return operator()(std::filesystem::path{path});
+	}
+
+	auto ShaderLoader::operator()(const std::filesystem::path& path) const noexcept -> entt::resource<element_type>
+	{
+		try
+		{
+			auto vertex_shader_path = path;
+			auto fragment_shader_path = path;
+
+			vertex_shader_path.replace_extension(".vert");
+			fragment_shader_path.replace_extension(".frag");
+
+			auto shader = std::make_shared<sf::Shader>();
+			if (not shader->loadFromFile(vertex_shader_path, fragment_shader_path))
+			{
+				SPDLOG_ERROR("载入着色器[{:<20}]失败!", path.string());
+				return entt::resource<element_type>{};
+			}
+
+			SPDLOG_INFO("载入着色器[{:<20}]成功!", path.string());
+
+			return entt::resource{std::move(shader)};
+		}
+		catch (const std::system_error& e)
+		{
+			SPDLOG_ERROR("载入着色器[{:<20}]失败: {}", path.string(), e.what());
 			return entt::resource<element_type>{};
 		}
 	}
