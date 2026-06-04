@@ -30,10 +30,7 @@ namespace pd::update
 			{
 				// 标记为可被销毁
 				registry.emplace<state::EntityDead>(entity);
-				continue;
 			}
-
-			// TODO: 有没有拖尾效果?
 		}
 	}
 }

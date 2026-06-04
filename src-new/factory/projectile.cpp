@@ -13,6 +13,7 @@
 #include <factory/detail/transform.hpp>
 #include <factory/detail/render.hpp>
 #include <factory/detail/collision.hpp>
+#include <factory/detail/particle_effect.hpp>
 
 #include <prometheus/functional/functor.hpp>
 #include <prometheus/platform/os.hpp>
@@ -63,9 +64,9 @@ namespace pd::factory
 			// TODO: 要解决飞弹刚发射就碰撞到自己有两种简易解决方案(不考虑在碰撞时判断)
 			//  1.控制飞弹的初始位置
 			//  2.控制飞弹的碰撞掩码
-			//  
+			//
 			// 第二种方式最简单,但是如果后续我们想开发一种可以通过发射者碰撞而改变轨迹的飞弹时要怎么办?如果允许飞弹命中友军怎么办?
-			// 
+			//
 			// TODO: 也许b2Filter::groupIndex能解决这个问题?待研究!
 			for (const auto shape_id: shape_ids)
 			{
@@ -109,9 +110,11 @@ namespace pd::factory
 			std::visit(visitor, projectile.trajectory.trajectory);
 		}
 		// lifetime
-		registry.emplace<projectile::Lifetime>(entity, sf::seconds(projectile.lifetime));
+		registry.emplace<projectile::Lifetime>(entity, sf::milliseconds(projectile.lifetime_ms));
 		// damage
 		registry.emplace<projectile::Damage>(entity, projectile.damage);
+		// 拖尾效果(粒子系统)
+		detail::attach(registry, entity, projectile.trailing_effect);
 		// tags
 		registry.emplace<tags::Projectile>(entity);
 

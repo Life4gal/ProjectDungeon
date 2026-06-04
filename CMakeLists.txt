@@ -192,6 +192,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/ai.hpp
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/name.hpp
+	# 粒子效果
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/particle_effect.hpp
 
 	# (枚举)定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def.hpp
@@ -223,6 +225,9 @@ add_executable(
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.cpp
+	# 粒子效果
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_effect.cpp
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.cpp
@@ -267,6 +272,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/name.hpp
+	# 粒子效果
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/particle_effect.hpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/projectile.hpp
@@ -317,6 +324,9 @@ add_executable(
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.cpp
+	# 粒子效果
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_effect.cpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.hpp
@@ -445,6 +455,9 @@ add_executable(
 	# 精灵动画特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.cpp
+	# 粒子效果
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_effect.cpp
 
 	# ============================
 	# SYSTEM -- RENDER
@@ -462,6 +475,9 @@ add_executable(
 	# 玩家状态
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.cpp
+	# 粒子效果
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle_effect.cpp
 
 	# ============================
 	# MENU

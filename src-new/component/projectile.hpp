@@ -8,6 +8,7 @@
 #include <component/transform.hpp>
 #include <component/render.hpp>
 #include <component/collision.hpp>
+#include <component/particle_effect.hpp>
 #include <component/tags.hpp>
 
 #include <SFML/System/Time.hpp>
@@ -17,6 +18,7 @@ namespace pd::component::projectile
 	// transform --> 飞弹变换
 	// render --> 飞弹渲染
 	// collision --> 飞弹碰撞体
+	// particle_effect --> 飞弹拖尾效果
 	// tags --> 飞弹标签
 
 	// 飞弹所有者

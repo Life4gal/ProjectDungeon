@@ -4,6 +4,7 @@
 // found in the top-level directory of this distribution.
 
 #include <designer/projectile.hpp>
+#include <designer/particle_effect.hpp>
 
 namespace pd::designer
 {
@@ -15,13 +16,7 @@ namespace pd::designer
 				.frames =
 				{
 						// 第一帧
-						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 16, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
-						// 第二帧
-						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 80, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
-						// 第三帧
-						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 144, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
-						// 第四帧
-						{.texture = "./assets/tileset/wall.png", .uv_position = {.x = 208, .y = 16}, .uv_size = {.width = 32, .height = 32}, .pivot = {.x = 16, .y = 16}, .duration_ms = 100},
+						{.texture = "./assets/projectile_standard.png", .uv_position = {.x = 0, .y = 0}, .uv_size = {.width = 24, .height = 24}, .pivot = {.x = 12, .y = 12}, .duration_ms = 1000},
 				},
 				.looping = true,
 				.reversed = false,
@@ -54,7 +49,7 @@ namespace pd::designer
 								blueprint::CollisionShape::circle
 								{
 										.center = {.x = 0, .y = 0},
-										.radius = 16,
+										.radius = 12,
 								},
 						},
 						//
@@ -65,16 +60,19 @@ namespace pd::designer
 		{
 				blueprint::Trajectory::straight
 				{
-						.speed = 200,
+						.speed = 350,
 				},
 		};
+		// 拖尾效果
+		auto trailing_effect = ParticleEffect::projectile_trail();
 
 		return
 		{
 				.sprite = std::move(sprite),
 				.collision = std::move(collision),
 				.trajectory = trajectory,
-				.lifetime = 3,
+				.trailing_effect = std::move(trailing_effect),
+				.lifetime_ms = 3000,
 				.damage = 10,
 		};
 	}
