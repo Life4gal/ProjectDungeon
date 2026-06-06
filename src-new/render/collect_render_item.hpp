@@ -7,12 +7,7 @@
 
 #include <entt/entity/fwd.hpp>
 
-namespace sf
-{
-	class RenderWindow;
-}
-
 namespace pd::render
 {
-	auto render(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
+	auto collect_render_item(entt::registry& registry) noexcept -> void;
 }

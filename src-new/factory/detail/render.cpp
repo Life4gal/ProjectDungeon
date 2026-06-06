@@ -6,13 +6,10 @@
 #include <factory/detail/render.hpp>
 
 #include <manager/resource.hpp>
-#include <manager/clock.hpp>
 
 #include <component/render.hpp>
-#include <component/renderer.hpp>
 
 #include <entt/entt.hpp>
-#include <SFML/System/Clock.hpp>
 
 namespace pd::factory::detail
 {
@@ -25,35 +22,17 @@ namespace pd::factory::detail
 		auto do_attach(entt::registry& registry, const entt::entity entity, const StaticSpriteLike& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
 		{
 			namespace rss = render::static_sprite;
-			namespace res = render_effect::sprite;
 
 			// 渲染层
 			registry.emplace<render::RenderLayer>(entity, render_layer);
-			// 生成时间
-			registry.emplace<render::SpawnTime>(entity, manager::Clock::now());
-
-			// 需要重新排序
-			registry.ctx().emplace<renderer::SortRequired>();
-
-			// ====================
-			// SPRITE
-			// ====================
 
 			auto texture = manager::Texture::load(std::filesystem::path{static_sprite.texture});
 
+			// 纹理
 			registry.emplace<rss::Texture>(entity, std::move(texture));
 			registry.emplace<rss::UvPosition>(entity, sf::Vector2f{static_sprite.uv_position.x, static_sprite.uv_position.y});
 			registry.emplace<rss::UvSize>(entity, sf::Vector2f{static_sprite.uv_size.width, static_sprite.uv_size.height});
 			registry.emplace<rss::Pivot>(entity, sf::Vector2f{static_sprite.pivot.x, static_sprite.pivot.y});
-
-			// ====================
-			// EFFECT
-			// ====================
-
-			registry.emplace<res::Position>(entity, sf::Vector2f{0, 0});
-			registry.emplace<res::Scale>(entity, sf::Vector2f{1, 1});
-			registry.emplace<res::Rotation>(entity, sf::degrees(0));
-			registry.emplace<res::Color>(entity, sf::Color::White);
 		}
 	}
 

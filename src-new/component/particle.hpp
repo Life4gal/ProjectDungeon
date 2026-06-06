@@ -13,6 +13,8 @@
 #include <component/render.hpp>
 #include <component/tags.hpp>
 
+#include <SFML/Graphics/Color.hpp>
+
 namespace pd::component::particle
 {
 	// transform --> 粒子变换

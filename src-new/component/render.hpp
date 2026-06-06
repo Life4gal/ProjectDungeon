@@ -11,24 +11,13 @@
 
 #include <blueprint/def.hpp>
 
-#include <component/render_effect.hpp>
-
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Time.hpp>
 
 namespace pd::component::render
 {
-	// render_effect --> 渲染特效
-
 	// 渲染层(渲染顺序)
 	using blueprint::RenderLayer;
-
-	// 生成时间(渲染层相同时优先渲染先生成的实体)
-	class SpawnTime final
-	{
-	public:
-		sf::Time time;
-	};
 
 	// 静态精灵
 	namespace static_sprite

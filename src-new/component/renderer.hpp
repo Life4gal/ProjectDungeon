@@ -5,13 +5,87 @@
 
 #pragma once
 
+#include <optional>
+#include <unordered_map>
+
+#include <manager/resource_fwd.hpp>
+
+#include <blueprint/def.hpp>
+
+#include <entt/entity/fwd.hpp>
+
+#include <SFML/System/Vector2.hpp>
+#include <SFML/System/Angle.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+
 namespace pd::component::renderer
 {
-	// 标记渲染视图需要进行排序
-	// 这会在创建/改动RenderLayer组件时设置
-	// factory/render.cpp
-	// update/render.cpp
+	// 渲染单元集
 	//
 	// [CTX]
-	class SortRequired final {};
+	class RenderSet final
+	{
+	public:
+		class Item final
+		{
+		public:
+			// ====================
+			// transform
+			// ====================
+
+			sf::Vector2f position;
+			sf::Angle rotation;
+
+			// ====================
+			// texture
+			// ====================
+
+			blueprint::RenderLayer render_layer;
+			manager::texture_handler texture;
+			sf::Vector2f uv_position;
+			sf::Vector2f uv_size;
+			sf::Vector2f pivot;
+
+			// ====================
+			// render effect
+			// ====================
+
+			class Effect final
+			{
+			public:
+				sf::Vector2f offset;
+				sf::Vector2f scale;
+				sf::Angle rotation;
+				sf::Color color;
+			};
+
+			std::optional<Effect> effect;
+
+			// ====================
+			// shader
+			// ====================
+
+			manager::shader_handler shader;
+		};
+
+		std::unordered_map<entt::entity, Item> set;
+	};
+
+	// 渲染队列
+	//
+	// [CTX]
+	class RenderQueue final
+	{
+	public:
+		class Batch final
+		{
+		public:
+			manager::texture_handler texture;
+			manager::shader_handler shader;
+			std::vector<sf::Vertex> vertices;
+		};
+
+		std::vector<Batch> queue;
+	};
 }

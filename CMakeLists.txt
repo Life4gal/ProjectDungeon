@@ -316,6 +316,9 @@ add_executable(
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render.cpp
+	# 渲染特效
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render_effect.cpp
 	# 碰撞体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/collision.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/collision.cpp
@@ -475,9 +478,21 @@ add_executable(
 	# 帧渲染系统
 	# ============================
 	
-	# (实体)渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.cpp
+	# 收集渲染项
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/collect_render_item.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/collect_render_item.cpp
+
+	# 应用渲染效果
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/apply_render_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/apply_render_effect.cpp
+
+	# 构建渲染队列
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/build_render_queue.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/build_render_queue.cpp
+
+	# 提交渲染队列
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/commit_render_queue.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/commit_render_queue.cpp
 
 	# 粒子
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle.hpp
@@ -490,7 +505,6 @@ add_executable(
 	# 玩家状态
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.cpp
-	# 粒子效果
 
 	# ============================
 	# MENU

@@ -42,8 +42,8 @@ namespace pd::factory
 		detail::attach(registry, entity, position);
 		// render
 		detail::attach(registry, entity, particle.sprite, blueprint::RenderLayer::PARTICLE);
-		// TODO: 当前粒子并不能像普通实体那样渲染,我们先随意移除一个组件,让该实体不满足一般实体的渲染条件
-		registry.remove<render_effect::sprite::Color>(entity);
+		// TODO: 当前粒子并不能像普通实体那样渲染,让该实体不满足一般实体的渲染条件
+		registry.emplace<state::DisableRender>(entity);
 		// owner
 		registry.emplace<particle::Owner>(entity, owner);
 		// shader

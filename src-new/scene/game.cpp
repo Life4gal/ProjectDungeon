@@ -32,12 +32,12 @@
 #include <factory/player.hpp>
 #include <factory/projectile.hpp>
 
-#include <component/projectile.hpp>
-
 #include <helper/camera.hpp>
 #include <helper/room.hpp>
 #include <helper/player_controller.hpp>
 #include <helper/cheat.hpp>
+
+#include <component/renderer.hpp>
 
 // =========
 // 更新
@@ -60,7 +60,10 @@
 // =========
 // 渲染
 
-#include <render/render.hpp>
+#include <render/collect_render_item.hpp>
+#include <render/apply_render_effect.hpp>
+#include <render/build_render_queue.hpp>
+#include <render/commit_render_queue.hpp>
 #include <render/particle.hpp>
 #include <render/player_status.hpp>
 #include <render/player_target_status.hpp>
@@ -346,7 +349,9 @@ namespace pd::scene
 		// 物理世界
 		create_physics_world(registry_);
 
-		// 
+		// TODO: 在合适的地方创建它们
+		registry_.ctx().emplace<component::renderer::RenderSet>();
+		registry_.ctx().emplace<component::renderer::RenderQueue>();
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -370,6 +375,10 @@ namespace pd::scene
 
 		// 最后销毁物理世界
 		destroy_physics_world(registry_);
+
+		// TODO: 在合适的地方销毁它们
+		registry_.ctx().erase<component::renderer::RenderSet>();
+		registry_.ctx().erase<component::renderer::RenderQueue>();
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void
@@ -571,8 +580,14 @@ namespace pd::scene
 		const auto camera_area = helper::Camera::get_area(registry_);
 		window.setView(sf::View{camera_area});
 
-		// 渲染实体
-		render::render(registry_, window);
+		// 收集渲染项
+		render::collect_render_item(registry_);
+		// 应用渲染效果
+		render::apply_render_effect(registry_);
+		// 构建渲染队列
+		render::build_render_queue(registry_);
+		// 提交渲染队列
+		render::commit_render_queue(registry_, window);
 
 		// 渲染粒子
 		render::particle(registry_, window);
