@@ -52,17 +52,18 @@
 #include <update/process_physics_events.hpp>
 #include <update/room_alive_check.hpp>
 #include <update/projectile.hpp>
+#include <update/particle_emitter.hpp>
+#include <update/particle.hpp>
 #include <update/dynamic_sprite.hpp>
 #include <update/sprite_effect.hpp>
-#include <update/particle_effect.hpp>
 
 // =========
 // 渲染
 
 #include <render/render.hpp>
+#include <render/particle.hpp>
 #include <render/player_status.hpp>
 #include <render/player_target_status.hpp>
-#include <render/particle_effect.hpp>
 
 // =========
 // 依赖
@@ -524,8 +525,6 @@ namespace pd::scene
 
 			// 监控那些处于/不处于当前房间(相机区域)的实体
 			update::room_guardian(registry_, delta);
-			// 检测新生成的实体是否处于当前房间(相机区域)
-			update::new_entity_tag(registry_, delta);
 
 			// 玩家控制器
 			update::player_controller(registry_, delta);
@@ -546,14 +545,19 @@ namespace pd::scene
 
 			// 飞弹
 			update::projectile(registry_, delta);
+			// 粒子发射器
+			update::particle_emitter(registry_, delta);
+			// 粒子
+			update::particle(registry_, delta);
 
 			// 动态精灵
 			update::dynamic_sprite(registry_, delta);
 			// 精灵特效
 			update::sprite_effect(registry_, delta);
 
-			// 粒子特效
-			update::particle_effect(registry_, delta);
+			// 检测新生成的实体是否处于当前房间(相机区域)
+			// 在最后检测?这假定了上面的update不依赖这里设置的标签,否则逻辑至少延迟一帧(甚至错过)
+			update::new_entity_tag(registry_, delta);
 		}
 	}
 
@@ -570,8 +574,8 @@ namespace pd::scene
 		// 渲染实体
 		render::render(registry_, window);
 
-		// 渲染粒子效果
-		render::particle_effect(registry_, window);
+		// 渲染粒子
+		render::particle(registry_, window);
 
 		// 物理调试绘制
 		if (g_physics_world_draw_on)

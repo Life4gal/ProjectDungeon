@@ -7,7 +7,8 @@
 
 #include <blueprint/detail/render.hpp>
 #include <blueprint/detail/collision.hpp>
-#include <blueprint/detail/particle_effect.hpp>
+
+#include <blueprint/particle_emitter.hpp>
 
 namespace pd::blueprint
 {
@@ -55,8 +56,8 @@ namespace pd::blueprint
 
 		// 飞行弹道
 		Trajectory trajectory;
-		// 拖尾效果
-		ParticleEmitterConfig trailing_effect;
+		// 粒子发射器(拖尾效果)
+		ParticleEmitter particle_emitter;
 		// 最大飞行时间(毫秒)
 		int lifetime_ms;
 

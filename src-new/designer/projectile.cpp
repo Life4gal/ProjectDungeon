@@ -4,7 +4,7 @@
 // found in the top-level directory of this distribution.
 
 #include <designer/projectile.hpp>
-#include <designer/particle_effect.hpp>
+#include <designer/particle_emitter.hpp>
 
 namespace pd::designer
 {
@@ -64,14 +64,14 @@ namespace pd::designer
 				},
 		};
 		// 拖尾效果
-		auto trailing_effect = ParticleEffect::projectile_trail();
+		auto particle_emitter = ParticleEmitter::projectile_trail();
 
 		return
 		{
 				.sprite = std::move(sprite),
 				.collision = std::move(collision),
 				.trajectory = trajectory,
-				.trailing_effect = std::move(trailing_effect),
+				.particle_emitter = std::move(particle_emitter),
 				.lifetime_ms = 3000,
 				.damage = 10,
 		};

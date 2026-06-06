@@ -5,14 +5,11 @@
 
 #pragma once
 
-#include <blueprint/detail/particle_effect.hpp>
+#include <entt/fwd.hpp>
 
-namespace pd::designer
+#include <SFML/System/Time.hpp>
+
+namespace pd::update
 {
-	class ParticleEffect final
-	{
-	public:
-		// 飞弹拖尾效果
-		[[nodiscard]] static auto projectile_trail() noexcept -> blueprint::ParticleEmitterConfig;
-	};
+	auto particle_emitter(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

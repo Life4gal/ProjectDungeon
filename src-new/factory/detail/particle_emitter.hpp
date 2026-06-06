@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <blueprint/detail/particle_effect.hpp>
+#include <blueprint/particle_emitter.hpp>
 
 #include <entt/entity/fwd.hpp>
 
 namespace pd::factory::detail
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::ParticleEmitterConfig& config) noexcept -> void;
+	auto attach(entt::registry& registry, entt::entity entity, const blueprint::ParticleEmitter& particle_emitter) noexcept -> void;
 }

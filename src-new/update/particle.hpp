@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto particle_effect(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto particle(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

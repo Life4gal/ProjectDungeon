@@ -52,7 +52,8 @@ namespace pd::blueprint
 		PROJECTILE = 1 << 17,
 
 		// [24~31]
-		//
+
+		PARTICLE = 1 << 24,
 	};
 
 	// 碰撞体类型

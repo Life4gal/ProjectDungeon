@@ -33,6 +33,9 @@ namespace pd::component
 
 		// 飞弹
 		class Projectile final {};
+
+		// 粒子
+		class Particle final {};
 	}
 
 	// ======================================

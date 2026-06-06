@@ -5,11 +5,14 @@
 
 #pragma once
 
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
-#include <SFML/Graphics/RenderWindow.hpp>
+namespace sf
+{
+	class RenderWindow;
+}
 
 namespace pd::render
 {
-	auto particle_effect(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
+	auto particle(entt::registry& registry, sf::RenderWindow& window) noexcept -> void;
 }

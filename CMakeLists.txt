@@ -192,14 +192,16 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/ai.hpp
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/name.hpp
-	# 粒子效果
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/particle_effect.hpp
 
 	# (枚举)定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def_name.hpp
 	# 瓦片
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/tile.hpp
+	# 粒子
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/particle.hpp
+	# 粒子发射器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/particle_emitter.hpp
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/projectile.hpp
 	# 敌人
@@ -222,12 +224,12 @@ add_executable(
 	# 生成蓝图
 	# ============================
 	
+	# 粒子发射器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_emitter.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_emitter.cpp
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.cpp
-	# 粒子效果
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_effect.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_effect.cpp
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.cpp
@@ -272,8 +274,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/name.hpp
-	# 粒子效果
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/particle_effect.hpp
+	# 粒子
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/particle.hpp
+	# 粒子发射器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/particle_emitter.hpp
 
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/projectile.hpp
@@ -324,10 +328,13 @@ add_executable(
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.cpp
-	# 粒子效果
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_effect.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_effect.cpp
+	# 粒子发射器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_emitter.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_emitter.cpp
 
+	# 粒子
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/particle.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/particle.cpp
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.cpp
@@ -449,15 +456,19 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.cpp
 
+	# 粒子发射器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_emitter.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_emitter.cpp
+	# 粒子
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle.cpp
+
 	# 动态精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/dynamic_sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/dynamic_sprite.cpp
 	# 精灵动画特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.cpp
-	# 粒子效果
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_effect.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_effect.cpp
 
 	# ============================
 	# SYSTEM -- RENDER
@@ -468,6 +479,10 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/render.cpp
 
+	# 粒子
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle.cpp
+
 	# 玩家目标状态
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.cpp
@@ -476,8 +491,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_status.cpp
 	# 粒子效果
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle_effect.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle_effect.cpp
 
 	# ============================
 	# MENU

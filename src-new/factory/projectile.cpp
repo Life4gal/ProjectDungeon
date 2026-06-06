@@ -13,7 +13,7 @@
 #include <factory/detail/transform.hpp>
 #include <factory/detail/render.hpp>
 #include <factory/detail/collision.hpp>
-#include <factory/detail/particle_effect.hpp>
+#include <factory/detail/particle_emitter.hpp>
 
 #include <prometheus/functional/functor.hpp>
 #include <prometheus/platform/os.hpp>
@@ -113,8 +113,8 @@ namespace pd::factory
 		registry.emplace<projectile::Lifetime>(entity, sf::milliseconds(projectile.lifetime_ms));
 		// damage
 		registry.emplace<projectile::Damage>(entity, projectile.damage);
-		// 拖尾效果(粒子系统)
-		detail::attach(registry, entity, projectile.trailing_effect);
+		// 拖尾效果
+		detail::attach(registry, entity, projectile.particle_emitter);
 		// tags
 		registry.emplace<tags::Projectile>(entity);
 
