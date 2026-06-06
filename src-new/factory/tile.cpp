@@ -7,9 +7,9 @@
 
 #include <component/tile.hpp>
 
-#include <factory/detail/transform.hpp>
-#include <factory/detail/render.hpp>
-#include <factory/detail/collision.hpp>
+#include <assembly/transform.hpp>
+#include <assembly/render.hpp>
+#include <assembly/collision.hpp>
 
 #include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
@@ -23,25 +23,13 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, tile.position);
+		assembly::Transform::make(registry, entity, tile.position);
 		// render
-		detail::attach(registry, entity, tile.sprite);
+		assembly::Render::make(registry, entity, tile.sprite);
 		// collision & ShapeIds
 		if (tile.collision.has_value())
 		{
-			const auto& [def, shapes] = *tile.collision;
-
-			const auto body_id = detail::create_attach(registry, entity, def, tile.position);
-
-			auto& [shape_ids] = registry.emplace<tile::ShapeIds>(entity);
-			shape_ids.reserve(shapes.size());
-
-			for (const auto& shape: shapes)
-			{
-				const auto shape_id = detail::create(body_id, shape);
-
-				shape_ids.push_back(shape_id);
-			}
+			assembly::Collision::make(registry, entity, *tile.collision, tile.position);
 		}
 		// tags
 		registry.emplace<tags::Tile>(entity);

@@ -5,11 +5,15 @@
 
 #pragma once
 
-#include <blueprint/detail/ai.hpp>
+#include <blueprint/detail/name.hpp>
 
 #include <entt/entity/registry.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Ai& ai) noexcept -> void;
+	class Name final
+	{
+	public:
+		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Name& name) noexcept -> void;
+	};
 }

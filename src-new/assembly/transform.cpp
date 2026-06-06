@@ -3,17 +3,17 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <factory/detail/transform.hpp>
+#include <assembly/transform.hpp>
 
 #include <component/transform.hpp>
 
 #include <entt/entt.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
 	using namespace component;
 
-	auto attach(
+	auto Transform::make(
 		entt::registry& registry,
 		const entt::entity entity,
 		const blueprint::Position position,

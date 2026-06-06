@@ -18,11 +18,4 @@ namespace pd::component::tile
 	// render --> 瓦片渲染
 	// collision --> 瓦片碰撞体
 	// tags --> 瓦片标签
-
-	// 形状ID
-	class ShapeIds final
-	{
-	public:
-		std::vector<b2ShapeId> shapes;
-	};
 }

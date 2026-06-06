@@ -7,7 +7,7 @@
 
 #include <component/bounding.hpp>
 
-#include <factory/detail/collision.hpp>
+#include <assembly/collision.hpp>
 
 #include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
@@ -42,14 +42,14 @@ namespace pd::factory
 
 		// collision
 		{
-			const auto body_id = detail::create_attach(registry, entity, BodyDef, bounding.position);
+			const auto body_id = assembly::Collision::make_body(registry, entity, BodyDef, bounding.position);
 
 			auto& [shape_ids] = registry.emplace<bounding::ShapeIds>(entity);
 			shape_ids.reserve(bounding.segments.size());
 
 			for (const auto& segment: bounding.segments)
 			{
-				const auto shape_id = detail::create(body_id, ShapeDef, segment);
+				const auto shape_id = assembly::Collision::make_shape(body_id, ShapeDef, segment);
 
 				shape_ids.push_back(shape_id);
 			}

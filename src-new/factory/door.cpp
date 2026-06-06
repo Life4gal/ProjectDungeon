@@ -7,9 +7,9 @@
 
 #include <component/door.hpp>
 
-#include <factory/detail/transform.hpp>
-#include <factory/detail/render.hpp>
-#include <factory/detail/collision.hpp>
+#include <assembly/transform.hpp>
+#include <assembly/render.hpp>
+#include <assembly/collision.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -54,15 +54,15 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, door.position);
+		assembly::Transform::make(registry, entity, door.position);
 		// render
-		detail::attach(registry, entity, door.sprite, blueprint::RenderLayer::DOOR);
+		assembly::Render::make(registry, entity, door.sprite, blueprint::RenderLayer::DOOR);
 		// collision
 		{
-			const auto body_id = detail::create_attach(registry, entity, BodyDef, door.position);
+			const auto body_id = assembly::Collision::make_body(registry, entity, BodyDef, door.position);
 
 			// 门
-			const auto door_shape_id = detail::create(
+			const auto door_shape_id = assembly::Collision::make_shape(
 				body_id,
 				DoorShapeDef,
 				blueprint::CollisionShape::offset_box
@@ -75,7 +75,7 @@ namespace pd::factory
 			registry.emplace<door::DoorShapeId>(entity, door_shape_id);
 
 			// 感应区
-			const auto sensor_shape_id = detail::create(
+			const auto sensor_shape_id = assembly::Collision::make_shape(
 				body_id,
 				SensorShapeDef,
 				blueprint::CollisionShape::offset_box

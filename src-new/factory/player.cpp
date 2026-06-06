@@ -7,11 +7,11 @@
 
 #include <component/player.hpp>
 
-#include <factory/detail/transform.hpp>
-#include <factory/detail/render.hpp>
-#include <factory/detail/collision.hpp>
-#include <factory/detail/property.hpp>
-#include <factory/detail/name.hpp>
+#include <assembly/transform.hpp>
+#include <assembly/render.hpp>
+#include <assembly/collision.hpp>
+#include <assembly/property.hpp>
+#include <assembly/name.hpp>
 
 #include <entt/entt.hpp>
 
@@ -24,15 +24,15 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, player.position);
+		assembly::Transform::make(registry, entity, player.position);
 		// render
-		detail::attach(registry, entity, player.sprite, blueprint::RenderLayer::PLAYER);
+		assembly::Render::make(registry, entity, player.sprite, blueprint::RenderLayer::PLAYER);
 		// collision
-		detail::attach(registry, entity, player.collision, player.position);
+		assembly::Collision::make(registry, entity, player.collision, player.position);
 		// property
-		detail::attach(registry, entity, player.property);
+		assembly::Property::make(registry, entity, player.property);
 		// name
-		detail::attach(registry, entity, player.name);
+		assembly::Name::make(registry, entity, player.name);
 		// speed
 		registry.emplace<player::Speed>(entity, player.speed);
 		// tags

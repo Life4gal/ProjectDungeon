@@ -10,10 +10,10 @@
 #include <component/projectile.hpp>
 #include <component/name.hpp>
 
-#include <factory/detail/transform.hpp>
-#include <factory/detail/render.hpp>
-#include <factory/detail/collision.hpp>
-#include <factory/detail/particle_emitter.hpp>
+#include <assembly/transform.hpp>
+#include <assembly/render.hpp>
+#include <assembly/collision.hpp>
+#include <assembly/particle_emitter.hpp>
 
 #include <prometheus/functional/functor.hpp>
 #include <prometheus/platform/os.hpp>
@@ -49,11 +49,11 @@ namespace pd::factory
 		);
 
 		// transform
-		detail::attach(registry, entity, position);
+		assembly::Transform::make(registry, entity, position);
 		// render
-		detail::attach(registry, entity, projectile.sprite, blueprint::RenderLayer::PROJECTILE);
+		assembly::Render::make(registry, entity, projectile.sprite, blueprint::RenderLayer::PROJECTILE);
 		// collision
-		detail::attach(registry, entity, projectile.collision, position);
+		assembly::Collision::make(registry, entity, projectile.collision, position);
 		// owner
 		registry.emplace<projectile::Owner>(entity, owner);
 		// speed & velocity
@@ -114,7 +114,7 @@ namespace pd::factory
 		// damage
 		registry.emplace<projectile::Damage>(entity, projectile.damage);
 		// 拖尾效果
-		detail::attach(registry, entity, projectile.particle_emitter);
+		assembly::ParticleEmitter::make(registry, entity, projectile.particle_emitter);
 		// tags
 		registry.emplace<tags::Projectile>(entity);
 

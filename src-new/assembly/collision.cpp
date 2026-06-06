@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <factory/detail/collision.hpp>
+#include <assembly/collision.hpp>
 
 #include <utility/physics.hpp>
 
@@ -12,7 +12,7 @@
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
 	using namespace component;
 	using utility::Physics;
@@ -50,7 +50,7 @@ namespace pd::factory::detail
 		}
 	}
 
-	auto create_attach(
+	auto Collision::make_body(
 		entt::registry& registry,
 		const entt::entity entity,
 		const blueprint::CollisionBodyDef& body_def,
@@ -73,7 +73,7 @@ namespace pd::factory::detail
 		return body_id;
 	}
 
-	auto create(
+	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
 		const blueprint::CollisionShape::circle& circle
@@ -88,7 +88,7 @@ namespace pd::factory::detail
 		return b2CreateCircleShape(body_id, &def, &shape);
 	}
 
-	auto create(
+	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
 		const blueprint::CollisionShape::capsule& capsule
@@ -104,7 +104,7 @@ namespace pd::factory::detail
 		return b2CreateCapsuleShape(body_id, &def, &shape);
 	}
 
-	auto create(
+	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
 		const blueprint::CollisionShape::box& box
@@ -119,7 +119,7 @@ namespace pd::factory::detail
 		return b2CreatePolygonShape(body_id, &def, &shape);
 	}
 
-	auto create(
+	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
 		const blueprint::CollisionShape::offset_box& offset_box
@@ -136,7 +136,7 @@ namespace pd::factory::detail
 		return b2CreatePolygonShape(body_id, &def, &shape);
 	}
 
-	auto create(
+	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
 		const blueprint::CollisionShape::segment& segment
@@ -151,7 +151,7 @@ namespace pd::factory::detail
 		return b2CreateSegmentShape(body_id, &def, &shape);
 	}
 
-	auto create(
+	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShape& shape
 	) noexcept -> b2ShapeId
@@ -159,13 +159,13 @@ namespace pd::factory::detail
 		return std::visit(
 			[&](const auto s) noexcept -> b2ShapeId
 			{
-				return create(body_id, shape.def, s);
+				return make_shape(body_id, shape.def, s);
 			},
 			shape.shape
 		);
 	}
 
-	auto attach(
+	auto Collision::make(
 		entt::registry& registry,
 		const entt::entity entity,
 		const blueprint::Collision& collision,
@@ -174,14 +174,14 @@ namespace pd::factory::detail
 	{
 		const auto& [def, shapes] = collision;
 
-		const auto body_id = create_attach(registry, entity, def, position);
+		const auto body_id = make_body(registry, entity, def, position);
 
 		auto& [shape_ids] = registry.emplace<collision::ShapeIds>(entity);
 		shape_ids.reserve(shapes.size());
 
 		for (const auto& shape: shapes)
 		{
-			const auto shape_id = create(body_id, shape);
+			const auto shape_id = make_shape(body_id, shape);
 
 			shape_ids.push_back(shape_id);
 		}

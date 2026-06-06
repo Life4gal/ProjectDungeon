@@ -304,36 +304,41 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/screen.hpp
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player_controller.hpp
-
+	
 	# ============================
-	# SYSTEM -- FACTORY
-	# 蓝图 --> 实体 + 组件
+	# SYSTEM -- ASSEMBLY
+	# 实体 + 蓝图 --> 组件
 	# ============================
 
 	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/transform.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/transform.cpp
 	# 渲染
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render.cpp
 	# 渲染特效
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render_effect.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/render_effect.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render_effect.cpp
 	# 碰撞体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/collision.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/collision.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/collision.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/collision.cpp
 	# 属性
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/property.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/property.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/property.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/property.cpp
 	# AI
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/ai.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/ai.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/ai.cpp
 	# 名称
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/name.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/name.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/name.cpp
 	# 粒子发射器
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_emitter.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/detail/particle_emitter.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/particle_emitter.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/particle_emitter.cpp
+
+	# ============================
+	# SYSTEM -- FACTORY
+	# 蓝图 --> 实体
+	# ============================
 
 	# 粒子
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/particle.hpp

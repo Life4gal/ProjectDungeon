@@ -10,8 +10,8 @@
 #include <component/particle.hpp>
 #include <component/name.hpp>
 
-#include <factory/detail/transform.hpp>
-#include <factory/detail/render.hpp>
+#include <assembly/transform.hpp>
+#include <assembly/render.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
@@ -39,9 +39,9 @@ namespace pd::factory
 		);
 
 		// transform
-		detail::attach(registry, entity, position);
+		assembly::Transform::make(registry, entity, position);
 		// render
-		detail::attach(registry, entity, particle.sprite, blueprint::RenderLayer::PARTICLE);
+		assembly::Render::make(registry, entity, particle.sprite, blueprint::RenderLayer::PARTICLE);
 		// TODO: 当前粒子并不能像普通实体那样渲染,让该实体不满足一般实体的渲染条件
 		registry.emplace<state::DisableRender>(entity);
 		// owner

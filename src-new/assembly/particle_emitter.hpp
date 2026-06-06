@@ -9,7 +9,11 @@
 
 #include <entt/entity/fwd.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::ParticleEmitter& particle_emitter) noexcept -> void;
+	class ParticleEmitter final
+	{
+	public:
+		static auto make(entt::registry& registry, entt::entity entity, const blueprint::ParticleEmitter& particle_emitter) noexcept -> void;
+	};
 }

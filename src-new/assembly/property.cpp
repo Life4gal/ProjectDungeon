@@ -3,18 +3,18 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <factory/detail/property.hpp>
+#include <assembly/property.hpp>
 
 #include <component/property.hpp>
 #include <component/damage_statistics.hpp>
 
 #include <entt/entt.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
 	using namespace component;
 
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Property& property) noexcept -> void
+	auto Property::make(entt::registry& registry, const entt::entity entity, const blueprint::Property& property) noexcept -> void
 	{
 		// =====================
 		// PROPERTY

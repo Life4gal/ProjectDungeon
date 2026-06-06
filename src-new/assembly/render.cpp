@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <factory/detail/render.hpp>
+#include <assembly/render.hpp>
 
 #include <manager/resource.hpp>
 
@@ -11,7 +11,7 @@
 
 #include <entt/entt.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
 	using namespace component;
 
@@ -19,7 +19,7 @@ namespace pd::factory::detail
 	{
 		template<typename StaticSpriteLike>
 			requires(std::is_same_v<StaticSpriteLike, blueprint::StaticSprite> or std::is_same_v<StaticSpriteLike, blueprint::DynamicSprite::Frame>)
-		auto do_attach(entt::registry& registry, const entt::entity entity, const StaticSpriteLike& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
+		auto do_make(entt::registry& registry, const entt::entity entity, const StaticSpriteLike& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
 		{
 			namespace rss = render::static_sprite;
 
@@ -36,12 +36,12 @@ namespace pd::factory::detail
 		}
 	}
 
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::StaticSprite& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
+	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::StaticSprite& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
 	{
-		do_attach(registry, entity, static_sprite, render_layer);
+		do_make(registry, entity, static_sprite, render_layer);
 	}
 
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::DynamicSprite& dynamic_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
+	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::DynamicSprite& dynamic_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
 	{
 		namespace rds = render::dynamic_sprite;
 
@@ -86,15 +86,15 @@ namespace pd::factory::detail
 
 		// static sprite
 		const auto& begin_frame = dynamic_sprite.frames[begin_frame_index];
-		do_attach(registry, entity, begin_frame, render_layer);
+		do_make(registry, entity, begin_frame, render_layer);
 	}
 
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void
+	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void
 	{
 		std::visit(
 			[&](const auto& s) noexcept -> void
 			{
-				attach(registry, entity, s, sprite.render_layer);
+				make(registry, entity, s, sprite.render_layer);
 			},
 			sprite.sprite
 		);

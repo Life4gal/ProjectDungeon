@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <factory/detail/name.hpp>
+#include <assembly/name.hpp>
 
 #include <manager/i18n.hpp>
 
@@ -11,7 +11,7 @@
 
 #include <entt/entt.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
 	using namespace component;
 
@@ -33,7 +33,7 @@ namespace pd::factory::detail
 			"NAME.ITEM.HEALTH_POTION",
 	};
 
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::Name& name) noexcept -> void
+	auto Name::make(entt::registry& registry, const entt::entity entity, const blueprint::Name& name) noexcept -> void
 	{
 		const auto t_name = manager::Internationalization::map(NameI18NKeys[std::to_underlying(name.type)]);
 

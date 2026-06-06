@@ -9,7 +9,11 @@
 
 #include <entt/entity/registry.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
-	auto attach(entt::registry& registry, entt::entity entity, const blueprint::Property& property) noexcept -> void;
+	class Property final
+	{
+	public:
+		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Property& property) noexcept -> void;
+	};
 }

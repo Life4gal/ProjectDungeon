@@ -3,17 +3,17 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <factory/detail/particle_emitter.hpp>
+#include <assembly/particle_emitter.hpp>
 
 #include <component/particle_emitter.hpp>
 
 #include <entt/entt.hpp>
 
-namespace pd::factory::detail
+namespace pd::assembly
 {
 	using namespace component;
 
-	auto attach(entt::registry& registry, const entt::entity entity, const blueprint::ParticleEmitter& particle_emitter) noexcept -> void
+	auto ParticleEmitter::make(entt::registry& registry, const entt::entity entity, const blueprint::ParticleEmitter& particle_emitter) noexcept -> void
 	{
 		// working time
 		registry.emplace<particle_emitter::TotalWorkingTime>(entity, sf::milliseconds(particle_emitter.working_time_ms));

@@ -7,12 +7,12 @@
 
 #include <component/enemy.hpp>
 
-#include <factory/detail/transform.hpp>
-#include <factory/detail/render.hpp>
-#include <factory/detail/collision.hpp>
-#include <factory/detail/property.hpp>
-#include <factory/detail/ai.hpp>
-#include <factory/detail/name.hpp>
+#include <assembly/transform.hpp>
+#include <assembly/render.hpp>
+#include <assembly/collision.hpp>
+#include <assembly/property.hpp>
+#include <assembly/ai.hpp>
+#include <assembly/name.hpp>
 
 #include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
@@ -26,17 +26,17 @@ namespace pd::factory
 		const auto entity = registry.create();
 
 		// transform
-		detail::attach(registry, entity, enemy.position);
+		assembly::Transform::make(registry, entity, enemy.position);
 		// render
-		detail::attach(registry, entity, enemy.sprite, blueprint::RenderLayer::ENEMY);
+		assembly::Render::make(registry, entity, enemy.sprite, blueprint::RenderLayer::ENEMY);
 		// collision
-		detail::attach(registry, entity, enemy.collision, enemy.position);
+		assembly::Collision::make(registry, entity, enemy.collision, enemy.position);
 		// property
-		detail::attach(registry, entity, enemy.property);
+		assembly::Property::make(registry, entity, enemy.property);
 		// ai
-		detail::attach(registry, entity, enemy.ai);
+		assembly::Ai::make(registry, entity, enemy.ai);
 		// name
-		detail::attach(registry, entity, enemy.name);
+		assembly::Name::make(registry, entity, enemy.name);
 		// contact_damage
 		registry.emplace<enemy::ContactDamage>(entity, enemy.contact_damage);
 		// type
