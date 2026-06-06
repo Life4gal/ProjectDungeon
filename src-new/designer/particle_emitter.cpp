@@ -15,7 +15,7 @@ namespace pd::designer
 		{
 				.sprite = {.texture = "./assets/projectile_standard.png", .uv_position = {.x = 0, .y = 24}, .uv_size = {.width = 24, .height = 24}, .pivot = {.x = 12, .y = 12}},
 				.shader = "./assets/shaders/projectile_trail",
-				.duration_ms = 500,
+				.lifetime = {.lifetime_ms = 500},
 				.start_color = sf::Color::White.toInteger(),
 				.end_color = sf::Color{255, 255, 255, 0}.toInteger(),
 				.start_scale = 0.8f,

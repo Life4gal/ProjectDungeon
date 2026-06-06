@@ -10,6 +10,7 @@
 #include <blueprint/def.hpp>
 
 #include <component/transform.hpp>
+#include <component/limited_life.hpp>
 #include <component/render.hpp>
 #include <component/tags.hpp>
 
@@ -18,6 +19,7 @@
 namespace pd::component::particle
 {
 	// transform --> 粒子变换
+	// limited_life --> 粒子有限生命
 	// render --> 粒子渲染
 	// tags --> 粒子标签
 
@@ -34,20 +36,6 @@ namespace pd::component::particle
 	{
 	public:
 		manager::shader_handler shader;
-	};
-
-	// 总存活时间
-	class Duration final
-	{
-	public:
-		sf::Time duration;
-	};
-
-	// 已存活时间
-	class Elapsed final
-	{
-	public:
-		sf::Time elapsed;
 	};
 
 	// 着色器参数

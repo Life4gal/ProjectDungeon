@@ -6,6 +6,7 @@
 #pragma once
 
 #include <component/transform.hpp>
+#include <component/limited_life.hpp>
 #include <component/render.hpp>
 #include <component/collision.hpp>
 #include <component/particle_emitter.hpp>
@@ -16,6 +17,7 @@
 namespace pd::component::projectile
 {
 	// transform --> 飞弹变换
+	// limited_life --> 飞弹有限生命
 	// render --> 飞弹渲染
 	// collision --> 飞弹碰撞体
 	// particle_emitter --> 飞弹拖尾效果
@@ -33,13 +35,6 @@ namespace pd::component::projectile
 	{
 	public:
 		float speed;
-	};
-
-	// 飞弹飞行生命周期
-	class Lifetime final
-	{
-	public:
-		sf::Time remaining;
 	};
 
 	// 飞弹伤害

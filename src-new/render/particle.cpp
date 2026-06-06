@@ -33,8 +33,8 @@ namespace pd::render
 			rss::UvSize,
 			rss::Pivot,
 			particle::Shader,
-			particle::Duration,
-			particle::Elapsed,
+			limited_life::time::Lifetime,
+			limited_life::time::Elapsed,
 			particle::ShaderParams,
 			transform::Position,
 			transform::Rotation
@@ -47,7 +47,7 @@ namespace pd::render
 			     texture_size,
 			     texture_pivot,
 			     shader,
-			     duration,
+			     lifetime,
 			     elapsed,
 			     shader_params,
 			     position,
@@ -72,7 +72,7 @@ namespace pd::render
 				continue;
 			}
 
-			const auto t = elapsed.elapsed / duration.duration;
+			const auto t = elapsed.elapsed / lifetime.lifetime;
 			const auto scale = shader_params.start_scale + (shader_params.end_scale - shader_params.start_scale) * t;
 
 			// 变换矩阵

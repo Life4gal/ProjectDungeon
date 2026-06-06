@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <blueprint/detail/limited_life.hpp>
 #include <blueprint/detail/render.hpp>
 
 namespace pd::blueprint
@@ -17,8 +18,8 @@ namespace pd::blueprint
 		StaticSprite sprite;
 		// 着色器路径
 		std::string shader;
-		// 存活时间(毫秒)
-		int duration_ms;
+		// 存在时间
+		LimitedLife::Time lifetime;
 
 		// TODO: 着色器参数如何配置?
 		std::uint32_t start_color;

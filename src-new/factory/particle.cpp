@@ -11,6 +11,7 @@
 #include <component/name.hpp>
 
 #include <assembly/transform.hpp>
+#include <assembly/limited_life.hpp>
 #include <assembly/render.hpp>
 
 #include <entt/entt.hpp>
@@ -40,6 +41,8 @@ namespace pd::factory
 
 		// transform
 		assembly::Transform::make(registry, entity, position);
+		// limited_life
+		assembly::LimitedLife::make(registry, entity, particle.lifetime);
 		// render
 		assembly::Render::make(registry, entity, particle.sprite, blueprint::RenderLayer::PARTICLE);
 		// TODO: 当前粒子并不能像普通实体那样渲染,让该实体不满足一般实体的渲染条件
@@ -48,10 +51,6 @@ namespace pd::factory
 		registry.emplace<particle::Owner>(entity, owner);
 		// shader
 		registry.emplace<particle::Shader>(entity, manager::Shader::load(std::filesystem::path{particle.shader}));
-		// duration
-		registry.emplace<particle::Duration>(entity, sf::milliseconds(particle.duration_ms));
-		// elapsed
-		registry.emplace<particle::Elapsed>(entity, sf::Time::Zero);
 		// shader params
 		registry.emplace<particle::ShaderParams>(
 			entity,

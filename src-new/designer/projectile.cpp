@@ -58,7 +58,7 @@ namespace pd::designer
 		// 弹道
 		constexpr blueprint::Trajectory trajectory
 		{
-				blueprint::Trajectory::straight
+				blueprint::Trajectory::Straight
 				{
 						.speed = 350,
 				},
@@ -72,7 +72,7 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.trajectory = trajectory,
 				.particle_emitter = std::move(particle_emitter),
-				.lifetime_ms = 3000,
+				.lifetime = {.lifetime_ms = 3000},
 				.damage = 10,
 		};
 	}

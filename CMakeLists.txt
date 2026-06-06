@@ -182,6 +182,8 @@ add_executable(
 	
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
+	# 有限生命
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/limited_life.hpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/render.hpp
 	# 碰撞体
@@ -256,6 +258,8 @@ add_executable(
 
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
+	# 有限生命
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/limited_life.hpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/render.hpp
 	# 渲染特效
@@ -313,6 +317,9 @@ add_executable(
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/transform.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/transform.cpp
+	# 有限生命
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/limited_life.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/limited_life.cpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render.cpp
@@ -460,16 +467,13 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/room_alive_check.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/room_alive_check.cpp
 
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/projectile.cpp
+	# 有限生命
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/limited_life.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/limited_life.cpp
 
 	# 粒子发射器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_emitter.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle_emitter.cpp
-	# 粒子
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/particle.cpp
 
 	# 动态精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/dynamic_sprite.hpp

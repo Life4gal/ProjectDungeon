@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <blueprint/detail/limited_life.hpp>
 #include <blueprint/detail/render.hpp>
 #include <blueprint/detail/collision.hpp>
 
@@ -12,31 +13,21 @@
 
 namespace pd::blueprint
 {
-	namespace projectile_detail
-	{
-		// 飞行弹道
-		class Trajectory final
-		{
-		public:
-			// 直线弹道
-			class Straight final
-			{
-			public:
-				// 飞行速度
-				// 飞行速度(velocity: Vec2)取决于发射方向
-				float speed;
-			};
-		};
-	}
-
 	// 飞行弹道
 	class Trajectory final
 	{
 	public:
-		using straight = projectile_detail::Trajectory::Straight;
+		// 直线弹道
+		class Straight final
+		{
+		public:
+			// 飞行速度
+			// 飞行速度(velocity: Vec2)取决于发射方向
+			float speed;
+		};
 
 		using trajectory_type = std::variant<
-			projectile_detail::Trajectory::Straight
+			Straight
 		>;
 
 		trajectory_type trajectory;
@@ -58,8 +49,8 @@ namespace pd::blueprint
 		Trajectory trajectory;
 		// 粒子发射器(拖尾效果)
 		ParticleEmitter particle_emitter;
-		// 最大飞行时间(毫秒)
-		int lifetime_ms;
+		// 最大飞行时间
+		LimitedLife::Time lifetime;
 
 		// 命中伤害
 		// TODO: AOE? DOT?

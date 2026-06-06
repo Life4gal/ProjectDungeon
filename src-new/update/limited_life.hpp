@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto particle(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto limited_life(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

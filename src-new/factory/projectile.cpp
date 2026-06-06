@@ -11,6 +11,7 @@
 #include <component/name.hpp>
 
 #include <assembly/transform.hpp>
+#include <assembly/limited_life.hpp>
 #include <assembly/render.hpp>
 #include <assembly/collision.hpp>
 #include <assembly/particle_emitter.hpp>
@@ -50,6 +51,8 @@ namespace pd::factory
 
 		// transform
 		assembly::Transform::make(registry, entity, position);
+		// limited_life
+		assembly::LimitedLife::make(registry, entity, projectile.lifetime);
 		// render
 		assembly::Render::make(registry, entity, projectile.sprite, blueprint::RenderLayer::PROJECTILE);
 		// collision
@@ -91,7 +94,7 @@ namespace pd::factory
 
 			const auto visitor = prometheus::functional::overloaded
 			{
-					[&](const blueprint::Trajectory::straight& straight) noexcept -> void
+					[&](const blueprint::Trajectory::Straight& straight) noexcept -> void
 					{
 						// velocity
 						const auto pixels_velocity = direction * straight.speed;
@@ -109,8 +112,6 @@ namespace pd::factory
 
 			std::visit(visitor, projectile.trajectory.trajectory);
 		}
-		// lifetime
-		registry.emplace<projectile::Lifetime>(entity, sf::milliseconds(projectile.lifetime_ms));
 		// damage
 		registry.emplace<projectile::Damage>(entity, projectile.damage);
 		// 拖尾效果
