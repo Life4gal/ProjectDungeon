@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <update/sprite_effect.hpp>
+#include <update/render_effect.hpp>
 
 #include <numbers>
 
@@ -18,19 +18,18 @@
 namespace pd::update
 {
 	using namespace component;
-	namespace res = render_effect::sprite;
 
 	namespace
 	{
 		namespace position
 		{
-			namespace sep = res::position;
+			namespace rep = render_effect::position;
 
 			auto update(entt::registry& registry, const float delta) noexcept -> void
 			{
 				const auto visitor = prometheus::functional::overloaded
 				{
-						[&](const entt::entity entity, res::Position& position, sep::Linear& linear) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Linear& linear) noexcept -> void
 						{
 							// 此帧移动距离
 							const auto traveled = linear.speed * delta;
@@ -39,7 +38,7 @@ namespace pd::update
 							if (linear.traveled >= linear.distance)
 							{
 								// 移除特效
-								registry.remove<sep::Linear>(entity);
+								registry.remove<rep::Linear>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -50,13 +49,13 @@ namespace pd::update
 
 							position.extra = linear.start + offset;
 						},
-						[&](const entt::entity entity, res::Position& position, sep::Oscillator& oscillator) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Oscillator& oscillator) noexcept -> void
 						{
 							oscillator.elapsed += delta;
 							if (oscillator.elapsed >= oscillator.duration)
 							{
 								// 移除特效
-								registry.remove<sep::Oscillator>(entity);
+								registry.remove<rep::Oscillator>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -79,13 +78,13 @@ namespace pd::update
 
 							position.extra = oscillator.p1 + offset;
 						},
-						[&](const entt::entity entity, res::Position& position, sep::Spring& spring) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Spring& spring) noexcept -> void
 						{
 							spring.elapsed += delta;
 							if (spring.elapsed >= spring.duration)
 							{
 								// 移除特效
-								registry.remove<sep::Spring>(entity);
+								registry.remove<rep::Spring>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -103,7 +102,7 @@ namespace pd::update
 
 							position.extra = spring.position;
 						},
-						[&](const entt::entity entity, res::Position& position, sep::Path& path) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Path& path) noexcept -> void
 						{
 							const auto segment_count = path.waypoints.size() - 1;
 
@@ -111,7 +110,7 @@ namespace pd::update
 							if (path.elapsed >= path.duration or path.current_segment == segment_count)
 							{
 								// 移除特效
-								registry.remove<sep::Path>(entity);
+								registry.remove<rep::Path>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -138,13 +137,13 @@ namespace pd::update
 
 							position.extra = path.position;
 						},
-						[&](const entt::entity entity, res::Position& position, sep::Orbit& orbit) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Orbit& orbit) noexcept -> void
 						{
 							orbit.elapsed += delta;
 							if (orbit.elapsed >= orbit.duration)
 							{
 								// 移除特效
-								registry.remove<sep::Orbit>(entity);
+								registry.remove<rep::Orbit>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -155,13 +154,13 @@ namespace pd::update
 
 							position.extra = orbit.center + offset;
 						},
-						[&](const entt::entity entity, res::Position& position, sep::Shake& shake) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Shake& shake) noexcept -> void
 						{
 							shake.elapsed += delta;
 							if (shake.elapsed >= shake.duration)
 							{
 								// 移除特效
-								registry.remove<sep::Shake>(entity);
+								registry.remove<rep::Shake>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -183,13 +182,13 @@ namespace pd::update
 
 							position.extra = shake.center + offset;
 						},
-						[&](const entt::entity entity, res::Position& position, sep::Wave& wave) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Wave& wave) noexcept -> void
 						{
 							wave.elapsed += delta;
 							if (wave.elapsed >= wave.duration)
 							{
 								// 移除特效
-								registry.remove<sep::Wave>(entity);
+								registry.remove<rep::Wave>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -206,13 +205,13 @@ namespace pd::update
 
 							position.extra = forward + perpendicular_offset;
 						},
-						[&](const entt::entity entity, res::Position& position, sep::Swing& swing) noexcept -> void
+						[&](const entt::entity entity, render_effect::Position& position, rep::Swing& swing) noexcept -> void
 						{
 							swing.elapsed += delta;
 							if (swing.elapsed >= swing.duration)
 							{
 								// 移除特效
-								registry.remove<sep::Swing>(entity);
+								registry.remove<rep::Swing>(entity);
 								// 重置位置
 								position.extra = sf::Vector2f{0, 0};
 								return;
@@ -241,7 +240,7 @@ namespace pd::update
 
 						// ================================
 
-						[&](this const auto& self, const entt::entity entity, res::Position& position) noexcept -> auto
+						[&](this const auto& self, const entt::entity entity, render_effect::Position& position) noexcept -> auto
 						{
 							return [&self, entity, &position](auto& e) noexcept -> void // NOLINT(clang-diagnostic-padded)
 							{
@@ -250,7 +249,7 @@ namespace pd::update
 						}
 				};
 
-				for (const auto view = registry.view<sep::Effect, res::Position>();
+				for (const auto view = registry.view<rep::Effect, render_effect::Position>();
 				     const auto [entity, effect, position]: view.each())
 				{
 					std::visit(visitor(entity, position), effect);
@@ -260,19 +259,19 @@ namespace pd::update
 
 		namespace scale
 		{
-			namespace ses = res::scale;
+			namespace res = render_effect::scale;
 
 			auto update(entt::registry& registry, const float delta) noexcept -> void
 			{
 				const auto visitor = prometheus::functional::overloaded
 				{
-						[&](const entt::entity entity, res::Scale& scale, ses::Oscillator& oscillator) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::Oscillator& oscillator) noexcept -> void
 						{
 							oscillator.elapsed += delta;
 							if (oscillator.elapsed >= oscillator.duration)
 							{
 								// 移除特效
-								registry.remove<ses::Oscillator>(entity);
+								registry.remove<res::Oscillator>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -295,13 +294,13 @@ namespace pd::update
 
 							scale.extra = offset;
 						},
-						[&](const entt::entity entity, res::Scale& scale, ses::Spring& spring) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::Spring& spring) noexcept -> void
 						{
 							spring.elapsed += delta;
 							if (spring.elapsed >= spring.duration)
 							{
 								// 移除特效
-								registry.remove<ses::Spring>(entity);
+								registry.remove<res::Spring>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -319,13 +318,13 @@ namespace pd::update
 
 							scale.extra = spring.scale;
 						},
-						[&](const entt::entity entity, res::Scale& scale, ses::Breathing& breathing) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::Breathing& breathing) noexcept -> void
 						{
 							breathing.elapsed += delta;
 							if (breathing.elapsed >= breathing.duration)
 							{
 								// 移除特效
-								registry.remove<ses::Breathing>(entity);
+								registry.remove<res::Breathing>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -338,13 +337,13 @@ namespace pd::update
 
 							scale.extra = breathing.min + offset;
 						},
-						[&](const entt::entity entity, res::Scale& scale, ses::SquashStretch& squash_stretch) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::SquashStretch& squash_stretch) noexcept -> void
 						{
 							squash_stretch.elapsed += delta;
 							if (squash_stretch.elapsed >= squash_stretch.duration)
 							{
 								// 移除特效
-								registry.remove<ses::SquashStretch>(entity);
+								registry.remove<res::SquashStretch>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -373,13 +372,13 @@ namespace pd::update
 							// scale.extra = {normal_scale.x * fx, normal_scale.y * fy};
 							scale.extra = {fx, fy};
 						},
-						[&](const entt::entity entity, res::Scale& scale, ses::DirectionalPulse& directional_pulse) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::DirectionalPulse& directional_pulse) noexcept -> void
 						{
 							directional_pulse.elapsed += delta;
 							if (directional_pulse.elapsed >= directional_pulse.duration)
 							{
 								// 移除特效
-								registry.remove<ses::DirectionalPulse>(entity);
+								registry.remove<res::DirectionalPulse>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -395,13 +394,13 @@ namespace pd::update
 
 							scale.extra = {perpendicular_scale, parallel_scale};
 						},
-						[&](const entt::entity entity, res::Scale& scale, ses::Jelly& jelly) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::Jelly& jelly) noexcept -> void
 						{
 							jelly.elapsed += delta;
 							if (jelly.elapsed >= jelly.duration)
 							{
 								// 移除特效
-								registry.remove<ses::Jelly>(entity);
+								registry.remove<res::Jelly>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -418,15 +417,15 @@ namespace pd::update
 
 							scale.extra = jelly.current_scale;
 						},
-						[&](const entt::entity entity, res::Scale& scale, ses::ElasticHit& elastic_hit) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::ElasticHit& elastic_hit) noexcept -> void
 						{
-							using phase = ses::ElasticHit::Phase;
+							using phase = res::ElasticHit::Phase;
 
 							elastic_hit.elapsed += delta;
 							if (elastic_hit.elapsed >= elastic_hit.duration)
 							{
 								// 移除特效
-								registry.remove<ses::ElasticHit>(entity);
+								registry.remove<res::ElasticHit>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -479,13 +478,13 @@ namespace pd::update
 								}
 							}
 						},
-						[&](const entt::entity entity, res::Scale& scale, ses::Ripple& ripple) noexcept -> void
+						[&](const entt::entity entity, render_effect::Scale& scale, res::Ripple& ripple) noexcept -> void
 						{
 							ripple.elapsed += delta;
 							if (ripple.elapsed >= ripple.duration)
 							{
 								// 移除特效
-								registry.remove<ses::Ripple>(entity);
+								registry.remove<res::Ripple>(entity);
 								// 重置缩放
 								scale.extra = sf::Vector2f{0, 0};
 								return;
@@ -503,7 +502,7 @@ namespace pd::update
 
 						// ================================
 
-						[&](this const auto& self, const entt::entity entity, res::Scale& scale) noexcept -> auto
+						[&](this const auto& self, const entt::entity entity, render_effect::Scale& scale) noexcept -> auto
 						{
 							return [&self, entity, &scale](auto& e) noexcept -> void // NOLINT(clang-diagnostic-padded)
 							{
@@ -512,7 +511,7 @@ namespace pd::update
 						}
 				};
 
-				for (const auto view = registry.view<ses::Effect, res::Scale>();
+				for (const auto view = registry.view<res::Effect, render_effect::Scale>();
 				     const auto [entity, effect, scale]: view.each())
 				{
 					std::visit(visitor(entity, scale), effect);
@@ -522,7 +521,7 @@ namespace pd::update
 
 		namespace color
 		{
-			namespace sec = res::color;
+			namespace rec = render_effect::color;
 
 			// ReSharper disable once IdentifierTypo
 			[[nodiscard]] auto lerp_sd(const sf::Color start, const sf::Color diff, const float t) noexcept -> sf::Color
@@ -610,13 +609,13 @@ namespace pd::update
 			{
 				const auto visitor = prometheus::functional::overloaded
 				{
-						[&](const entt::entity entity, res::Color& color, sec::Fade& fade) noexcept -> void
+						[&](const entt::entity entity, render_effect::Color& color, rec::Fade& fade) noexcept -> void
 						{
 							fade.elapsed += delta;
 							if (fade.elapsed >= fade.duration)
 							{
 								// 移除特效
-								registry.remove<sec::Fade>(entity);
+								registry.remove<rec::Fade>(entity);
 								// 重置颜色(需要吗?)
 								// color.color = sf::Color::White;
 								return;
@@ -626,13 +625,13 @@ namespace pd::update
 
 							color.color = lerp_sd(fade.start, fade.diff, t);
 						},
-						[&](const entt::entity entity, res::Color& color, sec::AlphaFade& alpha_fade) noexcept -> void
+						[&](const entt::entity entity, render_effect::Color& color, rec::AlphaFade& alpha_fade) noexcept -> void
 						{
 							alpha_fade.elapsed += delta;
 							if (alpha_fade.elapsed >= alpha_fade.duration)
 							{
 								// 移除特效
-								registry.remove<sec::AlphaFade>(entity);
+								registry.remove<rec::AlphaFade>(entity);
 								// 重置颜色(需要吗?)
 								// color.color = sf::Color::White;
 								return;
@@ -643,13 +642,13 @@ namespace pd::update
 
 							color.color.a = static_cast<std::uint8_t>(alpha * 255);
 						},
-						[&](const entt::entity entity, res::Color& color, sec::Flash& flash) noexcept -> void
+						[&](const entt::entity entity, render_effect::Color& color, rec::Flash& flash) noexcept -> void
 						{
 							flash.elapsed += delta;
 							if (flash.elapsed >= flash.duration)
 							{
 								// 移除特效
-								registry.remove<sec::Fade>(entity);
+								registry.remove<rec::Fade>(entity);
 								// 重置颜色
 								color.color = sf::Color::White;
 								return;
@@ -673,13 +672,13 @@ namespace pd::update
 								color.color = flash.base_color;
 							}
 						},
-						[&](const entt::entity entity, res::Color& color, sec::Breathing& breathing) noexcept -> void
+						[&](const entt::entity entity, render_effect::Color& color, rec::Breathing& breathing) noexcept -> void
 						{
 							breathing.elapsed += delta;
 							if (breathing.elapsed >= breathing.duration)
 							{
 								// 移除特效
-								registry.remove<sec::Breathing>(entity);
+								registry.remove<rec::Breathing>(entity);
 								// 重置颜色
 								color.color = sf::Color::White;
 								return;
@@ -691,13 +690,13 @@ namespace pd::update
 
 							color.color = lerp_sd(breathing.min, breathing.diff, normalized);
 						},
-						[&](const entt::entity entity, res::Color& color, sec::Pulse& pulse) noexcept -> void
+						[&](const entt::entity entity, render_effect::Color& color, rec::Pulse& pulse) noexcept -> void
 						{
 							pulse.elapsed += delta;
 							if (pulse.elapsed >= pulse.duration)
 							{
 								// 移除特效
-								registry.remove<sec::Pulse>(entity);
+								registry.remove<rec::Pulse>(entity);
 								// 重置颜色
 								color.color = sf::Color::White;
 								return;
@@ -725,13 +724,13 @@ namespace pd::update
 
 							color.color = lerp_sd(pulse.base_color, pulse.diff, t);
 						},
-						[&](const entt::entity entity, res::Color& color, sec::RainbowCycle& rainbow_cycle) noexcept -> void
+						[&](const entt::entity entity, render_effect::Color& color, rec::RainbowCycle& rainbow_cycle) noexcept -> void
 						{
 							rainbow_cycle.elapsed += delta;
 							if (rainbow_cycle.elapsed >= rainbow_cycle.duration)
 							{
 								// 移除特效
-								registry.remove<sec::RainbowCycle>(entity);
+								registry.remove<rec::RainbowCycle>(entity);
 								// 重置颜色
 								color.color = sf::Color::White;
 								return;
@@ -741,13 +740,13 @@ namespace pd::update
 
 							color.color = from_hsv(hue, rainbow_cycle.saturation, rainbow_cycle.lightness);
 						},
-						[&](const entt::entity entity, res::Color& color, sec::Oscillator& oscillator) noexcept -> void
+						[&](const entt::entity entity, render_effect::Color& color, rec::Oscillator& oscillator) noexcept -> void
 						{
 							oscillator.elapsed += delta;
 							if (oscillator.elapsed >= oscillator.duration)
 							{
 								// 移除特效
-								registry.remove<sec::Oscillator>(entity);
+								registry.remove<rec::Oscillator>(entity);
 								// 重置颜色
 								color.color = sf::Color::White;
 								return;
@@ -774,7 +773,7 @@ namespace pd::update
 
 						// ================================
 
-						[&](this const auto& self, const entt::entity entity, res::Color& color) noexcept -> auto
+						[&](this const auto& self, const entt::entity entity, render_effect::Color& color) noexcept -> auto
 						{
 							return [&self, entity, &color](auto& e) noexcept -> void // NOLINT(clang-diagnostic-padded)
 							{
@@ -783,7 +782,7 @@ namespace pd::update
 						}
 				};
 
-				for (const auto view = registry.view<sec::Effect, res::Color>();
+				for (const auto view = registry.view<rec::Effect, render_effect::Color>();
 				     const auto [entity, effect, color]: view.each())
 				{
 					std::visit(visitor(entity, color), effect);
@@ -792,9 +791,9 @@ namespace pd::update
 		}
 	}
 
-	auto sprite_effect(entt::registry& registry, const sf::Time delta) noexcept -> void
+	auto render_effect(entt::registry& registry, const sf::Time delta) noexcept -> void
 	{
-		// FIXME: 精灵动画特效更新没有考虑动画暂停
+		// FIXME: 渲染特效更新没有考虑动画暂停
 
 		const auto delta_seconds = delta.asSeconds();
 

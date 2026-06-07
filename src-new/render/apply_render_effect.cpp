@@ -18,17 +18,15 @@ namespace pd::render
 
 	auto apply_render_effect(entt::registry& registry) noexcept -> void
 	{
-		namespace res = render_effect::sprite;
-
 		auto& [set] = registry.ctx().get<renderer::RenderItemSet>();
 
 		const auto view = registry
 				.view<
 					state::InCameraArea,
-					res::Position,
-					res::Scale,
-					res::Rotation,
-					res::Color
+					render_effect::Position,
+					render_effect::Scale,
+					render_effect::Rotation,
+					render_effect::Color
 				>(entt::exclude<state::DisableRender>);
 
 		for (const auto [entity, position, scale, rotation, color]: view.each())

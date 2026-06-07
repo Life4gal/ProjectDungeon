@@ -14,16 +14,14 @@
 namespace pd::assembly
 {
 	using namespace component;
-	using namespace render_effect::sprite;
+	using namespace render_effect;
 
 	auto RenderEffect::make(entt::registry& registry, const entt::entity entity) noexcept -> void
 	{
-		namespace res = render_effect::sprite;
-
-		registry.emplace<res::Position>(entity, sf::Vector2f{0, 0});
-		registry.emplace<res::Scale>(entity, sf::Vector2f{1, 1});
-		registry.emplace<res::Rotation>(entity, sf::degrees(0));
-		registry.emplace<res::Color>(entity, sf::Color::White);
+		registry.emplace<Position>(entity, sf::Vector2f{0, 0});
+		registry.emplace<Scale>(entity, sf::Vector2f{1, 1});
+		registry.emplace<Rotation>(entity, sf::degrees(0));
+		registry.emplace<Color>(entity, sf::Color::White);
 	}
 
 	auto RenderEffect::Position::linear(

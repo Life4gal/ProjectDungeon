@@ -54,7 +54,7 @@
 #include <update/limited_life.hpp>
 #include <update/particle_emitter.hpp>
 #include <update/dynamic_sprite.hpp>
-#include <update/sprite_effect.hpp>
+#include <update/render_effect.hpp>
 
 // =========
 // 渲染
@@ -559,8 +559,9 @@ namespace pd::scene
 
 			// 动态精灵
 			update::dynamic_sprite(registry_, delta);
-			// 精灵特效
-			update::sprite_effect(registry_, delta);
+
+			// 渲染特效
+			update::render_effect(registry_, delta);
 
 			// 检测新生成的实体是否处于当前房间(相机区域)
 			// 在最后检测?这假定了上面的update不依赖这里设置的标签,否则逻辑至少延迟一帧(甚至错过)

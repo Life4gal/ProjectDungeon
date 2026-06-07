@@ -475,9 +475,10 @@ add_executable(
 	# 动态精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/dynamic_sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/dynamic_sprite.cpp
-	# 精灵动画特效
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/sprite_effect.cpp
+
+	# 渲染特效
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/render_effect.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/render_effect.cpp
 
 	# ============================
 	# SYSTEM -- RENDER

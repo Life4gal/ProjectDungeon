@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto sprite_effect(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto render_effect(entt::registry& registry, sf::Time delta) noexcept -> void;
 }
