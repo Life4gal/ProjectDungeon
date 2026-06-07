@@ -37,6 +37,8 @@
 #include <helper/player_controller.hpp>
 #include <helper/cheat.hpp>
 
+#include <var/window.hpp>
+
 #include <component/renderer.hpp>
 
 // =========
@@ -403,10 +405,18 @@ namespace pd::scene
 					if (helper::PlayerController::online(registry_))
 					{
 						const auto target = helper::PlayerController::target(registry_);
-						const auto target_position = helper::PlayerController::screen_position(registry_);
-						const auto direction = mbp->position - target_position;
+						const auto target_screen_position = sf::Vector2f{helper::PlayerController::screen_position(registry_)};
 
-						factory::Projectile::spawn(registry_, projectile_blueprint, target, sf::Vector2f{direction});
+						// TODO: 我们需要一种更*自动*的方式
+						const auto camera_size = helper::Camera::get_size(registry_);
+						const auto scale_x = camera_size.x / static_cast<float>(var::window_width);
+						const auto scale_y = camera_size.y / static_cast<float>(var::window_height);
+						const auto mouse_position_to_camera_x = static_cast<float>(mbp->position.x) * scale_x;
+						const auto mouse_position_to_camera_y = static_cast<float>(mbp->position.y) * scale_y;
+
+						const auto direction = sf::Vector2f{mouse_position_to_camera_x, mouse_position_to_camera_y} - target_screen_position;
+
+						factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
 					}
 				}
 			}
