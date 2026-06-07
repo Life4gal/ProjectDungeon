@@ -386,9 +386,6 @@ add_executable(
 	# 动态精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.cpp
-	# 精灵特效
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/sprite_effect.cpp
 	# 碰撞体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/collision.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/collision.cpp
