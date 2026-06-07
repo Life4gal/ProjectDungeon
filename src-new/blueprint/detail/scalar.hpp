@@ -5,19 +5,13 @@
 
 #pragma once
 
-#include <unordered_map>
-
-#include <blueprint/room.hpp>
-
 namespace pd::blueprint
 {
-	// 关卡
-	class Level final
+	// 大小
+	class Size final
 	{
 	public:
-		std::unordered_map<LayoutPosition, Room> rooms;
-
-		// 起始房间位置(避免遍历rooms查找RoomType::START)
-		LayoutPosition start_position;
+		float width;
+		float height;
 	};
 }

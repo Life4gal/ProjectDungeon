@@ -9,6 +9,8 @@
 #include <vector>
 
 #include <blueprint/detail/transform.hpp>
+#include <blueprint/detail/scalar.hpp>
+
 #include <blueprint/def.hpp>
 
 namespace pd::blueprint

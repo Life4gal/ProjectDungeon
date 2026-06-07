@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 namespace pd::blueprint
 {
 	// 世界坐标
@@ -15,16 +13,6 @@ namespace pd::blueprint
 	public:
 		float x;
 		float y;
-	};
-
-	// 布局坐标
-	class LayoutPosition final
-	{
-	public:
-		using size_type = std::uint32_t;
-
-		size_type x;
-		size_type y;
 	};
 
 	// 缩放
@@ -41,13 +29,5 @@ namespace pd::blueprint
 	public:
 		// degree
 		float rotation;
-	};
-
-	// 大小
-	class Size final
-	{
-	public:
-		float width;
-		float height;
 	};
 }

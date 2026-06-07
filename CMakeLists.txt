@@ -180,6 +180,10 @@ add_executable(
 	# 蓝图
 	# ============================
 	
+	# 布局
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/layout.hpp
+	# 标量
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/scalar.hpp
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
 	# 有限生命

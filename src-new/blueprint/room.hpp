@@ -7,6 +7,8 @@
 
 #include <array>
 
+#include <blueprint/detail/layout.hpp>
+
 #include <blueprint/door.hpp>
 #include <blueprint/bounding.hpp>
 #include <blueprint/tile.hpp>
