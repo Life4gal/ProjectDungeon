@@ -82,7 +82,7 @@ namespace pd::designer
 						.infinity_mana = false,
 				},
 				.name = {.type = blueprint::NameType::PLAYER_DEFAULT},
-				.speed = 120,
+				.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 4.0f,
 		};
 	}
 }

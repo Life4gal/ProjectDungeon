@@ -111,7 +111,7 @@ namespace pd::designer
 						.behavior =
 						blueprint::MoveBehavior::Wander
 						{
-								.speed = 60,
+								.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 2.0f,
 								.next_turn_min_time = 1.5f,
 								.next_turn_max_timer = 4.0f,
 						},
@@ -234,7 +234,7 @@ namespace pd::designer
 						.behavior =
 						blueprint::MoveBehavior::ChaseJump
 						{
-								.speed = 200,
+								.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 6.5f,
 								.duration = 0.6f,
 								.next_jump_min_time = 0.8f,
 								.next_jump_max_time = 1.6f,
@@ -359,7 +359,7 @@ namespace pd::designer
 						.behavior =
 						blueprint::MoveBehavior::Chase
 						{
-								.speed = 80,
+								.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 2.6667f,
 						},
 				},
 		};

@@ -5,6 +5,7 @@
 
 #include <designer/projectile.hpp>
 #include <designer/particle_emitter.hpp>
+#include <designer/room.hpp>
 
 namespace pd::designer
 {
@@ -60,7 +61,7 @@ namespace pd::designer
 		{
 				blueprint::Trajectory::Straight
 				{
-						.speed = 350,
+						.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 12.0f,
 				},
 		};
 		// 拖尾效果
