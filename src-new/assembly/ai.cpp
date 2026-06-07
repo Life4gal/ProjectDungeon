@@ -19,11 +19,11 @@ namespace pd::assembly
 	{
 		const auto visitor = prometheus::functional::overloaded
 		{
-				[&](const blueprint::MoveBehavior::stationary&) noexcept -> void
+				[&](const blueprint::MoveBehavior::Stationary&) noexcept -> void
 				{
 					//
 				},
-				[&](const blueprint::MoveBehavior::wander& wander) noexcept -> void
+				[&](const blueprint::MoveBehavior::Wander& wander) noexcept -> void
 				{
 					using namespace move_behavior::wander;
 
@@ -39,23 +39,23 @@ namespace pd::assembly
 					registry.emplace<Direction>(entity, sf::degrees(0));
 					registry.emplace<DirectionTimer>(entity, sf::Time::Zero);
 				},
-				[&](const blueprint::MoveBehavior::patrol& patrol) noexcept -> void
+				[&](const blueprint::MoveBehavior::Patrol& patrol) noexcept -> void
 				{
 					std::ignore = patrol;
 					PROMETHEUS_PLATFORM_UNREACHABLE();
 				},
-				[&](const blueprint::MoveBehavior::chase& chase) noexcept -> void
+				[&](const blueprint::MoveBehavior::Chase& chase) noexcept -> void
 				{
 					using namespace move_behavior::chase;
 
 					registry.emplace<Config>(entity, Config{.speed = chase.speed});
 				},
-				[&](const blueprint::MoveBehavior::jump& jump) noexcept -> void
+				[&](const blueprint::MoveBehavior::Jump& jump) noexcept -> void
 				{
 					std::ignore = jump;
 					PROMETHEUS_PLATFORM_UNREACHABLE();
 				},
-				[&](const blueprint::MoveBehavior::chase_jump& chase_jump) noexcept -> void
+				[&](const blueprint::MoveBehavior::ChaseJump& chase_jump) noexcept -> void
 				{
 					using namespace move_behavior::chase_jump;
 
@@ -72,7 +72,7 @@ namespace pd::assembly
 					registry.emplace<State>(entity, State::IDLE);
 					registry.emplace<AirTimer>(entity, sf::Time::Zero);
 				},
-				[&](const blueprint::MoveBehavior::teleport& teleport) noexcept -> void
+				[&](const blueprint::MoveBehavior::Teleport& teleport) noexcept -> void
 				{
 					std::ignore = teleport;
 					PROMETHEUS_PLATFORM_UNREACHABLE();

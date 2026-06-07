@@ -11,7 +11,7 @@ namespace pd::designer
 	auto Projectile::standard() noexcept -> blueprint::Projectile
 	{
 		// 渲染(必须是动态精灵)
-		blueprint::DynamicSprite sprite
+		blueprint::Sprite::Dynamic sprite
 		{
 				.frames =
 				{
@@ -46,7 +46,7 @@ namespace pd::designer
 										.enable_contact_events = true,
 								},
 								.shape =
-								blueprint::CollisionShape::circle
+								blueprint::CollisionShape::Circle
 								{
 										.center = {.x = 0, .y = 0},
 										.radius = 12,

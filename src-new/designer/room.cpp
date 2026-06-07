@@ -68,7 +68,7 @@ namespace pd::designer
 		{
 			using blueprint::Position;
 
-			const blueprint::DynamicSprite sprite
+			const blueprint::Sprite::Dynamic sprite
 			{
 					.frames =
 					{
@@ -380,7 +380,7 @@ namespace pd::designer
 						.position = {.x = 0, .y = 0},
 						.sprite =
 						{
-								.sprite = blueprint::StaticSprite
+								.sprite = blueprint::Sprite::Static
 								{
 										.texture = "./assets/wall+floor.png",
 										.uv_position = {.x = 576, .y = 256},
@@ -413,7 +413,7 @@ namespace pd::designer
 						.position = {.x = 0, .y = 0},
 						.sprite =
 						{
-								.sprite = blueprint::StaticSprite
+								.sprite = blueprint::Sprite::Static
 								{
 										.texture = "./assets/wall+floor.png",
 										.uv_position = {.x = 0, .y = 64},

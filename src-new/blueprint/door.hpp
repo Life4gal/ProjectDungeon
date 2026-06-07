@@ -31,6 +31,6 @@ namespace pd::blueprint
 		// 初始为暂停状态
 		// 正放 -> 开门
 		// 倒放 -> 关门
-		DynamicSprite sprite;
+		Sprite::Dynamic sprite;
 	};
 }

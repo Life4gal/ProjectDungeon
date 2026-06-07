@@ -18,7 +18,7 @@ namespace pd::designer
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
 		};
 		// 渲染(必须是动态精灵)
-		blueprint::DynamicSprite sprite
+		blueprint::Sprite::Dynamic sprite
 		{
 				.frames =
 				{
@@ -87,7 +87,7 @@ namespace pd::designer
 										.enable_contact_events = true,
 								},
 								.shape =
-								blueprint::CollisionShape::box
+								blueprint::CollisionShape::Box
 								{
 										.size = {.width = 60, .height = 120},
 								},
@@ -109,7 +109,7 @@ namespace pd::designer
 				.move_behavior =
 				{
 						.behavior =
-						blueprint::MoveBehavior::wander
+						blueprint::MoveBehavior::Wander
 						{
 								.speed = 60,
 								.next_turn_min_time = 1.5f,
@@ -140,7 +140,7 @@ namespace pd::designer
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
 		};
 		// 渲染(必须是动态精灵)
-		blueprint::DynamicSprite sprite
+		blueprint::Sprite::Dynamic sprite
 		{
 				.frames =
 				{
@@ -209,7 +209,7 @@ namespace pd::designer
 										.enable_contact_events = true,
 								},
 								.shape =
-								blueprint::CollisionShape::circle
+								blueprint::CollisionShape::Circle
 								{
 										.center = {.x = 0, .y = 8},
 										.radius = 32,
@@ -232,7 +232,7 @@ namespace pd::designer
 				.move_behavior =
 				{
 						.behavior =
-						blueprint::MoveBehavior::chase_jump
+						blueprint::MoveBehavior::ChaseJump
 						{
 								.speed = 200,
 								.duration = 0.6f,
@@ -264,7 +264,7 @@ namespace pd::designer
 				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
 		};
 		// 渲染(必须是动态精灵)
-		blueprint::DynamicSprite sprite
+		blueprint::Sprite::Dynamic sprite
 		{
 				.frames =
 				{
@@ -333,7 +333,7 @@ namespace pd::designer
 										.enable_contact_events = true,
 								},
 								.shape =
-								blueprint::CollisionShape::capsule
+								blueprint::CollisionShape::Capsule
 								{
 										.center1 = {.x = -35, .y = 0},
 										.center2 = {.x = 35, .y = 0},
@@ -357,7 +357,7 @@ namespace pd::designer
 				.move_behavior =
 				{
 						.behavior =
-						blueprint::MoveBehavior::chase
+						blueprint::MoveBehavior::Chase
 						{
 								.speed = 80,
 						},

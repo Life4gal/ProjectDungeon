@@ -65,7 +65,7 @@ namespace pd::factory
 			const auto door_shape_id = assembly::Collision::make_shape(
 				body_id,
 				DoorShapeDef,
-				blueprint::CollisionShape::offset_box
+				blueprint::CollisionShape::OffsetBox
 				{
 						.center = {.x = door.door_offset.x, .y = door.door_offset.y},
 						.size = door.door_size,
@@ -78,7 +78,7 @@ namespace pd::factory
 			const auto sensor_shape_id = assembly::Collision::make_shape(
 				body_id,
 				SensorShapeDef,
-				blueprint::CollisionShape::offset_box
+				blueprint::CollisionShape::OffsetBox
 				{
 						.center = {.x = door.sensor_offset.x, .y = door.sensor_offset.y},
 						.size = door.sensor_size,

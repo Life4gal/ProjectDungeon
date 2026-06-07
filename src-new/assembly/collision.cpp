@@ -76,7 +76,7 @@ namespace pd::assembly
 	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
-		const blueprint::CollisionShape::circle& circle
+		const blueprint::CollisionShape::Circle& circle
 	) noexcept -> b2ShapeId
 	{
 		const auto center = Physics::to_physics({circle.center.x, circle.center.y});
@@ -91,7 +91,7 @@ namespace pd::assembly
 	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
-		const blueprint::CollisionShape::capsule& capsule
+		const blueprint::CollisionShape::Capsule& capsule
 	) noexcept -> b2ShapeId
 	{
 		const auto center1 = Physics::to_physics({capsule.center1.x, capsule.center1.y});
@@ -107,7 +107,7 @@ namespace pd::assembly
 	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
-		const blueprint::CollisionShape::box& box
+		const blueprint::CollisionShape::Box& box
 	) noexcept -> b2ShapeId
 	{
 		const auto width = Physics::to_physics(box.size.width);
@@ -122,7 +122,7 @@ namespace pd::assembly
 	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
-		const blueprint::CollisionShape::offset_box& offset_box
+		const blueprint::CollisionShape::OffsetBox& offset_box
 	) noexcept -> b2ShapeId
 	{
 		const auto width = Physics::to_physics(offset_box.size.width);
@@ -139,7 +139,7 @@ namespace pd::assembly
 	auto Collision::make_shape(
 		const b2BodyId body_id,
 		const blueprint::CollisionShapeDef& shape_def,
-		const blueprint::CollisionShape::segment& segment
+		const blueprint::CollisionShape::Segment& segment
 	) noexcept -> b2ShapeId
 	{
 		const auto p1 = Physics::to_physics({segment.point1.x, segment.point1.y});

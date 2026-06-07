@@ -18,7 +18,7 @@ namespace pd::designer
 				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
 		};
 		// 渲染(必须是动态精灵)
-		blueprint::DynamicSprite sprite
+		blueprint::Sprite::Dynamic sprite
 		{
 				.frames =
 				{
@@ -59,7 +59,7 @@ namespace pd::designer
 										.enable_contact_events = true,
 								},
 								.shape =
-								blueprint::CollisionShape::circle
+								blueprint::CollisionShape::Circle
 								{
 										.center = {.x = 0, .y = 0},
 										.radius = 32,

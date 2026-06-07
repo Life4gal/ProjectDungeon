@@ -15,7 +15,7 @@ namespace pd::blueprint
 	{
 	public:
 		// 纹理
-		StaticSprite sprite;
+		Sprite::Static sprite;
 
 		// 存在时间
 		LimitedLife::Time lifetime;

@@ -18,7 +18,7 @@ namespace pd::assembly
 	namespace
 	{
 		template<typename StaticSpriteLike>
-			requires(std::is_same_v<StaticSpriteLike, blueprint::StaticSprite> or std::is_same_v<StaticSpriteLike, blueprint::DynamicSprite::Frame>)
+			requires(std::is_same_v<StaticSpriteLike, blueprint::Sprite::Static> or std::is_same_v<StaticSpriteLike, blueprint::Sprite::Dynamic::Frame>)
 		auto do_make(entt::registry& registry, const entt::entity entity, const StaticSpriteLike& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
 		{
 			namespace rss = render::static_sprite;
@@ -36,12 +36,12 @@ namespace pd::assembly
 		}
 	}
 
-	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::StaticSprite& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
+	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite::Static& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
 	{
 		do_make(registry, entity, static_sprite, render_layer);
 	}
 
-	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::DynamicSprite& dynamic_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
+	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite::Dynamic& dynamic_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
 	{
 		namespace rds = render::dynamic_sprite;
 

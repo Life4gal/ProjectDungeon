@@ -40,7 +40,7 @@ namespace pd::blueprint
 		// 初始位置取决于发射者
 
 		// 渲染(必须是动态精灵)
-		DynamicSprite sprite;
+		Sprite::Dynamic sprite;
 
 		// 碰撞体
 		Collision collision;

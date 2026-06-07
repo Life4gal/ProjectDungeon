@@ -21,7 +21,7 @@ namespace pd::blueprint
 		Position position;
 
 		// 渲染(必须是动态精灵吗?)
-		DynamicSprite sprite;
+		Sprite::Dynamic sprite;
 
 		// 碰撞体(一定有碰撞体吗?)
 		Collision collision;

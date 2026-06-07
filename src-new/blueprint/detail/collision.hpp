@@ -41,71 +41,6 @@ namespace pd::blueprint
 		// TODO: 其他需要的信息?
 	};
 
-	namespace collision_detail
-	{
-		class CollisionShape final
-		{
-		public:
-			// 圆形形状
-			// b2Circle
-			class Circle final
-			{
-			public:
-				// 圆心
-				Position center;
-				// 半径
-				float radius;
-			};
-
-			// 胶囊形状
-			// b2Capsule
-			class Capsule final
-			{
-			public:
-				// 原点1
-				Position center1;
-				// 原点2
-				Position center2;
-				// 半径
-				float radius;
-			};
-
-			// 矩形形状
-			// b2Polygon
-			class Box final
-			{
-			public:
-				// 中心点 == 刚体原点
-				// 大小
-				Size size;
-			};
-
-			// 矩形形状
-			// b2Polygon
-			class OffsetBox final
-			{
-			public:
-				// 中心点
-				Position center;
-				// 大小
-				Size size;
-				// 旋转
-				Rotation rotation;
-			};
-
-			// 线段形状
-			// b2Segment
-			class Segment final
-			{
-			public:
-				// 点1
-				Position point1;
-				// 点2
-				Position point2;
-			};
-		};
-	}
-
 	// 形状定义
 	// b2ShapeDef
 	class CollisionShapeDef final
@@ -145,18 +80,70 @@ namespace pd::blueprint
 	class CollisionShape final
 	{
 	public:
-		using circle = collision_detail::CollisionShape::Circle;
-		using capsule = collision_detail::CollisionShape::Capsule;
-		using box = collision_detail::CollisionShape::Box;
-		using offset_box = collision_detail::CollisionShape::OffsetBox;
-		using segment = collision_detail::CollisionShape::Segment;
+		// 圆形形状
+		// b2Circle
+		class Circle final
+		{
+		public:
+			// 圆心
+			Position center;
+			// 半径
+			float radius;
+		};
+
+		// 胶囊形状
+		// b2Capsule
+		class Capsule final
+		{
+		public:
+			// 原点1
+			Position center1;
+			// 原点2
+			Position center2;
+			// 半径
+			float radius;
+		};
+
+		// 矩形形状
+		// b2Polygon
+		class Box final
+		{
+		public:
+			// 中心点 == 刚体原点
+			// 大小
+			Size size;
+		};
+
+		// 矩形形状
+		// b2Polygon
+		class OffsetBox final
+		{
+		public:
+			// 中心点
+			Position center;
+			// 大小
+			Size size;
+			// 旋转
+			Rotation rotation;
+		};
+
+		// 线段形状
+		// b2Segment
+		class Segment final
+		{
+		public:
+			// 点1
+			Position point1;
+			// 点2
+			Position point2;
+		};
 
 		using shape_type = std::variant<
-			collision_detail::CollisionShape::Circle,
-			collision_detail::CollisionShape::Capsule,
-			collision_detail::CollisionShape::Box,
-			collision_detail::CollisionShape::OffsetBox,
-			collision_detail::CollisionShape::Segment
+			Circle,
+			Capsule,
+			Box,
+			OffsetBox,
+			Segment
 		>;
 
 		CollisionShapeDef def;

@@ -35,7 +35,7 @@ namespace pd::assembly
 		[[nodiscard]] static auto make_shape(
 			b2BodyId body_id,
 			const blueprint::CollisionShapeDef& shape_def,
-			const blueprint::CollisionShape::circle& circle
+			const blueprint::CollisionShape::Circle& circle
 		) noexcept -> b2ShapeId;
 
 		// ====================================
@@ -45,7 +45,7 @@ namespace pd::assembly
 		[[nodiscard]] static auto make_shape(
 			b2BodyId body_id,
 			const blueprint::CollisionShapeDef& shape_def,
-			const blueprint::CollisionShape::capsule& capsule
+			const blueprint::CollisionShape::Capsule& capsule
 		) noexcept -> b2ShapeId;
 
 		// ====================================
@@ -55,7 +55,7 @@ namespace pd::assembly
 		[[nodiscard]] static auto make_shape(
 			b2BodyId body_id,
 			const blueprint::CollisionShapeDef& shape_def,
-			const blueprint::CollisionShape::box& box
+			const blueprint::CollisionShape::Box& box
 		) noexcept -> b2ShapeId;
 
 		// ====================================
@@ -65,7 +65,7 @@ namespace pd::assembly
 		[[nodiscard]] static auto make_shape(
 			b2BodyId body_id,
 			const blueprint::CollisionShapeDef& shape_def,
-			const blueprint::CollisionShape::offset_box& offset_box
+			const blueprint::CollisionShape::OffsetBox& offset_box
 		) noexcept -> b2ShapeId;
 
 		// ====================================
@@ -75,7 +75,7 @@ namespace pd::assembly
 		[[nodiscard]] static auto make_shape(
 			b2BodyId body_id,
 			const blueprint::CollisionShapeDef& shape_def,
-			const blueprint::CollisionShape::segment& segment
+			const blueprint::CollisionShape::Segment& segment
 		) noexcept -> b2ShapeId;
 
 		// ====================================

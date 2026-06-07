@@ -12,7 +12,7 @@ namespace pd::blueprint
 	class Bounding final
 	{
 	public:
-		using segment_type = CollisionShape::segment;
+		using segment_type = CollisionShape::Segment;
 
 		// 边界的位置
 		// 绝对位置(刚体位置)
