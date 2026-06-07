@@ -265,6 +265,24 @@ namespace pd::update
 			{
 				const auto visitor = prometheus::functional::overloaded
 				{
+						[&](const entt::entity entity, render_effect::Scale& scale, res::Shrink& shrink) noexcept -> void
+						{
+							shrink.elapsed += delta;
+							if (shrink.elapsed >= shrink.duration)
+							{
+								// 移除特效
+								registry.remove<res::Shrink>(entity);
+								// 重置缩放
+								scale.extra = sf::Vector2f{0, 0};
+								return;
+							}
+
+							const auto t = shrink.elapsed / shrink.duration;
+							const auto x = std::lerp(shrink.start_scale.x, shrink.end_scale.x, t);
+							const auto y = std::lerp(shrink.start_scale.y, shrink.end_scale.y, t);
+
+							scale.extra = {x, y};
+						},
 						[&](const entt::entity entity, render_effect::Scale& scale, res::Oscillator& oscillator) noexcept -> void
 						{
 							oscillator.elapsed += delta;

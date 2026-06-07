@@ -373,6 +373,33 @@ namespace pd::component::render_effect
 
 	namespace scale
 	{
+		// 缩小
+		class Shrink final
+		{
+		public:
+			// =======================
+			// 输入参数
+			// =======================
+
+			// 初始缩放
+			sf::Vector2f start_scale;
+			// 结束缩放
+			sf::Vector2f end_scale;
+			// 持续时间(秒)
+			float duration;
+
+			// =======================
+			// 变量(常量)
+			// =======================
+
+			// =======================
+			// 状态
+			// =======================
+
+			// 已持续时间(秒)
+			float elapsed;
+		};
+
 		// 震荡
 		class Oscillator final
 		{
@@ -667,6 +694,7 @@ namespace pd::component::render_effect
 		};
 
 		class Effect final : public std::variant<
+					Shrink,
 					Oscillator,
 					Spring,
 					Breathing,

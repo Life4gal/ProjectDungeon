@@ -14,14 +14,16 @@
 namespace pd::assembly
 {
 	using namespace component;
-	using namespace render_effect;
+	namespace rep = render_effect::position;
+	namespace res = render_effect::scale;
+	namespace rec = render_effect::color;
 
 	auto RenderEffect::make(entt::registry& registry, const entt::entity entity) noexcept -> void
 	{
-		registry.emplace<Position>(entity, sf::Vector2f{0, 0});
-		registry.emplace<Scale>(entity, sf::Vector2f{1, 1});
-		registry.emplace<Rotation>(entity, sf::degrees(0));
-		registry.emplace<Color>(entity, sf::Color::White);
+		registry.emplace<render_effect::Position>(entity, sf::Vector2f{0, 0});
+		registry.emplace<render_effect::Scale>(entity, sf::Vector2f{1, 1});
+		registry.emplace<render_effect::Rotation>(entity, sf::degrees(0));
+		registry.emplace<render_effect::Color>(entity, sf::Color::White);
 	}
 
 	auto RenderEffect::Position::linear(
@@ -35,7 +37,7 @@ namespace pd::assembly
 		const auto offset = end - start;
 		const auto distance = offset.length();
 
-		const position::Linear linear
+		const rep::Linear linear
 		{
 				.start = start,
 				.end = end,
@@ -45,7 +47,7 @@ namespace pd::assembly
 				.traveled = 0,
 		};
 
-		registry.emplace_or_replace<position::Linear>(entity, linear);
+		registry.emplace_or_replace<rep::Effect>(entity, linear);
 	}
 
 	auto RenderEffect::Position::oscillator(
@@ -60,7 +62,7 @@ namespace pd::assembly
 		const auto offset = p2 - p1;
 		const auto distance = offset.length();
 
-		const position::Oscillator oscillator
+		const rep::Oscillator oscillator
 		{
 				.p1 = p1,
 				.p2 = p2,
@@ -71,7 +73,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<position::Oscillator>(entity, oscillator);
+		registry.emplace_or_replace<rep::Effect>(entity, oscillator);
 	}
 
 	auto RenderEffect::Position::spring(
@@ -84,7 +86,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const position::Spring spring
+		const rep::Spring spring
 		{
 				.start = start,
 				.target = target,
@@ -96,7 +98,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<position::Spring>(entity, spring);
+		registry.emplace_or_replace<rep::Effect>(entity, spring);
 	}
 
 	auto RenderEffect::Position::path(
@@ -128,7 +130,7 @@ namespace pd::assembly
 			distances.emplace_back(distance);
 		}
 
-		position::Path path
+		rep::Path path
 		{
 				.waypoints = std::move(waypoints),
 				.speed = speed,
@@ -141,7 +143,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<position::Path>(entity, std::move(path));
+		registry.emplace_or_replace<rep::Effect>(entity, std::move(path));
 	}
 
 	auto RenderEffect::Position::orbit(
@@ -153,7 +155,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const position::Orbit orbit
+		const rep::Orbit orbit
 		{
 				.center = center,
 				.radius = radius,
@@ -163,7 +165,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<position::Orbit>(entity, orbit);
+		registry.emplace_or_replace<rep::Effect>(entity, orbit);
 	}
 
 	auto RenderEffect::Position::shake(
@@ -176,7 +178,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const position::Shake shake
+		const rep::Shake shake
 		{
 				.center = center,
 				.intensity = intensity,
@@ -187,7 +189,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<position::Shake>(entity, shake);
+		registry.emplace_or_replace<rep::Effect>(entity, shake);
 	}
 
 	auto RenderEffect::Position::wave(
@@ -205,7 +207,7 @@ namespace pd::assembly
 
 		const auto perpendicular_direction = direction.perpendicular();
 
-		const position::Wave wave
+		const rep::Wave wave
 		{
 				.start = start,
 				.direction = direction,
@@ -218,7 +220,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<position::Wave>(entity, wave);
+		registry.emplace_or_replace<rep::Effect>(entity, wave);
 	}
 
 	auto RenderEffect::Position::swing(
@@ -235,7 +237,7 @@ namespace pd::assembly
 		const auto angle_diff = std::abs(end_angle - start_angle);
 		const auto angle_total = angle_diff * 2;
 
-		const position::Swing swing
+		const rep::Swing swing
 		{
 				.pivot = pivot,
 				.radius = radius,
@@ -248,7 +250,26 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<position::Swing>(entity, swing);
+		registry.emplace_or_replace<rep::Effect>(entity, swing);
+	}
+
+	auto RenderEffect::Scale::shrink(
+		entt::registry& registry,
+		const entt::entity entity,
+		const sf::Vector2f start_scale,
+		const sf::Vector2f end_scale,
+		const float duration
+	) noexcept -> void
+	{
+		const res::Shrink shrink
+		{
+				.start_scale = start_scale,
+				.end_scale = end_scale,
+				.duration = duration,
+				.elapsed = 0,
+		};
+
+		registry.emplace_or_replace<res::Effect>(entity, shrink);
 	}
 
 	auto RenderEffect::Scale::oscillator(
@@ -263,7 +284,7 @@ namespace pd::assembly
 		const auto diff = max - min;
 		const auto swing = diff * 2.0f;
 
-		const scale::Oscillator oscillator
+		const res::Oscillator oscillator
 		{
 				.min = min,
 				.max = max,
@@ -274,7 +295,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::Oscillator>(entity, oscillator);
+		registry.emplace_or_replace<res::Effect>(entity, oscillator);
 	}
 
 	auto RenderEffect::Scale::spring(
@@ -287,7 +308,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const scale::Spring spring
+		const res::Spring spring
 		{
 				.min = min,
 				.max = max,
@@ -299,7 +320,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::Spring>(entity, spring);
+		registry.emplace_or_replace<res::Effect>(entity, spring);
 	}
 
 	auto RenderEffect::Scale::breathing(
@@ -313,7 +334,7 @@ namespace pd::assembly
 	{
 		const auto diff = max - min;
 
-		const scale::Breathing breathing
+		const res::Breathing breathing
 		{
 				.min = min,
 				.max = max,
@@ -323,7 +344,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::Breathing>(entity, breathing);
+		registry.emplace_or_replace<res::Effect>(entity, breathing);
 	}
 
 	auto RenderEffect::Scale::squash_stretch(
@@ -334,7 +355,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const scale::SquashStretch squash_stretch
+		const res::SquashStretch squash_stretch
 		{
 				.squash_factory = squash_factory,
 				.speed = speed,
@@ -342,7 +363,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::SquashStretch>(entity, squash_stretch);
+		registry.emplace_or_replace<res::Effect>(entity, squash_stretch);
 	}
 
 	auto RenderEffect::Scale::directional_pulse(
@@ -355,7 +376,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const scale::DirectionalPulse directional_pulse
+		const res::DirectionalPulse directional_pulse
 		{
 				.center = center,
 				.direction = direction,
@@ -365,7 +386,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::DirectionalPulse>(entity, directional_pulse);
+		registry.emplace_or_replace<res::Effect>(entity, directional_pulse);
 	}
 
 	auto RenderEffect::Scale::jelly(
@@ -378,7 +399,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const scale::Jelly jelly
+		const res::Jelly jelly
 		{
 				.target_scale = target_scale,
 				.overshoot = overshoot,
@@ -390,7 +411,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::Jelly>(entity, jelly);
+		registry.emplace_or_replace<res::Effect>(entity, jelly);
 	}
 
 	auto RenderEffect::Scale::elastic_hit(
@@ -407,7 +428,7 @@ namespace pd::assembly
 		const auto stretch_phase_diff = stretch_scale - compress_scale;
 		const auto resume_phase_diff = sf::Vector2f{1, 1} - stretch_scale;
 
-		const scale::ElasticHit elastic_hit
+		const res::ElasticHit elastic_hit
 		{
 				.compress_scale = compress_scale,
 				.stretch_scale = stretch_scale,
@@ -417,12 +438,12 @@ namespace pd::assembly
 				.compress_phase_diff = compress_phase_diff,
 				.stretch_phase_diff = stretch_phase_diff,
 				.resume_phase_diff = resume_phase_diff,
-				.phase = scale::ElasticHit::Phase::COMPRESS,
+				.phase = res::ElasticHit::Phase::COMPRESS,
 				.phase_elapsed = 0,
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::ElasticHit>(entity, elastic_hit);
+		registry.emplace_or_replace<res::Effect>(entity, elastic_hit);
 	}
 
 	auto RenderEffect::Scale::ripple(
@@ -436,7 +457,7 @@ namespace pd::assembly
 	{
 		const auto scale_diff = edge_scale - center_scale;
 
-		const scale::Ripple ripple
+		const res::Ripple ripple
 		{
 				.center_scale = center_scale,
 				.edge_scale = edge_scale,
@@ -447,7 +468,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<scale::Ripple>(entity, ripple);
+		registry.emplace_or_replace<res::Effect>(entity, ripple);
 	}
 
 	auto RenderEffect::Color::fade(
@@ -460,7 +481,7 @@ namespace pd::assembly
 	{
 		const auto diff = end - start;
 
-		const color::Fade fade
+		const rec::Fade fade
 		{
 				.start = start,
 				.end = end,
@@ -469,7 +490,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<color::Fade>(entity, fade);
+		registry.emplace_or_replace<rec::Effect>(entity, fade);
 	}
 
 	auto RenderEffect::Color::alpha_fade(
@@ -482,7 +503,7 @@ namespace pd::assembly
 	{
 		const auto diff = end - start;
 
-		const color::AlphaFade alpha_fade
+		const rec::AlphaFade alpha_fade
 		{
 				.start = start,
 				.end = end,
@@ -491,7 +512,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<color::AlphaFade>(entity, alpha_fade);
+		registry.emplace_or_replace<rec::Effect>(entity, alpha_fade);
 	}
 
 	auto RenderEffect::Color::flash(
@@ -506,7 +527,7 @@ namespace pd::assembly
 	{
 		const auto diff = flash_color - base_color;
 
-		const color::Flash flash
+		const rec::Flash flash
 		{
 				.base_color = base_color,
 				.flash_color = flash_color,
@@ -517,7 +538,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<color::Flash>(entity, flash);
+		registry.emplace_or_replace<rec::Effect>(entity, flash);
 	}
 
 	auto RenderEffect::Color::breathing(
@@ -531,7 +552,7 @@ namespace pd::assembly
 	{
 		const auto diff = max - min;
 
-		const color::Breathing breathing
+		const rec::Breathing breathing
 		{
 				.min = min,
 				.max = max,
@@ -541,7 +562,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<color::Breathing>(entity, breathing);
+		registry.emplace_or_replace<rec::Effect>(entity, breathing);
 	}
 
 	auto RenderEffect::Color::pulse(
@@ -558,7 +579,7 @@ namespace pd::assembly
 		const auto cycle_duration = 1.0f / speed;
 		const auto raise_duration = (cycle_duration - peak_duration) / 2.0f;
 
-		const color::Pulse pulse
+		const rec::Pulse pulse
 		{
 				.base_color = base_color,
 				.peak_color = peak_color,
@@ -571,7 +592,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<color::Pulse>(entity, pulse);
+		registry.emplace_or_replace<rec::Effect>(entity, pulse);
 	}
 
 	auto RenderEffect::Color::rainbow_cycle(
@@ -583,7 +604,7 @@ namespace pd::assembly
 		const float duration
 	) noexcept -> void
 	{
-		const color::RainbowCycle rainbow_cycle
+		const rec::RainbowCycle rainbow_cycle
 		{
 				.speed = speed,
 				.saturation = saturation,
@@ -592,7 +613,7 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<color::RainbowCycle>(entity, rainbow_cycle);
+		registry.emplace_or_replace<rec::Effect>(entity, rainbow_cycle);
 	}
 
 	auto RenderEffect::Color::oscillator(
@@ -606,7 +627,7 @@ namespace pd::assembly
 	{
 		const auto diff = color2 - color1;
 
-		const color::Oscillator oscillator
+		const rec::Oscillator oscillator
 		{
 				.color1 = color1,
 				.color2 = color2,
@@ -616,6 +637,6 @@ namespace pd::assembly
 				.elapsed = 0,
 		};
 
-		registry.emplace_or_replace<color::Oscillator>(entity, oscillator);
+		registry.emplace_or_replace<rec::Effect>(entity, oscillator);
 	}
 }

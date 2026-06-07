@@ -146,6 +146,18 @@ namespace pd::assembly
 		class Scale final
 		{
 		public:
+			// 缩小
+			static auto shrink(
+				entt::registry& registry,
+				entt::entity entity,
+				// 初始缩放
+				sf::Vector2f start_scale,
+				// 结束缩放
+				sf::Vector2f end_scale,
+				// 持续时间(秒)
+				float duration
+			) noexcept -> void;
+
 			// 震荡
 			static auto oscillator(
 				entt::registry& registry,
