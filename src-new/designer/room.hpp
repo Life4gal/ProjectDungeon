@@ -38,18 +38,11 @@ namespace pd::designer
 	class RoomNavigation final
 	{
 	public:
-		enum class DirectionValue : std::make_signed_t<Room::size_type>
-		{
-			BACKWARD = -1,
-			NONE = 0,
-			FORWARD = 1,
-		};
+		using value_type = std::make_signed_t<Room::size_type>;
 
 		class Direction final
 		{
 		public:
-			using value_type = std::underlying_type_t<DirectionValue>;
-
 			value_type x;
 			value_type y;
 		};
@@ -58,35 +51,18 @@ namespace pd::designer
 		constexpr static std::array<Direction, 4> directions
 		{{
 				// NORTH
-				{.x = std::to_underlying(DirectionValue::NONE), .y = std::to_underlying(DirectionValue::BACKWARD)},
+				{.x = 0, .y = -1},
 				// SOUTH
-				{.x = std::to_underlying(DirectionValue::NONE), .y = std::to_underlying(DirectionValue::FORWARD)},
+				{.x = 0, .y = 1},
 				// WEST
-				{.x = std::to_underlying(DirectionValue::BACKWARD), .y = std::to_underlying(DirectionValue::NONE)},
+				{.x = -1, .y = 0},
 				// EAST
-				{.x = std::to_underlying(DirectionValue::FORWARD), .y = std::to_underlying(DirectionValue::NONE)}
+				{.x = 1, .y = 0}
 		}};
 
 		[[nodiscard]] constexpr static auto direction_of(const blueprint::Direction neighbor) noexcept -> Direction
 		{
-			if (neighbor == blueprint::Direction::NORTH)
-			{
-				return directions[0];
-			}
-			if (neighbor == blueprint::Direction::SOUTH)
-			{
-				return directions[1];
-			}
-			if (neighbor == blueprint::Direction::WEST)
-			{
-				return directions[2];
-			}
-			if (neighbor == blueprint::Direction::EAST)
-			{
-				return directions[3];
-			}
-
-			return {.x = std::to_underlying(DirectionValue::NONE), .y = std::to_underlying(DirectionValue::NONE)};
+			return directions[std::to_underlying(neighbor)];
 		}
 	};
 }
