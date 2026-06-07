@@ -63,7 +63,6 @@
 #include <render/apply_render_effect.hpp>
 #include <render/build_render_queue.hpp>
 #include <render/commit_render_queue.hpp>
-#include <render/particle.hpp>
 #include <render/player_status.hpp>
 #include <render/player_target_status.hpp>
 
@@ -587,9 +586,6 @@ namespace pd::scene
 		render::build_render_queue(registry_);
 		// 提交渲染队列
 		render::commit_render_queue(registry_, window);
-
-		// 渲染粒子
-		render::particle(registry_, window);
 
 		// 物理调试绘制
 		if (g_physics_world_draw_on)

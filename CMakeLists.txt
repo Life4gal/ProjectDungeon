@@ -501,10 +501,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/commit_render_queue.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/commit_render_queue.cpp
 
-	# 粒子
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/particle.cpp
-
 	# 玩家目标状态
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/render/player_target_status.cpp

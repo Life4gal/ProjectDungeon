@@ -13,6 +13,7 @@
 #include <assembly/transform.hpp>
 #include <assembly/limited_life.hpp>
 #include <assembly/render.hpp>
+#include <assembly/render_effect.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
@@ -45,23 +46,24 @@ namespace pd::factory
 		assembly::LimitedLife::make(registry, entity, particle.lifetime);
 		// render
 		assembly::Render::make(registry, entity, particle.sprite, blueprint::RenderLayer::PARTICLE);
-		// TODO: 当前粒子并不能像普通实体那样渲染,让该实体不满足一般实体的渲染条件
-		registry.emplace<state::DisableRender>(entity);
+		// render effect
+		assembly::RenderEffect::make(registry, entity);
+		assembly::RenderEffect::Color::alpha_fade(
+			registry,
+			entity,
+			particle.start_alpha,
+			particle.end_alpha,
+			sf::milliseconds(particle.lifetime.lifetime_ms).asSeconds()
+		);
+		assembly::RenderEffect::Scale::shrink(
+			registry,
+			entity,
+			{particle.start_scale, particle.start_scale},
+			{particle.end_scale, particle.end_scale},
+			sf::milliseconds(particle.lifetime.lifetime_ms).asSeconds()
+		);
 		// owner
 		registry.emplace<particle::Owner>(entity, owner);
-		// shader
-		registry.emplace<particle::Shader>(entity, manager::Shader::load(std::filesystem::path{particle.shader}));
-		// shader params
-		registry.emplace<particle::ShaderParams>(
-			entity,
-			particle::ShaderParams
-			{
-					.start_color = sf::Color{particle.start_color},
-					.end_color = sf::Color{particle.end_color},
-					.start_scale = particle.start_scale,
-					.end_scale = particle.end_scale,
-			}
-		);
 		// tags
 		registry.emplace<tags::Particle>(entity);
 

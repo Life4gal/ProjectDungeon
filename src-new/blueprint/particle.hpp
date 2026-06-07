@@ -16,14 +16,13 @@ namespace pd::blueprint
 	public:
 		// 纹理
 		StaticSprite sprite;
-		// 着色器路径
-		std::string shader;
+
 		// 存在时间
 		LimitedLife::Time lifetime;
-
-		// TODO: 着色器参数如何配置?
-		std::uint32_t start_color;
-		std::uint32_t end_color;
+		// render_effect::color::AlphaFade
+		float start_alpha;
+		float end_alpha;
+		// render_effect::scale::Shrink
 		float start_scale;
 		float end_scale;
 	};

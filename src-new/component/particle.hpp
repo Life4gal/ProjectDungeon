@@ -12,6 +12,7 @@
 #include <component/transform.hpp>
 #include <component/limited_life.hpp>
 #include <component/render.hpp>
+#include <component/render_effect.hpp>
 #include <component/tags.hpp>
 
 #include <SFML/Graphics/Color.hpp>
@@ -21,6 +22,7 @@ namespace pd::component::particle
 	// transform --> 粒子变换
 	// limited_life --> 粒子有限生命
 	// render --> 粒子渲染
+	// render_effect --> 粒子渲染特效
 	// tags --> 粒子标签
 
 	// 粒子所有者
@@ -29,22 +31,5 @@ namespace pd::component::particle
 	{
 	public:
 		entt::entity owner;
-	};
-
-	// 着色器
-	class Shader final
-	{
-	public:
-		manager::shader_handler shader;
-	};
-
-	// 着色器参数
-	class ShaderParams final
-	{
-	public:
-		sf::Color start_color;
-		sf::Color end_color;
-		float start_scale;
-		float end_scale;
 	};
 }
