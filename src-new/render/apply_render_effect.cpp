@@ -20,7 +20,7 @@ namespace pd::render
 	{
 		namespace res = render_effect::sprite;
 
-		auto& [set] = registry.ctx().get<renderer::RenderSet>();
+		auto& [set] = registry.ctx().get<renderer::RenderItemSet>();
 
 		const auto view = registry
 				.view<
@@ -46,13 +46,11 @@ namespace pd::render
 
 			auto& item = it->second;
 
-			item.effect =
-			{
-					.offset = position.extra,
-					.scale = scale.extra,
-					.rotation = rotation.extra,
-					.color = color.color,
-			};
+			item.position += position.extra;
+			item.scale.x *= scale.extra.x;
+			item.scale.y *= scale.extra.y;
+			item.rotation += rotation.extra;
+			item.color = color.color;
 		}
 	}
 }

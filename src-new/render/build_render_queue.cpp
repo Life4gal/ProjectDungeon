@@ -21,7 +21,7 @@ namespace pd::render
 
 	namespace
 	{
-		auto append_quad(std::vector<sf::Vertex>& vertices, const renderer::RenderSet::Item& item) noexcept -> void
+		auto append_quad(std::vector<sf::Vertex>& vertices, const renderer::RenderItemSet::Item& item) noexcept -> void
 		{
 			const auto texture_width = item.uv_size.x;
 			const auto texture_height = item.uv_size.y;
@@ -31,13 +31,8 @@ namespace pd::render
 			const auto texture_right = texture_left + item.uv_size.x;
 			const auto texture_bottom = texture_top + item.uv_size.y;
 
-			const auto offset = item.effect.has_value() ? item.effect->offset : sf::Vector2f{0, 0};
-			const auto scale = item.effect.has_value() ? item.effect->scale : sf::Vector2f{1, 1};
-			const auto rotation = item.effect.has_value() ? item.effect->rotation : sf::radians(0);
-			const auto color = item.effect.has_value() ? item.effect->color : sf::Color::White;
-
-			const auto cos_rot = std::cos(rotation.asRadians());
-			const auto sin_rot = std::sin(rotation.asRadians());
+			const auto cos_rot = std::cos(item.rotation.asRadians());
+			const auto sin_rot = std::sin(item.rotation.asRadians());
 
 			// 归一化uv
 			// 除以整张纹理大小,而不是该子纹理大小
@@ -72,45 +67,44 @@ namespace pd::render
 				for (const auto [local, world]: std::views::zip(locals, ws))
 				{
 					auto p = local - item.pivot;
-					p.x *= scale.x;
-					p.y *= scale.y;
+					p.x *= item.scale.x;
+					p.y *= item.scale.y;
 
 					const auto rx = p.x * cos_rot - p.y * sin_rot;
 					const auto ry = p.x * sin_rot + p.y * cos_rot;
 
-					world = item.position + offset + sf::Vector2f{rx, ry};
+					world = item.position + sf::Vector2f{rx, ry};
 				}
 
 				return ws;
 			}();
 
 			// two triangles: v0-v1-v2, v1-v3-v2
-			vertices.push_back({.position = worlds[0], .color = color, .texCoords = coordinates[0]});
-			vertices.push_back({.position = worlds[1], .color = color, .texCoords = coordinates[1]});
-			vertices.push_back({.position = worlds[2], .color = color, .texCoords = coordinates[2]});
-			vertices.push_back({.position = worlds[1], .color = color, .texCoords = coordinates[1]});
-			vertices.push_back({.position = worlds[3], .color = color, .texCoords = coordinates[3]});
-			vertices.push_back({.position = worlds[2], .color = color, .texCoords = coordinates[2]});
+			vertices.push_back({.position = worlds[0], .color = item.color, .texCoords = coordinates[0]});
+			vertices.push_back({.position = worlds[1], .color = item.color, .texCoords = coordinates[1]});
+			vertices.push_back({.position = worlds[2], .color = item.color, .texCoords = coordinates[2]});
+			vertices.push_back({.position = worlds[1], .color = item.color, .texCoords = coordinates[1]});
+			vertices.push_back({.position = worlds[3], .color = item.color, .texCoords = coordinates[3]});
+			vertices.push_back({.position = worlds[2], .color = item.color, .texCoords = coordinates[2]});
 		}
 	}
 
 	auto build_render_queue(entt::registry& registry) noexcept -> void
 	{
 		// 渲染单元集
-		const auto& [set] = registry.ctx().get<const renderer::RenderSet>();
+		const auto& [set] = registry.ctx().get<const renderer::RenderItemSet>();
 		// 所有单元
 		const auto set_values = set | std::views::values;
 		// 复制所有单元
-		std::vector<renderer::RenderSet::Item> items{set_values.begin(), set_values.end()};
+		std::vector<renderer::RenderItemSet::Item> items{set_values.begin(), set_values.end()};
 
 		// 排序:
 		// RenderLayer
 		// texture
-		// shader
 		// Z-ORDER (transform::Position::y)
 		std::ranges::sort(
 			items,
-			[](const renderer::RenderSet::Item& lhs, const renderer::RenderSet::Item& rhs) noexcept -> bool
+			[](const renderer::RenderItemSet::Item& lhs, const renderer::RenderItemSet::Item& rhs) noexcept -> bool
 			{
 				if (lhs.render_layer != rhs.render_layer)
 				{
@@ -126,19 +120,12 @@ namespace pd::render
 					return lhs.texture.operator->() < rhs.texture.operator->();
 				}
 
-				// 不一定有着色器
-				if (lhs.shader != manager::InvalidHandler or rhs.shader != manager::InvalidHandler)
-				{
-					// 着色器排序无所谓吧?
-					return lhs.shader == manager::InvalidHandler;
-				}
-
 				return lhs.position.y < rhs.position.y;
 			}
 		);
 
 		// 清空之前的渲染队列
-		auto& [queue] = registry.ctx().get<renderer::RenderQueue>();
+		auto& [queue] = registry.ctx().get<renderer::RenderCommandQueue>();
 		queue.clear();
 
 		for (const auto& item: items)
@@ -157,11 +144,6 @@ namespace pd::render
 					return true;
 				}
 
-				if (last_batch.shader != item.shader)
-				{
-					return true;
-				}
-
 				return false;
 			}();
 
@@ -170,7 +152,6 @@ namespace pd::render
 				queue.push_back(
 					{
 							.texture = item.texture,
-							.shader = item.shader,
 							.vertices = {},
 					}
 				);

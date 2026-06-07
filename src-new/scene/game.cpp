@@ -349,8 +349,8 @@ namespace pd::scene
 		create_physics_world(registry_);
 
 		// TODO: 在合适的地方创建它们
-		registry_.ctx().emplace<component::renderer::RenderSet>();
-		registry_.ctx().emplace<component::renderer::RenderQueue>();
+		registry_.ctx().emplace<component::renderer::RenderItemSet>();
+		registry_.ctx().emplace<component::renderer::RenderCommandQueue>();
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -376,8 +376,8 @@ namespace pd::scene
 		destroy_physics_world(registry_);
 
 		// TODO: 在合适的地方销毁它们
-		registry_.ctx().erase<component::renderer::RenderSet>();
-		registry_.ctx().erase<component::renderer::RenderQueue>();
+		registry_.ctx().erase<component::renderer::RenderItemSet>();
+		registry_.ctx().erase<component::renderer::RenderCommandQueue>();
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void

@@ -22,7 +22,7 @@ namespace pd::render
 		namespace rss = component::render::static_sprite;
 
 		// 清空之前的渲染单元集
-		auto& [set] = registry.ctx().get<renderer::RenderSet>();
+		auto& [set] = registry.ctx().get<renderer::RenderItemSet>();
 		set.clear();
 
 		const auto view = registry
@@ -42,14 +42,14 @@ namespace pd::render
 			set[entity] =
 			{
 					.position = position.position,
+					.scale = sf::Vector2f{1, 1},
 					.rotation = rotation.rotation,
 					.render_layer = render_layer,
 					.texture = texture.texture,
 					.uv_position = texture_position.position,
 					.uv_size = texture_size.size,
 					.pivot = texture_pivot.pivot,
-					.effect = std::nullopt,
-					.shader = manager::InvalidHandler,
+					.color = sf::Color::White,
 			};
 		}
 	}

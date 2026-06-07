@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <optional>
 #include <unordered_map>
 
 #include <manager/resource_fwd.hpp>
@@ -24,7 +23,7 @@ namespace pd::component::renderer
 	// 渲染单元集
 	//
 	// [CTX]
-	class RenderSet final
+	class RenderItemSet final
 	{
 	public:
 		class Item final
@@ -35,6 +34,7 @@ namespace pd::component::renderer
 			// ====================
 
 			sf::Vector2f position;
+			sf::Vector2f scale;
 			sf::Angle rotation;
 
 			// ====================
@@ -46,43 +46,22 @@ namespace pd::component::renderer
 			sf::Vector2f uv_position;
 			sf::Vector2f uv_size;
 			sf::Vector2f pivot;
-
-			// ====================
-			// render effect
-			// ====================
-
-			class Effect final
-			{
-			public:
-				sf::Vector2f offset;
-				sf::Vector2f scale;
-				sf::Angle rotation;
-				sf::Color color;
-			};
-
-			std::optional<Effect> effect;
-
-			// ====================
-			// shader
-			// ====================
-
-			manager::shader_handler shader;
+			sf::Color color;
 		};
 
 		std::unordered_map<entt::entity, Item> set;
 	};
 
-	// 渲染队列
+	// 渲染命令队列
 	//
 	// [CTX]
-	class RenderQueue final
+	class RenderCommandQueue final
 	{
 	public:
 		class Batch final
 		{
 		public:
 			manager::texture_handler texture;
-			manager::shader_handler shader;
 			std::vector<sf::Vertex> vertices;
 		};
 

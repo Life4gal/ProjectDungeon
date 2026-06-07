@@ -23,11 +23,10 @@ namespace pd::render
 	{
 		// 前端BUG,移动到for里面编译器报错
 		// ReSharper disable once CppTooWideScopeInitStatement
-		const auto& [queue] = registry.ctx().get<const renderer::RenderQueue>();
-		for (const auto& [texture, shader, vertices]: queue)
+		const auto& [queue] = registry.ctx().get<const renderer::RenderCommandQueue>();
+		for (const auto& [texture, vertices]: queue)
 		{
 			g_render_states.texture = texture.operator->();
-			g_render_states.shader = shader.operator->();
 
 			window.draw(vertices.data(), vertices.size(), sf::PrimitiveType::Triangles, g_render_states);
 		}
