@@ -18,12 +18,13 @@ namespace pd::component::transform
 		sf::Vector2f position;
 	};
 
-	// 屏幕坐标
-	// 当且仅当目标实体在屏幕(相机?)区域才存在该组件
-	class ScreenPosition final
+	// 缩放
+	// 无物理体: Scale == 实体缩放
+	// 有物理体: Scale == 无效(功能暂未实现)
+	class Scale final
 	{
 	public:
-		sf::Vector2i position;
+		sf::Vector2f scale;
 	};
 
 	// 旋转

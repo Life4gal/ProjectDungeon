@@ -34,15 +34,16 @@ namespace pd::render
 					rss::UvSize,
 					rss::Pivot,
 					transform::Position,
+					transform::Scale,
 					transform::Rotation
 				>(entt::exclude<state::DisableRender>);
 
-		for (const auto [entity, render_layer, texture, texture_position, texture_size, texture_pivot, position, rotation]: view.each())
+		for (const auto [entity, render_layer, texture, texture_position, texture_size, texture_pivot, position, scale, rotation]: view.each())
 		{
 			set[entity] =
 			{
 					.position = position.position,
-					.scale = sf::Vector2f{1, 1},
+					.scale = scale.scale,
 					.rotation = rotation.rotation,
 					.render_layer = render_layer,
 					.texture = texture.texture,

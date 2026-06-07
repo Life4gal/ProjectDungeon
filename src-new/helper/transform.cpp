@@ -5,11 +5,7 @@
 
 #include <helper/transform.hpp>
 
-#include <ranges>
-
 #include <component/transform.hpp>
-
-#include <helper/camera.hpp>
 
 #include <entt/entt.hpp>
 
@@ -31,102 +27,25 @@ namespace pd::helper
 	auto Transform::set_position(entt::registry& registry, const entt::entity entity, const sf::Vector2f new_position) noexcept -> void
 	{
 		auto* position = registry.try_get<transform::Position>(entity);
-		auto* screen_position = registry.try_get<transform::ScreenPosition>(entity);
 
-		if (position == nullptr or screen_position == nullptr)
+		if (position == nullptr)
 		{
 			return;
 		}
-
-		const auto camera_position = Camera::get_position(registry);
-		const auto relative = new_position - camera_position;
 
 		position->position = new_position;
-		screen_position->position = sf::Vector2i{relative};
-	}
-
-	auto Transform::set_position(entt::registry& registry, const std::span<const entt::entity> entities, const std::span<const sf::Vector2f> new_positions) noexcept -> void
-	{
-		const auto camera_position = Camera::get_position(registry);
-
-		for (const auto [entity, new_position]: std::views::zip(entities, new_positions))
-		{
-			auto* position = registry.try_get<transform::Position>(entity);
-			auto* screen_position = registry.try_get<transform::ScreenPosition>(entity);
-
-			if (position == nullptr or screen_position == nullptr)
-			{
-				continue;
-			}
-
-			const auto relative = new_position - camera_position;
-
-			position->position = new_position;
-			screen_position->position = sf::Vector2i{relative};
-		}
-	}
-
-	auto Transform::get_screen_position(entt::registry& registry, const entt::entity entity) noexcept -> sf::Vector2i
-	{
-		const auto* screen_position = registry.try_get<const transform::ScreenPosition>(entity);
-		if (screen_position == nullptr)
-		{
-			return {0, 0};
-		}
-
-		return screen_position->position;
-	}
-
-	auto Transform::set_screen_position(entt::registry& registry, const entt::entity entity, const sf::Vector2i new_position) noexcept -> void
-	{
-		auto* position = registry.try_get<transform::Position>(entity);
-		auto* screen_position = registry.try_get<transform::ScreenPosition>(entity);
-
-		if (position == nullptr or screen_position == nullptr)
-		{
-			return;
-		}
-
-		const auto camera_position = Camera::get_position(registry);
-		const auto relative = new_position + sf::Vector2i{camera_position};
-
-		position->position = sf::Vector2f{relative};
-		screen_position->position = new_position;
-	}
-
-	auto Transform::set_screen_position(entt::registry& registry, const std::span<const entt::entity> entities, const std::span<const sf::Vector2i> new_positions) noexcept -> void
-	{
-		const auto camera_position = Camera::get_position(registry);
-
-		for (const auto [entity, new_position]: std::views::zip(entities, new_positions))
-		{
-			auto* position = registry.try_get<transform::Position>(entity);
-			auto* screen_position = registry.try_get<transform::ScreenPosition>(entity);
-
-			if (position == nullptr or screen_position == nullptr)
-			{
-				return;
-			}
-
-			const auto relative = new_position + sf::Vector2i{camera_position};
-
-			position->position = sf::Vector2f{relative};
-			screen_position->position = new_position;
-		}
 	}
 
 	auto Transform::translate(entt::registry& registry, const entt::entity entity, const sf::Vector2f distance) noexcept -> void
 	{
 		auto* position = registry.try_get<transform::Position>(entity);
-		auto* screen_position = registry.try_get<transform::ScreenPosition>(entity);
 
-		if (position == nullptr or screen_position == nullptr)
+		if (position == nullptr)
 		{
 			return;
 		}
 
 		position->position += distance;
-		screen_position->position += sf::Vector2i{distance};
 	}
 
 	auto Transform::get_rotation(entt::registry& registry, const entt::entity entity) noexcept -> sf::Angle

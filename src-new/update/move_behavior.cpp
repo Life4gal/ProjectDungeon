@@ -18,7 +18,6 @@
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
-#include <box2d/box2d.h>
 
 namespace pd::update
 {
@@ -115,7 +114,7 @@ namespace pd::update
 			{
 				const auto physics_speed = utility::Physics::to_physics(config.speed);
 
-				const auto player_position = helper::PlayerController::position(registry);
+				const auto player_position = helper::PlayerController::get_position(registry);
 				const auto direction = player_position - position.position;
 
 				if (direction == sf::Vector2f{0, 0})
@@ -173,7 +172,7 @@ namespace pd::update
 					air_timer.remaining -= delta;
 					if (air_timer.remaining <= sf::Time::Zero)
 					{
-						const auto player_position = helper::PlayerController::position(registry);
+						const auto player_position = helper::PlayerController::get_position(registry);
 						const auto direction = player_position - position.position;
 
 						if (direction == sf::Vector2f{0, 0})

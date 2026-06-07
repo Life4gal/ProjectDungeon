@@ -405,7 +405,9 @@ namespace pd::scene
 					if (helper::PlayerController::online(registry_))
 					{
 						const auto target = helper::PlayerController::target(registry_);
-						const auto target_screen_position = sf::Vector2f{helper::PlayerController::screen_position(registry_)};
+						const auto target_position = helper::PlayerController::get_position(registry_);
+						const auto camera_position = helper::Camera::get_position(registry_);
+						const auto camera_offset = target_position - camera_position;
 
 						// TODO: 我们需要一种更*自动*的方式
 						const auto camera_size = helper::Camera::get_size(registry_);
@@ -414,7 +416,7 @@ namespace pd::scene
 						const auto mouse_position_to_camera_x = static_cast<float>(mbp->position.x) * scale_x;
 						const auto mouse_position_to_camera_y = static_cast<float>(mbp->position.y) * scale_y;
 
-						const auto direction = sf::Vector2f{mouse_position_to_camera_x, mouse_position_to_camera_y} - target_screen_position;
+						const auto direction = sf::Vector2f{mouse_position_to_camera_x, mouse_position_to_camera_y} - camera_offset;
 
 						factory::Projectile::spawn(registry_, projectile_blueprint, target, direction);
 					}

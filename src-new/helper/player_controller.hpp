@@ -34,19 +34,11 @@ namespace pd::helper
 
 		// 获取控制器当前控制的实体的位置
 		// 如果控制器没有控制任何实体则返回{0,0}
-		[[nodiscard]] static auto position(entt::registry& registry) noexcept -> sf::Vector2f;
-
-		// 获取控制器当前控制的实体的屏幕(相机)位置
-		// 如果控制器没有控制任何实体则返回{0,0}
-		[[nodiscard]] static auto screen_position(entt::registry& registry) noexcept -> sf::Vector2i;
+		[[nodiscard]] static auto get_position(entt::registry& registry) noexcept -> sf::Vector2f;
 
 		// 移动控制器控制的实体到指定的位置
 		// 如果控制器没有控制任何实体则什么也不做
 		static auto move_to(entt::registry& registry, sf::Vector2f new_position) noexcept -> void;
-
-		// 移动控制器控制的实体到指定的屏幕(相机)位置
-		// 如果控制器没有控制任何实体则什么也不做
-		static auto move_to_screen(entt::registry& registry, sf::Vector2i new_position) noexcept -> void;
 
 		// 平移控制器控制的实体
 		// 如果控制器没有控制任何实体则什么也不做
