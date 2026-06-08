@@ -11,5 +11,5 @@
 
 namespace pd::update
 {
-	auto limited_life(entt::registry& registry, sf::Time delta) noexcept -> void;
+	auto scheduled_task(entt::registry& registry, sf::Time delta) noexcept -> void;
 }

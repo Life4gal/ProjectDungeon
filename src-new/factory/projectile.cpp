@@ -11,10 +11,11 @@
 #include <component/name.hpp>
 
 #include <assembly/transform.hpp>
-#include <assembly/limited_life.hpp>
 #include <assembly/render.hpp>
 #include <assembly/collision.hpp>
 #include <assembly/particle_emitter.hpp>
+
+#include <factory/scheduled_task.hpp>
 
 #include <prometheus/functional/functor.hpp>
 #include <prometheus/platform/os.hpp>
@@ -48,11 +49,11 @@ namespace pd::factory
 			direction.x,
 			direction.y
 		);
-
+		
 		// transform
 		assembly::Transform::make(registry, entity, position);
-		// limited_life
-		assembly::LimitedLife::make(registry, entity, projectile.lifetime);
+		// scheduled_task
+		ScheduledTask::spawn(registry, entity, projectile.lifetime);
 		// render
 		assembly::Render::make(registry, entity, projectile.sprite, blueprint::RenderLayer::PROJECTILE);
 		// collision

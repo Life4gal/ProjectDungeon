@@ -10,7 +10,7 @@
 #include <blueprint/def.hpp>
 
 #include <component/transform.hpp>
-#include <component/limited_life.hpp>
+#include <component/scheduled_task.hpp>
 #include <component/render.hpp>
 #include <component/render_effect.hpp>
 #include <component/tags.hpp>
@@ -20,7 +20,7 @@
 namespace pd::component::particle
 {
 	// transform --> 粒子变换
-	// limited_life --> 粒子有限生命
+	// scheduled_task --> 粒子计划任务(定时销毁)
 	// render --> 粒子渲染
 	// render_effect --> 粒子渲染特效
 	// tags --> 粒子标签

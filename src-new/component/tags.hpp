@@ -13,6 +13,24 @@ namespace pd::component
 
 	namespace tags
 	{
+		// 计划任务
+		class ScheduledTask final {};
+
+		// 粒子
+		class Particle final {};
+
+		// 飞弹
+		class Projectile final {};
+
+		// 敌人
+		class Enemy final {};
+
+		// NPC
+		class Npc final {};
+
+		// 玩家
+		class Player final {};
+
 		// 地下城-- 关卡 -- 房间 -- 门
 		class Door final {};
 
@@ -24,18 +42,6 @@ namespace pd::component
 
 		// 地下城-- 关卡 -- 房间
 		class Room final {};
-
-		// 敌人
-		class Enemy final {};
-
-		// 玩家
-		class Player final {};
-
-		// 飞弹
-		class Projectile final {};
-
-		// 粒子
-		class Particle final {};
 	}
 
 	// ======================================

@@ -7,6 +7,8 @@
 
 #include <component/particle_emitter.hpp>
 
+#include <factory/scheduled_task.hpp>
+
 #include <entt/entt.hpp>
 
 namespace pd::assembly
@@ -15,12 +17,10 @@ namespace pd::assembly
 
 	auto ParticleEmitter::make(entt::registry& registry, const entt::entity entity, const blueprint::ParticleEmitter& particle_emitter) noexcept -> void
 	{
-		// working time
-		registry.emplace<particle_emitter::TotalWorkingTime>(entity, sf::milliseconds(particle_emitter.working_time_ms));
-		registry.emplace<particle_emitter::WorkingTime>(entity, sf::Time::Zero);
-		// emission
-		registry.emplace<particle_emitter::EmissionInterval>(entity, sf::milliseconds(particle_emitter.emission_interval_ms));
-		registry.emplace<particle_emitter::EmissionCooldown>(entity, sf::Time::Zero);
+		// 定时 -> 移除发射器组件
+		factory::ScheduledTask::spawn</*particle_emitter::Cooldown, */particle_emitter::Particle>(registry, entity, particle_emitter.emitter);
+		// 定时 -> 发射粒子
+		factory::ScheduledTask::spawn<particle_emitter::Cooldown>(registry, entity, particle_emitter.emission);
 		// particle
 		registry.emplace<particle_emitter::Particle>(entity, particle_emitter.particle);
 	}

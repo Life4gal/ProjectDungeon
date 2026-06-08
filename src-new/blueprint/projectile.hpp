@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <blueprint/detail/limited_life.hpp>
+#include <blueprint/detail/scheduled_task.hpp>
 #include <blueprint/detail/render.hpp>
 #include <blueprint/detail/collision.hpp>
 
@@ -49,8 +49,8 @@ namespace pd::blueprint
 		Trajectory trajectory;
 		// 粒子发射器(拖尾效果)
 		ParticleEmitter particle_emitter;
-		// 最大飞行时间
-		LimitedLife::Time lifetime;
+		// 定时 -> 销毁
+		ScheduledTask::TimeCycle lifetime;
 
 		// 命中伤害
 		// TODO: AOE? DOT?

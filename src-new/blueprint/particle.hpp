@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <blueprint/detail/limited_life.hpp>
+#include <blueprint/detail/scheduled_task.hpp>
 #include <blueprint/detail/render.hpp>
 
 namespace pd::blueprint
@@ -17,8 +17,8 @@ namespace pd::blueprint
 		// 纹理
 		Sprite::Static sprite;
 
-		// 存在时间
-		LimitedLife::Time lifetime;
+		// 定时 -> 销毁
+		ScheduledTask::TimeCycle lifetime;
 		// render_effect::color::AlphaFade
 		float start_alpha;
 		float end_alpha;

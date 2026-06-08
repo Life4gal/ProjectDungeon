@@ -7,37 +7,11 @@
 
 #include <blueprint/particle.hpp>
 
-#include <SFML/System/Time.hpp>
-
 namespace pd::component::particle_emitter
 {
-	// 发射器工作时间
-	class TotalWorkingTime final
-	{
-	public:
-		sf::Time time;
-	};
-
-	// 发射器已工作时间
-	class WorkingTime final
-	{
-	public:
-		sf::Time time;
-	};
-
-	// 发射器发射粒子间隔
-	class EmissionInterval final
-	{
-	public:
-		sf::Time interval;
-	};
-
-	// 发射器发射粒子已经历间隔
-	class EmissionCooldown final
-	{
-	public:
-		sf::Time cooldown;
-	};
+	// 当前发射器是否处于冷却中
+	// scheduled_task --> 移除该组件 --> 可以发射 --> 发射 --> 添加该组件
+	class Cooldown {};
 
 	// 粒子蓝图
 	class Particle final

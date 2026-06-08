@@ -73,7 +73,7 @@ namespace pd::designer
 				.collision = std::move(collision),
 				.trajectory = trajectory,
 				.particle_emitter = std::move(particle_emitter),
-				.lifetime = {.lifetime_ms = 3000},
+				.lifetime = {.time_ms = 3000},
 				.damage = 10,
 		};
 	}

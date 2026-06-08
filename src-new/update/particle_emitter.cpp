@@ -17,35 +17,17 @@ namespace pd::update
 {
 	using namespace component;
 
-	auto particle_emitter(entt::registry& registry, const sf::Time delta) noexcept -> void
+	auto particle_emitter(entt::registry& registry, [[maybe_unused]] const sf::Time delta) noexcept -> void
 	{
-		const auto view = registry
-				.view<
-					const particle_emitter::TotalWorkingTime,
-					particle_emitter::WorkingTime,
-					const particle_emitter::EmissionInterval,
-					particle_emitter::EmissionCooldown,
-					const particle_emitter::Particle,
-					transform::Position
-				>();
-
-		for (const auto [entity, total_working_time, working_time, emission_interval, emission_cooldown, particle, position]: view.each())
+		// 所有不处于冷却的发射器
+		// particle_emitter::Cooldown由scheduled_task负责移除
+		for (const auto view = registry.view<const particle_emitter::Particle, const transform::Position>(entt::exclude<particle_emitter::Cooldown>);
+		     const auto [entity, particle, position]: view.each())
 		{
-			working_time.time += delta;
-
-			// 仅在工作时间小于总工作时间时才发射粒子
-			if (working_time.time < total_working_time.time)
-			{
-				emission_cooldown.cooldown -= delta;
-
-				// 仅在冷却完毕时才发射粒子
-				if (emission_cooldown.cooldown <= sf::Time::Zero)
-				{
-					factory::Particle::spawn(registry, particle.particle, entity);
-
-					emission_cooldown.cooldown += emission_interval.interval;
-				}
-			}
+			// 进入冷却
+			registry.emplace<particle_emitter::Cooldown>(entity);
+			// 生成粒子
+			factory::Particle::spawn(registry, particle.particle, entity);
 		}
 	}
 }

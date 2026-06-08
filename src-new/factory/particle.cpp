@@ -5,15 +5,14 @@
 
 #include <factory/particle.hpp>
 
-#include <manager/resource.hpp>
-
 #include <component/particle.hpp>
 #include <component/name.hpp>
 
 #include <assembly/transform.hpp>
-#include <assembly/limited_life.hpp>
 #include <assembly/render.hpp>
 #include <assembly/render_effect.hpp>
+
+#include <factory/scheduled_task.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
@@ -42,8 +41,8 @@ namespace pd::factory
 
 		// transform
 		assembly::Transform::make(registry, entity, position);
-		// limited_life
-		assembly::LimitedLife::make(registry, entity, particle.lifetime);
+		// scheduled_task
+		ScheduledTask::spawn(registry, entity, particle.lifetime);
 		// render
 		assembly::Render::make(registry, entity, particle.sprite, blueprint::RenderLayer::PARTICLE);
 		// render effect
@@ -53,14 +52,14 @@ namespace pd::factory
 			entity,
 			particle.start_alpha,
 			particle.end_alpha,
-			sf::milliseconds(particle.lifetime.lifetime_ms).asSeconds()
+			sf::milliseconds(particle.lifetime.time_ms).asSeconds()
 		);
 		assembly::RenderEffect::Scale::shrink(
 			registry,
 			entity,
 			{particle.start_scale, particle.start_scale},
 			{particle.end_scale, particle.end_scale},
-			sf::milliseconds(particle.lifetime.lifetime_ms).asSeconds()
+			sf::milliseconds(particle.lifetime.time_ms).asSeconds()
 		);
 		// owner
 		registry.emplace<particle::Owner>(entity, owner);

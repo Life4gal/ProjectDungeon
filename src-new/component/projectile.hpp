@@ -6,7 +6,7 @@
 #pragma once
 
 #include <component/transform.hpp>
-#include <component/limited_life.hpp>
+#include <component/scheduled_task.hpp>
 #include <component/render.hpp>
 #include <component/collision.hpp>
 #include <component/particle_emitter.hpp>
@@ -17,7 +17,7 @@
 namespace pd::component::projectile
 {
 	// transform --> 飞弹变换
-	// limited_life --> 飞弹有限生命
+	// scheduled_task --> 飞弹计划任务(定时销毁)
 	// render --> 飞弹渲染
 	// collision --> 飞弹碰撞体
 	// particle_emitter --> 飞弹拖尾效果

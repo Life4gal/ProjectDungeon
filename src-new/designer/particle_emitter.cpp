@@ -12,7 +12,7 @@ namespace pd::designer
 		blueprint::Particle particle
 		{
 				.sprite = {.texture = "./assets/projectile_standard.png", .uv_position = {.x = 0, .y = 24}, .uv_size = {.width = 24, .height = 24}, .pivot = {.x = 12, .y = 12}},
-				.lifetime = {.lifetime_ms = 500},
+				.lifetime = {.time_ms = 500},
 				.start_alpha = 1,
 				.end_alpha = 0,
 				.start_scale = 0.8f,
@@ -21,8 +21,8 @@ namespace pd::designer
 
 		return
 		{
-				.working_time_ms = 2050,
-				.emission_interval_ms = 200,
+				.emitter = {.time_ms = 2050},
+				.emission = {.time_ms = 200},
 				.particle = std::move(particle),
 		};
 	}

@@ -13,10 +13,10 @@ namespace pd::blueprint
 	class ParticleEmitter final
 	{
 	public:
-		// 总工作时间(毫秒)
-		int working_time_ms;
-		// 发射间隔(毫秒)
-		int emission_interval_ms;
+		// 定时 -> 移除发射器组件
+		ScheduledTask::TimeCycle emitter;
+		// 定时 -> 发射粒子
+		ScheduledTask::TimeCycle emission;
 
 		// 发射的粒子
 		Particle particle;

@@ -39,7 +39,14 @@
 
 #include <var/window.hpp>
 
+#include <component/scheduled_task_context.hpp>
 #include <component/renderer.hpp>
+
+// =========
+// 实体销毁收尾
+
+#include <undertaker/scheduled_task.hpp>
+#include <undertaker/collision.hpp>
 
 // =========
 // 更新
@@ -53,7 +60,7 @@
 #include <update/sync_physics_transform.hpp>
 #include <update/process_physics_events.hpp>
 #include <update/room_alive_check.hpp>
-#include <update/limited_life.hpp>
+#include <update/scheduled_task.hpp>
 #include <update/particle_emitter.hpp>
 #include <update/dynamic_sprite.hpp>
 #include <update/render_effect.hpp>
@@ -86,14 +93,8 @@ namespace pd::scene
 		// TODO: 暂停菜单是否需要切换音乐?
 		constexpr std::string_view GameMusic = R"(.\media\musics\game.wav)";
 
-		auto on_destroy_physics_body(entt::registry& registry, const entt::entity entity) noexcept -> void
-		{
-			const auto [body_id] = registry.get<const component::collision::BodyId>(entity);
-			b2DestroyBody(body_id);
-		}
-
 		// 创建物理世界
-		auto create_physics_world(entt::registry& registry) noexcept -> void
+		auto create_physics_world() noexcept -> void
 		{
 			auto& world_id = utility::Physics::world_id;
 
@@ -103,20 +104,14 @@ namespace pd::scene
 			// 无重力世界(俯视角)
 			def.gravity = b2Vec2_zero;
 			world_id = b2CreateWorld(&def);
-
-			// 订阅组件销毁事件,以便在组件销毁时销毁物理刚体
-			// 如此便不需要在销毁实体前手动调用deattach函数销毁物理刚体组件
-			registry.on_destroy<component::collision::BodyId>().connect<&on_destroy_physics_body>();
 		}
 
 		// 销毁物理世界
-		auto destroy_physics_world(entt::registry& registry) noexcept -> void
+		auto destroy_physics_world() noexcept -> void
 		{
 			auto& world_id = utility::Physics::world_id;
 
 			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NON_NULL(world_id), "物理世界未创建");
-
-			registry.on_destroy<component::collision::BodyId>().disconnect<&on_destroy_physics_body>();
 
 			b2DestroyWorld(world_id);
 			world_id = b2_nullWorldId;
@@ -347,9 +342,13 @@ namespace pd::scene
 		music_ = manager::Music::load(GameMusic);
 
 		// 物理世界
-		create_physics_world(registry_);
+		create_physics_world();
+
+		undertaker::ScheduledTask::watch(registry_);
+		undertaker::Collision::watch(registry_);
 
 		// TODO: 在合适的地方创建它们
+		registry_.ctx().emplace<component::scheduled_task::Context>();
 		registry_.ctx().emplace<component::renderer::RenderItemSet>();
 		registry_.ctx().emplace<component::renderer::RenderCommandQueue>();
 	}
@@ -374,9 +373,10 @@ namespace pd::scene
 		factory::Player::destroy_all(registry_);
 
 		// 最后销毁物理世界
-		destroy_physics_world(registry_);
+		destroy_physics_world();
 
 		// TODO: 在合适的地方销毁它们
+		registry_.ctx().erase<component::scheduled_task::Context>();
 		registry_.ctx().erase<component::renderer::RenderItemSet>();
 		registry_.ctx().erase<component::renderer::RenderCommandQueue>();
 	}
@@ -562,8 +562,8 @@ namespace pd::scene
 			// 如果房间内敌人全部死亡则打开门
 			update::room_alive_check(registry_, delta);
 
-			// 有限生命
-			update::limited_life(registry_, delta);
+			// 计划任务
+			update::scheduled_task(registry_, delta);
 
 			// 粒子发射器
 			update::particle_emitter(registry_, delta);
