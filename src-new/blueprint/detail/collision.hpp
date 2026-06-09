@@ -88,7 +88,7 @@ namespace pd::blueprint
 		{
 		public:
 			// 圆心
-			Position center;
+			Offset center;
 			// 半径
 			float radius;
 		};
@@ -99,9 +99,9 @@ namespace pd::blueprint
 		{
 		public:
 			// 原点1
-			Position center1;
+			Offset center1;
 			// 原点2
-			Position center2;
+			Offset center2;
 			// 半径
 			float radius;
 		};
@@ -122,7 +122,7 @@ namespace pd::blueprint
 		{
 		public:
 			// 中心点
-			Position center;
+			Offset center;
 			// 大小
 			Size size;
 			// 旋转
@@ -135,9 +135,9 @@ namespace pd::blueprint
 		{
 		public:
 			// 点1
-			Position point1;
+			Offset point1;
 			// 点2
-			Position point2;
+			Offset point2;
 		};
 
 		using shape_type = std::variant<

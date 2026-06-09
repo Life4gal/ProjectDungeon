@@ -18,11 +18,10 @@ namespace pd::component::room
 	// tags --> 房间标签
 
 	// ============================================
-	// 类型 + 邻居
+	// 类型
 	// ============================================
 
 	using blueprint::RoomType;
-	using blueprint::DirectionMask;
 
 	// ============================================
 	// 位置 + 大小
@@ -52,6 +51,16 @@ namespace pd::component::room
 	};
 
 	// ============================================
+	// 边界(墙壁)
+	// ============================================
+
+	class Bounding final
+	{
+	public:
+		entt::entity bounding;
+	};
+
+	// ============================================
 	// 门
 	// ============================================
 
@@ -61,16 +70,6 @@ namespace pd::component::room
 		// 如有有 -> valid entity
 		// 如果没有 -> null
 		std::array<entt::entity, 4> doors;
-	};
-
-	// ============================================
-	// 房间边界
-	// ============================================
-
-	class Bounding final
-	{
-	public:
-		entt::entity bounding;
 	};
 
 	// ============================================
@@ -95,4 +94,15 @@ namespace pd::component::room
 	public:
 		std::vector<entt::entity> enemies;
 	};
+
+	// ============================================
+	// NPC
+	// ============================================
+
+	// // 当前房间的NPC实体
+	// class Npc final
+	// {
+	// public:
+	// 	std::vector<entt::entity> npc;
+	// };
 }

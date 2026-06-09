@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <array>
-
 #include <blueprint/detail/layout.hpp>
 
 #include <blueprint/door.hpp>
@@ -22,8 +20,6 @@ namespace pd::blueprint
 	public:
 		// 房间类型
 		RoomType type;
-		// 房间邻居
-		DirectionMask neighbors;
 
 		// 房间位置(布局)
 		LayoutPosition layout_position;
@@ -32,21 +28,16 @@ namespace pd::blueprint
 		// 房间大小
 		Size size;
 
-		// 门
-		// 基于neighbors创建
-		std::array<Door, 4> doors;
-
-		// 房间边界(墙壁)
+		// 边界(墙壁)
 		Bounding bounding;
-
-		// 房间内所有瓦片
+		// 门
+		std::vector<Door> doors;
+		// 瓦片
 		std::vector<Tile> tiles;
 
-		// 房间内所有敌人
-		// TODO: 理论上敌人应该是独立于房间的存在?
+		// 敌人生成
 		std::vector<Enemy> enemies;
-
-		// 房间内所有NPC
+		// NPC生成
 		std::vector<Npc> npc;
 	};
 }

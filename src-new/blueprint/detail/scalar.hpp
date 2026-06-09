@@ -7,6 +7,14 @@
 
 namespace pd::blueprint
 {
+	// 偏移
+	class Offset final
+	{
+	public:
+		float x;
+		float y;
+	};
+
 	// 大小
 	class Size final
 	{

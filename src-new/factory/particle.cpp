@@ -44,7 +44,7 @@ namespace pd::factory
 		// scheduled_task
 		ScheduledTask::spawn(registry, entity, particle.lifetime);
 		// render
-		assembly::Render::make(registry, entity, particle.sprite, blueprint::RenderLayer::PARTICLE);
+		assembly::Render::make(registry, entity, particle.sprite);
 		// render effect
 		assembly::RenderEffect::make(registry, entity);
 		assembly::RenderEffect::Color::alpha_fade(

@@ -36,12 +36,12 @@ namespace pd::assembly
 		}
 	}
 
-	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite::Static& static_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
+	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite::Static& static_sprite) noexcept -> void
 	{
-		do_make(registry, entity, static_sprite, render_layer);
+		do_make(registry, entity, static_sprite, static_sprite.render_layer);
 	}
 
-	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite::Dynamic& dynamic_sprite, const blueprint::RenderLayer render_layer) noexcept -> void
+	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite::Dynamic& dynamic_sprite) noexcept -> void
 	{
 		namespace rds = render::dynamic_sprite;
 
@@ -86,7 +86,7 @@ namespace pd::assembly
 
 		// static sprite
 		const auto& begin_frame = dynamic_sprite.frames[begin_frame_index];
-		do_make(registry, entity, begin_frame, render_layer);
+		do_make(registry, entity, begin_frame, dynamic_sprite.render_layer);
 	}
 
 	auto Render::make(entt::registry& registry, const entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void
@@ -94,7 +94,7 @@ namespace pd::assembly
 		std::visit(
 			[&](const auto& s) noexcept -> void
 			{
-				make(registry, entity, s, sprite.render_layer);
+				make(registry, entity, s);
 			},
 			sprite.sprite
 		);

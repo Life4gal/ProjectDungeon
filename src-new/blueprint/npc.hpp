@@ -17,7 +17,7 @@ namespace pd::blueprint
 	class Npc final
 	{
 	public:
-		// 商人的初始位置
+		// NPC的初始位置
 		Position position;
 
 		// 渲染(必须是动态精灵吗?)

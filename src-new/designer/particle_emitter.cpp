@@ -5,25 +5,17 @@
 
 #include <designer/particle_emitter.hpp>
 
+#include <designer/particle.hpp>
+
 namespace pd::designer
 {
 	auto ParticleEmitter::projectile_trail() noexcept -> blueprint::ParticleEmitter
 	{
-		blueprint::Particle particle
-		{
-				.sprite = {.texture = "./assets/projectile_standard.png", .uv_position = {.x = 0, .y = 24}, .uv_size = {.width = 24, .height = 24}, .pivot = {.x = 12, .y = 12}},
-				.lifetime = {.time_ms = 500},
-				.start_alpha = 1,
-				.end_alpha = 0,
-				.start_scale = 0.8f,
-				.end_scale = 0.25f,
-		};
-
 		return
 		{
 				.emitter = {.time_ms = 2050},
 				.emission = {.time_ms = 200},
-				.particle = std::move(particle),
+				.particle = Particle::projectile(),
 		};
 	}
 }

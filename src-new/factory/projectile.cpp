@@ -55,7 +55,7 @@ namespace pd::factory
 		// scheduled_task
 		ScheduledTask::spawn(registry, entity, projectile.lifetime);
 		// render
-		assembly::Render::make(registry, entity, projectile.sprite, blueprint::RenderLayer::PROJECTILE);
+		assembly::Render::make(registry, entity, projectile.sprite);
 		// collision
 		assembly::Collision::make(registry, entity, projectile.collision, position);
 		// owner

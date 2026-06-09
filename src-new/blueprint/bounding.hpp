@@ -14,13 +14,11 @@ namespace pd::blueprint
 	public:
 		using segment_type = CollisionShape::Segment;
 
-		// 边界的位置
-		// 绝对位置(刚体位置)
+		// 边界的位置(房间的位置)
 		Position position;
 
-		// 线段位置
-		// 相对位置(相对于刚体的偏移)
-		// 以房间坐标为(0,0),房间大小为(90,90),房间内瓦片大小为10X10,房间邻居只有右+下为例:
+		// 线段位置(相对于边界的位置的偏移)
+		// 以房间大小为(90,90),房间内瓦片大小为10X10,房间邻居只有右+下为例:
 		// position = {0,0}
 		// bounding =
 		// {

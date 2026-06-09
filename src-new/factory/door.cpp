@@ -49,14 +49,14 @@ namespace pd::factory
 		};
 	}
 
-	auto Door::spawn(entt::registry& registry, const blueprint::Door& door, const blueprint::Direction direction) noexcept -> entt::entity
+	auto Door::spawn(entt::registry& registry, const blueprint::Door& door) noexcept -> entt::entity
 	{
 		const auto entity = registry.create();
 
 		// transform
 		assembly::Transform::make(registry, entity, door.position);
 		// render
-		assembly::Render::make(registry, entity, door.sprite, blueprint::RenderLayer::DOOR);
+		assembly::Render::make(registry, entity, door.sprite);
 		// collision
 		{
 			const auto body_id = assembly::Collision::make_body(registry, entity, BodyDef, door.position);
@@ -88,7 +88,7 @@ namespace pd::factory
 			registry.emplace<door::SensorShapeId>(entity, sensor_shape_id);
 		}
 		// direction
-		registry.emplace<door::Direction>(entity, direction);
+		registry.emplace<door::Direction>(entity, door.direction);
 		// state
 		registry.emplace<door::State>(entity, door::State::CLOSED);
 		// door::Room由factory::Room附加

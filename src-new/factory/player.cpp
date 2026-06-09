@@ -26,7 +26,7 @@ namespace pd::factory
 		// transform
 		assembly::Transform::make(registry, entity, player.position);
 		// render
-		assembly::Render::make(registry, entity, player.sprite, blueprint::RenderLayer::PLAYER);
+		assembly::Render::make(registry, entity, player.sprite);
 		// collision
 		assembly::Collision::make(registry, entity, player.collision, player.position);
 		// property

@@ -5,18 +5,10 @@
 
 #include <designer/enemy.hpp>
 
-#include <designer/room.hpp>
-
 namespace pd::designer
 {
-	auto Enemy::rat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
+	auto Enemy::rat() noexcept -> blueprint::Enemy
 	{
-		// 初始位置
-		const blueprint::Position position
-		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-		};
 		// 渲染(必须是动态精灵)
 		blueprint::Sprite::Dynamic sprite
 		{
@@ -59,6 +51,7 @@ namespace pd::designer
 						// 第四帧
 						{.texture = "./assets/rat.png", .uv_position = {.x = 808, .y = 780}, .uv_size = {.width = 140, .height = 116}, .pivot = {.x = 90, .y = 56}, .duration_ms = 350},
 				},
+				.render_layer = blueprint::RenderLayer::ENEMY,
 				.looping = true,
 				.reversed = false,
 				.pause = false,
@@ -111,7 +104,7 @@ namespace pd::designer
 						.behavior =
 						blueprint::MoveBehavior::Wander
 						{
-								.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 2.0f,
+								.speed = 60 * 2.0f,
 								.next_turn_min_time = 1.5f,
 								.next_turn_max_timer = 4.0f,
 						},
@@ -120,7 +113,7 @@ namespace pd::designer
 
 		return
 		{
-				.position = position,
+				.position = {.x = 0, .y = 0},
 				.sprite = std::move(sprite),
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::RAT,
@@ -131,14 +124,8 @@ namespace pd::designer
 		};
 	}
 
-	auto Enemy::slime(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
+	auto Enemy::slime() noexcept -> blueprint::Enemy
 	{
-		// 初始位置
-		const blueprint::Position position
-		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-		};
 		// 渲染(必须是动态精灵)
 		blueprint::Sprite::Dynamic sprite
 		{
@@ -181,6 +168,7 @@ namespace pd::designer
 						// 第四帧
 						{.texture = "./assets/slime.png", .uv_position = {.x = 796, .y = 812}, .uv_size = {.width = 64, .height = 80}, .pivot = {.x = 32, .y = 32}, .duration_ms = 200},
 				},
+				.render_layer = blueprint::RenderLayer::ENEMY,
 				.looping = true,
 				.reversed = false,
 				.pause = false,
@@ -234,7 +222,7 @@ namespace pd::designer
 						.behavior =
 						blueprint::MoveBehavior::ChaseJump
 						{
-								.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 6.5f,
+								.speed = 60 * 6.5f,
 								.duration = 0.6f,
 								.next_jump_min_time = 0.8f,
 								.next_jump_max_time = 1.6f,
@@ -244,7 +232,7 @@ namespace pd::designer
 
 		return
 		{
-				.position = position,
+				.position = {.x = 0, .y = 0},
 				.sprite = std::move(sprite),
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::SLIME,
@@ -255,14 +243,8 @@ namespace pd::designer
 		};
 	}
 
-	auto Enemy::bat(const size_type tile_x, const size_type tile_y) noexcept -> blueprint::Enemy
+	auto Enemy::bat() noexcept -> blueprint::Enemy
 	{
-		// 初始位置
-		const blueprint::Position position
-		{
-				.x = static_cast<float>(Room::tile_origin_x + tile_x * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + tile_y * Room::tile_height),
-		};
 		// 渲染(必须是动态精灵)
 		blueprint::Sprite::Dynamic sprite
 		{
@@ -305,6 +287,7 @@ namespace pd::designer
 						// 第四帧
 						{.texture = "./assets/bat.png", .uv_position = {.x = 760, .y = 780}, .uv_size = {.width = 136, .height = 110}, .pivot = {.x = 68, .y = 55}, .duration_ms = 300},
 				},
+				.render_layer = blueprint::RenderLayer::ENEMY,
 				.looping = true,
 				.reversed = false,
 				.pause = false,
@@ -359,14 +342,14 @@ namespace pd::designer
 						.behavior =
 						blueprint::MoveBehavior::Chase
 						{
-								.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 2.6667f,
+								.speed = 60 * 2.6667f,
 						},
 				},
 		};
 
 		return
 		{
-				.position = position,
+				.position = {.x = 0, .y = 0},
 				.sprite = std::move(sprite),
 				.collision = std::move(collision),
 				.type = blueprint::EnemyType::BAT,

@@ -14,7 +14,7 @@ namespace pd::factory
 	class Door final
 	{
 	public:
-		static auto spawn(entt::registry& registry, const blueprint::Door& door, blueprint::Direction direction) noexcept -> entt::entity;
+		static auto spawn(entt::registry& registry, const blueprint::Door& door) noexcept -> entt::entity;
 
 		static auto destroy_all(entt::registry& registry) noexcept -> void;
 	};

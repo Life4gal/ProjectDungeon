@@ -14,9 +14,9 @@ namespace pd::assembly
 	class Render final
 	{
 	public:
-		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Sprite::Static& static_sprite, blueprint::RenderLayer render_layer) noexcept -> void;
+		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Sprite::Static& static_sprite) noexcept -> void;
 
-		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Sprite::Dynamic& dynamic_sprite, blueprint::RenderLayer render_layer) noexcept -> void;
+		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Sprite::Dynamic& dynamic_sprite) noexcept -> void;
 
 		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void;
 

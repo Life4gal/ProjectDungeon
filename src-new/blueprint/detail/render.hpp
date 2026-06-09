@@ -29,10 +29,12 @@ namespace pd::blueprint
 			Position uv_position;
 			// 纹理大小
 			Size uv_size;
-
 			// 锚点
 			// render-position = entity-position - pivot
-			Position pivot;
+			Offset pivot;
+
+			// 渲染层
+			RenderLayer render_layer;
 		};
 
 		// 动态精灵
@@ -49,10 +51,9 @@ namespace pd::blueprint
 				Position uv_position;
 				// 纹理大小
 				Size uv_size;
-
 				// 锚点
 				// render-position = entity-position - pivot
-				Position pivot;
+				Offset pivot;
 
 				// 持续时间(毫秒)
 				int duration_ms;
@@ -60,6 +61,9 @@ namespace pd::blueprint
 
 			// 所有帧
 			std::vector<Frame> frames;
+
+			// 渲染层
+			RenderLayer render_layer;
 
 			// 是否循环播放
 			// 如果不循环则播放到最后一帧时不再从头播放
@@ -73,6 +77,5 @@ namespace pd::blueprint
 		using sprite_type = std::variant<Static, Dynamic>;
 
 		sprite_type sprite;
-		RenderLayer render_layer;
 	};
 }

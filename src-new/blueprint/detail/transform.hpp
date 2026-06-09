@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <bit>
+
 namespace pd::blueprint
 {
 	// 世界坐标
@@ -30,4 +32,23 @@ namespace pd::blueprint
 		// degree
 		float rotation;
 	};
+
+	[[nodiscard]] constexpr auto operator==(const Position& lhs, const Position& rhs) noexcept -> bool
+	{
+		return lhs.x == rhs.x and lhs.y == rhs.y;
+	}
 }
+
+template<>
+struct std::hash<pd::blueprint::Position>
+{
+	static_assert(sizeof(std::size_t) >= 8);
+
+	[[nodiscard]] static auto operator()(const pd::blueprint::Position& position) noexcept -> std::size_t
+	{
+		const auto x = std::bit_cast<std::uint32_t>(position.x);
+		const auto y = std::bit_cast<std::uint32_t>(position.y);
+
+		return static_cast<std::size_t>(x) << 32 | static_cast<std::size_t>(y);
+	}
+};

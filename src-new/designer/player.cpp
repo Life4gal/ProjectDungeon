@@ -5,18 +5,10 @@
 
 #include <designer/player.hpp>
 
-#include <designer/room.hpp>
-
 namespace pd::designer
 {
 	auto Player::test_character() noexcept -> blueprint::Player
 	{
-		// 初始位置
-		constexpr blueprint::Position position
-		{
-				.x = static_cast<float>(Room::tile_origin_x + 10 * Room::tile_width),
-				.y = static_cast<float>(Room::tile_origin_y + 5 * Room::tile_height),
-		};
 		// 渲染(必须是动态精灵)
 		blueprint::Sprite::Dynamic sprite
 		{
@@ -31,6 +23,7 @@ namespace pd::designer
 						// 第四帧
 						{.texture = "./assets/tileset/player.png", .uv_position = {.x = 192, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 250},
 				},
+				.render_layer = blueprint::RenderLayer::PLAYER,
 				.looping = true,
 				.reversed = false,
 				.pause = false,
@@ -68,21 +61,23 @@ namespace pd::designer
 						//
 				},
 		};
+		// 属性
+		constexpr blueprint::Property property
+		{
+				.health = 50,
+				.mana = 20,
+				.invincible = false,
+				.infinity_mana = false,
+		};
 
 		return
 		{
-				.position = position,
+				.position = {.x = 0, .y = 0},
 				.sprite = std::move(sprite),
 				.collision = std::move(collision),
-				.property =
-				{
-						.health = 50,
-						.mana = 20,
-						.invincible = false,
-						.infinity_mana = false,
-				},
+				.property = property,
 				.name = {.type = blueprint::NameType::PLAYER_DEFAULT},
-				.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 4.0f,
+				.speed = 60 * 4.0f,
 		};
 	}
 }

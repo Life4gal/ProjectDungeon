@@ -4,8 +4,8 @@
 // found in the top-level directory of this distribution.
 
 #include <designer/projectile.hpp>
+
 #include <designer/particle_emitter.hpp>
-#include <designer/room.hpp>
 
 namespace pd::designer
 {
@@ -19,6 +19,7 @@ namespace pd::designer
 						// 第一帧
 						{.texture = "./assets/projectile_standard.png", .uv_position = {.x = 0, .y = 0}, .uv_size = {.width = 24, .height = 24}, .pivot = {.x = 12, .y = 12}, .duration_ms = 1000},
 				},
+				.render_layer = blueprint::RenderLayer::PROJECTILE,
 				.looping = true,
 				.reversed = false,
 				.pause = false,
@@ -61,7 +62,7 @@ namespace pd::designer
 		{
 				blueprint::Trajectory::Straight
 				{
-						.speed = static_cast<float>(std::ranges::min(Room::tile_width, Room::tile_height)) * 12.0f,
+						.speed = 60 * 12.0f,
 				},
 		};
 		// 拖尾效果

@@ -5,17 +5,17 @@
 
 #pragma once
 
-#include <blueprint/enemy.hpp>
+#include <blueprint/tile.hpp>
 
 namespace pd::designer
 {
-	class Enemy final
+	class Tile final
 	{
 	public:
-		[[nodiscard]] static auto rat() noexcept -> blueprint::Enemy;
+		// 地板
+		[[nodiscard]] static auto floor() noexcept -> blueprint::Tile;
 
-		[[nodiscard]] static auto slime() noexcept -> blueprint::Enemy;
-
-		[[nodiscard]] static auto bat() noexcept -> blueprint::Enemy;
+		// 墙壁
+		[[nodiscard]] static auto wall() noexcept -> blueprint::Tile;
 	};
 }

@@ -8,7 +8,6 @@
 #include <blueprint/def_name.hpp>
 
 #include <component/room.hpp>
-#include <component/enemy.hpp>
 
 #include <factory/door.hpp>
 #include <factory/bounding.hpp>
@@ -37,13 +36,11 @@ namespace pd::factory
 		);
 
 		// ============================================
-		// 类型 + 邻居
+		// 类型
 		// ============================================
 
 		// type
 		registry.emplace<room::RoomType>(entity, room.type);
-		// neighbors
-		registry.emplace<room::DirectionMask>(entity, room.neighbors);
 
 		// ============================================
 		// 位置 + 大小
@@ -57,50 +54,7 @@ namespace pd::factory
 		registry.emplace<room::Size>(entity, sf::Vector2f{room.size.width, room.size.height});
 
 		// ============================================
-		// 门
-		// ============================================
-
-		{
-			const auto neighbors_value = std::to_underlying(room.neighbors);
-			const auto neighbors_count = std::popcount(neighbors_value);
-
-			SPDLOG_INFO("开始创建门,共有{}个邻居房间...", neighbors_count);
-
-			auto& [doors] = registry.emplace<room::Doors>(entity);
-			doors.fill(entt::null);
-
-			const auto do_create = [&](const blueprint::DirectionMask mask, const blueprint::Direction direction) noexcept -> void
-			{
-				if (neighbors_value & std::to_underlying(mask))
-				{
-					SPDLOG_INFO(
-						"正在创建位于({})的门...",
-						prometheus::meta::name_of(direction)
-					);
-
-					const auto& def = room.doors[std::to_underlying(direction)];
-					auto& door = doors[std::to_underlying(direction)];
-
-					door = Door::spawn(registry, def, direction);
-
-					// 设置门所属房间实体
-					registry.emplace<door::Room>(door, entity); // NOLINT(readability-suspicious-call-argument)
-					// 先将门的目标房间设置为当前房间
-					// 如此在factory::Level我们便可以确定遍历到的门实体属于哪个房间
-					registry.emplace<door::TargetRoom>(door, entity); // NOLINT(readability-suspicious-call-argument)
-				}
-			};
-
-			do_create(blueprint::DirectionMask::NORTH, blueprint::Direction::NORTH);
-			do_create(blueprint::DirectionMask::SOUTH, blueprint::Direction::SOUTH);
-			do_create(blueprint::DirectionMask::WEST, blueprint::Direction::WEST);
-			do_create(blueprint::DirectionMask::EAST, blueprint::Direction::EAST);
-
-			SPDLOG_INFO("门创建完成");
-		}
-
-		// ============================================
-		// 房间边界
+		// 边界(墙壁)
 		// ============================================
 
 		{
@@ -114,6 +68,36 @@ namespace pd::factory
 			registry.emplace<room::Bounding>(entity, bounding_entity);
 
 			SPDLOG_INFO("房间边界创建完成");
+		}
+
+		// ============================================
+		// 门
+		// ============================================
+
+		{
+			SPDLOG_INFO("开始创建门,共有{}个邻居房间...", room.doors.size());
+
+			auto& [doors] = registry.emplace<room::Doors>(entity);
+			doors.fill(entt::null);
+
+			for (const auto& door: room.doors)
+			{
+				SPDLOG_INFO(
+					"正在创建位于({})的门...",
+					prometheus::meta::name_of(door.direction)
+				);
+
+				auto& door_entity = doors[std::to_underlying(door.direction)];
+
+				door_entity = Door::spawn(registry, door);
+				// 设置门所属房间实体
+				registry.emplace<door::Room>(door_entity, entity); // NOLINT(readability-suspicious-call-argument)
+				// 先将门的目标房间设置为当前房间
+				// 如此在factory::Level我们便可以确定遍历到的门实体属于哪个房间
+				registry.emplace<door::TargetRoom>(door_entity, entity); // NOLINT(readability-suspicious-call-argument)
+			}
+
+			SPDLOG_INFO("门创建完成");
 		}
 
 		// ============================================
@@ -140,6 +124,7 @@ namespace pd::factory
 		// 敌人
 		// ============================================
 
+		if (not room.enemies.empty())
 		{
 			SPDLOG_INFO("开始创建敌人,共有{}个敌人...", room.enemies.size());
 
@@ -157,6 +142,19 @@ namespace pd::factory
 			}
 
 			SPDLOG_INFO("敌人创建完成");
+		}
+
+		// ============================================
+		// NPC
+		// ============================================
+
+		if (not room.npc.empty())
+		{
+			SPDLOG_INFO("开始创建NPC,共有{}个NPC...", room.npc.size());
+
+			//
+
+			SPDLOG_INFO("NPC创建完成");
 		}
 
 		// tags

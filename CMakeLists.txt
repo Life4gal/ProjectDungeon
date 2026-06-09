@@ -184,10 +184,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/layout.hpp
 	# 标量
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/scalar.hpp
+
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
-	# 计划任务
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/scheduled_task.hpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/render.hpp
 	# 碰撞体
@@ -199,23 +198,29 @@ add_executable(
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/name.hpp
 
+	# 计划任务
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/scheduled_task.hpp
+
 	# (枚举)定义
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/def_name.hpp
-	# 瓦片
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/tile.hpp
+
 	# 粒子
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/particle.hpp
 	# 粒子发射器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/particle_emitter.hpp
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/projectile.hpp
+
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/enemy.hpp
 	# NPC
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/npc.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/player.hpp
+
+	# 地下城 -- 关卡 -- 房间 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/tile.hpp
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/door.hpp
 	# 地下城 -- 关卡 -- 房间 -- 边界
@@ -230,12 +235,16 @@ add_executable(
 	# 生成蓝图
 	# ============================
 	
+	# 粒子
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle.cpp
 	# 粒子发射器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_emitter.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle_emitter.cpp
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.cpp
+
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.cpp
@@ -245,6 +254,13 @@ add_executable(
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/player.cpp
+
+	# 地下城 -- 关卡 -- 房间 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/tile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/tile.cpp
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/door.cpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/room.cpp
@@ -262,9 +278,6 @@ add_executable(
 
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
-	# 计划任务
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/scheduled_task.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/scheduled_task_context.hpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/render.hpp
 	# 渲染特效
@@ -283,25 +296,31 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/ai.hpp
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/name.hpp
+
+	# 计划任务
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/scheduled_task.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/scheduled_task_context.hpp
+
 	# 粒子
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/particle.hpp
 	# 粒子发射器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/particle_emitter.hpp
-
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/projectile.hpp
+
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/enemy.hpp
 	# NPC
 	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/npc.hpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/player.hpp
+
+	# 地下城 -- 关卡 -- 房间 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tile.hpp
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/door.hpp
 	# 地下城 -- 关卡 -- 房间 -- 房间边界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/bounding.hpp
-	# 地下城 -- 关卡 -- 房间 -- 瓦片
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tile.hpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
 	# 地下城 -- 关卡
@@ -340,6 +359,7 @@ add_executable(
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/name.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/name.cpp
+
 	# 粒子发射器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/particle_emitter.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/particle_emitter.cpp
@@ -352,27 +372,30 @@ add_executable(
 	# 计划任务
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/scheduled_task.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/scheduled_task.cpp
+
 	# 粒子
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/particle.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/particle.cpp
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/projectile.cpp
+
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/enemy.cpp
 	# 玩家
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/player.cpp
+
+	# 地下城 -- 关卡 -- 房间 -- 瓦片
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.cpp
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/door.cpp
 	# 地下城 -- 关卡 -- 房间 -- 房间边界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/bounding.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/bounding.cpp
-	# 地下城 -- 关卡 -- 房间 -- 瓦片
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/tile.cpp
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/room.cpp
@@ -417,6 +440,7 @@ add_executable(
 	# 飞弹
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.cpp
+
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.cpp
