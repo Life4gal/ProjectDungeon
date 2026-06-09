@@ -453,7 +453,10 @@ add_executable(
 	# 地下城 -- 关卡 -- 房间
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.cpp
-	
+	# 地下城 -- 关卡
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/level.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/level.cpp
+
 	# ============================
 	# SYSTEM -- UNDERTAKER
 	# 处理那些不能*自动*销毁的组件

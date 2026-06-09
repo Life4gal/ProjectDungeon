@@ -27,10 +27,16 @@ namespace pd::blueprint
 		EAST = 0b1000
 	};
 
-	// [[nodiscard]] constexpr auto operator-(const Direction direction) noexcept -> Direction
-	// {
-	// 	return static_cast<Direction>(std::to_underlying(direction) ^ 0b01);
-	// }
+	// 直接得到反向方向
+	[[nodiscard]] constexpr auto operator-(const Direction direction) noexcept -> Direction
+	{
+		return static_cast<Direction>(std::to_underlying(direction) ^ 0b01);
+	}
+
+	static_assert(-Direction::NORTH == Direction::SOUTH);
+	static_assert(-Direction::SOUTH == Direction::NORTH);
+	static_assert(-Direction::WEST == Direction::EAST);
+	static_assert(-Direction::EAST == Direction::WEST);
 
 	// 渲染层(渲染顺序)
 	enum class RenderLayer : std::uint32_t
