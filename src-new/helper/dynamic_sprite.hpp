@@ -25,8 +25,9 @@ namespace pd::helper
 		//
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		[[nodiscard]] static auto get_next_frame_index(
-			const component::render::dynamic_sprite::FramesCount& frames_count,
-			const component::render::dynamic_sprite::Index& index,
+			const component::render::dynamic_sprite::BeginFrameIndex& begin_frame,
+			const component::render::dynamic_sprite::EndFrameIndex& end_frame,
+			const component::render::dynamic_sprite::CurrentFrameIndex& index,
 			const component::render::dynamic_sprite::AnimationMode& mode,
 			const component::render::dynamic_sprite::AnimationDirection& direction
 		) noexcept -> index_type;
@@ -36,9 +37,10 @@ namespace pd::helper
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		// *不会*标记动画结束(显然如此,因为未传入registry&entity)
 		static auto set_next_frame(
-			const component::render::dynamic_sprite::FramesCount& frames_count,
-			component::render::dynamic_sprite::Timer& timer,
-			component::render::dynamic_sprite::Index& index,
+			const component::render::dynamic_sprite::BeginFrameIndex& begin_frame,
+			const component::render::dynamic_sprite::EndFrameIndex& end_frame,
+			component::render::dynamic_sprite::CurrentFrameIndex& index,
+			component::render::dynamic_sprite::CurrentFrameElapsed& elapsed,
 			const component::render::dynamic_sprite::AnimationMode& mode,
 			const component::render::dynamic_sprite::AnimationDirection& direction
 		) noexcept -> index_type;
@@ -48,8 +50,9 @@ namespace pd::helper
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		// *不会*标记动画结束(显然如此,因为未传入registry&entity)
 		static auto jump_to_next_frame(
-			const component::render::dynamic_sprite::FramesCount& frames_count,
-			component::render::dynamic_sprite::Index& index,
+			const component::render::dynamic_sprite::BeginFrameIndex& begin_frame,
+			const component::render::dynamic_sprite::EndFrameIndex& end_frame,
+			component::render::dynamic_sprite::CurrentFrameIndex& index,
 			const component::render::dynamic_sprite::AnimationMode& mode,
 			const component::render::dynamic_sprite::AnimationDirection& direction
 		) noexcept -> index_type;
@@ -59,9 +62,10 @@ namespace pd::helper
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		static auto set_frame(
 			index_type frame_index,
-			const component::render::dynamic_sprite::FramesCount& frames_count,
-			component::render::dynamic_sprite::Timer& timer,
-			component::render::dynamic_sprite::Index& index
+			const component::render::dynamic_sprite::BeginFrameIndex& begin_frame,
+			const component::render::dynamic_sprite::EndFrameIndex& end_frame,
+			component::render::dynamic_sprite::CurrentFrameIndex& index,
+			component::render::dynamic_sprite::CurrentFrameElapsed& elapsed
 		) noexcept -> index_type;
 
 		// 使实体的动画播放到第N帧
@@ -69,8 +73,9 @@ namespace pd::helper
 		// *inline*版本,配合registry.view<xxx>效率更高(不需要多次查找)
 		static auto jump_to_frame(
 			index_type frame_index,
-			const component::render::dynamic_sprite::FramesCount& frames_count,
-			component::render::dynamic_sprite::Index& index
+			const component::render::dynamic_sprite::BeginFrameIndex& begin_frame,
+			const component::render::dynamic_sprite::EndFrameIndex& end_frame,
+			component::render::dynamic_sprite::CurrentFrameIndex& index
 		) noexcept -> index_type;
 	};
 }

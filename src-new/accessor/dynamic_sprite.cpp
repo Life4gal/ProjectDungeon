@@ -19,34 +19,48 @@ namespace pd::accessor
 
 	auto DynamicSprite::get_frame_count(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<Frames>(entity_with_animation)));
 
-		const auto& [frames_count] = registry.get<const FramesCount>(entity_with_animation);
+		const auto& [frames] = registry.get<const Frames>(entity_with_animation);
 
-		return frames_count;
+		return frames.size();
+	}
+
+	auto DynamicSprite::get_present_frame_count(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
+	{
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<BeginFrameIndex, EndFrameIndex>(entity_with_animation)));
+
+		const auto& [begin_frame_index] = registry.get<const BeginFrameIndex>(entity_with_animation);
+		const auto& [end_frame_index] = registry.get<const EndFrameIndex>(entity_with_animation);
+
+		return end_frame_index - begin_frame_index;
 	}
 
 	auto DynamicSprite::get_next_frame_index(const entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount,Index,AnimationMode, AnimationDirection>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<BeginFrameIndex, EndFrameIndex, CurrentFrameIndex, AnimationMode, AnimationDirection>(entity_with_animation)));
 
-		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
-		const auto& index = registry.get<const Index>(entity_with_animation);
+		const auto& begin_frame_index = registry.get<const BeginFrameIndex>(entity_with_animation);
+		const auto& end_frame_index = registry.get<const EndFrameIndex>(entity_with_animation);
+		auto& current_frame_index = registry.get<CurrentFrameIndex>(entity_with_animation);
 		const auto& mode = registry.get<const AnimationMode>(entity_with_animation);
 		const auto& direction = registry.get<const AnimationDirection>(entity_with_animation);
 
-		return helper::DynamicSprite::get_next_frame_index(frames_count, index, mode, direction);
+		return helper::DynamicSprite::get_next_frame_index(begin_frame_index, end_frame_index, current_frame_index, mode, direction);
 	}
 
 	auto DynamicSprite::set_next_frame(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
-		auto& timer = registry.get<Timer>(entity_with_animation);
-		auto& index = registry.get<Index>(entity_with_animation);
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<BeginFrameIndex, EndFrameIndex, CurrentFrameIndex, CurrentFrameElapsed, AnimationMode, AnimationDirection>(entity_with_animation)));
+
+		const auto& begin_frame_index = registry.get<const BeginFrameIndex>(entity_with_animation);
+		const auto& end_frame_index = registry.get<const EndFrameIndex>(entity_with_animation);
+		auto& current_frame_index = registry.get<CurrentFrameIndex>(entity_with_animation);
+		auto& current_frame_elapsed = registry.get<CurrentFrameElapsed>(entity_with_animation);
 		const auto& mode = registry.get<const AnimationMode>(entity_with_animation);
 		const auto& direction = registry.get<const AnimationDirection>(entity_with_animation);
 
-		const auto next_frame_index = helper::DynamicSprite::set_next_frame(frames_count, timer, index, mode, direction);
+		const auto next_frame_index = helper::DynamicSprite::set_next_frame(begin_frame_index, end_frame_index, current_frame_index, current_frame_elapsed, mode, direction);
 
 		// 标记为已结束
 		if (next_frame_index == animation_ended)
@@ -59,12 +73,15 @@ namespace pd::accessor
 
 	auto DynamicSprite::jump_to_next_frame(entt::registry& registry, const entt::entity entity_with_animation) noexcept -> index_type
 	{
-		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
-		auto& index = registry.get<Index>(entity_with_animation);
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<BeginFrameIndex, EndFrameIndex, CurrentFrameIndex, AnimationMode, AnimationDirection>(entity_with_animation)));
+
+		const auto& begin_frame_index = registry.get<const BeginFrameIndex>(entity_with_animation);
+		const auto& end_frame_index = registry.get<const EndFrameIndex>(entity_with_animation);
+		auto& current_frame_index = registry.get<CurrentFrameIndex>(entity_with_animation);
 		const auto& mode = registry.get<const AnimationMode>(entity_with_animation);
 		const auto& direction = registry.get<const AnimationDirection>(entity_with_animation);
 
-		const auto next_frame_index = helper::DynamicSprite::jump_to_next_frame(frames_count, index, mode, direction);
+		const auto next_frame_index = helper::DynamicSprite::jump_to_next_frame(begin_frame_index, end_frame_index, current_frame_index, mode, direction);
 
 		// 标记为已结束
 		if (next_frame_index == animation_ended)
@@ -77,29 +94,31 @@ namespace pd::accessor
 
 	auto DynamicSprite::set_frame(entt::registry& registry, const entt::entity entity_with_animation, const index_type frame_index) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount, Timer, Index>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<BeginFrameIndex, EndFrameIndex, CurrentFrameIndex, CurrentFrameElapsed>(entity_with_animation)));
 
-		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
-		auto& timer = registry.get<Timer>(entity_with_animation);
-		auto& index = registry.get<Index>(entity_with_animation);
+		const auto& begin_frame_index = registry.get<const BeginFrameIndex>(entity_with_animation);
+		const auto& end_frame_index = registry.get<const EndFrameIndex>(entity_with_animation);
+		auto& current_frame_index = registry.get<CurrentFrameIndex>(entity_with_animation);
+		auto& current_frame_elapsed = registry.get<CurrentFrameElapsed>(entity_with_animation);
 
-		return helper::DynamicSprite::set_frame(frame_index, frames_count, timer, index);
+		return helper::DynamicSprite::set_frame(frame_index, begin_frame_index, end_frame_index, current_frame_index, current_frame_elapsed);
 	}
 
 	auto DynamicSprite::jump_to_frame(entt::registry& registry, const entt::entity entity_with_animation, const index_type frame_index) noexcept -> index_type
 	{
-		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<FramesCount, Index>(entity_with_animation)));
+		PROMETHEUS_PLATFORM_ASSUME((registry.all_of<BeginFrameIndex, EndFrameIndex, CurrentFrameIndex>(entity_with_animation)));
 
-		const auto& frames_count = registry.get<const FramesCount>(entity_with_animation);
-		auto& index = registry.get<Index>(entity_with_animation);
+		const auto& begin_frame_index = registry.get<const BeginFrameIndex>(entity_with_animation);
+		const auto& end_frame_index = registry.get<const EndFrameIndex>(entity_with_animation);
+		auto& current_frame_index = registry.get<CurrentFrameIndex>(entity_with_animation);
 
-		return helper::DynamicSprite::jump_to_frame(frame_index, frames_count, index);
+		return helper::DynamicSprite::jump_to_frame(frame_index, begin_frame_index, end_frame_index, current_frame_index);
 	}
 
 	auto DynamicSprite::set_mode(
 		entt::registry& registry,
 		const entt::entity entity_with_animation,
-		const blueprint::AnimationMode mode
+		const AnimationMode mode
 	) noexcept -> void
 	{
 		registry.emplace_or_replace<AnimationMode>(entity_with_animation, mode);

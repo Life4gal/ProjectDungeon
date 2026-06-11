@@ -189,6 +189,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/transform.hpp
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/render.hpp
+	# 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/animation.hpp
 	# 碰撞体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/collision.hpp
 	# 属性
@@ -197,6 +199,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/ai.hpp
 	# 名称
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/name.hpp
+	# 角色
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/character.hpp
 
 	# 计划任务
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/detail/scheduled_task.hpp
@@ -237,6 +241,10 @@ add_executable(
 	# 生成蓝图
 	# ============================
 	
+	# 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/animation.cpp
+
 	# 粒子
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/particle.cpp
@@ -247,6 +255,9 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/projectile.cpp
 
+	# 角色
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/character.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/character.cpp
 	# 敌人
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/enemy.cpp
@@ -287,6 +298,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/render.hpp
 	# 渲染特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/render_effect.hpp
+	# 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/animation.hpp
 	# 渲染器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/renderer.hpp
 	# 碰撞体
@@ -345,27 +358,37 @@ add_executable(
 	# 实体 + 蓝图 --> 组件
 	# ============================
 
+	# 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/detail/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/detail/animation.cpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/detail/property.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/detail/property.cpp
+	# 名称
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/detail/name.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/detail/name.cpp
+
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/transform.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/transform.cpp
+
 	# 渲染
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render.cpp
 	# 渲染特效
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render_effect.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/render_effect.cpp
+
 	# 碰撞体
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/collision.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/collision.cpp
-	# 属性
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/property.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/property.cpp
+
+	# 角色
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/character.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/character.cpp
 	# AI
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/ai.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/ai.cpp
-	# 名称
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/name.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/name.cpp
 
 	# 粒子发射器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/assembly/particle_emitter.hpp
@@ -524,6 +547,10 @@ add_executable(
 	# (AI)移动行为
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/move_behavior.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/move_behavior.cpp
+
+	# 动画
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/animation.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/animation.cpp
 
 	# 物理世界
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/physics_world.hpp

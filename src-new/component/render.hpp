@@ -80,26 +80,34 @@ namespace pd::component::render
 			std::vector<Frame> frames;
 		};
 
-		// 总帧数
-		class FramesCount final
-		{
-		public:
-			// Frames::frames.size()
-			std::size_t frames_count;
-		};
-
-		// 帧计时器
-		class Timer final
-		{
-		public:
-			sf::Time elapsed;
-		};
-
-		// 帧索引
-		class Index final
+		// 起始帧索引
+		// 一般为0,不过可以修改该值来控制渲染的帧
+		class BeginFrameIndex final
 		{
 		public:
 			std::size_t index;
+		};
+
+		// 结束帧索引
+		// 一般为Frames::frames.size(),不过可以修改该值来控制渲染的帧
+		class EndFrameIndex final
+		{
+		public:
+			std::size_t index;
+		};
+
+		// 当前渲染的帧
+		class CurrentFrameIndex final
+		{
+		public:
+			std::size_t index;
+		};
+
+		// 当前渲染的帧已持续时间
+		class CurrentFrameElapsed final
+		{
+		public:
+			sf::Time elapsed;
 		};
 
 		// 当前动画播放模式

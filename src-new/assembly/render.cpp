@@ -68,12 +68,14 @@ namespace pd::assembly
 				frames.push_back(std::move(frame));
 			}
 		}
-		// frames_count
-		registry.emplace<rds::FramesCount>(entity, dynamic_sprite.frames.size());
-		// timer
-		registry.emplace<rds::Timer>(entity, sf::Time::Zero);
-		// index
-		registry.emplace<rds::Index>(entity, begin_frame_index);
+		// begin frame index
+		registry.emplace<rds::BeginFrameIndex>(entity, begin_frame_index);
+		// end frame index
+		registry.emplace<rds::EndFrameIndex>(entity, dynamic_sprite.frames.size() - 1);
+		// current frame index
+		registry.emplace<rds::CurrentFrameIndex>(entity, begin_frame_index);
+		// current frame elapsed
+		registry.emplace<rds::CurrentFrameElapsed>(entity, sf::Time::Zero);
 		// mode
 		registry.emplace<rds::AnimationMode>(entity, dynamic_sprite.mode);
 		// direction

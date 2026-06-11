@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <assembly/name.hpp>
+#include <assembly/detail/name.hpp>
 
 #include <manager/i18n.hpp>
 

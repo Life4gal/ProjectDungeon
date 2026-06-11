@@ -7,17 +7,13 @@
 
 #include <blueprint/detail/character.hpp>
 
-namespace pd::blueprint
+#include <entt/entity/fwd.hpp>
+
+namespace pd::assembly
 {
-	// 玩家
-	class Player final
+	class Character final
 	{
 	public:
-		// 玩家角色
-		Character character;
-
-		// 移动速度
-		// FIXME(OPT): 将它移动到合适的地方
-		float speed;
+		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Character& character) noexcept -> void;
 	};
 }

@@ -24,9 +24,10 @@ namespace pd::update
 		const auto view = registry
 				.view<
 					const rds::Frames,
-					const rds::FramesCount,
-					rds::Timer,
-					rds::Index,
+					const rds::BeginFrameIndex,
+					const rds::EndFrameIndex,
+					rds::CurrentFrameIndex,
+					rds::CurrentFrameElapsed,
 					const rds::AnimationMode,
 					const rds::AnimationDirection>(
 					entt::exclude<
@@ -37,22 +38,22 @@ namespace pd::update
 					>
 				);
 
-		for (const auto [entity, frames, frames_count, timer, index, mode, direction]: view.each())
+		for (const auto [entity, frames, begin_frame_index, end_frame_index, current_frame_index, current_frame_elapsed, mode, direction]: view.each())
 		{
-			const auto& this_frame = frames.frames[index.index];
+			const auto& this_frame = frames.frames[current_frame_index.index];
 
-			timer.elapsed += delta;
+			current_frame_elapsed.elapsed += delta;
 			// 如果此帧未结束,无需更新
-			if (timer.elapsed < this_frame.duration)
+			if (current_frame_elapsed.elapsed < this_frame.duration)
 			{
 				continue;
 			}
 
 			// 帧计时并不重置为0,而是减去当前帧的持续时间
-			timer.elapsed -= this_frame.duration;
+			current_frame_elapsed.elapsed -= this_frame.duration;
 
 			// 跳转到下一帧
-			if (const auto next_frame_index = helper::DynamicSprite::jump_to_next_frame(frames_count, index, mode, direction);
+			if (const auto next_frame_index = helper::DynamicSprite::jump_to_next_frame(begin_frame_index, end_frame_index, current_frame_index, mode, direction);
 				next_frame_index == accessor::DynamicSprite::animation_ended)
 			{
 				// 如果动画已结束则标记为已结束
@@ -61,7 +62,7 @@ namespace pd::update
 			else
 			{
 				// 切换sprite
-				const auto& [texture, position, size, pivot, duration] = frames.frames[next_frame_index];
+				const auto& [texture, position, size, pivot, duration] = frames.frames[current_frame_index.index];
 
 				// 如果动画每帧间隔较长,而FPS较高时,每次都遍历Texture&Position&Size&Pivot会比较浪费性能
 				// 在动画帧切换时才获取&更新这些组件

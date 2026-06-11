@@ -372,9 +372,9 @@ namespace pd::designer
 		{
 			enemies.reserve(3);
 
-			enemies.emplace_back(Enemy::rat()).position = center_position_of(2, 2);
-			enemies.emplace_back(Enemy::slime()).position = center_position_of(3, 3);
-			enemies.emplace_back(Enemy::bat()).position = center_position_of(4, 4);
+			enemies.emplace_back(Enemy::rat()).character.position = center_position_of(2, 2);
+			enemies.emplace_back(Enemy::slime()).character.position = center_position_of(3, 3);
+			enemies.emplace_back(Enemy::bat()).character.position = center_position_of(4, 4);
 		}
 
 		// ===========================
@@ -404,9 +404,23 @@ namespace pd::designer
 		// 瓦片
 		std::ranges::for_each(tiles, center_offset_to_world, &blueprint::Tile::position);
 		// 敌人
-		std::ranges::for_each(enemies, center_offset_to_world, &blueprint::Enemy::position);
+		std::ranges::for_each(
+			enemies,
+			center_offset_to_world,
+			[](blueprint::Enemy& enemy) noexcept -> blueprint::Position&
+			{
+				return enemy.character.position;
+			}
+		);
 		// npc
-		std::ranges::for_each(npc, center_offset_to_world, &blueprint::Npc::position);
+		std::ranges::for_each(
+			npc,
+			center_offset_to_world,
+			[](blueprint::Npc& n) noexcept -> blueprint::Position&
+			{
+				return n.character.position;
+			}
+		);
 
 		return
 		{

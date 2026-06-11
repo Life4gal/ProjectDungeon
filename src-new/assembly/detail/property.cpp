@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <assembly/property.hpp>
+#include <assembly/detail/property.hpp>
 
 #include <component/property.hpp>
 #include <component/damage_statistics.hpp>

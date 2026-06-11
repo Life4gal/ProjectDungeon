@@ -7,13 +7,10 @@
 
 #include <component/player.hpp>
 
-#include <assembly/transform.hpp>
-#include <assembly/render.hpp>
-#include <assembly/collision.hpp>
-#include <assembly/property.hpp>
-#include <assembly/name.hpp>
+#include <assembly/character.hpp>
 
 #include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
 
 namespace pd::factory
 {
@@ -23,16 +20,8 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
-		// transform
-		assembly::Transform::make(registry, entity, player.position);
-		// render
-		assembly::Render::make(registry, entity, player.sprite);
-		// collision
-		assembly::Collision::make(registry, entity, player.collision, player.position);
-		// property
-		assembly::Property::make(registry, entity, player.property);
-		// name
-		assembly::Name::make(registry, entity, player.name);
+		// character
+		assembly::Character::make(registry, entity, player.character);
 		// speed
 		registry.emplace<player::Speed>(entity, player.speed);
 		// tags
@@ -46,7 +35,11 @@ namespace pd::factory
 
 	auto Player::destroy_all(entt::registry& registry) noexcept -> void
 	{
+		SPDLOG_INFO("正在销毁所有玩家...");
+
 		const auto view = registry.view<tags::Player>();
 		registry.destroy(view.begin(), view.end());
+
+		SPDLOG_INFO("已销毁{}个玩家", view.size());
 	}
 }

@@ -20,13 +20,22 @@ namespace pd::accessor
 		constexpr static index_type animation_ended = 0xffffffff;
 
 		// ===========================================================================
-		// FRAME
+		// FRAMES
 		// ===========================================================================
 
 		// 获取实体的动画的总帧数
 		//
 		// 假定实体存在动画组件
 		[[nodiscard]] static auto get_frame_count(const entt::registry& registry, entt::entity entity_with_animation) noexcept -> index_type;
+
+		// 获取实体的(当前动画)使用帧数
+		//
+		// 假定实体存在动画组件
+		[[nodiscard]] static auto get_present_frame_count(const entt::registry& registry, entt::entity entity_with_animation) noexcept -> index_type;
+
+		// ===========================================================================
+		// FRAME INDEX
+		// ===========================================================================
 
 		// 获取实体的动画的下一帧动画索引
 		//

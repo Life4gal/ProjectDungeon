@@ -46,6 +46,7 @@
 #include <update/new_entity_tag.hpp>
 #include <update/player_controller.hpp>
 #include <update/move_behavior.hpp>
+#include <update/animation.hpp>
 #include <update/physics_world.hpp>
 #include <update/sync_physics_transform.hpp>
 #include <update/process_physics_events.hpp>
@@ -486,6 +487,10 @@ namespace pd::scene
 			// (AI)移动行为
 			update::move_behavior(registry_, delta);
 
+			// 动画
+			update::animation(registry_, delta);
+
+			// 物理世界
 			update::physics_world(registry_, delta);
 			// b2World_GetBodyEvents -> b2BodyMoveEvent 的数据是该次b2World_Step的*旧*数据
 			// 如果我们在 b2World_GetContactEvents/b2World_GetSensorEvents 可能直接修改物理体的 b2Transform 数据

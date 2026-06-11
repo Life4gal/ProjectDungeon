@@ -7,12 +7,8 @@
 
 #include <component/enemy.hpp>
 
-#include <assembly/transform.hpp>
-#include <assembly/render.hpp>
-#include <assembly/collision.hpp>
-#include <assembly/property.hpp>
+#include <assembly/character.hpp>
 #include <assembly/ai.hpp>
-#include <assembly/name.hpp>
 
 #include <spdlog/spdlog.h>
 #include <entt/entt.hpp>
@@ -25,18 +21,10 @@ namespace pd::factory
 	{
 		const auto entity = registry.create();
 
-		// transform
-		assembly::Transform::make(registry, entity, enemy.position);
-		// render
-		assembly::Render::make(registry, entity, enemy.sprite);
-		// collision
-		assembly::Collision::make(registry, entity, enemy.collision, enemy.position);
-		// property
-		assembly::Property::make(registry, entity, enemy.property);
+		// character
+		assembly::Character::make(registry, entity, enemy.character);
 		// ai
 		assembly::Ai::make(registry, entity, enemy.ai);
-		// name
-		assembly::Name::make(registry, entity, enemy.name);
 		// contact_damage
 		registry.emplace<enemy::ContactDamage>(entity, enemy.contact_damage);
 		// type

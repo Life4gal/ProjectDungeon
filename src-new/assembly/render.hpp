@@ -19,9 +19,5 @@ namespace pd::assembly
 		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Sprite::Dynamic& dynamic_sprite) noexcept -> void;
 
 		static auto make(entt::registry& registry, entt::entity entity, const blueprint::Sprite& sprite) noexcept -> void;
-
-		// ========================================================================
-
-		// 其他渲染方式?
 	};
 }
