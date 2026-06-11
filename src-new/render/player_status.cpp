@@ -10,7 +10,7 @@
 #include <component/name.hpp>
 #include <component/property.hpp>
 
-#include <helper/player_controller.hpp>
+#include <accessor/player_controller.hpp>
 
 #include <entt/entt.hpp>
 #include <SFML/Graphics.hpp>
@@ -42,12 +42,12 @@ namespace pd::render
 
 	auto player_status(entt::registry& registry, sf::RenderWindow& window) noexcept -> void
 	{
-		if (not helper::PlayerController::online(registry))
+		if (not accessor::PlayerController::online(registry))
 		{
 			return;
 		}
 
-		const auto target = helper::PlayerController::target(registry);
+		const auto target = accessor::PlayerController::target(registry);
 		if (not registry.valid(target))
 		{
 			return;

@@ -17,9 +17,10 @@
 #include <component/level.hpp>
 #include <component/room.hpp>
 
+#include <accessor/camera.hpp>
+#include <accessor/player_controller.hpp>
+
 #include <helper/door.hpp>
-#include <helper/camera.hpp>
-#include <helper/player_controller.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
@@ -194,8 +195,8 @@ namespace pd::helper
 			const auto start_position = position + size / 2.0f;
 
 			// TODO: 可视(相机)区域大小?
-			Camera::initialize(registry, {position, size});
-			PlayerController::move_to(registry, start_position);
+			accessor::Camera::initialize(registry, {position, size});
+			accessor::PlayerController::move_to(registry, start_position);
 		}
 
 		// 上下文
@@ -267,29 +268,29 @@ namespace pd::helper
 		{
 			case door::Direction::NORTH:
 			{
-				Camera::translate(registry, {0, -CameraOffsetY});
-				PlayerController::translate(registry, {0, -PlayerOffsetY});
+				accessor::Camera::translate(registry, {0, -CameraOffsetY});
+				accessor::PlayerController::translate(registry, {0, -PlayerOffsetY});
 
 				break;
 			}
 			case door::Direction::SOUTH:
 			{
-				Camera::translate(registry, {0, CameraOffsetY});
-				PlayerController::translate(registry, {0, PlayerOffsetY});
+				accessor::Camera::translate(registry, {0, CameraOffsetY});
+				accessor::PlayerController::translate(registry, {0, PlayerOffsetY});
 
 				break;
 			}
 			case door::Direction::WEST:
 			{
-				Camera::translate(registry, {-CameraOffsetX, 0});
-				PlayerController::translate(registry, {-PlayerOffsetX, 0});
+				accessor::Camera::translate(registry, {-CameraOffsetX, 0});
+				accessor::PlayerController::translate(registry, {-PlayerOffsetX, 0});
 
 				break;
 			}
 			case door::Direction::EAST:
 			{
-				Camera::translate(registry, {CameraOffsetX, 0});
-				PlayerController::translate(registry, {PlayerOffsetX, 0});
+				accessor::Camera::translate(registry, {CameraOffsetX, 0});
+				accessor::PlayerController::translate(registry, {PlayerOffsetX, 0});
 
 				break;
 			}

@@ -9,7 +9,7 @@
 #include <component/tags.hpp>
 #include <component/transform.hpp>
 
-#include <helper/camera.hpp>
+#include <accessor/camera.hpp>
 
 #include <entt/entt.hpp>
 
@@ -26,7 +26,7 @@ namespace pd::update
 		}
 		registry.ctx().erase<level::RoomChanged>();
 
-		const auto camera_area = helper::Camera::get_area(registry);
+		const auto camera_area = accessor::Camera::get_area(registry);
 
 		for (const auto view = registry.view<transform::Position>();
 		     const auto [entity, position]: view.each())

@@ -7,6 +7,7 @@
 
 #include <component/render.hpp>
 
+#include <accessor/dynamic_sprite.hpp>
 #include <helper/dynamic_sprite.hpp>
 
 #include <entt/entt.hpp>
@@ -26,8 +27,8 @@ namespace pd::update
 					const rds::FramesCount,
 					rds::Timer,
 					rds::Index,
-					const rds::Mode,
-					const rds::Direction>(
+					const rds::AnimationMode,
+					const rds::AnimationDirection>(
 					entt::exclude<
 						// 如果动画暂停则无需更新动画
 						rds::Paused,
@@ -50,14 +51,12 @@ namespace pd::update
 			// 帧计时并不重置为0,而是减去当前帧的持续时间
 			timer.elapsed -= this_frame.duration;
 
-			using helper::DynamicSprite;
-
 			// 跳转到下一帧
-			if (const auto next_frame_index = DynamicSprite::jump_to_next_frame(frames_count, index, mode, direction);
-				next_frame_index == DynamicSprite::animation_ended)
+			if (const auto next_frame_index = helper::DynamicSprite::jump_to_next_frame(frames_count, index, mode, direction);
+				next_frame_index == accessor::DynamicSprite::animation_ended)
 			{
 				// 如果动画已结束则标记为已结束
-				DynamicSprite::end(registry, entity);
+				accessor::DynamicSprite::end(registry, entity);
 			}
 			else
 			{

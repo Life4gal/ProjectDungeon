@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <helper/camera.hpp>
+#include <accessor/camera.hpp>
 
 #include <manager/event.hpp>
 
@@ -14,7 +14,7 @@
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 
-namespace pd::helper
+namespace pd::accessor
 {
 	using namespace component;
 

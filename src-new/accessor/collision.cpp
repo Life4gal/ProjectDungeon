@@ -3,20 +3,16 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <helper/collision.hpp>
-
-#include <ranges>
+#include <accessor/collision.hpp>
 
 #include <utility/physics.hpp>
 
 #include <component/collision.hpp>
 
-#include <helper/camera.hpp>
-
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 
-namespace pd::helper
+namespace pd::accessor
 {
 	using namespace component;
 
@@ -81,69 +77,6 @@ namespace pd::helper
 		const auto new_physics_position = utility::Physics::to_physics(new_position);
 
 		set_position(registry, entity, new_physics_position);
-	}
-
-	auto Collision::get_screen_position(entt::registry& registry, const entt::entity entity) noexcept -> sf::Vector2i
-	{
-		const auto pixel_position = get_pixel_position(registry, entity);
-		// get_pixel_position返回{0,0}其实有两种可能:
-		//  1.不存在物理刚体组件
-		//  2.实体的确位于{0,0}
-		// 此时返回{0,0}理论上无论如何都不算错?
-		if (pixel_position == sf::Vector2f{0, 0})
-		{
-			return {0, 0};
-		}
-
-		const auto camera_position = Camera::get_position(registry);
-		const auto relative = pixel_position - camera_position;
-
-		return sf::Vector2i{relative};
-	}
-
-	auto Collision::get_screen_position(entt::registry& registry, const std::span<const entt::entity> entities) noexcept -> std::vector<sf::Vector2i>
-	{
-		const auto camera_position = Camera::get_position(registry);
-
-		std::vector<sf::Vector2i> screen_positions{};
-		screen_positions.resize(entities.size());
-
-		for (auto [entity, screen_position]: std::views::zip(entities, screen_positions))
-		{
-			const auto pixel_position = get_pixel_position(registry, entity);
-			// @see get_screen_position
-			if (pixel_position == sf::Vector2f{0, 0})
-			{
-				screen_position = {0, 0};
-				continue;
-			}
-
-			const auto relative = pixel_position - camera_position;
-
-			screen_position = sf::Vector2i{relative};
-		}
-
-		return screen_positions;
-	}
-
-	auto Collision::set_screen_position(entt::registry& registry, const entt::entity entity, const sf::Vector2i new_position) noexcept -> void
-	{
-		const auto camera_position = Camera::get_position(registry);
-		const auto pixel_position = sf::Vector2i{camera_position} + new_position;
-
-		set_pixel_position(registry, entity, sf::Vector2f{pixel_position});
-	}
-
-	auto Collision::set_screen_position(entt::registry& registry, const std::span<const entt::entity> entities, const std::span<const sf::Vector2i> new_positions) noexcept -> void
-	{
-		const auto camera_position = Camera::get_position(registry);
-
-		for (const auto [entity, new_position]: std::views::zip(entities, new_positions))
-		{
-			const auto pixel_position = sf::Vector2i{camera_position} + new_position;
-
-			set_pixel_position(registry, entity, sf::Vector2f{pixel_position});
-		}
 	}
 
 	auto Collision::translate(entt::registry& registry, const entt::entity entity, const b2Vec2 distance) noexcept -> void

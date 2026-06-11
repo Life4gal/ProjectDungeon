@@ -5,23 +5,20 @@
 
 #pragma once
 
-#include <span>
-#include <vector>
-
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
 #include <SFML/System/Vector2.hpp>
 
 #include <box2d/id.h>
 #include <box2d/math_functions.h>
 
-namespace pd::helper
+namespace pd::accessor
 {
 	class Collision final
 	{
 	public:
-// ================================================
-		// GETTER & SETTER
+		// ================================================
+		// ABILITY
 		// ================================================
 
 		// 禁用一个实体的物理刚体,如果目标实体没有物理刚体组件则什么也不做
@@ -47,22 +44,6 @@ namespace pd::helper
 
 		// 设置一个实体的物理刚体的位置(像素),如果目标实体没有物理刚体组件则什么也不做
 		static auto set_pixel_position(entt::registry& registry, entt::entity entity, sf::Vector2f new_position) noexcept -> void;
-
-		// 获取一个实体的物理刚体的位置(像素,基于屏幕(相机)位置),如果目标实体没有物理刚体组件则返回{0,0}
-		// 使用Transform::get_screen_position更高效,因为它不需要调用b2Body_GetPosition,也不需要获取屏幕(相机)位置
-		[[nodiscard]] static auto get_screen_position(entt::registry& registry, entt::entity entity) noexcept -> sf::Vector2i;
-
-		// 获取多个实体的物理刚体的位置(像素,基于屏幕(相机)位置),如果目标实体没有物理刚体组件则返回{0,0}
-		// 使用Transform::get_screen_position更高效,因为它不需要调用b2Body_GetPosition,也不需要获取屏幕(相机)位置
-		// 相比于对每个实体调用一次get_screen_position,此接口效率要更高,因为无需多次访问registry来获取屏幕(相机)位置
-		[[nodiscard]] static auto get_screen_position(entt::registry& registry, std::span<const entt::entity> entities) noexcept -> std::vector<sf::Vector2i>;
-
-		// 设置一个实体的物理刚体的位置(像素,基于屏幕(相机)位置),如果目标实体没有物理刚体组件则什么也不做
-		static auto set_screen_position(entt::registry& registry, entt::entity entity, sf::Vector2i new_position) noexcept -> void;
-
-		// 设置多个实体的物理刚体的位置(像素,基于屏幕(相机)位置),如果目标实体没有物理刚体组件则什么也不做
-		// 相比于对每个实体调用一次set_screen_position,此接口效率要更高,因为无需多次访问registry来获取屏幕(相机)位置
-		static auto set_screen_position(entt::registry& registry, std::span<const entt::entity> entities, std::span<const sf::Vector2i> new_positions) noexcept -> void;
 
 		// 平移一个实体的物理刚体的位置,如果目标实体没有物理刚体组件则什么也不做
 		static auto translate(entt::registry& registry, entt::entity entity, b2Vec2 distance) noexcept -> void;
@@ -106,12 +87,14 @@ namespace pd::helper
 		[[nodiscard]] static auto get_linear_velocity(entt::registry& registry, entt::entity entity) noexcept -> b2Vec2;
 
 		// 获取一个物理刚体的线性速度
+		// FIXME: 该接口不应该在这里
 		[[nodiscard]] static auto get_linear_velocity(b2BodyId body_id) noexcept -> b2Vec2;
 
 		// 设置一个实体的物理刚体的线性速度,如果目标实体没有物理刚体组件则什么也不做
 		static auto set_linear_velocity(entt::registry& registry, entt::entity entity, b2Vec2 new_velocity) noexcept -> void;
 
 		// 设置一个物理刚体的线性速度
+		// FIXME: 该接口不应该在这里
 		static auto set_linear_velocity(b2BodyId body_id, b2Vec2 new_velocity) noexcept -> void;
 	};
 }

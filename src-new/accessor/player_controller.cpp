@@ -1,0 +1,107 @@
+// This file is part of ProjectDungeon
+// Copyright (C) 2026 Life4gal <life4gal@gmail.com>
+// This file is subject to the license terms in the LICENSE file
+// found in the top-level directory of this distribution.
+
+#include <accessor/player_controller.hpp>
+
+#include <component/player_controller.hpp>
+
+#include <accessor/transform.hpp>
+#include <accessor/collision.hpp>
+
+#include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
+
+namespace pd::accessor
+{
+	using namespace component;
+
+	auto PlayerController::online(entt::registry& registry) noexcept -> bool
+	{
+		return registry.ctx().find<player_controller::Target>() != nullptr;
+	}
+
+	auto PlayerController::target(entt::registry& registry) noexcept -> entt::entity
+	{
+		const auto* target = registry.ctx().find<const player_controller::Target>();
+
+		if (target == nullptr)
+		{
+			return entt::null;
+		}
+
+		return target->entity;
+	}
+
+	auto PlayerController::set_target(entt::registry& registry, const entt::entity new_target) noexcept -> void
+	{
+		registry.ctx().insert_or_assign(player_controller::Target{.entity = new_target});
+	}
+
+	auto PlayerController::get_position(entt::registry& registry) noexcept -> sf::Vector2f
+	{
+		const auto e = target(registry);
+		if (e == entt::null)
+		{
+			return {0, 0};
+		}
+
+		return Transform::get_position(registry, e);
+	}
+
+	auto PlayerController::move_to(entt::registry& registry, const sf::Vector2f new_position) noexcept -> void
+	{
+		const auto e = target(registry);
+		if (e == entt::null)
+		{
+			return;
+		}
+
+		const auto old_position = Transform::get_position(registry, e);
+		SPDLOG_INFO(
+			"玩家位置移动: [X]={} -> {}({}), [Y]={} -> {}({})",
+			old_position.x,
+			new_position.x,
+			new_position.x - old_position.x,
+			old_position.y,
+			new_position.y,
+			new_position.y - old_position.y
+		);
+
+		// Collision::set_pixel_position 仅更新物理体的位置
+		// 在下一帧的sync_physics_transform中才会同步Transform的位置
+		// 但是我们会在该帧的render::camera中计算视野内的实体,如果Transform的位置没有被同步,则可能导致玩家控制的实体在该帧内不在视野内
+		// 我们必须手动同步Transform的位置,以保证玩家控制的实体在该帧内仍然在视野内
+		Collision::set_pixel_position(registry, e, new_position);
+		Transform::set_position(registry, e, new_position);
+	}
+
+	auto PlayerController::translate(entt::registry& registry, const sf::Vector2f distance) noexcept -> void
+	{
+		const auto e = target(registry);
+		if (e == entt::null)
+		{
+			return;
+		}
+
+		const auto old_position = Transform::get_position(registry, e);
+		const auto new_position = old_position + distance;
+		SPDLOG_INFO(
+			"玩家位置移动: [X]={} -> {}({}), [Y]={} -> {}({})",
+			old_position.x,
+			new_position.x,
+			distance.x,
+			old_position.y,
+			new_position.y,
+			distance.y
+		);
+
+		// Collision::set_pixel_position 仅更新物理体的位置
+		// 在下一帧的sync_physics_transform中才会同步Transform的位置
+		// 但是我们会在该帧的render::camera中计算视野内的实体,如果Transform的位置没有被同步,则可能导致玩家控制的实体在该帧内不在视野内
+		// 我们必须手动同步Transform的位置,以保证玩家控制的实体在该帧内仍然在视野内
+		Collision::set_pixel_position(registry, e, new_position);
+		Transform::set_position(registry, e, new_position);
+	}
+}

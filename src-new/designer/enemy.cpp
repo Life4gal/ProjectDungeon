@@ -52,8 +52,8 @@ namespace pd::designer
 						{.texture = "./assets/rat.png", .uv_position = {.x = 808, .y = 780}, .uv_size = {.width = 140, .height = 116}, .pivot = {.x = 90, .y = 56}, .duration_ms = 350},
 				},
 				.render_layer = blueprint::RenderLayer::ENEMY,
-				.looping = true,
-				.reversed = false,
+				.mode = blueprint::AnimationMode::LOOP,
+				.direction = blueprint::AnimationDirection::FORWARD,
 				.pause = false,
 		};
 		// 碰撞体
@@ -169,8 +169,8 @@ namespace pd::designer
 						{.texture = "./assets/slime.png", .uv_position = {.x = 796, .y = 812}, .uv_size = {.width = 64, .height = 80}, .pivot = {.x = 32, .y = 32}, .duration_ms = 200},
 				},
 				.render_layer = blueprint::RenderLayer::ENEMY,
-				.looping = true,
-				.reversed = false,
+				.mode = blueprint::AnimationMode::LOOP,
+				.direction = blueprint::AnimationDirection::FORWARD,
 				.pause = false,
 		};
 		// 碰撞体
@@ -288,8 +288,8 @@ namespace pd::designer
 						{.texture = "./assets/bat.png", .uv_position = {.x = 760, .y = 780}, .uv_size = {.width = 136, .height = 110}, .pivot = {.x = 68, .y = 55}, .duration_ms = 300},
 				},
 				.render_layer = blueprint::RenderLayer::ENEMY,
-				.looping = true,
-				.reversed = false,
+				.mode = blueprint::AnimationMode::LOOP,
+				.direction = blueprint::AnimationDirection::FORWARD,
 				.pause = false,
 		};
 		// 碰撞体

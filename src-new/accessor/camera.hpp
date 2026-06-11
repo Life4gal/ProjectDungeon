@@ -5,28 +5,18 @@
 
 #pragma once
 
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-namespace pd::helper
+namespace pd::accessor
 {
 	class Camera final
 	{
 	public:
 		// ================================================
-		// UPDATE
-		// ================================================
-
-		// 相机是否有变动(需要重新计算相机区域内实体)
-		[[nodiscard]] static auto dirty(entt::registry& registry) noexcept -> bool;
-
-		// 标记相机已更新
-		static auto clean(entt::registry& registry) noexcept -> void;
-
-		// ================================================
-		// GETTER & SETTER
+		// AREA
 		// ================================================
 
 		// 初始化相机区域
@@ -41,6 +31,10 @@ namespace pd::helper
 		// Event:
 		//  event::camera::SetArea
 		static auto set_area(entt::registry& registry, sf::FloatRect new_area) noexcept -> void;
+
+		// ================================================
+		// ROTATION
+		// ================================================
 
 		// 获取相机位置
 		[[nodiscard]] static auto get_position(entt::registry& registry) noexcept -> sf::Vector2f;
@@ -57,6 +51,10 @@ namespace pd::helper
 		// Event:
 		//  event::camera::Translate
 		static auto translate(entt::registry& registry, sf::Vector2f distance) noexcept -> void;
+
+		// ================================================
+		// SIZE
+		// ================================================
 
 		// 获取相机区域大小
 		[[nodiscard]] static auto get_size(entt::registry& registry) noexcept -> sf::Vector2f;

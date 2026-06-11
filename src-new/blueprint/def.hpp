@@ -38,6 +38,24 @@ namespace pd::blueprint
 	static_assert(-Direction::WEST == Direction::EAST);
 	static_assert(-Direction::EAST == Direction::WEST);
 
+	// 动画播放模式
+	enum class AnimationMode : std::uint8_t
+	{
+		// 单次播放
+		ONE_SHOT = 0,
+		// 循环播放
+		LOOP,
+	};
+
+	// 动画播放方向
+	enum class AnimationDirection : std::uint8_t
+	{
+		// 正向播放
+		FORWARD = 0,
+		// 反向播放
+		BACKWARD,
+	};
+
 	// 渲染层(渲染顺序)
 	enum class RenderLayer : std::uint32_t
 	{

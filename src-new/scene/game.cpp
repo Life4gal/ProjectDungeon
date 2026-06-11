@@ -30,7 +30,9 @@
 #include <designer/projectile.hpp>
 #include <factory/projectile.hpp>
 
-#include <helper/camera.hpp>
+#include <accessor/camera.hpp>
+#include <accessor/player_controller.hpp>
+
 #include <helper/player_controller.hpp>
 #include <helper/cheat.hpp>
 
@@ -335,15 +337,15 @@ namespace pd::scene
 					// TODO: 蓝图持久化?
 					const static auto projectile_blueprint = designer::Projectile::standard();
 
-					if (helper::PlayerController::online(registry_))
+					if (accessor::PlayerController::online(registry_))
 					{
-						const auto target = helper::PlayerController::target(registry_);
-						const auto target_position = helper::PlayerController::get_position(registry_);
-						const auto camera_position = helper::Camera::get_position(registry_);
+						const auto target = accessor::PlayerController::target(registry_);
+						const auto target_position = accessor::PlayerController::get_position(registry_);
+						const auto camera_position = accessor::Camera::get_position(registry_);
 						const auto camera_offset = target_position - camera_position;
 
 						// TODO: 我们需要一种更*自动*的方式
-						const auto camera_size = helper::Camera::get_size(registry_);
+						const auto camera_size = accessor::Camera::get_size(registry_);
 						const auto scale_x = camera_size.x / static_cast<float>(var::window_width);
 						const auto scale_y = camera_size.y / static_cast<float>(var::window_height);
 						const auto mouse_position_to_camera_x = static_cast<float>(mbp->position.x) * scale_x;
@@ -395,9 +397,9 @@ namespace pd::scene
 					// TODO: 蓝图持久化?
 					const static auto projectile_blueprint = designer::Projectile::standard();
 
-					if (helper::PlayerController::online(registry_))
+					if (accessor::PlayerController::online(registry_))
 					{
-						const auto target = helper::PlayerController::target(registry_);
+						const auto target = accessor::PlayerController::target(registry_);
 
 						const auto direction = [&] noexcept -> sf::Vector2f
 						{
@@ -423,7 +425,7 @@ namespace pd::scene
 				{
 					if (kp->control)
 					{
-						const auto target = helper::PlayerController::target(registry_);
+						const auto target = accessor::PlayerController::target(registry_);
 
 						// 击杀所有敌人
 						helper::Cheat::kill_all_enemy(registry_, target);
@@ -520,7 +522,7 @@ namespace pd::scene
 		// 相机视图
 		// ================
 
-		const auto camera_area = helper::Camera::get_area(registry_);
+		const auto camera_area = accessor::Camera::get_area(registry_);
 		window.setView(sf::View{camera_area});
 
 		// 收集渲染项

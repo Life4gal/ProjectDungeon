@@ -5,20 +5,18 @@
 
 #pragma once
 
-#include <span>
-
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Angle.hpp>
 
-namespace pd::helper
+namespace pd::accessor
 {
 	class Transform final
 	{
 	public:
 		// ================================================
-		// GETTER & SETTER
+		// POSITION
 		// ================================================
 
 		// 获取一个实体的位置,如果目标实体没有变换组件则返回{0,0}
@@ -31,6 +29,10 @@ namespace pd::helper
 		// 平移一个实体的位置,如果目标实体没有变换组件则什么也不做
 		// 如果该实体存在物理刚体组件则此接口没有意义,因为带物理刚体组件的变换组件的位置是只读的,其随物理刚体的位置自动更新
 		static auto translate(entt::registry& registry, entt::entity entity, sf::Vector2f distance) noexcept -> void;
+
+		// ================================================
+		// ROTATION
+		// ================================================
 
 		// 获取一个实体的旋转,如果目标实体没有变换组件则返回0度
 		[[nodiscard]] static auto get_rotation(entt::registry& registry, entt::entity entity) noexcept -> sf::Angle;

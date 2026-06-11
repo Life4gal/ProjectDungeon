@@ -7,17 +7,13 @@
 
 #include <utility/physics.hpp>
 
-// #include <component/transform.hpp>
-
-#include <helper/transform.hpp>
+#include <accessor/transform.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 
 namespace pd::update
 {
-	// using namespace component;
-
 	auto sync_physics_transform(entt::registry& registry, [[maybe_unused]] const sf::Time delta) noexcept -> void
 	{
 		using utility::Physics;
@@ -43,11 +39,9 @@ namespace pd::update
 			const auto pixels_rotation = Physics::from_physics(rotation);
 
 			// 位置
-			// registry.emplace_or_replace<transform::Position>(entity, pixels_position);
-			helper::Transform::set_position(registry, entity, pixels_position);
+			accessor::Transform::set_position(registry, entity, pixels_position);
 			// 旋转
-			// registry.emplace_or_replace<transform::Rotation>(entity, pixels_rotation);
-			helper::Transform::set_rotation(registry, entity, pixels_rotation);
+			accessor::Transform::set_rotation(registry, entity, pixels_rotation);
 		}
 	}
 }

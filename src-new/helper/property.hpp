@@ -12,32 +12,6 @@ namespace pd::helper
 	class Property final
 	{
 	public:
-		constexpr static auto invalid_value = -1.0f;
-
-		// 获取一个实体的生命值,如果目标实体没有Actor组件则返回invalid_value
-		[[nodiscard]] static auto get_health(entt::registry& registry, entt::entity entity) noexcept -> float;
-
-		// 获取一个实体的最大生命值,如果目标实体没有Actor组件则返回invalid_value
-		[[nodiscard]] static auto get_max_health(entt::registry& registry, entt::entity entity) noexcept -> float;
-
-		// 设置一个实体的生命值,如果目标实体没有Actor组件则什么也不做
-		static auto set_health(entt::registry& registry, entt::entity entity, float new_health) noexcept -> void;
-
-		// 设置一个实体的最大生命值,如果目标实体没有Actor组件则什么也不做
-		static auto set_max_health(entt::registry& registry, entt::entity entity, float new_max_health) noexcept -> void;
-
-		// 获取一个实体的魔法值,如果目标实体没有Actor组件则返回invalid_value
-		[[nodiscard]] static auto get_mana(entt::registry& registry, entt::entity entity) noexcept -> float;
-
-		// 获取一个实体的最大魔法值,如果目标实体没有Actor组件则返回invalid_value
-		[[nodiscard]] static auto get_max_mana(entt::registry& registry, entt::entity entity) noexcept -> float;
-
-		// 设置一个实体的魔法值,如果目标实体没有Actor组件则什么也不做
-		static auto set_mana(entt::registry& registry, entt::entity entity, float new_mana) noexcept -> void;
-
-		// 设置一个实体的最大魔法值,如果目标实体没有Actor组件则什么也不做
-		static auto set_max_mana(entt::registry& registry, entt::entity entity, float new_max_mana) noexcept -> void;
-
 		// =====================================
 		// TODO: 下面这几个接口放在这里显然不合适,应该放到哪里呢?
 

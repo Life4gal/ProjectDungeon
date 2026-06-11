@@ -75,9 +75,9 @@ namespace pd::assembly
 		// index
 		registry.emplace<rds::Index>(entity, begin_frame_index);
 		// mode
-		registry.emplace<rds::Mode>(entity, dynamic_sprite.looping ? rds::Mode::LOOP : rds::Mode::ONE_SHOT);
+		registry.emplace<rds::AnimationMode>(entity, dynamic_sprite.mode);
 		// direction
-		registry.emplace<rds::Direction>(entity, dynamic_sprite.reversed ? rds::Direction::BACKWARD : rds::Direction::FORWARD);
+		registry.emplace<rds::AnimationDirection>(entity, dynamic_sprite.direction);
 		// paused
 		if (dynamic_sprite.pause)
 		{

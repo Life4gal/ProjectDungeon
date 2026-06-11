@@ -11,8 +11,9 @@
 
 #include <component/door.hpp>
 
+#include <accessor/dynamic_sprite.hpp>
+
 #include <helper/room.hpp>
-#include <helper/dynamic_sprite.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
@@ -98,11 +99,11 @@ namespace pd::helper
 		// 倒放 -> 关门
 		// 见 blueprint::Door::sprite
 		// 确保不循环
-		DynamicSprite::set_mode_one_shot(registry, door);
+		accessor::DynamicSprite::set_mode_one_shot(registry, door);
 		// 确保正向播放
-		DynamicSprite::set_direction_forward(registry, door);
+		accessor::DynamicSprite::set_direction_forward(registry, door);
 		// 开始播放
-		DynamicSprite::replay(registry, door);
+		accessor::DynamicSprite::replay(registry, door);
 
 		// TODO: 音效?
 	}
@@ -144,11 +145,11 @@ namespace pd::helper
 		// 倒放 -> 关门
 		// 见 blueprint::Door::sprite
 		// 确保不循环
-		DynamicSprite::set_mode_one_shot(registry, door);
+		accessor::DynamicSprite::set_mode_one_shot(registry, door);
 		// 确保反向播放
-		DynamicSprite::set_direction_backward(registry, door);
+		accessor::DynamicSprite::set_direction_backward(registry, door);
 		// 开始播放
-		DynamicSprite::replay(registry, door);
+		accessor::DynamicSprite::replay(registry, door);
 
 		// TODO: 音效?
 	}

@@ -17,7 +17,8 @@
 #include <factory/level.hpp>
 #include <factory/player.hpp>
 
-#include <helper/player_controller.hpp>
+#include <accessor/player_controller.hpp>
+
 #include <helper/room.hpp>
 
 #include <undertaker/scheduled_task.hpp>
@@ -86,7 +87,7 @@ namespace pd::factory
 		// 创建玩家实体
 		const auto player = designer::Player::test_character();
 		const auto player_entity = Player::spawn(registry, player);
-		helper::PlayerController::set_target(registry, player_entity);
+		accessor::PlayerController::set_target(registry, player_entity);
 
 		// 进入起始房间
 		helper::Room::enter(registry, level_blueprint.start_position.x, level_blueprint.start_position.y);

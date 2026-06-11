@@ -3,13 +3,13 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <helper/transform.hpp>
+#include <accessor/transform.hpp>
 
 #include <component/transform.hpp>
 
 #include <entt/entt.hpp>
 
-namespace pd::helper
+namespace pd::accessor
 {
 	using namespace component;
 

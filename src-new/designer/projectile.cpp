@@ -20,8 +20,8 @@ namespace pd::designer
 						{.texture = "./assets/projectile_standard.png", .uv_position = {.x = 0, .y = 0}, .uv_size = {.width = 24, .height = 24}, .pivot = {.x = 12, .y = 12}, .duration_ms = 1000},
 				},
 				.render_layer = blueprint::RenderLayer::PROJECTILE,
-				.looping = true,
-				.reversed = false,
+				.mode = blueprint::AnimationMode::LOOP,
+				.direction = blueprint::AnimationDirection::FORWARD,
 				.pause = false,
 		};
 		// 碰撞体

@@ -35,6 +35,22 @@ namespace prometheus::meta::user_defined
 	struct enum_is_flag<pd::blueprint::DirectionMask> : std::true_type {};
 
 	// ==============
+	// ANIMATION
+	// ==============
+
+	template<>
+	struct enum_name_policy<pd::blueprint::AnimationMode>
+	{
+		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
+	};
+
+	template<>
+	struct enum_name_policy<pd::blueprint::AnimationDirection>
+	{
+		constexpr static auto value = EnumNamePolicy::WITH_SCOPED_NAME;
+	};
+
+	// ==============
 	// RENDER LAYER
 	// ==============
 

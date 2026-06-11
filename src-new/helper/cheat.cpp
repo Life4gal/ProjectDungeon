@@ -7,6 +7,7 @@
 
 #include <component/enemy.hpp>
 
+#include <accessor/property.hpp>
 #include <helper/property.hpp>
 
 #include <entt/entt.hpp>
@@ -42,12 +43,12 @@ namespace pd::helper
 		for (const auto view = registry.view<tags::Enemy, state::InCameraArea>();
 		     const auto [entity]: view.each())
 		{
-			if (const auto max_health = Property::get_max_health(registry, entity);
+			if (const auto max_health = accessor::Property::get_max_health(registry, entity);
 				max_health >= 0)
 			{
 				const auto health = max_health * percent;
 
-				Property::set_health(registry, entity, health);
+				accessor::Property::set_health(registry, entity, health);
 			}
 		}
 	}

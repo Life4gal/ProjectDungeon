@@ -65,11 +65,10 @@ namespace pd::blueprint
 			// 渲染层
 			RenderLayer render_layer;
 
-			// 是否循环播放
-			// 如果不循环则播放到最后一帧时不再从头播放
-			bool looping;
-			// 是否反向播放
-			bool reversed;
+			// 播放模式
+			AnimationMode mode;
+			// 播放方向
+			AnimationDirection direction;
 			// 是否暂停
 			bool pause;
 		};

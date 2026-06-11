@@ -96,8 +96,8 @@ namespace pd::designer
 								{.texture = "./assets/tileset/door.png", .uv_position = {.x = size.width * 3, .y = 0}, .uv_size = size, .pivot = pivot, .duration_ms = 100},
 						},
 						.render_layer = blueprint::RenderLayer::DOOR,
-						.looping = false,
-						.reversed = false,
+						.mode = blueprint::AnimationMode::ONE_SHOT,
+						.direction = blueprint::AnimationDirection::FORWARD,
 						.pause = true,
 				},
 		};

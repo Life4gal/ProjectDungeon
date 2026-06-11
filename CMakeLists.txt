@@ -412,34 +412,47 @@ add_executable(
 	# 地下城
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/dungeon.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/dungeon.cpp
+	
+	# ============================
+	# SYSTEM -- ACCESSOR
+	# registry + entity                       --> read component
+	# registry + entity + new-component-value --> write component
+	# ============================
+	
+	# 变换
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/transform.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/transform.cpp
+	# 动态精灵
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/dynamic_sprite.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/dynamic_sprite.cpp
+	# 碰撞体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/collision.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/collision.cpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/property.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/property.cpp
+	
+	# 相机(可视区域)
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/camera.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/camera.cpp
+
+	# 玩家控制器
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/player_controller.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/player_controller.cpp
 
 	# ============================
 	# SYSTEM -- HELPER
 	# 辅助读写组件(避免直接访问registry)
 	# ============================
-	
-	# 变换
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/transform.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/transform.cpp
+
 	# 动态精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.cpp
-	# 碰撞体
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/collision.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/collision.cpp
+
 	# 属性
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/property.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/property.cpp
-	# AI
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/ai.hpp
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/ai.cpp
 
-	# 相机(可视区域)
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/camera.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/camera.cpp
-	# 屏幕
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/screen.hpp
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/screen.cpp
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.cpp

@@ -24,8 +24,8 @@ namespace pd::designer
 						{.texture = "./assets/tileset/player.png", .uv_position = {.x = 192, .y = 0}, .uv_size = {.width = 64, .height = 64}, .pivot = {.x = 32, .y = 32}, .duration_ms = 250},
 				},
 				.render_layer = blueprint::RenderLayer::PLAYER,
-				.looping = true,
-				.reversed = false,
+				.mode = blueprint::AnimationMode::LOOP,
+				.direction = blueprint::AnimationDirection::FORWARD,
 				.pause = false,
 		};
 		// 碰撞体

@@ -103,22 +103,10 @@ namespace pd::component::render
 		};
 
 		// 当前动画播放模式
-		enum class Mode : std::uint8_t
-		{
-			// 单次播放
-			ONE_SHOT,
-			// 循环播放
-			LOOP,
-		};
+		using blueprint::AnimationMode;
 
 		// 当前动画播放方向
-		enum class Direction : std::uint8_t
-		{
-			// 正向播放
-			FORWARD,
-			// 反向播放
-			BACKWARD,
-		};
+		using blueprint::AnimationDirection;
 
 		// 标记当前动画是否暂停
 		// 如果不暂停则不存在该数据
