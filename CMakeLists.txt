@@ -229,6 +229,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/room.hpp
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/level.hpp
+	# 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/blueprint/dungeon.hpp
 
 	# ============================
 	# DESIGNER
@@ -267,6 +269,9 @@ add_executable(
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/level.cpp
+	# 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/dungeon.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/designer/dungeon.cpp
 	
 	# ============================
 	# COMPONENT
@@ -325,6 +330,8 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/room.hpp
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/level.hpp
+	# 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/dungeon.hpp
 
 	# 相机(可视区域)
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/camera.hpp
@@ -402,6 +409,9 @@ add_executable(
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/level.cpp
+	# 地下城
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/dungeon.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/factory/dungeon.cpp
 
 	# ============================
 	# SYSTEM -- HELPER

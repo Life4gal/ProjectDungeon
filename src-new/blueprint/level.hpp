@@ -15,9 +15,12 @@ namespace pd::blueprint
 	class Level final
 	{
 	public:
-		std::unordered_map<LayoutPosition, Room> rooms;
+		using position_type = LayoutPosition;
+		using size_type = LayoutPosition::size_type;
+
+		std::unordered_map<position_type, Room> rooms;
 
 		// 起始房间位置(避免遍历rooms查找RoomType::START)
-		LayoutPosition start_position;
+		position_type start_position;
 	};
 }

@@ -16,37 +16,25 @@
 #include <manager/random.hpp>
 
 // =========
-// 物理世界特别处理
+// 物理世界绘制
 
 #include <utility/physics.hpp>
-#include <component/collision.hpp>
 #include <box2d/box2d.h>
 
 // =========
 // 测试用
 
-#include <designer/level.hpp>
-#include <designer/player.hpp>
+#include <designer/dungeon.hpp>
+#include <factory/dungeon.hpp>
+
 #include <designer/projectile.hpp>
-#include <factory/level.hpp>
-#include <factory/player.hpp>
 #include <factory/projectile.hpp>
 
 #include <helper/camera.hpp>
-#include <helper/room.hpp>
 #include <helper/player_controller.hpp>
 #include <helper/cheat.hpp>
 
 #include <var/window.hpp>
-
-#include <component/scheduled_task_context.hpp>
-#include <component/renderer.hpp>
-
-// =========
-// 实体销毁收尾
-
-#include <undertaker/scheduled_task.hpp>
-#include <undertaker/collision.hpp>
 
 // =========
 // 更新
@@ -92,30 +80,6 @@ namespace pd::scene
 		// TODO: 多个音乐
 		// TODO: 暂停菜单是否需要切换音乐?
 		constexpr std::string_view GameMusic = R"(.\media\musics\game.wav)";
-
-		// 创建物理世界
-		auto create_physics_world() noexcept -> void
-		{
-			auto& world_id = utility::Physics::world_id;
-
-			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NULL(world_id), "重复创建物理世界");
-
-			auto def = b2DefaultWorldDef();
-			// 无重力世界(俯视角)
-			def.gravity = b2Vec2_zero;
-			world_id = b2CreateWorld(&def);
-		}
-
-		// 销毁物理世界
-		auto destroy_physics_world() noexcept -> void
-		{
-			auto& world_id = utility::Physics::world_id;
-
-			PROMETHEUS_PLATFORM_ASSUME(B2_IS_NON_NULL(world_id), "物理世界未创建");
-
-			b2DestroyWorld(world_id);
-			world_id = b2_nullWorldId;
-		}
 
 		// 绘制物理世界
 		constexpr auto rgb_to_rgba = [](const b2HexColor color) noexcept -> sf::Color
@@ -292,21 +256,9 @@ namespace pd::scene
 
 	auto Game::start_game() noexcept -> bool
 	{
-		// 进入地下城
-
-		manager::Random::seed(123456);
-
-		// 关卡
-		const auto level = designer::Level::generate(8, 5, 15, 4, 2);
-		factory::Level::create(registry_, level);
-
-		// 玩家
-		const auto player = designer::Player::test_character();
-		const auto player_entity = factory::Player::spawn(registry_, player);
-		helper::PlayerController::set_target(registry_, player_entity);
-
-		// 进入起始房间
-		helper::Room::enter(registry_, level.start_position.x, level.start_position.y);
+		// 创建地下城
+		const auto dungeon_blueprint = designer::Dungeon::standard();
+		factory::Dungeon::create(registry_, dungeon_blueprint);
 
 		return true;
 	}
@@ -340,17 +292,6 @@ namespace pd::scene
 		pause_ = std::make_unique<menu::Pause>(is_paused_);
 
 		music_ = manager::Music::load(GameMusic);
-
-		// 物理世界
-		create_physics_world();
-
-		undertaker::ScheduledTask::watch(registry_);
-		undertaker::Collision::watch(registry_);
-
-		// TODO: 在合适的地方创建它们
-		registry_.ctx().emplace<component::scheduled_task::Context>();
-		registry_.ctx().emplace<component::renderer::RenderItemSet>();
-		registry_.ctx().emplace<component::renderer::RenderCommandQueue>();
 	}
 
 	auto Game::on_initialized() noexcept -> void
@@ -368,17 +309,9 @@ namespace pd::scene
 
 		pause_.reset();
 
-		// 销毁所有实体(如果有)
-		factory::Level::destroy(registry_);
-		factory::Player::destroy_all(registry_);
-
-		// 最后销毁物理世界
-		destroy_physics_world();
-
-		// TODO: 在合适的地方销毁它们
-		registry_.ctx().erase<component::scheduled_task::Context>();
-		registry_.ctx().erase<component::renderer::RenderItemSet>();
-		registry_.ctx().erase<component::renderer::RenderCommandQueue>();
+		// 销毁地下城
+		// TODO: 在合适的地方销毁
+		factory::Dungeon::destroy(registry_);
 	}
 
 	auto Game::handle_event(const sf::Event& event) noexcept -> void

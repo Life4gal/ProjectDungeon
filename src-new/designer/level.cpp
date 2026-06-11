@@ -498,11 +498,11 @@ namespace pd::designer
 
 	auto Level::generate(size_type horizontal_count, size_type vertical_count, size_type count, size_type start_x, size_type start_y) noexcept -> blueprint::Level
 	{
-		horizontal_count = std::ranges::clamp(horizontal_count, horizontal_min_count, horizontal_max_count);
-		vertical_count = std::ranges::clamp(vertical_count, vertical_min_count, vertical_max_count);
-		count = std::ranges::clamp(count, base_count, horizontal_count * vertical_count);
-		start_x = std::ranges::min(start_x, horizontal_count - 1);
-		start_y = std::ranges::min(start_y, vertical_count - 1);
+		// horizontal_count = std::ranges::clamp(horizontal_count, horizontal_min_count, horizontal_max_count);
+		// vertical_count = std::ranges::clamp(vertical_count, vertical_min_count, vertical_max_count);
+		// count = std::ranges::clamp(count, base_count, horizontal_count * vertical_count);
+		// start_x = std::ranges::min(start_x, horizontal_count - 1);
+		// start_y = std::ranges::min(start_y, vertical_count - 1);
 
 		// 生成布局
 		const auto layout_opt = Layout::generate(horizontal_count, vertical_count, count, start_x, start_y);
