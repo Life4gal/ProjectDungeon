@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
-namespace pd::helper
+namespace pd::trigger
 {
 	class Property final
 	{
@@ -15,16 +15,16 @@ namespace pd::helper
 		// =====================================
 		// TODO: 下面这几个接口放在这里显然不合适,应该放到哪里呢?
 
-		// 对指定实体造成伤害,如果目标实体没有Actor组件则什么也不做
+		// 对指定实体造成伤害,如果目标实体没有Property组件则什么也不做
 		//
 		// Event:
-		//  event::actor::Damaged
+		//  event::property::Damaged
 		static auto hurt(entt::registry& registry, entt::entity victim, entt::entity attacker, float damage) noexcept -> void;
 
-		// 杀死指定实体,如果目标实体没有Actor组件则什么也不做
+		// 杀死指定实体,如果目标实体没有Property组件则什么也不做
 		//
 		// Event:
-		//  event::actor::Slayed
+		//  event::property::Slayed
 		static auto kill(entt::registry& registry, entt::entity victim, entt::entity attacker) noexcept -> void;
 	};
 }

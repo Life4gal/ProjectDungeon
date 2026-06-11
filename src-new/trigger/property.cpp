@@ -3,12 +3,12 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <helper/Property.hpp>
+#include <trigger/property.hpp>
 
 #include <manager/event.hpp>
 #include <manager/clock.hpp>
 
-#include <event/actor.hpp>
+#include <event/property.hpp>
 
 #include <component/property.hpp>
 #include <component/damage_statistics.hpp>
@@ -19,7 +19,7 @@
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 
-namespace pd::helper
+namespace pd::trigger
 {
 	using namespace component;
 
@@ -77,7 +77,7 @@ namespace pd::helper
 			health->health
 		);
 
-		manager::Event::enqueue(event::actor::Damaged{.victim = victim, .attacker = attacker, .damage = damage});
+		manager::Event::enqueue(event::property::Damaged{.victim = victim, .attacker = attacker, .damage = damage});
 	}
 
 	auto Property::kill([[maybe_unused]] entt::registry& registry, const entt::entity victim, const entt::entity attacker) noexcept -> void
@@ -96,6 +96,6 @@ namespace pd::helper
 			entt::to_integral(attacker)
 		);
 
-		manager::Event::enqueue(event::actor::Slayed{.victim = victim, .attacker = attacker});
+		manager::Event::enqueue(event::property::Slayed{.victim = victim, .attacker = attacker});
 	}
 }

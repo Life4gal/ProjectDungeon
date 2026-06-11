@@ -167,8 +167,8 @@ add_executable(
 	# 物理
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/physics.hpp
 	
-	# Actor
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/actor.hpp
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/property.hpp
 
 	# 地下城 -- 关卡 -- 房间 -- 门
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/event/door.hpp
@@ -439,19 +439,42 @@ add_executable(
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/player_controller.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/accessor/player_controller.cpp
+		
+	# ============================
+	# SYSTEM -- TRIGGER
+	# trigger -> action + event
+	# ============================
+	
+	# 属性
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/property.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/property.cpp
+	
+	# 飞弹
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/projectile.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/projectile.cpp
+	
+	# 敌人
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/enemy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/enemy.cpp
+	# 玩家
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/player.hpp
+	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/player.cpp
+
+	# 地下城 -- 关卡 -- 房间 -- 门
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/door.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/door.cpp
+	# 地下城 -- 关卡 -- 房间
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/room.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/trigger/room.cpp
 
 	# ============================
 	# SYSTEM -- HELPER
-	# 辅助读写组件(避免直接访问registry)
+	# <待拆分>
 	# ============================
 
 	# 动态精灵
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/dynamic_sprite.cpp
-
-	# 属性
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/property.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/property.cpp
 
 	# 玩家控制器
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player_controller.hpp
@@ -460,22 +483,6 @@ add_executable(
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/cheat.cpp
 
-	# 飞弹
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/projectile.cpp
-
-	# 敌人
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/enemy.cpp
-	# 玩家
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player.hpp
-	#${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/player.cpp
-	# 地下城 -- 关卡 -- 房间 -- 门
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/door.cpp
-	# 地下城 -- 关卡 -- 房间
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/room.cpp
 	# 地下城 -- 关卡
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/level.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/helper/level.cpp

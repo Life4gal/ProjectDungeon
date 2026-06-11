@@ -9,9 +9,9 @@
 
 #include <blueprint/def_name.hpp>
 
-#include <helper/enemy.hpp>
-#include <helper/projectile.hpp>
-#include <helper/door.hpp>
+#include <trigger/enemy.hpp>
+#include <trigger/projectile.hpp>
+#include <trigger/door.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
@@ -70,7 +70,7 @@ namespace pd::update
 				const auto projectile = a ? entity_a : entity_b;
 				const auto other = a ? entity_b : entity_a;
 
-				helper::Projectile::contact(registry, projectile, other);
+				trigger::Projectile::contact(registry, projectile, other);
 				return;
 			}
 
@@ -80,7 +80,7 @@ namespace pd::update
 				const auto enemy = a ? entity_a : entity_b;
 				const auto other = a ? entity_b : entity_a;
 
-				helper::Enemy::contact(registry, enemy, other);
+				trigger::Enemy::contact(registry, enemy, other);
 				return;
 			}
 
@@ -90,7 +90,7 @@ namespace pd::update
 				const auto door = a ? entity_a : entity_b;
 				const auto other = a ? entity_b : entity_a;
 
-				helper::Door::contact(registry, door, other);
+				trigger::Door::contact(registry, door, other);
 				return;
 			}
 
@@ -149,7 +149,7 @@ namespace pd::update
 
 			if (sensor_shape_type == blueprint::CollisionCategory::DOOR_SENSOR)
 			{
-				helper::Door::sense(registry, sensor_entity, visitor_entity);
+				trigger::Door::sense(registry, sensor_entity, visitor_entity);
 				return;
 			}
 

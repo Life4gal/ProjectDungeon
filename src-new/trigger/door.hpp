@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
-namespace pd::helper
+namespace pd::trigger
 {
 	class Door final
 	{

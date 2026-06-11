@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <helper/door.hpp>
+#include <trigger/door.hpp>
 
 #include <manager/event.hpp>
 
@@ -13,14 +13,14 @@
 
 #include <accessor/dynamic_sprite.hpp>
 
-#include <helper/room.hpp>
+#include <trigger/room.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
 #include <spdlog/spdlog.h>
 
-namespace pd::helper
+namespace pd::trigger
 {
 	using namespace component;
 

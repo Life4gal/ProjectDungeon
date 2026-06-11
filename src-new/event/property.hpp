@@ -7,7 +7,7 @@
 
 #include <entt/entity/fwd.hpp>
 
-namespace pd::event::actor
+namespace pd::event::property
 {
 	// 被伤害
 	class Damaged final

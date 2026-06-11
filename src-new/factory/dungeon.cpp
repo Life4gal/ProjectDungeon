@@ -19,7 +19,7 @@
 
 #include <accessor/player_controller.hpp>
 
-#include <helper/room.hpp>
+#include <trigger/room.hpp>
 
 #include <undertaker/scheduled_task.hpp>
 #include <undertaker/collision.hpp>
@@ -90,7 +90,7 @@ namespace pd::factory
 		accessor::PlayerController::set_target(registry, player_entity);
 
 		// 进入起始房间
-		helper::Room::enter(registry, level_blueprint.start_position.x, level_blueprint.start_position.y);
+		trigger::Room::enter(registry, level_blueprint.start_position.x, level_blueprint.start_position.y);
 	}
 
 	auto Dungeon::destroy(entt::registry& registry) noexcept -> void

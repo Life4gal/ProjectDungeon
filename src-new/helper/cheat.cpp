@@ -8,7 +8,7 @@
 #include <component/enemy.hpp>
 
 #include <accessor/property.hpp>
-#include <helper/property.hpp>
+#include <trigger/property.hpp>
 
 #include <entt/entt.hpp>
 
@@ -18,7 +18,7 @@ namespace pd::helper
 
 	auto Cheat::kill_enemy(entt::registry& registry, const entt::entity attacker, const entt::entity enemy) noexcept -> void
 	{
-		Property::kill(registry, enemy, attacker);
+		trigger::Property::kill(registry, enemy, attacker);
 	}
 
 	auto Cheat::kill_all_enemy(entt::registry& registry, const entt::entity attacker) noexcept -> void
@@ -26,7 +26,7 @@ namespace pd::helper
 		for (const auto view = registry.view<tags::Enemy, state::InCameraArea>();
 		     const auto [entity]: view.each())
 		{
-			Property::kill(registry, entity, attacker);
+			trigger::Property::kill(registry, entity, attacker);
 		}
 	}
 

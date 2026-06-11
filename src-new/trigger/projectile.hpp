@@ -5,17 +5,17 @@
 
 #pragma once
 
-#include <entt/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
-namespace pd::helper
+namespace pd::trigger
 {
-	class Enemy final
+	class Projectile final
 	{
 	public:
 		// 接触其他实体
 		//
 		// Event:
-		//  event::actor::Damaged (Actor::hurt)
-		static auto contact(entt::registry& registry, entt::entity enemy, entt::entity other) noexcept -> void;
+		//  event::property::Damaged (Property::hurt)
+		static auto contact(entt::registry& registry, entt::entity projectile, entt::entity other) noexcept -> void;
 	};
 }

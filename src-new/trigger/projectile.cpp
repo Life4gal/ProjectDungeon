@@ -3,17 +3,17 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <helper/projectile.hpp>
+#include <trigger/projectile.hpp>
 
 #include <component/projectile.hpp>
 #include <component/name.hpp>
 
-#include <helper/property.hpp>
+#include <trigger/property.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 
-namespace pd::helper
+namespace pd::trigger
 {
 	using namespace component;
 

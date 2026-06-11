@@ -3,7 +3,7 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <helper/room.hpp>
+#include <trigger/room.hpp>
 
 #include <algorithm>
 #include <ranges>
@@ -20,13 +20,13 @@
 #include <accessor/camera.hpp>
 #include <accessor/player_controller.hpp>
 
-#include <helper/door.hpp>
+#include <trigger/door.hpp>
 
 #include <prometheus/platform/os.hpp>
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 
-namespace pd::helper
+namespace pd::trigger
 {
 	using namespace component;
 

@@ -11,8 +11,8 @@
 #include <component/room.hpp>
 #include <component/enemy.hpp>
 
-#include <helper/property.hpp>
-#include <helper/room.hpp>
+#include <trigger/property.hpp>
+#include <trigger/room.hpp>
 
 #include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
@@ -27,7 +27,7 @@ namespace pd::update
 		const auto view = registry.view<state::InCameraArea, tags::Enemy, property::Health>();
 
 		// 如果房间已清理
-		if (helper::Room::check(registry, room))
+		if (trigger::Room::check(registry, room))
 		{
 			// 理论上房间内不应该存在存活敌人了,如果存在则说明房间被错误地标记为已清理了,我们需要消灭所有存活敌人
 			if (view.begin() != view.end())
@@ -61,7 +61,7 @@ namespace pd::update
 					}
 
 					// FIXME: 被谁杀死?房间?
-					helper::Property::kill(registry, entity, room);
+					trigger::Property::kill(registry, entity, room);
 				}
 			}
 		}
@@ -87,7 +87,7 @@ namespace pd::update
 					const auto& [records] = registry.get<const damage_statistics::InjuryRecords>(entity);
 					const auto& last_record = records.back();
 
-					helper::Property::kill(registry, entity, last_record.attacker);
+					trigger::Property::kill(registry, entity, last_record.attacker);
 				}
 			}
 		}
