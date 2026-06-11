@@ -68,7 +68,7 @@ namespace pd::helper
 				auto& [room_doors] = registry.get<room::Doors>(room);
 				const auto room_door = room_doors[std::to_underlying(direction)];
 				PROMETHEUS_PLATFORM_ASSUME(registry.valid(room_door));
-				registry.emplace_or_replace<door::TargetRoom>(room_door, neighbors);
+				registry.emplace_or_replace<door::TargetRoom>(room_door, neighbor);
 
 				// 4. 将目标房间门目标指定为当前房间
 				auto& [neighbor_doors] = registry.get<room::Doors>(neighbor);
