@@ -292,6 +292,21 @@ add_executable(
 	# 标签
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/tags.hpp
 
+	# ================================================
+	# 调度器
+	# ================================================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/scheduler.hpp
+
+	# 销毁实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/schedule_destroy.hpp
+	# 移除组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/schedule_component.hpp
+	
+	# ================================================
+	# 
+	# ================================================
+
 	# 变换
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/component/transform.hpp
 	# 渲染
@@ -528,6 +543,24 @@ add_executable(
 	# 帧更新系统
 	# ============================
 	
+	# ================================================
+	# 调度器
+	# ================================================
+
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/scheduler.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/scheduler.cpp
+
+	# 销毁实体
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/schedule_destroy.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/schedule_destroy.cpp
+	# 移除组件
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/schedule_component.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/schedule_component.cpp
+
+	# ================================================
+	# 
+	# ================================================
+
 	# 墓地
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/graveyard.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src-new/update/graveyard.cpp
